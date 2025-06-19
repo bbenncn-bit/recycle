@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+/* 为 Tailwind v4 配置自定义暗色模式变体 */
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 移除这个自定义的 .dark 类，它与 Tailwind 的暗色模式冲突 */
+/* .dark {
+  background-color: #1a202c;
+  color: #e2e8f0;
+} */
+
