@@ -9,7 +9,7 @@ import ThemeToggle from './theme-toggle';
 
 const navigation = [
   { name: '首页', href: '/'},
-  { name: '市场', href: '/dashboard'},
+  { name: '市场', href: '/market'},
   { 
     name: '物资处置', 
     href: '/disposal', 
@@ -36,6 +36,16 @@ export default function Navbar() {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
 
+  // 处理桌面端鼠标悬停事件
+  const handleMouseEnter = (itemName: string) => {
+    setOpenDropdown(itemName);
+  };
+
+  const handleMouseLeave = () => {
+    setOpenDropdown(null);
+  };
+
+  // 处理移动端点击事件
   const handleDropdownToggle = (itemName: string) => {
     setOpenDropdown(openDropdown === itemName ? null : itemName);
   };
@@ -80,9 +90,14 @@ export default function Navbar() {
               
               if (item.dropdown) {
                 return (
-                  <div key={item.name} className="relative">
-                    <button
-                      onClick={() => handleDropdownToggle(item.name)}
+                  <div 
+                    key={item.name} 
+                    className="relative group"
+                    onMouseEnter={() => handleMouseEnter(item.name)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <Link
+                      href={item.href}
                       className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-normal transition-colors ${
                         isActive
                           ? 'bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white shadow-lg'
@@ -93,26 +108,27 @@ export default function Navbar() {
                       <ChevronDownIcon className={`h-4 w-4 transition-transform ${
                         openDropdown === item.name ? 'rotate-180' : ''
                       }`} />
-                    </button>
+                    </Link>
                     
-                    {/* Dropdown Menu */}
+                    {/* Dropdown Menu - 移除mt-1间距，添加pt-1内边距来创建无缝连接 */}
                     {openDropdown === item.name && (
-                      <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 z-50">
-                        <div className="py-1">
-                          {item.dropdown.map((subItem) => (
-                            <Link
-                              key={subItem.name}
-                              href={subItem.href}
-                              className={`block px-4 py-2 text-sm transition-colors ${
-                                pathname === subItem.href
-                                  ? 'bg-blue-50/50 dark:bg-gray-700/50 text-blue-300 dark:text-blue-400'
-                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
-                              }`}
-                              onClick={closeDropdown}
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
+                      <div className="absolute top-full left-0 pt-1 w-56 z-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-600">
+                          <div className="py-1">
+                            {item.dropdown.map((subItem) => (
+                              <Link
+                                key={subItem.name}
+                                href={subItem.href}
+                                className={`block px-4 py-2 text-sm transition-colors ${
+                                  pathname === subItem.href
+                                    ? 'bg-blue-50/50 dark:bg-gray-700/50 text-blue-300 dark:text-blue-400'
+                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+                                }`}
+                              >
+                                {subItem.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}

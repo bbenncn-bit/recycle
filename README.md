@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 再生资源交易数据展示系统
 
-## Getting Started
+基于 Next.js 构建的现代化再生资源交易数据展示平台，支持智能缩略图优化。
 
-First, run the development server:
+## ✨ 主要功能
 
+- 📊 实时展示再生资源交易数据（报废车、废钢铁）
+- 🎨 智能图片缩略图生成和优化
+- 🌙 深色/浅色主题切换
+- 📱 响应式设计，支持移动端
+- ⚡ 渐进式图片加载，提升用户体验
+
+## 🚀 快速开始
+
+### 安装依赖
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 配置数据库（首次使用）
+```bash
+# 编辑 setup-thumbnails.js 中的数据库配置
+# 然后运行设置脚本
+node setup-thumbnails.js setup
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 启动应用
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 缩略图系统
 
-## Learn More
+本系统包含自动化的缩略图生成功能：
 
-To learn more about Next.js, take a look at the following resources:
+### 快速设置
+```bash
+# 设置数据库并生成缩略图任务
+node setup-thumbnails.js setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 启动缩略图生成服务
+node setup-thumbnails.js start
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 查看处理状态
+node setup-thumbnails.js status
+```
 
-## Deploy on Vercel
+### 表选择
+在设置过程中可以选择：
+- 输入 `g` - 只处理 receiptfg 表
+- 输入 `c` - 只处理 receiptfc 表  
+- 输入 `both` - 处理两个表
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 项目结构
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+├── src/
+│   ├── app/                  # Next.js 应用页面
+│   ├── components/           # React 组件
+│   │   └── instant-thumbnail.tsx  # 缩略图组件
+│   ├── lib/                  # 工具库
+│   │   ├── image-utils.ts    # 图片处理工具
+│   │   └── thumbnail-auto-init.ts  # 缩略图自动初始化
+│   └── services/            # 业务服务
+│       └── thumbnail-service.ts   # 缩略图生成服务
+├── setup-thumbnails.js      # 缩略图系统设置脚本
+├── run-thumbnail-service.ts # 缩略图服务启动器
+└── database-optimization-simple.sql  # 数据库优化脚本
+```
+
+## 🔧 技术栈
+
+- **前端**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **后端**: Node.js, MySQL
+- **图片处理**: Sharp
+- **主题**: next-themes
