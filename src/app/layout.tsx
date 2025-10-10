@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   title: '再生资源交易中心',
   description: '变废为宝 - 再生资源交易平台',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', type: 'image/x-icon' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 

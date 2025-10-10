@@ -10,9 +10,10 @@ const readline = require('readline');
 
 // 数据库配置 - 请根据实际情况修改
 const DB_CONFIG = {
-  host: '118.89.111.78',
-  user: 'remote_user',        // 替换为您的数据库用户名
-  password: 'Monica00',    // 替换为您的数据库密码
+  host: '43.137.106.186',
+  port: 25424,
+  user: 'root',        // 替换为您的数据库用户名
+  password: 'Rsg@px@123',    // 替换为您的数据库密码
   database: 'pls',              // 替换为您的数据库名
   multipleStatements: true     // 允许执行多条SQL语句
 };
@@ -42,7 +43,6 @@ async function setupDatabase(targetTable = 'both') {
     
     console.log('📖 读取数据库优化脚本...');
     let sqlScript;
-    
     // 优先使用简化版本的SQL脚本
     try {
       sqlScript = await fs.readFile('database-optimization-simple.sql', 'utf8');
@@ -113,6 +113,43 @@ async function setupDatabase(targetTable = 'both') {
     console.log('📋 创建的表:', tables.map(t => t.table_name));
     console.log('🏗️ 添加的字段:', columns.map(c => `${c.table_name}.${c.column_name}`));
     
+    // 确保 thumbnail_tasks 表存在（如果不存在则创建）
+    try {
+      const [existingTaskTable] = await connection.execute(
+        `
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = ? AND table_name = 'thumbnail_tasks'
+        LIMIT 1
+        `,
+        [DB_CONFIG.database]
+      );
+
+      if (existingTaskTable.length === 0) {
+        console.log('⚠️ thumbnail_tasks 表不存在，正在创建...');
+        await connection.execute(`
+          CREATE TABLE IF NOT EXISTS thumbnail_tasks (
+            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            table_name VARCHAR(50) NOT NULL COMMENT '表名',
+            record_id BIGINT NOT NULL COMMENT '记录ID',
+            original_urls JSON NOT NULL COMMENT '原始图片URL数组',
+            status ENUM('pending','processing','completed','failed') DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            processed_at TIMESTAMP NULL,
+            error_message TEXT NULL,
+            INDEX idx_status_created (status, created_at),
+            INDEX idx_table_record (table_name, record_id)
+          ) COMMENT='缩略图生成任务队列'
+        `);
+        console.log('✅ thumbnail_tasks 表创建成功');
+      } else {
+        console.log('✅ thumbnail_tasks 表已存在');
+      }
+    } catch (e) {
+      console.error('❌ 检查/创建 thumbnail_tasks 表失败:', e.message);
+      throw e;
+    }
+
     // 生成初始缩略图任务（如果存储过程存在）
     console.log('🔄 生成历史数据的缩略图任务...');
     try {
@@ -129,7 +166,9 @@ async function setupDatabase(targetTable = 'both') {
           AND imgUrls != ''
           AND imgUrls != '[]'
           AND imgUrls != 'null'
-          AND JSON_LENGTH(imgUrls) > 0
+          AND JSON_VALID(imgUrls)
+          AND JSON_TYPE(CAST(imgUrls AS JSON)) = 'ARRAY'
+          AND JSON_LENGTH(CAST(imgUrls AS JSON)) > 0
           AND (thumbnailProcessed = 0 OR thumbnailProcessed IS NULL)
           AND NOT EXISTS (
             SELECT 1 FROM thumbnail_tasks 
@@ -150,7 +189,9 @@ async function setupDatabase(targetTable = 'both') {
           AND imgUrls != ''
           AND imgUrls != '[]'
           AND imgUrls != 'null'
-          AND JSON_LENGTH(imgUrls) > 0
+          AND JSON_VALID(imgUrls)
+          AND JSON_TYPE(CAST(imgUrls AS JSON)) = 'ARRAY'
+          AND JSON_LENGTH(CAST(imgUrls AS JSON)) > 0
           AND (thumbnailProcessed = 0 OR thumbnailProcessed IS NULL)
           AND NOT EXISTS (
             SELECT 1 FROM thumbnail_tasks 
