@@ -1,0 +1,27 @@
+{
+  "node": {
+    "40d8c4b939b93db451cc230ae885fafa2fa3da3f8d": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    },
+    "40e484fae75597c1d5bb857da3bd92c78038d542eb": {
+      "workers": {
+        "app/page": {
+          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    }
+  },
+  "edge": {}
+}

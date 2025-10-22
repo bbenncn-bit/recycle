@@ -1,0 +1,3 @@
+{
+  "/api/energy/consumption-query/route": "app/api/energy/consumption-query/route.js"
+}

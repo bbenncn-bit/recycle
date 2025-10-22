@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/middleware.ts"],"sourcesContent":["import { NextRequest, NextResponse } from 'next/server';\r\n\r\nexport function middleware(request: NextRequest) {\r\n  // 在生产环境强制HTTPS\r\n  if (process.env.NODE_ENV === 'production') {\r\n    const url = request.nextUrl.clone();\r\n    const host = request.headers.get('host');\r\n    const protocol = request.headers.get('x-forwarded-proto') || 'http';\r\n\r\n    // 如果是HTTP访问，重定向到HTTPS\r\n    if (protocol === 'http' && host) {\r\n      url.protocol = 'https:';\r\n      url.host = host;\r\n      return NextResponse.redirect(url, 301);\r\n    }\r\n  }\r\n\r\n  return NextResponse.next();\r\n}\r\n\r\nexport const config = {\r\n  matcher: [\r\n    /*\r\n     * Match all request paths except for the ones starting with:\r\n     * - api (API routes)\r\n     * - _next/static (static files)\r\n     * - _next/image (image optimization files)\r\n     * - favicon.ico (favicon file)\r\n     */\r\n    '/((?!api|_next/static|_next/image|favicon.ico).*)',\r\n  ],\r\n}; "],"names":[],"mappings":";;;;AAAA;AAAA;;AAEO,SAAS,WAAW,OAAoB;IAC7C,eAAe;IACf,uCAA2C;;IAW3C;IAEA,OAAO,6LAAA,CAAA,eAAY,CAAC,IAAI;AAC1B;AAEO,MAAM,SAAS;IACpB,SAAS;QACP;;;;;;KAMC,GACD;KACD;AACH"}}]
+}
