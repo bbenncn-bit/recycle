@@ -8,334 +8,324 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model pls_carbonre {
-  owner                    String? @db.VarChar(256)
-  minProduceCarbon         Float?
-  maxProduceCarbon         Float?
-  maxCarbonRedu            Float?
-  createdAt                BigInt?
-  createBy                 String? @db.VarChar(256)
-  updateBy                 String? @db.VarChar(256)
-  percentRecycleCarbonRedu Float?
-  openid                   String? @map("_openid") @db.Text
-  minCarbonRedu            Float?
-  id                       String  @id @map("_id") @db.VarChar(34)
-  category                 String? @db.Text
-  updatedAt                BigInt?
+/// 12.4 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAHoldings {
+  id       Int     @id @default(autoincrement()) @map("_id")
+  asset    String? @db.VarChar(255)
+  quantity String? @db.VarChar(255)
+  value    String? @db.VarChar(255)
+  status   String? @db.VarChar(255)
 }
 
-model pls_datashow {
-  owner             String? @db.VarChar(256)
-  departmentList    String? @map("_departmentList") @db.VarChar(34)
-  weightToday       Float?
-  weightAll         Float?
-  wasteDispMoney    Float?
-  moneyAll          Float?
-  createdAt         BigInt?
-  createBy          String? @db.VarChar(256)
-  reverseMoney      Float?
-  updateBy          String? @db.VarChar(256)
-  moneyToday        Float?
-  openid            String? @map("_openid") @db.Text
-  reverseInvol      Float?
-  wasteDispTon      Float?
-  id                String  @id @map("_id") @db.VarChar(34)
-  updatedAt         BigInt?
-  steelScrapTon25   Float?
-  lithiumScrapTon25 Float?
-  vehicleScrapTon25 Float?
+/// 12.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAMarketCards {
+  id     Int     @id @default(autoincrement()) @map("_id")
+  price  String? @db.VarChar(255)
+  volume String? @db.VarChar(255)
+  change String? @db.VarChar(255)
+  unit   String? @db.VarChar(255)
 }
 
-model pls_materialnum {
-  owner           String? @db.VarChar(256)
-  createdAt       BigInt?
-  createBy        String? @db.VarChar(256)
-  material        String? @db.Text
-  updateBy        String? @db.VarChar(256)
-  materialNum     String? @db.Text
-  departmentList  String? @map("_departmentList") @db.VarChar(34)
-  openid          String? @map("_openid") @db.Text
-  id              String  @id @map("_id") @db.VarChar(34)
-  inventoryNature String? @db.Text
-  updatedAt       BigInt?
-  carbonRedu      Float?
+/// 12.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAPieChart {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  type       String? @db.VarChar(255)
+  value      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
 }
 
-model pls_meminfo {
-  area                 String? @db.Text
-  owner                String? @db.VarChar(256)
-  address              String? @db.Text
-  card_number          String? @db.Text
-  avatarUrl            String? @db.Text
-  regiter_date         String? @db.Text
-  openID               String? @db.Text
-  departmentList       String? @map("_departmentList") @db.VarChar(34)
-  longti               Float?
-  points               Float?
-  bankCardB            String? @db.Text
-  ID_number            String? @db.Text
-  createdAt            BigInt?
-  createBy             String? @db.VarChar(256)
-  IDCardF              String? @db.Text
-  phone                String? @db.Text
-  updateBy             String? @db.VarChar(256)
-  openid               String? @map("_openid") @db.Text
-  lati                 Float?
-  name                 String? @db.Text
-  IDCardB              String? @db.Text
-  id                   String  @id @map("_id") @db.VarChar(34)
-  bankCardF            String? @db.Text
-  updatedAt            BigInt?
-  amountAll            Float?
-  amountMon            Float?
-  branchName           String? @db.Text
-  monthTon             Float?
-  supplyCategory       String? @db.Text
-  desc_drop_1744944058 String? @map("desc-drop-1744944058") @db.Text
-  supplyMaterial       String? @db.Text
-  customerID           String? @db.Text
+/// 12.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAPriceChart {
+  id     Int     @id @default(autoincrement()) @map("_id")
+  date   String? @db.VarChar(255)
+  price  String? @db.VarChar(255)
+  volume String? @db.VarChar(255)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model pls_orders {
-  wasteType            Float?
-  payTime              String?  @db.Text
-  weightTime           String?  @db.Text
-  recycleStationOpenID String?  @db.Text
-  createdAt            BigInt?
-  orderTime            String?  @db.Text
-  updateBy             String?  @db.VarChar(256)
-  price                Float?
-  lati                 Float?
-  countyName           String?  @db.Text
-  updatedAt            BigInt?
-  owner                String?  @db.VarChar(256)
-  thumbnail            String?  @db.Text
-  address              String?  @db.Text
-  openID               String?  @db.Text
-  recycleStationName   String?  @db.Text
-  departmentList       String?  @map("_departmentList") @db.VarChar(34)
-  weight               Float?
-  stationOrNot         Boolean?
-  longti               Float?
-  poundImg             String?  @db.Text
-  imgUrl               String?  @db.Text
-  createBy             String?  @db.VarChar(256)
-  communityRoom        String?  @db.Text
-  phone                String?  @db.Text
-  openid               String?  @map("_openid") @db.Text
-  id                   String?  @map("_id") @db.VarChar(34)
-  priceTime            String?  @db.Text
-  status               Float?
-  inboundNo            String?  @db.Text
-  name                 String?  @db.Text
-  customerNo           String?  @db.Text
-  entryID              String?  @db.Text
-  entryNum             String?  @db.Text
-  tax                  Float?
-  taxInclu             Float?
-  taxRate              Float?
-  totalAmount          Float?
-  unitpriceIncluTax    Float?
-  unitpriceNoTax       Float?
-  wasteTypeName        String?  @db.Text
-  tradeOrBase          String?  @db.Text
-
-  @@ignore
+/// 7.2 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBComparisonChart {
+  id     Int     @id @default(autoincrement()) @map("_id")
+  month  String? @db.VarChar(255)
+  actual String? @db.VarChar(255)
+  budget String? @db.VarChar(255)
 }
 
-model pls_users {
-  freeCounts     Float?
-  owner          String? @db.VarChar(256)
-  address        String? @db.Text
-  level          Float?
-  redeemed       Float?
-  openID         String? @db.Text
-  recycledCounts Float?
-  departmentList String? @map("_departmentList") @db.VarChar(34)
-  longti         Float?
-  pic            String? @db.Text
-  discount_rate  Float?
-  redeemedTime   String? @db.Text
-  points         Float?
-  createdAt      BigInt?
-  createBy       String? @db.VarChar(256)
-  money          Float?
-  phone          String? @db.Text
-  updateBy       String? @db.VarChar(256)
-  openid         String? @map("_openid") @db.Text
-  name           String? @db.Text
-  lati           Float?
-  id             String  @id @map("_id") @db.VarChar(34)
-  countyName     String? @db.Text
-  updatedAt      BigInt?
+/// 7.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBMonthlyDetails {
+  id            Int     @id @default(autoincrement()) @map("_id")
+  month         String? @db.VarChar(255)
+  energy_budget String? @db.VarChar(255)
+  actual        String? @db.VarChar(255)
+  variance      String? @db.VarChar(255)
+  status        String? @db.VarChar(255)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model pls_vehiclein {
-  owner              String? @db.VarChar(256)
-  createdAt          BigInt?
-  createBy           String? @db.VarChar(256)
-  updateBy           String? @db.VarChar(256)
-  departmentList     String? @map("_departmentList") @db.VarChar(34)
-  openid             String? @map("_openid") @db.Text
-  id                 String? @map("_id") @db.VarChar(34)
-  updatedAt          BigInt?
-  create_at          String? @db.Text
-  address            String? @db.Text
-  disassembleUrl     String? @db.Text
-  disassembly_at     String? @db.Text
-  engineNo           String? @db.Text
-  ID                 String? @db.Text
-  image              String? @db.Text
-  licensePlate       String? @db.Text
-  passengersCapacity Float?
-  phone              String? @db.Text
-  poundUrl           String? @db.Text
-  price              Float?
-  regisDate          String? @db.Text
-  vehicleBrand       String? @db.Text
-  vehicleColor       String? @db.Text
-  vehicleOwner       String? @db.Text
-  vehicleType        String? @db.Text
-  vin                String? @db.Text
-  vinUrl             String? @db.Text
-  weight             Float?
-  batteryNo          String? @db.Text
-  batteryType        String? @db.Text
-  cancle_at          String? @db.Text
-  CBS                String? @db.Text
-  cert6              String? @db.Text
-  curbWeight         Float?
-  payAmount          Float?
-  powerType          String? @db.Text
-  senderName         String? @db.Text
-  status             String? @db.Text
-  taxInclu           Float?
-  tex                Float?
-  totalAmount        Float?
-  useCharacter       String? @db.Text
-  wheelType          String? @db.Text
-  salesType          String? @db.Text
+/// 7.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBSummaryCards {
+  id           Int     @id @default(autoincrement()) @map("_id")
+  total_energy String? @db.VarChar(255)
+  used         String? @db.VarChar(255)
+  remaining    String? @db.VarChar(255)
+  overrun_rate String? @db.VarChar(255)
+  unit         String? @db.VarChar(255)
+}
 
-  @@ignore
+/// 9.3This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFDetails {
+  id       Int      @id @default(autoincrement()) @map("_id")
+  process  String?  @db.VarChar(255)
+  scope    String?  @db.VarChar(255)
+  emission Decimal? @db.Decimal(10, 2)
+  factor   Decimal? @db.Decimal(10, 2)
+  total    Decimal? @db.Decimal(10, 2)
+}
+
+/// 9.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFPieChart {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  scope      String? @db.VarChar(255)
+  value      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
+}
+
+/// 9.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFTrendChart {
+  id        Int     @id @default(autoincrement()) @map("_id")
+  month     String? @db.VarChar(255)
+  footprint String? @db.VarChar(255)
+  scope1    String? @db.VarChar(255)
+  scope2    String? @db.VarChar(255)
+  scope3    String? @db.VarChar(255)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAConsumptionTrend {
+  id         Int      @id @default(autoincrement()) @map("_id")
+  date       String?  @db.VarChar(255)
+  total      Decimal? @db.Decimal(10, 2)
+  upstream   Decimal? @db.Decimal(10, 2)
+  downstream Decimal? @db.Decimal(10, 2)
+  forecast   Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAMonthSummary {
+  id              Int      @id @default(autoincrement()) @map("_id")
+  month           String?  @db.VarChar(255)
+  total           Decimal? @db.Decimal(10, 2)
+  upstream        Decimal? @db.Decimal(10, 2)
+  growth_rate     Decimal? @db.Decimal(10, 2)
+  forecast_growth Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAStrategy {
+  id          Int     @id @default(autoincrement()) @map("_id")
+  title       String? @db.VarChar(255)
+  description String? @db.VarChar(255)
+  impact      Json?
+  action      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EATypeComparison {
+  id       Int      @id @default(autoincrement()) @map("_id")
+  month    String?  @db.VarChar(255)
+  coal     Decimal? @db.Decimal(10, 2)
+  gas      Decimal? @db.Decimal(10, 2)
+  electric Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBParamCards {
+  id    Int     @id @default(autoincrement()) @map("_id")
+  key   String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  unit  String? @db.VarChar(255)
+  trend String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBPieChart {
+  id    Int     @id @default(autoincrement()) @map("_id")
+  type  String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  color String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBResults {
+  id      Int     @id @default(autoincrement()) @map("_id")
+  before  Json?
+  after   Json?
+  savings String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBTrendChart {
+  id          Int     @id @default(autoincrement()) @map("_id")
+  time        String? @db.VarChar(255)
+  generation  String? @db.VarChar(255)
+  consumption String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECenergyFlowRealTime {
+  id             Int     @id @default(autoincrement()) @map("_id")
+  device_id      Int?
+  energy_type_id String? @db.VarChar(255)
+  flow_value     String? @db.VarChar(255)
+  temperature    String? @db.VarChar(255)
+  pressure       String? @db.VarChar(255)
+  timestamp      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECenergyTypes {
+  id                Int     @id @default(autoincrement()) @map("_id")
+  type              String? @db.VarChar(255)
+  name              String? @db.VarChar(255)
+  unit              String? @db.VarChar(255)
+  icon              String? @db.VarChar(255)
+  conversion_factor String? @db.VarChar(255)
+  created_at        String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EChistory {
+  id             Int       @id @default(autoincrement()) @map("_id")
+  energy_type_id String?   @db.VarChar(255)
+  date_time      DateTime? @db.DateTime(0)
+  consumption    String?   @db.VarChar(255)
+  generation     String?   @db.VarChar(255)
+  status         String?   @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECrealTime {
+  id             Int     @id @default(autoincrement()) @map("_id")
+  energy_type_id String? @db.VarChar(255)
+  current_value  String? @db.VarChar(255)
+  total_value    String? @db.VarChar(255)
+  unit           String? @db.VarChar(255)
+  timestamp      String? @db.VarChar(255)
+  status         String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EEBenchmarkRankCards {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  rank       Int?
+  name       String? @db.VarChar(255)
+  efficiency String? @db.VarChar(255)
+  unit       String? @db.VarChar(255)
+  trend      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EEGaugeMetrics {
+  id      Int     @id @default(autoincrement()) @map("_id")
+  current String? @db.VarChar(255)
+  target  String? @db.VarChar(255)
+  label   String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EERankingList {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  enterprise String? @db.VarChar(255)
+  rank       Int?
+  efficiency String? @db.VarChar(255)
+  benchmark  String? @db.VarChar(255)
+  delta      String? @db.VarChar(255)
+  status     String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EETrendChartData {
+  id        Int     @id @default(autoincrement()) @map("_id")
+  month     String? @db.VarChar(255)
+  value     String? @db.VarChar(255)
+  benchmark String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSankeyLinks {
+  id     Int     @id @default(autoincrement()) @map("_id")
+  source Int?
+  target Int?
+  value  String? @db.VarChar(255)
+  type   String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSankeyNodes {
+  id    Int     @id @default(autoincrement()) @map("_id")
+  node  Int?
+  name  String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  unit  String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSummaryTable {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  name       String? @db.VarChar(255)
+  total      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
+  unit       String? @db.VarChar(255)
+}
+
+/// 10.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model SCRanking {
+  id         Int     @id @default(autoincrement()) @map("_id")
+  supplier   String? @db.VarChar(255)
+  emission   String? @db.VarChar(255)
+  intensity  String? @db.VarChar(255)
+  rank       Int?
+  compliance String? @db.VarChar(255)
+}
+
+/// 10.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model SCSankeyData {
+  id     Int     @id @default(autoincrement()) @map("_id")
+  node   Int?
+  name   String? @db.VarChar(255)
+  value  String? @db.VarChar(255)
+  source Int?
+  target Int?
+  co2    String? @db.VarChar(255)
+  type   String? @db.VarChar(255)
+}
+
 model receiptfc {
-  id                 Int       @id @default(autoincrement())
-  saleMemberId       String?   @db.VarChar(500)
-  saleMemberName     String?   @db.VarChar(500)
-  taxInclu           Decimal?  @db.Decimal(15, 6)
-  unitpriceIncluTax  Decimal?  @db.Decimal(15, 6)
-  wasteTypeName      String?   @db.VarChar(500)
-  imgUrls            String?   @db.VarChar(500)
-  weight             Decimal?  @db.Decimal(15, 6)
-  orderTime          DateTime? @db.DateTime(0)
-  carNumber          String?   @db.VarChar(500)
-  carBrand           String?   @db.VarChar(500)
-  createTime         DateTime  @default(now()) @db.Timestamp(0)
-  queryDate          DateTime? @db.Date
-  smallThumbnail     String?   @db.LongText
-  mediumThumbnail    String?   @db.LongText
-  thumbnailProcessed Boolean?  @default(false)
-  tinyThumbnail      String?   @db.LongText
-
-  @@index([orderTime, thumbnailProcessed], map: "idx_receiptfc_ordertime_thumbnail")
-  @@index([thumbnailProcessed], map: "idx_receiptfc_thumbnail_processed")
+  id                Int       @id @default(autoincrement())
+  saleMemberId      String?   @db.VarChar(500)
+  saleMemberName    String?   @db.VarChar(500)
+  taxInclu          Decimal?  @db.Decimal(15, 6)
+  unitpriceIncluTax Decimal?  @db.Decimal(15, 6)
+  wasteTypeName     String?   @db.VarChar(500)
+  imgUrls           String?   @db.VarChar(500)
+  weight            Decimal?  @db.Decimal(15, 6)
+  orderTime         DateTime? @db.DateTime(0)
+  carNumber         String?   @db.VarChar(500)
+  carBrand          String?   @db.VarChar(500)
+  createTime        DateTime? @default(now()) @db.Timestamp(0)
+  queryDate         DateTime? @db.Date
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model receiptfg {
-  id                 Int       @id @default(autoincrement())
-  saleMemberId       String?   @db.VarChar(500)
-  saleMemberName     String?   @db.VarChar(500)
-  taxInclu           Decimal?  @db.Decimal(15, 6)
-  unitpriceIncluTax  Decimal?  @db.Decimal(15, 6)
-  wasteTypeName      String?   @db.VarChar(500)
-  weight             Decimal?  @db.Decimal(15, 6)
-  orderTime          DateTime? @db.DateTime(0)
-  carNumber          String?   @db.VarChar(500)
-  carBrand           String?   @db.VarChar(500)
-  createTime         DateTime  @default(now()) @db.Timestamp(0)
-  queryDate          DateTime? @db.Date
-  smallThumbnail     String?   @db.LongText
-  mediumThumbnail    String?   @db.LongText
-  thumbnailProcessed Boolean?  @default(false)
-  tinyThumbnail      String?   @db.LongText
-  imgUrls            String?   @db.VarChar(255)
-
-  @@index([orderTime, thumbnailProcessed], map: "idx_receiptfg_ordertime_thumbnail")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model show3 {
-  time       DateTime? @db.Time(0)
-  branchName String?   @db.VarChar(255)
-  catergory  String?   @db.VarChar(255)
-  weight     Float?
-  price      Decimal?  @db.Decimal(10, 2)
-  carbonRedu Float?
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model show4 {
-  area       String?  @db.VarChar(255)
-  branchName String?  @db.VarChar(255)
-  inMoney    Decimal? @db.Decimal(10, 2)
-  outMoney   Decimal? @db.Decimal(10, 2)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model show5 {
-  branchInMoney       Decimal? @db.Decimal(10, 2)
-  branchOutMoney      Decimal? @db.Decimal(10, 2)
-  segregationInMoney  Decimal? @db.Decimal(10, 2)
-  segregationOutMoney Decimal? @db.Decimal(20, 2)
-  fgInMoney           Decimal? @db.Decimal(10, 2)
-  fgOutMoney          Decimal? @db.Decimal(10, 2)
-  fcInMoney           Decimal? @db.Decimal(10, 2)
-  fcOutMoney          Decimal? @db.Decimal(20, 2)
-
-  @@ignore
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model show8 {
-  fg         Decimal? @db.Decimal(10, 2)
-  fc         Decimal? @db.Decimal(10, 2)
-  fz         Decimal? @db.Decimal(10, 2)
-  fsl        Decimal? @db.Decimal(10, 2)
-  fxj        Decimal? @db.Decimal(10, 2)
-  ffzp       Decimal? @db.Decimal(10, 2)
-  fcInMoney  Decimal? @db.Decimal(10, 2)
-  fcOutMoney Decimal? @db.Decimal(10, 2)
-
-  @@ignore
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model thumbnail_tasks {
-  id            BigInt                  @id @default(autoincrement())
-  table_name    String                  @db.VarChar(50)
-  record_id     BigInt
-  original_urls Json
-  status        thumbnail_tasks_status? @default(pending)
-  created_at    DateTime                @default(now()) @db.Timestamp(0)
-  processed_at  DateTime?               @db.Timestamp(0)
-  error_message String?                 @db.Text
-
-  @@index([status, created_at], map: "idx_status_created")
-  @@index([table_name, record_id], map: "idx_table_record")
-}
-
-enum thumbnail_tasks_status {
-  pending
-  processing
-  completed
-  failed
+  id                Int       @id @default(autoincrement())
+  saleMemberId      String?   @db.VarChar(500)
+  saleMemberName    String?   @db.VarChar(500)
+  taxInclu          Decimal?  @db.Decimal(15, 6)
+  unitpriceIncluTax Decimal?  @db.Decimal(15, 6)
+  wasteTypeName     String?   @db.VarChar(500)
+  imgUrls           String?   @db.Text
+  weight            Decimal?  @db.Decimal(15, 6)
+  orderTime         DateTime? @db.DateTime(0)
+  carNumber         String?   @db.VarChar(500)
+  carBrand          String?   @db.VarChar(500)
+  createTime        DateTime? @default(now()) @db.Timestamp(0)
+  queryDate         DateTime? @db.Date
 }

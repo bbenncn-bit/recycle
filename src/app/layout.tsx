@@ -6,7 +6,7 @@ import Footer from 'src/components/footer';
 import { ThemeProvider } from 'src/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: '再生资源交易中心',
+  title: '萍乡再生资源交易中心',
   description: '变废为宝 - 再生资源交易平台',
   icons: {
     icon: [

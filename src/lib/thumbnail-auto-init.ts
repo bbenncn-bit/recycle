@@ -3,7 +3,7 @@
  * 在应用启动时自动检查并启动缩略图生成服务
  */
 
-import { pool } from '@/lib/db';
+// 注意：新数据库中没有缩略图相关表和字段，此功能已禁用
 import { thumbnailService } from '@/services/thumbnail-service';
 
 let isInitialized = false;
@@ -11,66 +11,22 @@ let initPromise: Promise<void> | null = null;
 
 /**
  * 检查数据库是否已经设置了缩略图优化
+ * 注意：新数据库中没有缩略图相关表和字段，此功能已禁用
  */
 async function checkThumbnailOptimization(): Promise<boolean> {
-  try {
-    // 检查是否存在缩略图字段
-    const [columns] = await pool.query(`
-      SELECT COLUMN_NAME 
-      FROM information_schema.COLUMNS 
-      WHERE TABLE_SCHEMA = DATABASE() 
-      AND TABLE_NAME = 'receiptfg' 
-      AND COLUMN_NAME IN ('tinyThumbnail', 'thumbnailProcessed')
-    `);
-
-    // 检查是否存在任务表
-    const [tables] = await pool.query(`
-      SELECT TABLE_NAME 
-      FROM information_schema.TABLES 
-      WHERE TABLE_SCHEMA = DATABASE() 
-      AND TABLE_NAME = 'thumbnail_tasks'
-    `);
-
-    const hasColumns = (columns as any[]).length >= 2;
-    const hasTaskTable = (tables as any[]).length > 0;
-
-    return hasColumns && hasTaskTable;
-  } catch (error) {
-    console.warn('⚠️ 检查缩略图优化状态失败:', error);
-    return false;
-  }
+  // 新数据库中没有缩略图相关表和字段，返回 false
+  console.log('⚠️ 新数据库中没有缩略图相关表和字段，缩略图功能已禁用');
+  return false;
 }
 
 /**
  * 自动创建缩略图任务
+ * 注意：新数据库中没有缩略图相关字段，此功能已禁用
  */
 async function autoCreateThumbnailTasks() {
-  try {
-    // 检查是否有未处理的图片
-    const [unprocessedCount] = await pool.query(`
-      SELECT 
-        (SELECT COUNT(*) FROM receiptfg WHERE thumbnailProcessed = 0 AND imgUrls IS NOT NULL) +
-        (SELECT COUNT(*) FROM receiptfc WHERE thumbnailProcessed = 0 AND imgUrls IS NOT NULL) as total
-    `);
-
-    const needsProcessing = (unprocessedCount as any[])[0]?.total || 0;
-
-    if (needsProcessing > 0) {
-      console.log(`🔍 发现 ${needsProcessing} 个图片需要生成缩略图`);
-      
-      // 创建批量任务
-      await thumbnailService.createBatchTasks();
-      
-      console.log('✅ 缩略图任务已创建');
-      return needsProcessing;
-    } else {
-      console.log('✅ 所有图片缩略图已处理完成');
-      return 0;
-    }
-  } catch (error) {
-    console.error('❌ 创建缩略图任务失败:', error);
-    return 0;
-  }
+  // 新数据库中没有缩略图相关字段，跳过创建任务
+  console.log('⚠️ 新数据库中没有缩略图相关字段，无法创建缩略图任务');
+  return 0;
 }
 
 /**

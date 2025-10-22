@@ -9,10 +9,24 @@ import ThemeToggle from './theme-toggle';
 
 const navigation = [
   { name: '首页', href: '/'},
-  { name: '市场', href: '/market'},
+  { 
+    name: '能碳管理', 
+    href: '/energy/consumption-query', 
+    dropdown: [
+      { name: '能耗查询', href: '/energy/consumption-query' },
+      { name: '能源消费量计算', href: '/energy/consumption-calculation' },
+      { name: '能源分析与策略', href: '/energy/analysis-strategy' },
+      { name: '能效对标', href: '/energy/efficiency-benchmark' },
+      { name: '能流分析', href: '/energy/flow-analysis' },
+      { name: '能效平衡与优化', href: '/energy/balance-optimization' },
+      { name: '能碳预测管理', href: '/energy/prediction-management' },
+      { name: '碳排放核算', href: '/energy/carbon-accounting' },
+      { name: '更多', href: '/energy/more' },
+    ]
+  },
   { 
     name: '物资处置', 
-    href: '/disposal', 
+    href: '/disposal/auction', 
     dropdown: [
       { name: '竞价拍卖', href: '/disposal/auction' },
       { name: '一口价销售', href: '/disposal/fixedprice' },
@@ -20,7 +34,7 @@ const navigation = [
   },
   { 
     name: '物资采购', 
-    href: '/purchase', 
+    href: '/purchase/scrapsteel', 
     dropdown: [
       { name: '废钢铁', href: '/purchase/scrapsteel' },
       { name: '报废车', href: '/purchase/scrapcar' },

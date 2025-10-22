@@ -1,24 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getReceiptfcData } from './api/receiptfc/fetch';
-import { getReceiptfgData } from './api/receiptfg/fetch';
+// 移除直接导入服务端函数，改为通过API路由获取数据
 import { getReceiptfgDataBatch } from './api/receiptfg/fetch-batch';
 import { getReceiptfcDataBatch } from './api/receiptfc/fetch-batch';
+// import Component from "./disposal/auction/page";
 import ProgressiveTableWithPagination from '../components/progressive-table-with-pagination';
 import dayjs from 'dayjs';
 
 interface TableData {
   id: number;
-  saleMemberId: string;
-  saleMemberName: string;
-  taxInclu: string | number;
-  unitpriceIncluTax: string | number;
-  wasteTypeName: string;
-  weight: string | number;
-  orderTime: string;
-  carNumber: string;
-  carBrand: string;
+  saleMemberId: string | null;
+  saleMemberName: string | null;
+  taxInclu: string | number | null;
+  unitpriceIncluTax: string | number | null;
+  wasteTypeName: string | null;
+  weight: string | number | null;
+  orderTime: Date | string | null;
+  carNumber: string | null;
+  carBrand: string | null;
   hasImage: boolean;
   progressiveUrls?: any;
   thumbnailSource?: 'database' | 'cdn';
@@ -32,11 +32,15 @@ export default function Page() {
   const [fgStatsLoading, setFgStatsLoading] = useState(true);
 
   useEffect(() => {
-    // 报废车统计数据加载（仅用于统计，使用原有API）
+    // 报废车统计数据加载（通过API路由）
     const fetchFcStatsData = async () => {
       try {
         setFcStatsLoading(true);
-        const result = await getReceiptfcData();
+        const response = await fetch('/api/receiptfc/fetch');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
         setFcTotalData(result);
       } catch (error) {
         console.error('获取FC统计数据失败:', error);
@@ -46,11 +50,15 @@ export default function Page() {
       }
     };
 
-    // 废钢统计数据加载（仅用于统计，使用原有API）
+    // 废钢统计数据加载（通过API路由）
     const fetchFgStatsData = async () => {
       try {
         setFgStatsLoading(true);
-        const result = await getReceiptfgData();
+        const response = await fetch('/api/receiptfg');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
         setFgTotalData(result);
       } catch (error) {
         console.error('获取FG统计数据失败:', error);

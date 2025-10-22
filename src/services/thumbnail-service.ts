@@ -1,4 +1,4 @@
-import { pool } from '@/lib/db';
+// 注意：新数据库中没有缩略图相关表和字段，此功能已禁用
 import sharp from 'sharp';
 
 interface ThumbnailTask {
@@ -67,65 +67,12 @@ class ThumbnailService {
 
   /**
    * 获取待处理任务
+   * 注意：新数据库中没有 thumbnail_tasks 表，此功能已禁用
    */
   private async getPendingTasks(): Promise<ThumbnailTask[]> {
-    const [rows] = await pool.query(`
-      SELECT id, table_name, record_id, original_urls, status
-      FROM thumbnail_tasks 
-      WHERE status = 'pending'
-      ORDER BY created_at ASC
-      LIMIT ?
-    `, [this.BATCH_SIZE]);
-    
-    return (rows as any[]).map(row => {
-      let originalUrls: string[];
-      
-      // MySQL JSON 字段可能返回 object、string 或 null
-      if (row.original_urls === null || row.original_urls === undefined) {
-        originalUrls = [];
-      } else if (Array.isArray(row.original_urls)) {
-        // 已经是数组格式（MySQL JSON 类型）
-        originalUrls = row.original_urls.filter((url: any) => url && typeof url === 'string' && url.trim().length > 0);
-      } else if (typeof row.original_urls === 'string') {
-        try {
-          // 尝试解析为JSON
-          const parsed = JSON.parse(row.original_urls);
-          originalUrls = Array.isArray(parsed) ? parsed : [parsed];
-        } catch (error) {
-          // 如果不是JSON格式，尝试其他方式处理
-          if (row.original_urls.startsWith('http')) {
-            originalUrls = [row.original_urls];
-          } else if (row.original_urls.includes(',')) {
-            originalUrls = row.original_urls.split(',').map((url: string) => url.trim());
-          } else {
-            originalUrls = [row.original_urls];
-          }
-        }
-      } else {
-        originalUrls = [];
-      }
-      
-      // 过滤掉无效的URL
-      const validUrls: string[] = [];
-      for (const url of (originalUrls as any[])) {
-        if (url && 
-            typeof url === 'string' && 
-            url.trim().length > 0 && 
-            (url.startsWith('http://') || url.startsWith('https://'))) {
-          validUrls.push(url as string);
-        }
-      }
-      originalUrls = validUrls;
-      
-      if (originalUrls.length === 0) {
-        console.log(`⚠️ 任务 ${row.id} 没有有效的图片URL，原始数据:`, JSON.stringify(row.original_urls));
-      }
-      
-      return {
-        ...row,
-        original_urls: originalUrls
-      };
-    });
+    // 新数据库中没有 thumbnail_tasks 表，返回空数组
+    console.log('⚠️ 新数据库中没有 thumbnail_tasks 表，缩略图功能已禁用');
+    return [];
   }
 
   /**
@@ -236,87 +183,48 @@ class ThumbnailService {
 
   /**
    * 保存缩略图到数据库
+   * 注意：新数据库中没有缩略图字段，此功能已禁用
    */
   private async saveThumbnails(tableName: string, recordId: number, thumbnails: any) {
-    const query = `
-      UPDATE ${tableName} 
-      SET 
-        tinyThumbnail = ?,
-        smallThumbnail = ?,
-        mediumThumbnail = ?,
-        thumbnailProcessed = 1
-      WHERE id = ?
-    `;
-    
-    await pool.query(query, [
-      thumbnails.tiny,
-      thumbnails.small, 
-      thumbnails.medium,
-      recordId
-    ]);
-    
-    console.log(`💾 缩略图已保存到 ${tableName}#${recordId}`);
+    // 新数据库中没有缩略图字段，跳过保存
+    console.log(`⚠️ 新数据库中没有缩略图字段，无法保存缩略图到 ${tableName}#${recordId}`);
   }
 
   /**
    * 更新任务状态
+   * 注意：新数据库中没有 thumbnail_tasks 表，此功能已禁用
    */
   private async updateTaskStatus(taskId: number, status: string, errorMessage?: string) {
-    if (errorMessage) {
-      await pool.query(`
-        UPDATE thumbnail_tasks 
-        SET status = ?, processed_at = NOW(), error_message = ?
-        WHERE id = ?
-      `, [status, errorMessage, taskId]);
-    } else {
-      await pool.query(`
-        UPDATE thumbnail_tasks 
-        SET status = ?, processed_at = NOW()
-        WHERE id = ?
-      `, [status, taskId]);
-    }
+    // 新数据库中没有 thumbnail_tasks 表，跳过更新
+    console.log(`⚠️ 新数据库中没有 thumbnail_tasks 表，无法更新任务状态`);
   }
 
   /**
    * 为新记录创建缩略图任务
+   * 注意：新数据库中没有 thumbnail_tasks 表，此功能已禁用
    */
   async createThumbnailTask(tableName: string, recordId: number, imgUrls: string[]) {
-    if (!imgUrls || imgUrls.length === 0) return;
-    
-    await pool.query(`
-      INSERT INTO thumbnail_tasks (table_name, record_id, original_urls)
-      VALUES (?, ?, ?)
-    `, [tableName, recordId, JSON.stringify(imgUrls)]);
-    
-    console.log(`📝 已创建缩略图任务: ${tableName}#${recordId}`);
+    // 新数据库中没有 thumbnail_tasks 表，跳过创建任务
+    console.log(`⚠️ 新数据库中没有 thumbnail_tasks 表，无法创建缩略图任务: ${tableName}#${recordId}`);
   }
 
   /**
    * 批量创建历史数据的缩略图任务
+   * 注意：新数据库中没有 thumbnail_tasks 表，此功能已禁用
    */
   async createBatchTasks() {
-    try {
-      // 调用存储过程生成批量任务
-      await pool.query('CALL GenerateThumbnailTasks()');
-      console.log('🔄 已生成历史数据的缩略图任务');
-    } catch (error) {
-      console.error('❌ 生成批量任务失败:', error);
-    }
+    // 新数据库中没有 thumbnail_tasks 表，跳过批量创建
+    console.log('⚠️ 新数据库中没有 thumbnail_tasks 表，无法创建批量缩略图任务');
   }
 
   /**
    * 获取处理统计
+   * 注意：新数据库中没有 thumbnail_tasks 表，此功能已禁用
    */
   async getStats() {
-    const [rows] = await pool.query(`
-      SELECT 
-        status,
-        COUNT(*) as count
-      FROM thumbnail_tasks 
-      GROUP BY status
-    `);
-    
-    return rows;
+    // 新数据库中没有 thumbnail_tasks 表，返回空统计
+    console.log('⚠️ 新数据库中没有 thumbnail_tasks 表，无法获取缩略图统计');
+    return [];
   }
 
   /**

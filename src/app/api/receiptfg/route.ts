@@ -1,20 +1,15 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prismadb";
+import { ReceiptfgService } from "@/lib/services/receipt-service";
 
 export async function GET() {
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-  const receiptfg = await prisma.receiptfg.findMany({
-    where: {
-      orderTime: {
-        gte: oneWeekAgo,
-      },
-    },
-    orderBy: {
-      orderTime: "desc",
-    },
-  });
-
-  return NextResponse.json(receiptfg);
+  try {
+    const data = await ReceiptfgService.getLatestData();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('❌ 获取废钢数据失败:', error);
+    return NextResponse.json(
+      { error: '获取数据失败' },
+      { status: 500 }
+    );
+  }
 }

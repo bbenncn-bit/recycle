@@ -6,15 +6,15 @@ import dayjs from 'dayjs';
 
 interface TableData {
   id: number;
-  saleMemberId: string;
-  saleMemberName: string;
-  taxInclu: string | number;
-  unitpriceIncluTax: string | number;
-  wasteTypeName: string;
-  weight: string | number;
-  orderTime: string;
-  carNumber: string;
-  carBrand: string;
+  saleMemberId: string | null;
+  saleMemberName: string | null;
+  taxInclu: string | number | null;
+  unitpriceIncluTax: string | number | null;
+  wasteTypeName: string | null;
+  weight: string | number | null;
+  orderTime: Date | string | null;
+  carNumber: string | null;
+  carBrand: string | null;
   hasImage: boolean;
   progressiveUrls?: any;
   thumbnailSource?: 'database' | 'cdn';

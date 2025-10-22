@@ -7,7 +7,7 @@ export default function AcmeLogo() {
       className="flex flex-row items-center leading-none text-white"
     >
       <GlobeAltIcon className="h-24 w-24 rotate-[15deg]" />
-      <p className="text-[25px]">再生资源交易中心</p>
+      <p className="text-[25px]">萍乡再生资源交易中心</p>
     </div>
   );
 }

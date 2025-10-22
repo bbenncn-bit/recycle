@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model receiptfc {
+  id                Int       @id @default(autoincrement())
+  saleMemberId      String?   @db.VarChar(500)
+  saleMemberName    String?   @db.VarChar(500)
+  taxInclu          Decimal?  @db.Decimal(15, 6)
+  unitpriceIncluTax Decimal?  @db.Decimal(15, 6)
+  wasteTypeName     String?   @db.VarChar(500)
+  imgUrls           String?   @db.VarChar(500)
+  weight            Decimal?  @db.Decimal(15, 6)
+  orderTime         DateTime? @db.DateTime(0)
+  carNumber         String?   @db.VarChar(500)
+  carBrand          String?   @db.VarChar(500)
+  createTime        DateTime? @default(now()) @db.Timestamp(0)
+  queryDate         DateTime? @db.Date
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model receiptfg {
+  id                Int       @id @default(autoincrement())
+  saleMemberId      String?   @db.VarChar(500)
+  saleMemberName    String?   @db.VarChar(500)
+  taxInclu          Decimal?  @db.Decimal(15, 6)
+  unitpriceIncluTax Decimal?  @db.Decimal(15, 6)
+  wasteTypeName     String?   @db.VarChar(500)
+  imgUrls           String?   @db.Text
+  weight            Decimal?  @db.Decimal(15, 6)
+  orderTime         DateTime? @db.DateTime(0)
+  carNumber         String?   @db.VarChar(500)
+  carBrand          String?   @db.VarChar(500)
+  createTime        DateTime? @default(now()) @db.Timestamp(0)
+  queryDate         DateTime? @db.Date
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAHoldings {
+  _id     Int     @id @default(autoincrement())
+  asset   String? @db.VarChar(255)
+  quantity String? @db.VarChar(255)
+  value   String? @db.VarChar(255)
+  status  String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAMarketCards {
+  _id    Int     @id @default(autoincrement())
+  price  String? @db.VarChar(255)
+  volume String? @db.VarChar(255)
+  change String? @db.VarChar(255)
+  unit   String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAPieChart {
+  _id        Int     @id @default(autoincrement())
+  type       String? @db.VarChar(255)
+  value      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CAPriceChart {
+  _id    Int     @id @default(autoincrement())
+  date   String? @db.VarChar(255)
+  price  String? @db.VarChar(255)
+  volume String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBComparisonChart {
+  _id    Int     @id @default(autoincrement())
+  month  String? @db.VarChar(255)
+  actual String? @db.VarChar(255)
+  budget String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBMonthlyDetails {
+  _id           Int     @id @default(autoincrement())
+  month         String? @db.VarChar(255)
+  energy_budget String? @db.VarChar(255)
+  actual        String? @db.VarChar(255)
+  variance      String? @db.VarChar(255)
+  status        String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CBSummaryCards {
+  _id          Int     @id @default(autoincrement())
+  total_energy String? @db.VarChar(255)
+  used         String? @db.VarChar(255)
+  remaining    String? @db.VarChar(255)
+  overrun_rate String? @db.VarChar(255)
+  unit         String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFDetails {
+  _id      Int      @id @default(autoincrement())
+  process  String?  @db.VarChar(255)
+  scope    String?  @db.VarChar(255)
+  emission Decimal? @db.Decimal(10, 2)
+  factor   Decimal? @db.Decimal(10, 2)
+  total    Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFPieChart {
+  _id        Int     @id @default(autoincrement())
+  scope      String? @db.VarChar(255)
+  value      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model CFTrendChart {
+  _id       Int     @id @default(autoincrement())
+  month     String? @db.VarChar(255)
+  footprint String? @db.VarChar(255)
+  scope1    String? @db.VarChar(255)
+  scope2    String? @db.VarChar(255)
+  scope3    String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAConsumptionTrend {
+  _id        Int      @id @default(autoincrement())
+  date       String?  @db.VarChar(255)
+  total      Decimal? @db.Decimal(10, 2)
+  upstream   Decimal? @db.Decimal(10, 2)
+  downstream Decimal? @db.Decimal(10, 2)
+  forecast   Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAMonthSummary {
+  _id             Int      @id @default(autoincrement())
+  month           String?  @db.VarChar(255)
+  total           Decimal? @db.Decimal(10, 2)
+  upstream        Decimal? @db.Decimal(10, 2)
+  growth_rate     Decimal? @db.Decimal(10, 2)
+  forecast_growth Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EAStrategy {
+  _id         Int     @id @default(autoincrement())
+  title       String? @db.VarChar(255)
+  description String? @db.VarChar(255)
+  impact      Json?
+  action      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EATypeComparison {
+  _id      Int      @id @default(autoincrement())
+  month    String?  @db.VarChar(255)
+  coal     Decimal? @db.Decimal(10, 2)
+  gas      Decimal? @db.Decimal(10, 2)
+  electric Decimal? @db.Decimal(10, 2)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBParamCards {
+  _id   Int     @id @default(autoincrement())
+  key   String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  unit  String? @db.VarChar(255)
+  trend String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBPieChart {
+  _id   Int     @id @default(autoincrement())
+  type  String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  color String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBResults {
+  _id     Int     @id @default(autoincrement())
+  before  Json?
+  after   Json?
+  savings String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EBTrendChart {
+  _id         Int     @id @default(autoincrement())
+  time        String? @db.VarChar(255)
+  generation  String? @db.VarChar(255)
+  consumption String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECenergyFlowRealTime {
+  _id            Int     @id @default(autoincrement())
+  id             String? @db.VarChar(255)
+  device_id      Int?
+  energy_type_id String? @db.VarChar(255)
+  flow_value     String? @db.VarChar(255)
+  temperature    String? @db.VarChar(255)
+  pressure       String? @db.VarChar(255)
+  timestamp      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECenergyTypes {
+  _id              Int     @id @default(autoincrement())
+  type             String? @db.VarChar(255)
+  name             String? @db.VarChar(255)
+  unit             String? @db.VarChar(255)
+  icon             String? @db.VarChar(255)
+  conversion_factor String? @db.VarChar(255)
+  created_at       String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EChistory {
+  _id            Int       @id @default(autoincrement())
+  energy_type_id String?   @db.VarChar(255)
+  date_time      DateTime? @db.DateTime(0)
+  consumption    String?   @db.VarChar(255)
+  generation     String?   @db.VarChar(255)
+  status         String?   @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ECrealTime {
+  _id            Int     @id @default(autoincrement())
+  energy_type_id String? @db.VarChar(255)
+  current_value  String? @db.VarChar(255)
+  total_value    String? @db.VarChar(255)
+  unit           String? @db.VarChar(255)
+  timestamp      String? @db.VarChar(255)
+  status         String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EEBenchmarkRankCards {
+  _id        Int     @id @default(autoincrement())
+  rank       Int?
+  name       String? @db.VarChar(255)
+  efficiency String? @db.VarChar(255)
+  unit       String? @db.VarChar(255)
+  trend      String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EEGaugeMetrics {
+  _id     Int     @id @default(autoincrement())
+  current String? @db.VarChar(255)
+  target  String? @db.VarChar(255)
+  label   String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EERankingList {
+  _id        Int     @id @default(autoincrement())
+  enterprise String? @db.VarChar(255)
+  rank       Int?
+  efficiency String? @db.VarChar(255)
+  benchmark  String? @db.VarChar(255)
+  delta      String? @db.VarChar(255)
+  status     String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EETrendChartData {
+  _id       Int     @id @default(autoincrement())
+  month     String? @db.VarChar(255)
+  value     String? @db.VarChar(255)
+  benchmark String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSankeyLinks {
+  _id    Int     @id @default(autoincrement())
+  source Int?
+  target Int?
+  value  String? @db.VarChar(255)
+  type   String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSankeyNodes {
+  _id   Int     @id @default(autoincrement())
+  node  Int?
+  name  String? @db.VarChar(255)
+  value String? @db.VarChar(255)
+  unit  String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model EFSummaryTable {
+  _id        Int     @id @default(autoincrement())
+  name       String? @db.VarChar(255)
+  total      String? @db.VarChar(255)
+  percentage String? @db.VarChar(255)
+  unit       String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model SCRanking {
+  _id        Int     @id @default(autoincrement())
+  supplier   String? @db.VarChar(255)
+  emission   String? @db.VarChar(255)
+  intensity  String? @db.VarChar(255)
+  rank       Int?
+  compliance String? @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model SCSankeyData {
+  _id    Int     @id @default(autoincrement())
+  node   Int?
+  name   String? @db.VarChar(255)
+  value  String? @db.VarChar(255)
+  source Int?
+  target Int?
+  co2    String? @db.VarChar(255)
+  type   String? @db.VarChar(255)
+}
