@@ -36,14 +36,30 @@ export default function Page() {
     const fetchFcStatsData = async () => {
       try {
         setFcStatsLoading(true);
-        const response = await fetch('/api/receiptfc/fetch');
+        const response = await fetch('/api/receiptfc');
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
         }
         const result = await response.json();
-        setFcTotalData(result);
+        
+        // 检查是否是错误响应
+        if (result && result.error) {
+          console.error('❌ API返回错误:', result.error);
+          setFcTotalData([]);
+          return;
+        }
+        
+        // 确保 result 是数组
+        if (Array.isArray(result)) {
+          console.log('✅ FC统计数据获取成功:', result.length, '条记录');
+          setFcTotalData(result);
+        } else {
+          console.warn('⚠️ FC数据格式不正确，期望数组，实际收到:', typeof result, result);
+          setFcTotalData([]);
+        }
       } catch (error) {
-        console.error('获取FC统计数据失败:', error);
+        console.error('❌ 获取FC统计数据失败:', error);
         setFcTotalData([]);
       } finally {
         setFcStatsLoading(false);
@@ -56,12 +72,28 @@ export default function Page() {
         setFgStatsLoading(true);
         const response = await fetch('/api/receiptfg');
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
         }
         const result = await response.json();
-        setFgTotalData(result);
+        
+        // 检查是否是错误响应
+        if (result && result.error) {
+          console.error('❌ API返回错误:', result.error);
+          setFgTotalData([]);
+          return;
+        }
+        
+        // 确保 result 是数组
+        if (Array.isArray(result)) {
+          console.log('✅ FG统计数据获取成功:', result.length, '条记录');
+          setFgTotalData(result);
+        } else {
+          console.warn('⚠️ FG数据格式不正确，期望数组，实际收到:', typeof result, result);
+          setFgTotalData([]);
+        }
       } catch (error) {
-        console.error('获取FG统计数据失败:', error);
+        console.error('❌ 获取FG统计数据失败:', error);
         setFgTotalData([]);
       } finally {
         setFgStatsLoading(false);

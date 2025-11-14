@@ -257,7 +257,7 @@ function Footer() {
                                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
                                                                     href: "#",
                                                                     className: "text-sm leading-6 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white",
-                                                                    children: "萍乡县打区发布"
+                                                                    children: "萍乡县区发布"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/components/footer.tsx",
                                                                     lineNumber: 38,
@@ -631,7 +631,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$theme$2
 ;
 ;
 const metadata = {
-    title: '萍乡再生资源交易中心',
+    title: '欧冶链金（萍乡）再生资源有限公司',
     description: '变废为宝 - 再生资源交易平台',
     icons: {
         icon: [

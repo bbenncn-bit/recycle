@@ -1706,14 +1706,30 @@ function Page() {
                 "Page.useEffect.fetchFcStatsData": async ()=>{
                     try {
                         setFcStatsLoading(true);
-                        const response = await fetch('/api/receiptfc/fetch');
+                        const response = await fetch('/api/receiptfc');
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            const errorData = await response.json().catch({
+                                "Page.useEffect.fetchFcStatsData": ()=>({})
+                            }["Page.useEffect.fetchFcStatsData"]);
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
                         }
                         const result = await response.json();
-                        setFcTotalData(result);
+                        // 检查是否是错误响应
+                        if (result && result.error) {
+                            console.error('❌ API返回错误:', result.error);
+                            setFcTotalData([]);
+                            return;
+                        }
+                        // 确保 result 是数组
+                        if (Array.isArray(result)) {
+                            console.log('✅ FC统计数据获取成功:', result.length, '条记录');
+                            setFcTotalData(result);
+                        } else {
+                            console.warn('⚠️ FC数据格式不正确，期望数组，实际收到:', typeof result, result);
+                            setFcTotalData([]);
+                        }
                     } catch (error) {
-                        console.error('获取FC统计数据失败:', error);
+                        console.error('❌ 获取FC统计数据失败:', error);
                         setFcTotalData([]);
                     } finally{
                         setFcStatsLoading(false);
@@ -1727,12 +1743,28 @@ function Page() {
                         setFgStatsLoading(true);
                         const response = await fetch('/api/receiptfg');
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            const errorData = await response.json().catch({
+                                "Page.useEffect.fetchFgStatsData": ()=>({})
+                            }["Page.useEffect.fetchFgStatsData"]);
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
                         }
                         const result = await response.json();
-                        setFgTotalData(result);
+                        // 检查是否是错误响应
+                        if (result && result.error) {
+                            console.error('❌ API返回错误:', result.error);
+                            setFgTotalData([]);
+                            return;
+                        }
+                        // 确保 result 是数组
+                        if (Array.isArray(result)) {
+                            console.log('✅ FG统计数据获取成功:', result.length, '条记录');
+                            setFgTotalData(result);
+                        } else {
+                            console.warn('⚠️ FG数据格式不正确，期望数组，实际收到:', typeof result, result);
+                            setFgTotalData([]);
+                        }
                     } catch (error) {
-                        console.error('获取FG统计数据失败:', error);
+                        console.error('❌ 获取FG统计数据失败:', error);
                         setFgTotalData([]);
                     } finally{
                         setFgStatsLoading(false);
@@ -1763,7 +1795,7 @@ function Page() {
                             children: "再生资源交易数据表"
                         }, void 0, false, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 87,
+                            lineNumber: 119,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1771,13 +1803,13 @@ function Page() {
                             children: "查看每天再生资源交易记录和详细信息"
                         }, void 0, false, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 88,
+                            lineNumber: 120,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/page.tsx",
-                    lineNumber: 86,
+                    lineNumber: 118,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$progressive$2d$table$2d$with$2d$pagination$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1788,7 +1820,7 @@ function Page() {
                     itemsPerPage: 10
                 }, void 0, false, {
                     fileName: "[project]/src/app/page.tsx",
-                    lineNumber: 94,
+                    lineNumber: 126,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$progressive$2d$table$2d$with$2d$pagination$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1799,7 +1831,7 @@ function Page() {
                     itemsPerPage: 10
                 }, void 0, false, {
                     fileName: "[project]/src/app/page.tsx",
-                    lineNumber: 103,
+                    lineNumber: 135,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1814,12 +1846,12 @@ function Page() {
                                         className: "h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
-                                        lineNumber: 116,
+                                        lineNumber: 148,
                                         columnNumber: 17
                                     }, this) : fcTotalData.length
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 114,
+                                    lineNumber: 146,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1827,13 +1859,13 @@ function Page() {
                                     children: "报废车 交易记录"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 121,
+                                    lineNumber: 153,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 113,
+                            lineNumber: 145,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1845,12 +1877,12 @@ function Page() {
                                         className: "h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 158,
                                         columnNumber: 17
                                     }, this) : fgTotalData.length
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 124,
+                                    lineNumber: 156,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1858,13 +1890,13 @@ function Page() {
                                     children: "废钢铁 交易记录"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 131,
+                                    lineNumber: 163,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 123,
+                            lineNumber: 155,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1876,12 +1908,12 @@ function Page() {
                                         className: "h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
-                                        lineNumber: 136,
+                                        lineNumber: 168,
                                         columnNumber: 17
                                     }, this) : fcTotalData.length + fgTotalData.length
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 134,
+                                    lineNumber: 166,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1889,13 +1921,13 @@ function Page() {
                                     children: "总交易记录"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 173,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 133,
+                            lineNumber: 165,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1907,12 +1939,12 @@ function Page() {
                                         className: "h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
-                                        lineNumber: 146,
+                                        lineNumber: 178,
                                         columnNumber: 17
                                     }, this) : `¥${getTotalAmount().toLocaleString()}`
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 144,
+                                    lineNumber: 176,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1920,30 +1952,30 @@ function Page() {
                                     children: "总交易金额"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
-                                    lineNumber: 151,
+                                    lineNumber: 183,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/page.tsx",
-                            lineNumber: 143,
+                            lineNumber: 175,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/page.tsx",
-                    lineNumber: 112,
+                    lineNumber: 144,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/page.tsx",
-            lineNumber: 85,
+            lineNumber: 117,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/page.tsx",
-        lineNumber: 84,
+        lineNumber: 116,
         columnNumber: 5
     }, this);
 }

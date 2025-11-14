@@ -36,7 +36,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link href="#" className="text-sm leading-6 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                      萍乡县打区发布
+                      萍乡县区发布
                     </Link>
                   </li>
                 </ul>
