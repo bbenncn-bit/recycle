@@ -8816,6 +8816,10 @@ class ReceiptfcService {
             const progressiveUrls = originalUrl ? this.generateProgressiveUrls(originalUrl) : null;
             return {
                 ...item,
+                // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
+                taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
+                unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
+                weight: item.weight ? item.weight.toString() : null,
                 originalImageUrl: originalUrl,
                 thumbnailUrl: progressiveUrls?.tiny || null,
                 smallThumbnailUrl: progressiveUrls?.small || null,
@@ -9003,6 +9007,10 @@ class ReceiptfgService {
             const progressiveUrls = originalUrl ? this.generateProgressiveUrls(originalUrl) : null;
             return {
                 ...item,
+                // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
+                taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
+                unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
+                weight: item.weight ? item.weight.toString() : null,
                 originalImageUrl: originalUrl,
                 thumbnailUrl: progressiveUrls?.tiny || null,
                 smallThumbnailUrl: progressiveUrls?.small || null,
@@ -9064,7 +9072,7 @@ class ReceiptfgService {
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"40d8c4b939b93db451cc230ae885fafa2fa3da3f8d":"getReceiptfgDataBatch"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"40010632a053bd7b9e4ed3caf74233213663aa3b64":"getReceiptfgDataBatch"},"",""] */ __turbopack_context__.s({
     "getReceiptfgDataBatch": (()=>getReceiptfgDataBatch)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
@@ -9081,14 +9089,14 @@ async function getReceiptfgDataBatch(params = {}) {
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getReceiptfgDataBatch
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getReceiptfgDataBatch, "40d8c4b939b93db451cc230ae885fafa2fa3da3f8d", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getReceiptfgDataBatch, "40010632a053bd7b9e4ed3caf74233213663aa3b64", null);
 }}),
 "[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ [{"40e484fae75597c1d5bb857da3bd92c78038d542eb":"getReceiptfcDataBatch"},"",""] */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ [{"40eed293b8565b5fb998d28411b6e9cac9a59921da":"getReceiptfcDataBatch"},"",""] */ __turbopack_context__.s({
     "getReceiptfcDataBatch": (()=>getReceiptfcDataBatch)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
@@ -9105,7 +9113,7 @@ async function getReceiptfcDataBatch(params = {}) {
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getReceiptfcDataBatch
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getReceiptfcDataBatch, "40e484fae75597c1d5bb857da3bd92c78038d542eb", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getReceiptfcDataBatch, "40eed293b8565b5fb998d28411b6e9cac9a59921da", null);
 }}),
 "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>": ((__turbopack_context__) => {
 "use strict";
@@ -9134,8 +9142,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
-    "40d8c4b939b93db451cc230ae885fafa2fa3da3f8d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getReceiptfgDataBatch"]),
-    "40e484fae75597c1d5bb857da3bd92c78038d542eb": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getReceiptfcDataBatch"])
+    "40010632a053bd7b9e4ed3caf74233213663aa3b64": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getReceiptfgDataBatch"]),
+    "40eed293b8565b5fb998d28411b6e9cac9a59921da": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getReceiptfcDataBatch"])
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)");
@@ -9147,8 +9155,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
-    "40d8c4b939b93db451cc230ae885fafa2fa3da3f8d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40d8c4b939b93db451cc230ae885fafa2fa3da3f8d"]),
-    "40e484fae75597c1d5bb857da3bd92c78038d542eb": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40e484fae75597c1d5bb857da3bd92c78038d542eb"])
+    "40010632a053bd7b9e4ed3caf74233213663aa3b64": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40010632a053bd7b9e4ed3caf74233213663aa3b64"]),
+    "40eed293b8565b5fb998d28411b6e9cac9a59921da": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40eed293b8565b5fb998d28411b6e9cac9a59921da"])
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <module evaluation>');
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfg$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$src$2f$app$2f$api$2f$receiptfc$2f$fetch$2d$batch$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => "[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <exports>');

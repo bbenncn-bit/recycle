@@ -6,8 +6,8 @@ import Footer from 'src/components/footer';
 import { ThemeProvider } from 'src/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: '欧冶链金（萍乡）再生资源有限公司',
-  description: '变废为宝 - 再生资源交易平台',
+  title: '萍乡再生资源交易中心',
+  description: '变废为宝 - 萍乡再生资源交易中心',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },

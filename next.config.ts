@@ -2,15 +2,13 @@ import type { NextConfig } from "next";
 
 const path = require('path');
 const nextConfig: NextConfig = {
-  experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
-    }, 
+    },
   },
   output: 'standalone',
   env: {
@@ -67,9 +65,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
-  // enable font optimization for Turbopack compatibility
-  optimizeFonts: true,
   
   // 确保生产环境下强制HTTPS
   ...(process.env.NODE_ENV === 'production' && {

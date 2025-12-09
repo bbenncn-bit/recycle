@@ -208,6 +208,10 @@ export class ReceiptfcService {
 
       return {
         ...item,
+        // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
+        taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
+        unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
+        weight: item.weight ? item.weight.toString() : null,
         originalImageUrl: originalUrl,
         thumbnailUrl: progressiveUrls?.tiny || null,
         smallThumbnailUrl: progressiveUrls?.small || null,
@@ -431,6 +435,10 @@ export class ReceiptfgService {
 
       return {
         ...item,
+        // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
+        taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
+        unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
+        weight: item.weight ? item.weight.toString() : null,
         originalImageUrl: originalUrl,
         thumbnailUrl: progressiveUrls?.tiny || null,
         smallThumbnailUrl: progressiveUrls?.small || null,
