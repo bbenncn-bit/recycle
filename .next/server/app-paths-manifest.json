@@ -1,5 +1,1 @@
-{
-  "/api/receiptfc/route": "app/api/receiptfc/route.js",
-  "/api/receiptfg/route": "app/api/receiptfg/route.js",
-  "/page": "app/page.js"
-}
+{}

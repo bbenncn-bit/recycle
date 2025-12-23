@@ -1,28 +1,5 @@
 {
-  "node": {
-    "40010632a053bd7b9e4ed3caf74233213663aa3b64": {
-      "workers": {
-        "app/page": {
-          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/page": "action-browser"
-      }
-    },
-    "40eed293b8565b5fb998d28411b6e9cac9a59921da": {
-      "workers": {
-        "app/page": {
-          "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/api/receiptfg/fetch-batch.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/app/api/receiptfc/fetch-batch.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
   "encryptionKey": "h29gS76KfrhXtIObm0QU+K6nsYpIT60qw2hDOFpuAEM="
 }

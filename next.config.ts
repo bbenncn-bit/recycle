@@ -2,10 +2,7 @@ import type { NextConfig } from "next";
 
 const path = require('path');
 const nextConfig: NextConfig = {
-  // 启用 instrumentation hook（用于应用启动时的初始化）
-  experimental: {
-    instrumentationHook: true,
-  },
+  // 注意：instrumentation.ts 在 Next.js 15+ 中默认启用，无需配置
   turbopack: {
     rules: {
       '*.svg': {
