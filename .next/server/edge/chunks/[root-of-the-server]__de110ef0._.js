@@ -29,6 +29,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/esm/server/web/spec-extension/response.js [middleware-edge] (ecmascript)");
 ;
 function middleware(request) {
+    // 注意：数据同步定时任务现在通过 instrumentation.ts 在应用启动时初始化
+    // 不再在 middleware 中初始化，以避免每次请求都检查
     // 在生产环境强制HTTPS
     if ("TURBOPACK compile-time falsy", 0) {
         "TURBOPACK unreachable";

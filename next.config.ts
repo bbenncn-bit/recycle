@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const path = require('path');
 const nextConfig: NextConfig = {
+  // 启用 instrumentation hook（用于应用启动时的初始化）
+  experimental: {
+    instrumentationHook: true,
+  },
   turbopack: {
     rules: {
       '*.svg': {

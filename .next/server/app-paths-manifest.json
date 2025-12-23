@@ -1,13 +1,5 @@
 {
-  "/api/energy/balance-optimization/route": "app/api/energy/balance-optimization/route.js",
-  "/api/energy/consumption-calculation/route": "app/api/energy/consumption-calculation/route.js",
-  "/api/energy/consumption-query/route": "app/api/energy/consumption-query/route.js",
   "/api/receiptfc/route": "app/api/receiptfc/route.js",
   "/api/receiptfg/route": "app/api/receiptfg/route.js",
-  "/disposal/auction/page": "app/disposal/auction/page.js",
-  "/energy/balance-optimization/page": "app/energy/balance-optimization/page.js",
-  "/energy/consumption-calculation/page": "app/energy/consumption-calculation/page.js",
-  "/energy/consumption-query/page": "app/energy/consumption-query/page.js",
-  "/page": "app/page.js",
-  "/purchase/scrapsteel/page": "app/purchase/scrapsteel/page.js"
+  "/page": "app/page.js"
 }

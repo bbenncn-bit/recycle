@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // 注意：数据同步定时任务现在通过 instrumentation.ts 在应用启动时初始化
+  // 不再在 middleware 中初始化，以避免每次请求都检查
+
   // 在生产环境强制HTTPS
   if (process.env.NODE_ENV === 'production') {
     const url = request.nextUrl.clone();
