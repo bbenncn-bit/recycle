@@ -25,13 +25,9 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-const getInitialTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'light';
-  return (localStorage.getItem('theme') as Theme) || 'light';
-};
-
+// Theme is not persisted (no localStorage) to avoid SSR errors when Node has a broken localStorage (e.g. --localstorage-file).
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -39,9 +35,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    
-    localStorage.setItem('theme', theme);
+    if (!mounted || typeof document === 'undefined') return;
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme, mounted]);
 

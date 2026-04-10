@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">萍乡市再生资源交易中心</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">萍乡再生资源交易中心</h3>
               <p className="mt-4 text-sm text-gray-600 dark:text-gray-300">
                 变废为宝，推动循环经济发展，打造绿色可持续的再生资源交易生态系统。
               </p>

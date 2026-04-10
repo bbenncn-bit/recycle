@@ -1,0 +1,1137 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import ReactECharts from 'echarts-for-react';
+
+const SALES_DETAILS_PAGE_SIZE = 10;
+
+/** 解析发货日期字符串为 Date，支持 1/1/2026（月/日/年）及 ISO 等格式 */
+function parseDeliveryDate(str: string | null): Date | null {
+  if (!str?.trim()) return null;
+  const d = new Date(str.trim());
+  if (!isNaN(d.getTime()) && d.getFullYear() >= 1900 && d.getFullYear() <= 2100) return d;
+  return null;
+}
+
+/** 从销售明细项得到月份键 YYYY-MM */
+function getMonthKey(deliveryDate: string): string {
+  const d = parseDeliveryDate(deliveryDate);
+  if (!d) return '';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+interface ProfitAnalysisData {
+  summary: {
+    todayProfit: number;
+    weekProfit: number;
+    monthProfit: number;
+    todayRevenue: number;
+    todayMaterialCost: number;
+    todayProcessingCost: number;
+  };
+  dailyTrend: {
+    dates: string[];
+    revenue: number[];
+    materialCost: number[];
+    processingCost: number[];
+    profit: number[];
+  };
+  weekBreakdown: {
+    days: string[];
+    revenue: number[];
+    materialCost: number[];
+    processingCost: number[];
+    profit: number[];
+  };
+  salesDetails: Array<{
+    deliveryNumber: string;
+    deliveryDate: string;
+    productType: string;
+    warehouse: string;
+    customer: string;
+    settlementQuantity: number;
+    revenue: number;
+    materialCost: number;
+    processingCost: number;
+    otherCosts: number;
+    otherIncome: number;
+    transportCost: number;
+    taxCost: number;
+    discountCost: number;
+    interestCost: number;
+    immediateRefund: number;
+    governmentSupport: number;
+    profit: number;
+    materialComposition: Array<{
+      material: string;
+      quantity: number;
+      cost: number;
+    }>;
+    productionRecords?: Array<{
+      id: number;
+      productionDate: string;
+      quantity: number;
+      unitCost: number;
+      totalCost: number;
+    }>;
+  }>;
+  productComparison: {
+    products: string[];
+    currentMonth: {
+      materialUsagePerTon: number[];
+      processingCostPerTon: number[];
+    };
+    lastMonth: {
+      materialUsagePerTon: number[];
+      processingCostPerTon: number[];
+    };
+  };
+}
+
+export default function ProfitAnalysis() {
+  const [data, setData] = useState<ProfitAnalysisData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [tooltipData, setTooltipData] = useState<{
+    x: number;
+    y: number;
+    kind: 'material' | 'otherCosts' | 'otherIncome';
+    sale: ProfitAnalysisData['salesDetails'][0];
+  } | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(1920); // 默认值，避免 SSR 错误
+  const [salesDetailMonth, setSalesDetailMonth] = useState<string>(''); // 当前选中的月份 YYYY-MM，空表示“全部”
+  const [salesDetailPage, setSalesDetailPage] = useState(1);
+
+  useEffect(() => {
+    // 客户端才设置窗口宽度
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      const handleResize = () => setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // 按月份分组销售明细（根据 delivery_date 月/日/年 格式解析）
+  type SalesDetails = ProfitAnalysisData['salesDetails'];
+  const { salesDetailsByMonth, monthKeys } = useMemo(() => {
+    const list: SalesDetails = data?.salesDetails ?? [];
+    const byMonth: Record<string, SalesDetails> = {};
+    for (const sale of list) {
+      const key = getMonthKey(sale.deliveryDate);
+      if (!key) continue;
+      if (!byMonth[key]) byMonth[key] = [];
+      byMonth[key].push(sale);
+    }
+    const keys = Object.keys(byMonth).sort();
+    return { salesDetailsByMonth: byMonth, monthKeys: keys };
+  }, [data?.salesDetails]);
+
+  // 当前选中月份下的列表与分页
+  const currentMonthDetails = useMemo(() => {
+    if (!data?.salesDetails?.length) return [];
+    if (!salesDetailMonth) return data.salesDetails;
+    return salesDetailsByMonth[salesDetailMonth] ?? [];
+  }, [data?.salesDetails, salesDetailMonth, salesDetailsByMonth]);
+
+  const totalPages = Math.max(1, Math.ceil(currentMonthDetails.length / SALES_DETAILS_PAGE_SIZE));
+  const paginatedDetails = useMemo(() => {
+    const from = (salesDetailPage - 1) * SALES_DETAILS_PAGE_SIZE;
+    return currentMonthDetails.slice(from, from + SALES_DETAILS_PAGE_SIZE);
+  }, [currentMonthDetails, salesDetailPage]);
+
+  // 数据加载后默认选中第一个月份
+  useEffect(() => {
+    if (monthKeys.length > 0 && salesDetailMonth === '') {
+      setSalesDetailMonth(monthKeys[0]);
+      setSalesDetailPage(1);
+    }
+  }, [monthKeys.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onMonthChange = (key: string) => {
+    setSalesDetailMonth(key);
+    setSalesDetailPage(1);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // 设置超时（5分钟，300秒）- 临时方案，等待缓存生效后可以改回60秒
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 300000);
+        
+        const response = await fetch('/api/profit-management/profit-analysis', {
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          throw new Error(result.error || '获取数据失败');
+        }
+      } catch (err) {
+        console.error('获取利润分析数据失败:', err);
+        const errorMessage = err instanceof Error 
+          ? (err.name === 'AbortError' ? '请求超时，请稍后重试' : err.message)
+          : '未知错误';
+        setError(errorMessage);
+        setData({
+          summary: {
+            todayProfit: 0,
+            weekProfit: 0,
+            monthProfit: 0,
+            todayRevenue: 0,
+            todayMaterialCost: 0,
+            todayProcessingCost: 0,
+          },
+          dailyTrend: {
+            dates: [],
+            revenue: [],
+            materialCost: [],
+            processingCost: [],
+            profit: [],
+          },
+          weekBreakdown: {
+            days: [],
+            revenue: [],
+            materialCost: [],
+            processingCost: [],
+            profit: [],
+          },
+          salesDetails: [],
+          productComparison: {
+            products: [],
+            currentMonth: {
+              materialUsagePerTon: [],
+              processingCostPerTon: [],
+            },
+            lastMonth: {
+              materialUsagePerTon: [],
+              processingCostPerTon: [],
+            },
+          },
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-gray-600 dark:text-gray-400">加载中...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-red-600 dark:text-red-400">错误: {error}</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-gray-600 dark:text-gray-400">暂无数据</div>
+      </div>
+    );
+  }
+
+  // 日利润趋势图配置（堆叠面积图）
+  const dailyTrendOption = {
+    title: {
+      text: '日利润趋势（最近30天）',
+      left: 'center',
+      textStyle: {
+        color: '#333',
+        fontSize: 18
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        label: {
+          backgroundColor: '#6a7985'
+        }
+      },
+      formatter: (params: any) => {
+        let result = params[0].name + '<br/>';
+        const order = ['销售收入', '材料成本', '加工成本', '利润'];
+        order.forEach(seriesName => {
+          const param = params.find((p: any) => p.seriesName === seriesName);
+          if (param) {
+            result += `${param.marker}${param.seriesName}: ${param.value.toFixed(2)} 万元<br/>`;
+          }
+        });
+        return result;
+      }
+    },
+    legend: {
+      data: ['销售收入', '材料成本', '加工成本', '利润'],
+      bottom: 0
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      top: '10%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: data.dailyTrend.dates.map(date => {
+        const parts = date.split('-');
+        return `${parts[1]}-${parts[2]}`;
+      }),
+      axisLabel: {
+        rotate: 45
+      }
+    },
+    yAxis: {
+      type: 'value',
+      name: '金额（万元）'
+    },
+    series: [
+      {
+        name: '销售收入',
+        type: 'line',
+        stack: 'cost',
+        smooth: true,
+        areaStyle: {
+          opacity: 0.8
+        },
+        itemStyle: {
+          color: '#5470c6'
+        },
+        lineStyle: {
+          color: '#5470c6',
+          width: 1
+        },
+        data: data.dailyTrend.revenue || []
+      },
+      {
+        name: '材料成本',
+        type: 'line',
+        stack: 'cost',
+        smooth: true,
+        areaStyle: {
+          opacity: 0.8
+        },
+        itemStyle: {
+          color: '#ee6666'
+        },
+        lineStyle: {
+          color: '#ee6666',
+          width: 1
+        },
+        data: data.dailyTrend.materialCost || []
+      },
+      {
+        name: '加工成本',
+        type: 'line',
+        stack: 'cost',
+        smooth: true,
+        areaStyle: {
+          opacity: 0.8
+        },
+        itemStyle: {
+          color: '#fac858'
+        },
+        lineStyle: {
+          color: '#fac858',
+          width: 1
+        },
+        data: data.dailyTrend.processingCost || []
+      },
+      {
+        name: '利润',
+        type: 'line',
+        smooth: true,
+        itemStyle: {
+          color: '#91cc75'
+        },
+        lineStyle: {
+          color: '#91cc75',
+          width: 2
+        },
+        data: data.dailyTrend.profit || []
+      }
+    ]
+  };
+
+  // 周利润分解图：左柱=销售收入、右柱=总成本（左Y轴）；利润用曲线图绑定右侧Y轴
+  const totalCostByDay = (data.weekBreakdown.materialCost || []).map((m: number, i: number) =>
+    (m || 0) + (data.weekBreakdown.processingCost?.[i] ?? 0)
+  );
+  const weekBreakdownOption = {
+    title: {
+      text: '最近一周利润分解',
+      left: 'center',
+      textStyle: {
+        color: '#333',
+        fontSize: 18
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        const revParam = params.find((p: any) => p.seriesName === '销售收入');
+        const costParam = params.find((p: any) => p.seriesName === '总成本');
+        const profitParam = params.find((p: any) => p.seriesName === '利润');
+        const revenue = revParam?.value ?? 0;
+        const totalCost = costParam?.value ?? 0;
+        const profit = profitParam?.value ?? (revenue - totalCost);
+        const materialCost = data.weekBreakdown.materialCost?.[revParam?.dataIndex ?? 0] ?? 0;
+        const processingCost = data.weekBreakdown.processingCost?.[revParam?.dataIndex ?? 0] ?? 0;
+        let result = `${params[0].name}<br/>`;
+        result += `${revParam?.marker}销售收入: ${revenue.toFixed(2)} 万元<br/>`;
+        result += `${costParam?.marker}总成本: ${totalCost.toFixed(2)} 万元（材料 ${materialCost.toFixed(2)} + 加工 ${processingCost.toFixed(2)}）<br/>`;
+        result += `${profitParam?.marker ?? ''}<b>利润: ${profit.toFixed(2)} 万元</b>`;
+        return result;
+      }
+    },
+    legend: {
+      data: ['销售收入', '总成本', '利润'],
+      bottom: 0
+    },
+    grid: {
+      left: '3%',
+      right: '14%',
+      bottom: '12%',
+      top: '12%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: data.weekBreakdown.days,
+      axisLabel: { rotate: 0 }
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '金额（万元）',
+        position: 'left',
+        axisLine: { show: true },
+        axisLabel: { color: '#5470c6' },
+        nameTextStyle: { color: '#5470c6' }
+      },
+      {
+        type: 'value',
+        name: '利润（万元）',
+        position: 'right',
+        axisLine: { show: true, lineStyle: { color: '#91cc75' } },
+        axisLabel: { color: '#91cc75' },
+        nameTextStyle: { color: '#91cc75' },
+        splitLine: { show: false }
+      }
+    ],
+    series: [
+      {
+        name: '销售收入',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: data.weekBreakdown.revenue || [],
+        barWidth: '28%',
+        barGap: '15%',
+        itemStyle: { color: '#5470c6' },
+        label: { show: false }
+      },
+      {
+        name: '总成本',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: totalCostByDay,
+        barWidth: '28%',
+        barGap: '15%',
+        itemStyle: { color: '#ee6666' },
+        label: { show: false }
+      },
+      {
+        name: '利润',
+        type: 'line',
+        yAxisIndex: 1,
+        data: data.weekBreakdown.profit || [],
+        symbol: 'circle',
+        symbolSize: 8,
+        lineStyle: { color: '#91cc75', width: 2 },
+        itemStyle: { color: '#91cc75' },
+        label: { show: false }
+      }
+    ]
+  };
+
+  // 成品对比分析图配置（分组柱状图）
+  const productComparisonOption = {
+    title: {
+      text: '成品对比分析（当月 vs 上月）',
+      left: 'center',
+      textStyle: {
+        color: '#333',
+        fontSize: 18
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    legend: {
+      data: ['当月原材料使用量/吨', '上月原材料使用量/吨', '当月加工成本/元/吨', '上月加工成本/元/吨'],
+      bottom: 0
+    },
+    grid: {
+      left: '15%',
+      right: '5%',
+      bottom: '20%',
+      top: '10%',
+      containLabel: false
+    },
+    xAxis: {
+      type: 'category',
+      data: data.productComparison.products,
+      axisLabel: {
+        rotate: 45,
+        interval: 0
+      }
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '原材料使用量（吨/吨成品）',
+        position: 'left'
+      },
+      {
+        type: 'value',
+        name: '加工成本（元/吨）',
+        position: 'right'
+      }
+    ],
+    series: [
+      {
+        name: '当月原材料使用量/吨',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: data.productComparison.currentMonth.materialUsagePerTon,
+        itemStyle: {
+          color: '#5470c6'
+        }
+      },
+      {
+        name: '上月原材料使用量/吨',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: data.productComparison.lastMonth.materialUsagePerTon,
+        itemStyle: {
+          color: '#91cc75'
+        }
+      },
+      {
+        name: '当月加工成本/元/吨',
+        type: 'line',
+        yAxisIndex: 1,
+        data: data.productComparison.currentMonth.processingCostPerTon,
+        itemStyle: {
+          color: '#ee6666'
+        }
+      },
+      {
+        name: '上月加工成本/元/吨',
+        type: 'line',
+        yAxisIndex: 1,
+        data: data.productComparison.lastMonth.processingCostPerTon,
+        itemStyle: {
+          color: '#fac858'
+        }
+      }
+    ]
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* 页面标题 */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            利润分析
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            实时监控废钢业务利润，为经营决策提供数据支持
+          </p>
+        </div>
+
+        {/* 利润公式说明 */}
+        <div className="mb-8 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">利润计算公式</h3>
+          <p className="text-sm text-gray-700 dark:text-gray-300 font-mono break-all">
+            利润 = 销售收入 − 总成本（废钢成本 + 加工成本）− 运输费 − 税费 + 即征即退 + 政府扶持资金 − 贴现费用 − 回款周期资金利息
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            销售明细表中按每张销售单分别计算：总成本含材料成本与加工成本；其它成本项 = 运输费 + 税费 + 贴现费用 + 回款周期资金利息；其它收入项 = 即征即退 + 政府扶持资金（待配置）。
+          </p>
+        </div>
+
+        {/* 统计卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* 今日利润 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  今日利润
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                  {data.summary.todayProfit.toFixed(2)}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    收入: {data.summary.todayRevenue.toFixed(2)} 万元
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    成本: {(data.summary.todayMaterialCost + data.summary.todayProcessingCost).toFixed(2)} 万元
+                  </p>
+                </div>
+              </div>
+              <div className="bg-green-100 dark:bg-green-900 rounded-full p-3">
+                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* 本周利润 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  本周利润
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                  {data.summary.weekProfit.toFixed(2)}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+              </div>
+              <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-3">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* 本月利润 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  本月利润
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                  {data.summary.monthProfit.toFixed(2)}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3">
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* 今日成本明细 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                今日成本明细
+              </p>
+              <div className="mt-3 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-500">材料成本:</span>
+                  <span className="text-xs font-semibold">{data.summary.todayMaterialCost.toFixed(2)} 万元</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-500">加工成本:</span>
+                  <span className="text-xs font-semibold">{data.summary.todayProcessingCost.toFixed(2)} 万元</span>
+                </div>
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-between">
+                    <span className="text-xs font-medium">总成本:</span>
+                    <span className="text-xs font-bold">{(data.summary.todayMaterialCost + data.summary.todayProcessingCost).toFixed(2)} 万元</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 图表区域 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* 日利润趋势图 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <ReactECharts
+              option={dailyTrendOption}
+              style={{ height: '400px', width: '100%' }}
+            />
+          </div>
+
+          {/* 周利润分解图 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <ReactECharts
+              option={weekBreakdownOption}
+              style={{ height: '400px', width: '100%' }}
+            />
+          </div>
+        </div>
+
+        {/* 销售明细表格：月份导航 + 分页 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">销售明细</h2>
+
+          {/* 月份导航（根据 delivery_date 自动累加） */}
+          {monthKeys.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">月份：</span>
+              <button
+                type="button"
+                onClick={() => onMonthChange('')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium ${salesDetailMonth === ''
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+              >
+                全部
+              </button>
+              {monthKeys.map((key) => {
+                const [y, m] = key.split('-');
+                const label = monthKeys.some(k => k !== key && k.startsWith(y)) ? `${parseInt(m, 10)}月` : `${y}年${parseInt(m, 10)}月`;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => onMonthChange(key)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium ${salesDetailMonth === key
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发货单号</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发货日期</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">成品名称</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发往客户</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">结算量(吨)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">销售收入(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">材料成本(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">加工成本(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它成本项:运输费+税费+贴现+回款利息(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它收入项:即征即退+政府扶持(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">利润(元)</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {paginatedDetails.map((sale, index) => (
+                  <tr
+                    key={`${sale.deliveryNumber}-${sale.deliveryDate}-${index}`}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                    title={sale.materialComposition?.length ? `原材料构成: ${sale.materialComposition.map(m => `${m.material}(${(m.quantity ?? 0).toFixed(2)}吨)`).join(', ')}` : undefined}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryNumber}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryDate}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.productType}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.customer}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.settlementQuantity.toFixed(2)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.revenue.toFixed(2)}</td>
+                    <td
+                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      onMouseEnter={(e) => {
+                        const hasData = sale.materialCost > 0 && ((sale.materialComposition?.length ?? 0) > 0 || (sale.productionRecords?.length ?? 0) > 0);
+                        if (hasData) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipData({
+                            x: rect.left + rect.width / 2,
+                            y: rect.bottom,
+                            kind: 'material',
+                            sale,
+                          });
+                        }
+                      }}
+                      onMouseLeave={() => setTooltipData(null)}
+                    >
+                      <span className="cursor-help">
+                        {(sale.materialCost ?? 0).toFixed(2)}
+                        {((sale.materialComposition?.length ?? 0) > 0 || (sale.productionRecords?.length ?? 0) > 0) && (sale.materialCost ?? 0) > 0 && (
+                          <span className="ml-1 text-blue-500 text-xs">ℹ️</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.processingCost.toFixed(2)}</td>
+                    <td
+                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      onMouseEnter={(e) => {
+                        if ((sale.otherCosts ?? 0) > 0) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipData({
+                            x: rect.left + rect.width / 2,
+                            y: rect.bottom,
+                            kind: 'otherCosts',
+                            sale,
+                          });
+                        }
+                      }}
+                      onMouseLeave={() => setTooltipData(null)}
+                    >
+                      <span className="cursor-help">
+                        {(sale.otherCosts ?? 0).toFixed(2)}
+                        {(sale.otherCosts ?? 0) > 0 && (
+                          <span className="ml-1 text-blue-500 text-xs">ℹ️</span>
+                        )}
+                      </span>
+                    </td>
+                    <td
+                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      onMouseEnter={(e) => {
+                        if ((sale.otherIncome ?? 0) > 0) {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setTooltipData({
+                            x: rect.left + rect.width / 2,
+                            y: rect.bottom,
+                            kind: 'otherIncome',
+                            sale,
+                          });
+                        }
+                      }}
+                      onMouseLeave={() => setTooltipData(null)}
+                    >
+                      <span className="cursor-help">
+                        {(sale.otherIncome ?? 0).toFixed(2)}
+                        {(sale.otherIncome ?? 0) > 0 && (
+                          <span className="ml-1 text-blue-500 text-xs">ℹ️</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className={`px-4 py-3 whitespace-nowrap text-sm font-semibold ${sale.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {sale.profit.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 单月超过 10 条时分页 */}
+          {currentMonthDetails.length > SALES_DETAILS_PAGE_SIZE && (
+            <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                共 {currentMonthDetails.length} 条，第 {(salesDetailPage - 1) * SALES_DETAILS_PAGE_SIZE + 1}–{Math.min(salesDetailPage * SALES_DETAILS_PAGE_SIZE, currentMonthDetails.length)} 条
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSalesDetailPage(p => Math.max(1, p - 1))}
+                  disabled={salesDetailPage <= 1}
+                  className="px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  上一页
+                </button>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {salesDetailPage} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSalesDetailPage(p => Math.min(totalPages, p + 1))}
+                  disabled={salesDetailPage >= totalPages}
+                  className="px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  下一页
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 成品对比分析图 */}
+        {data.productComparison.products.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <ReactECharts
+              option={productComparisonOption}
+              style={{ height: '400px', width: '100%' }}
+            />
+          </div>
+        )}
+
+        {/* 材料成本 Tooltip（桑基图 + 平均生产日期） */}
+        {tooltipData && tooltipData.kind === 'material' && (tooltipData.sale.materialCost ?? 0) > 0 && ((tooltipData.sale.materialComposition?.length ?? 0) > 0 || (tooltipData.sale.productionRecords?.length ?? 0) > 0) && (
+          <div
+            className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-blue-200 dark:border-blue-700 p-4 pointer-events-auto"
+            style={{
+              left: `${Math.min(Math.max(tooltipData.x, 200), windowWidth - 320)}px`,
+              top: `${tooltipData.y + 10}px`,
+              transform: tooltipData.x > windowWidth - 320 ? 'translateX(-100%)' : 'translateX(-50%)',
+              minWidth: '450px',
+              maxWidth: '650px',
+            }}
+            onMouseEnter={() => {}} // 保持 tooltip 显示
+            onMouseLeave={() => setTooltipData(null)}
+          >
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                材料成本明细（LIFO）
+              </h3>
+              <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                <div>发货单号: {tooltipData.sale.deliveryNumber}</div>
+                <div>成品: {tooltipData.sale.productType} ({tooltipData.sale.warehouse})</div>
+                <div>销售数量: {tooltipData.sale.settlementQuantity.toFixed(2)} 吨</div>
+                <div>总材料成本: {tooltipData.sale.materialCost.toFixed(2)} 元</div>
+              </div>
+            </div>
+            
+            {tooltipData.sale.productionRecords && tooltipData.sale.productionRecords.length > 0 && (
+              <div className="mb-3">
+                <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  使用的生产记录:
+                </h4>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {tooltipData.sale.productionRecords.map((record, idx) => (
+                    <div key={idx} className="text-xs text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700 pb-1">
+                      <div>生产日期: {record.productionDate}</div>
+                      <div>使用数量: {(record.quantity ?? 0).toFixed(2)} 吨 | 单位成本: {(record.unitCost ?? 0).toFixed(2)} 元/吨 | 成本: {(record.totalCost ?? 0).toFixed(2)} 元</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tooltipData.sale.materialComposition && tooltipData.sale.materialComposition.length > 0 && (() => {
+              const comp = tooltipData.sale.materialComposition!;
+              const targetName = '材料成本(元)';
+              const nodes = [
+                ...comp.map(m => ({ name: m.material })),
+                { name: targetName },
+              ];
+              const links = comp
+                .filter(m => (m.quantity ?? 0) > 0)
+                .map(m => ({ source: m.material, target: targetName, value: m.quantity }));
+              const avgProdDate = (() => {
+                const recs = tooltipData.sale.productionRecords;
+                if (!recs?.length) return null;
+                const parseDate = (s: string): number => {
+                  if (!s || typeof s !== 'string') return NaN;
+                  const iso = s.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+                  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]).getTime();
+                  const slash = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  if (slash) return new Date(+slash[3], +slash[1] - 1, +slash[2]).getTime();
+                  return new Date(s).getTime();
+                };
+                let totalQ = 0;
+                let sumT = 0;
+                for (const r of recs) {
+                  const t = parseDate(r.productionDate);
+                  if (!Number.isNaN(t) && r.quantity > 0) {
+                    totalQ += r.quantity;
+                    sumT += r.quantity * t;
+                  }
+                }
+                if (totalQ <= 0) return null;
+                const avg = new Date(sumT / totalQ);
+                return `${avg.getFullYear()}-${String(avg.getMonth() + 1).padStart(2, '0')}-${String(avg.getDate()).padStart(2, '0')}`;
+              })();
+              return (
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    原材料构成（桑基图，流量=吨）
+                  </h4>
+                  {avgProdDate != null && (
+                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      平均生产日期: {avgProdDate}
+                    </div>
+                  )}
+                  <ReactECharts
+                    option={{
+                      tooltip: {
+                        trigger: 'item',
+                        formatter: (params: { data: { value?: number }; name: string }) =>
+                          typeof params.data?.value === 'number'
+                            ? `${params.name}: ${params.data.value.toFixed(2)} 吨`
+                            : params.name,
+                      },
+                      series: [
+                        {
+                          type: 'sankey',
+                          emphasis: { focus: 'adjacency' },
+                          data: nodes,
+                          links: links,
+                          lineStyle: { curveness: 0.5 },
+                          label: { fontSize: 11 },
+                        },
+                      ],
+                    }}
+                    style={{ height: '280px', width: '100%' }}
+                  />
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* 其它成本项 Tooltip：运输费 + 税费 + 贴现 + 回款利息 */}
+        {tooltipData && tooltipData.kind === 'otherCosts' && (
+          <div
+            className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-200 dark:border-amber-700 p-4 pointer-events-auto"
+            style={{
+              left: `${Math.min(Math.max(tooltipData.x, 200), windowWidth - 360)}px`,
+              top: `${tooltipData.y + 10}px`,
+              transform: tooltipData.x > windowWidth - 360 ? 'translateX(-100%)' : 'translateX(-50%)',
+              minWidth: '420px',
+              maxWidth: '520px',
+            }}
+            onMouseEnter={() => {}}
+            onMouseLeave={() => setTooltipData(null)}
+          >
+            {(() => {
+              const s = tooltipData.sale;
+              const qty = s.settlementQuantity || 0;
+              const transport = s.transportCost ?? 0;
+              const tax = s.taxCost ?? 0;
+              const discount = s.discountCost ?? 0;
+              const interest = s.interestCost ?? 0;
+              const total = s.otherCosts ?? 0;
+              const transportPerTon = qty > 0 ? transport / qty : 0;
+              const taxPerTon = qty > 0 ? tax / qty : 0;
+              const discountPerTon = qty > 0 ? discount / qty : 0;
+              const interestPerTon = qty > 0 ? interest / qty : 0;
+              const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
+              const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
+              return (
+                <>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    其它成本项明细
+                  </h3>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
+                    <div>发货单号: {s.deliveryNumber}</div>
+                    <div>客户: {s.customer} | 成品: {s.productType}</div>
+                    <div>结算量: {qty.toFixed(2)} 吨</div>
+                  </div>
+                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">
+                    <div>运输费: {transport.toFixed(2)} 元（≈ {transportPerTon.toFixed(2)} 元/吨）</div>
+                    <div>税费: {tax.toFixed(2)} 元（≈ {taxPerTon.toFixed(2)} 元/吨）</div>
+                    <div>贴现费用: {discount.toFixed(2)} 元（≈ {discountPerTon.toFixed(2)} 元/吨）</div>
+                    <div>回款周期资金利息: {interest.toFixed(2)} 元（≈ {interestPerTon.toFixed(2)} 元/吨）</div>
+                    <div className="font-semibold mt-1">
+                      合计: {total.toFixed(2)} 元
+                    </div>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                      计算公式（按吨）概览
+                    </h4>
+                    <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
+                      <li>销售单价(不含税) ≈ {salesUnitExclTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
+                      <li>材料单价(不含税) ≈ {materialUnitExclTax.toFixed(2)} 元/吨 = 材料成本 / 结算量</li>
+                      <li>运输费: 客户对应的运价(含税/1.03) × 结算量</li>
+                      <li>税费: (销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%)×10% + (销售单价+材料单价)×0.05%</li>
+                      <li>贴现费用: 仅萍钢 = 销售单价×1.13×2.175%</li>
+                      <li>回款利息: 销售单价×1.13×3%/360×回款天数（萍钢18/吉钢12/新钢37）</li>
+                    </ul>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* 其它收入项 Tooltip：即征即退 + 政府扶持资金 */}
+        {tooltipData && tooltipData.kind === 'otherIncome' && (
+          <div
+            className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-emerald-200 dark:border-emerald-700 p-4 pointer-events-auto"
+            style={{
+              left: `${Math.min(Math.max(tooltipData.x, 200), windowWidth - 360)}px`,
+              top: `${tooltipData.y + 10}px`,
+              transform: tooltipData.x > windowWidth - 360 ? 'translateX(-100%)' : 'translateX(-50%)',
+              minWidth: '420px',
+              maxWidth: '520px',
+            }}
+            onMouseEnter={() => {}}
+            onMouseLeave={() => setTooltipData(null)}
+          >
+            {(() => {
+              const s = tooltipData.sale;
+              const qty = s.settlementQuantity || 0;
+              const imm = s.immediateRefund ?? 0;
+              const gov = s.governmentSupport ?? 0;
+              const total = s.otherIncome ?? 0;
+              const immPerTon = qty > 0 ? imm / qty : 0;
+              const govPerTon = qty > 0 ? gov / qty : 0;
+              const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
+              const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
+              const baseTransport = s.customer === '萍钢' ? 20.6 / 1.03 : s.customer === '新钢' ? 48 / 1.03 : 0;
+              return (
+                <>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    其它收入项明细
+                  </h3>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
+                    <div>发货单号: {s.deliveryNumber}</div>
+                    <div>客户: {s.customer} | 成品: {s.productType}</div>
+                    <div>结算量: {qty.toFixed(2)} 吨</div>
+                  </div>
+                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">
+                    <div>即征即退: {imm.toFixed(2)} 元（≈ {immPerTon.toFixed(2)} 元/吨）</div>
+                    <div>政府扶持资金: {gov.toFixed(2)} 元（≈ {govPerTon.toFixed(2)} 元/吨）</div>
+                    <div className="font-semibold mt-1">
+                      合计: {total.toFixed(2)} 元
+                    </div>
+                  </div>
+                  {(s.customer === '萍钢' || s.customer === '新钢') && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                      <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                        计算公式（按吨）概览
+                      </h4>
+                      <p className="text-[11px] text-gray-600 dark:text-gray-400 mb-1">
+                        销售单价(不含税) ≈ {salesUnitExclTax.toFixed(2)} 元/吨；材料单价(不含税) ≈ {materialUnitExclTax.toFixed(2)} 元/吨；运输费基数 ≈ {baseTransport.toFixed(2)} 元/吨。
+                      </p>
+                      <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
+                        <li>税费基数 = 销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%</li>
+                        <li>即征即退 = 税费基数 × 30%</li>
+                        <li>政府扶持资金 = 税费基数×70%×38% + 税费基数×10%×80% + (销售单价+材料单价)×0.05%×100%</li>
+                      </ul>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

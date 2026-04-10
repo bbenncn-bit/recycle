@@ -4,14 +4,18 @@ const path = require('path');
 const nextConfig: NextConfig = {
   // 注意：instrumentation.ts 在 Next.js 15+ 中默认启用，无需配置
   turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
       },
-    },
-  },
+    }, 
+  // 仅在生产构建时使用 standalone 输出
+  ...(process.env.NODE_ENV === 'production' && {
   output: 'standalone',
+  }),
+  
   env: {
     NEXT_PUBLIC_SITE_URL: 'https://www.pxrecycle.com',
   },

@@ -5,10 +5,9 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 12.4 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CAHoldings {
   id       Int     @id @default(autoincrement()) @map("_id")
   asset    String? @db.VarChar(255)
@@ -17,7 +16,7 @@ model CAHoldings {
   status   String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 12.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CAMarketCards {
   id     Int     @id @default(autoincrement()) @map("_id")
   price  String? @db.VarChar(255)
@@ -26,7 +25,7 @@ model CAMarketCards {
   unit   String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 12.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CAPieChart {
   id         Int     @id @default(autoincrement()) @map("_id")
   type       String? @db.VarChar(255)
@@ -34,7 +33,7 @@ model CAPieChart {
   percentage String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 12.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CAPriceChart {
   id     Int     @id @default(autoincrement()) @map("_id")
   date   String? @db.VarChar(255)
@@ -42,7 +41,7 @@ model CAPriceChart {
   volume String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 7.2 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CBComparisonChart {
   id     Int     @id @default(autoincrement()) @map("_id")
   month  String? @db.VarChar(255)
@@ -50,7 +49,7 @@ model CBComparisonChart {
   budget String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 7.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CBMonthlyDetails {
   id            Int     @id @default(autoincrement()) @map("_id")
   month         String? @db.VarChar(255)
@@ -60,7 +59,7 @@ model CBMonthlyDetails {
   status        String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 7.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CBSummaryCards {
   id           Int     @id @default(autoincrement()) @map("_id")
   total_energy String? @db.VarChar(255)
@@ -70,7 +69,7 @@ model CBSummaryCards {
   unit         String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 9.3This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CFDetails {
   id       Int      @id @default(autoincrement()) @map("_id")
   process  String?  @db.VarChar(255)
@@ -80,7 +79,7 @@ model CFDetails {
   total    Decimal? @db.Decimal(10, 2)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 9.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CFPieChart {
   id         Int     @id @default(autoincrement()) @map("_id")
   scope      String? @db.VarChar(255)
@@ -88,7 +87,7 @@ model CFPieChart {
   percentage String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 9.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model CFTrendChart {
   id        Int     @id @default(autoincrement()) @map("_id")
   month     String? @db.VarChar(255)
@@ -276,7 +275,7 @@ model EFSummaryTable {
   unit       String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 10.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model SCRanking {
   id         Int     @id @default(autoincrement()) @map("_id")
   supplier   String? @db.VarChar(255)
@@ -286,7 +285,7 @@ model SCRanking {
   compliance String? @db.VarChar(255)
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// 10.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model SCSankeyData {
   id     Int     @id @default(autoincrement()) @map("_id")
   node   Int?
@@ -328,4 +327,180 @@ model receiptfg {
   carBrand          String?   @db.VarChar(500)
   createTime        DateTime? @default(now()) @db.Timestamp(0)
   queryDate         DateTime? @db.Date
+}
+
+/// 固废管理 - 工业固体废物信息表
+model WasteManagement {
+  id                Int       @id @default(autoincrement())
+  wasteCode         String?   @db.VarChar(100) // 固废代码
+  wasteName         String?   @db.VarChar(255) // 固废名称
+  wasteCategory     String?   @db.VarChar(100) // 固废类别（危险废物/一般工业固废等）
+  wasteType         String?   @db.VarChar(100) // 固废种类
+  quantity          Decimal?  @db.Decimal(15, 3) // 数量
+  unit              String?   @db.VarChar(50) // 单位（吨、立方米等）
+  source            String?   @db.VarChar(255) // 产生来源/产生环节
+  flowDirection     String?   @db.VarChar(255) // 流向（去向）
+  storageLocation   String?   @db.VarChar(255) // 贮存地点
+  storageMethod     String?   @db.VarChar(255) // 贮存方式
+  utilizationMethod String?   @db.VarChar(255) // 利用方式
+  disposalMethod    String?   @db.VarChar(255) // 处置方式
+  disposalUnit      String?   @db.VarChar(255) // 处置单位
+  disposalLocation  String?   @db.VarChar(255) // 处置地点
+  recordDate        DateTime? @db.Date // 记录日期
+  operator          String?   @db.VarChar(100) // 操作员/安全员
+  remark            String?   @db.Text // 备注
+  createTime        DateTime? @default(now()) @db.Timestamp(0) // 创建时间
+  updateTime        DateTime? @updatedAt @db.Timestamp(0) // 更新时间
+}
+
+/// 入库单表（采购成本数据）
+model PurchaseWarehouse {
+  id                              Int       @id @default(autoincrement()) @map("id")
+  ledgerNo                        String?   @map("ledger_no") @db.VarChar(100) // 账套号
+  warehouseNo                     String?   @map("warehouse_no") @db.VarChar(100) // 入库单号
+  purchaseContractNo              String?   @map("purchase_contract_no") @db.VarChar(100) // 采购合同编号
+  purchaseOrderNo                 String?   @map("purchase_order_no") @db.VarChar(100) // 采购订单编号
+  warehouseTime                   String?   @map("warehouse_time") @db.VarChar(50) // 入库时间
+  status                          String?   @map("status") @db.VarChar(50) // 状态
+  settlementStatus                String?   @map("settlement_status") @db.VarChar(50) // 结算状态
+  receiptNo                       String?   @map("receipt_no") @db.VarChar(100) // 收货单号
+  base                            String?   @map("base") @db.VarChar(200) // 基地
+  supplier                        String?   @map("supplier") @db.VarChar(200) // 供应商
+  vehicleNo                       String?   @map("vehicle_no") @db.VarChar(100) // 车船号
+  warehouse                       String?   @map("warehouse") @db.VarChar(100) // 仓库
+  warehouseArea                   String?   @map("warehouse_area") @db.VarChar(100) // 库区
+  material                        String?   @map("material") @db.VarChar(100) // 物料（废钢类型）
+  grossWeight                     Decimal?  @map("gross_weight") @db.Decimal(18, 2) // 毛重
+  tareWeight                      Decimal?  @map("tare_weight") @db.Decimal(18, 2) // 皮重
+  netWeight                       Decimal?  @map("net_weight") @db.Decimal(18, 2) // 净重
+  deduction                       Decimal?  @map("deduction") @db.Decimal(18, 2) // 扣杂
+  estimatedDryBasis               Decimal?  @map("estimated_dry_basis") @db.Decimal(18, 2) // 预估干基
+  supplierWeightData              String?   @map("supplier_weight_data") @db.Text // 供应商磅单数据
+  qualityInspector                String?   @map("quality_inspector") @db.VarChar(100) // 质检审批人
+  qualityInspectTime              String?   @map("quality_inspect_time") @db.VarChar(50) // 质检审批时间
+  unitPriceExcludingTax           Decimal?  @map("unit_price_excluding_tax") @db.Decimal(18, 8) // 单价（不含税）
+  totalPriceExcludingTax          Decimal?  @map("total_price_excluding_tax") @db.Decimal(18, 2) // 总价（不含税）
+  warehouseDate                   String?   @map("warehouse_date") @db.VarChar(20) // 入库日期（字符串格式）
+  remark                          String?   @map("remark") @db.Text // 备注
+  creator                         String?   @map("creator") @db.VarChar(100) // 制单人
+  createTime                      String?   @map("create_time") @db.VarChar(50) // 创建时间
+  shippingVesselNo                String?   @map("shipping_vessel_no") @db.VarChar(100) // 发运船号
+  qualityChecker                  String?   @map("quality_checker") @db.VarChar(100) // 质检员
+  inboundWeighingPerson           String?   @map("inbound_weighing_person") @db.VarChar(100) // 入场称重员
+  inboundTime                     String?   @map("inbound_time") @db.VarChar(50) // 入场时间
+  outboundWeighingPerson          String?   @map("outbound_weighing_person") @db.VarChar(100) // 出场称重员
+  confirmDate                     String?   @map("confirm_date") @db.VarChar(50) // 确认日期
+  taxRate                         Decimal?  @map("tax_rate") @db.Decimal(5, 2) // 税率
+  taxAmount                       Decimal?  @map("tax_amount") @db.Decimal(18, 2) // 税额
+  unitPriceIncludingTax           Decimal?  @map("unit_price_including_tax") @db.Decimal(18, 8) // 单价（含税）
+  totalPriceIncludingTax          Decimal?  @map("total_price_including_tax") @db.Decimal(18, 2) // 总价（含税）- 成本计算字段
+  grade                           String?   @map("grade") @db.VarChar(100) // 品位
+  confirmer                       String?   @map("confirmer") @db.VarChar(100) // 确认人
+  supplierWeightTotalExcludingTax Decimal?  @map("supplier_weight_total_excluding_tax") @db.Decimal(18, 2) // 供应商磅单总价（不含税）
+  supplierWeightTotalIncludingTax Decimal?  @map("supplier_weight_total_including_tax") @db.Decimal(18, 2) // 供应商磅单总价（含税）
+  businessType                    String?   @map("business_type") @db.VarChar(100) // 业务类型
+  warehouseType                   String?   @map("warehouse_type") @db.VarChar(100) // 入库类型
+  endUser                         String?   @map("end_user") @db.VarChar(200) // 终端用户
+  weighingTime                    String?   @map("weighing_time") @db.VarChar(50) // 磅单时间
+  supplierNo                      String?   @map("supplier_no") @db.VarChar(100) // 供货方编号
+  supplierName                    String?   @map("supplier_name") @db.VarChar(200) // 供货方
+  supplierContact                 String?   @map("supplier_contact") @db.VarChar(100) // 供货方联系方式
+  qualityUnitPrice                Decimal?  @map("quality_unit_price") @db.Decimal(18, 8) // 质检单价
+  purchaseContractNo2             String?   @map("purchase_contract_no_2") @db.VarChar(100) // 采购合同编号（重复字段）
+  purchaseOrderNo2                String?   @map("purchase_order_no_2") @db.VarChar(100) // 采购订单编号（重复字段）
+  salesOrderNo                    String?   @map("sales_order_no") @db.VarChar(100) // 销售订单号
+  paymentReceiptNo                String?   @map("payment_receipt_no") @db.VarChar(100) // 收付单号
+  weighingBatchNo                 String?   @map("weighing_batch_no") @db.VarChar(100) // 磅单批次号
+  isManualAdd                     String?   @map("is_manual_add") @db.VarChar(10) // 是否手工新增
+  redFlushStatus                  String?   @map("red_flush_status") @db.VarChar(50) // 红冲状态
+  redFlushedOrderNo               String?   @map("red_flushed_order_no") @db.VarChar(100) // 被红冲单号
+  revokeStatus                    String?   @map("revoke_status") @db.VarChar(50) // 撤销状态
+  revokeFailReason                String?   @map("revoke_fail_reason") @db.Text // 撤销失败原因
+  revokeApproved                  String?   @map("revoke_approved") @db.VarChar(10) // 撤销是否审批
+  driverName                      String?   @map("driver_name") @db.VarChar(100) // 司机姓名
+  driverPhone                     String?   @map("driver_phone") @db.VarChar(100) // 司机手机号码
+  createdAt                       DateTime? @default(now()) @map("created_at") @db.Timestamp(0) // 记录创建时间
+  updatedAt                       DateTime? @updatedAt @map("updated_at") @db.Timestamp(0) // 记录更新时间
+
+  @@index([warehouseNo])
+  @@index([supplier])
+  @@index([material])
+  @@index([status])
+  @@map("PurchaseWarehouse")
+}
+
+/// 钢厂结算表（销售收入数据）
+model DeliverySettlement {
+  id                    Int       @id @default(autoincrement()) @map("id")
+  deliveryNumber        String?   @map("delivery_number") @db.VarChar(50) // 发货单号
+  customer              String?   @map("customer") @db.VarChar(50) // 客户
+  deliveryDate          String?   @map("delivery_date") @db.VarChar(50) // 发货日期
+  factoryUnloadDate     String?   @map("factory_unload_date") @db.VarChar(50) // 钢厂卸货日期
+  warehouse             String?   @map("warehouse") @db.VarChar(100) // 仓库
+  productType           String?   @map("product_type") @db.VarChar(50) // 品种（成品名称）
+  vehicleNumber         String?   @map("vehicle_number") @db.VarChar(50) // 车船号
+  netWeight             Decimal?  @map("net_weight") @db.Decimal(10, 2) // 净重（吨）
+  factoryNetWeight      Decimal?  @map("factory_net_weight") @db.Decimal(10, 2) // 钢厂净重（吨）
+  deductionRate         Decimal?  @map("deduction_rate") @db.Decimal(5, 3) // 扣杂率
+  deliveryQuantity      Int?      @map("delivery_quantity") // 发货数量
+  settlementQuantity    Decimal?  @map("settlement_quantity") @db.Decimal(10, 2) // 结算量（吨）
+  totalSettlementAmount Decimal?  @map("total_settlement_amount") @db.Decimal(12, 2) // 合计结算金额（元）- 销售收入
+  createdAt             DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([deliveryDate])
+  @@index([warehouse])
+  @@index([productType])
+  @@map("DeliverySettlement")
+}
+
+/// 生产情况录入表
+model ProcessingCostInput {
+  id                  Int       @id @default(autoincrement()) @map("id")
+  productName         String?   @map("product_name") @db.VarChar(100) // 成品名称（如：钢筋压块）
+  productWarehouse    String?   @map("product_warehouse") @db.VarChar(100) // 成品仓库（如：C1）
+  productTons         Decimal?  @map("product_tons") @db.Decimal(18, 2) // 成品重量（吨）
+  productionDate      String?   @map("production_date") @db.VarChar(50) // 生产日期时间（VARCHAR 50格式）
+  materialComposition Json?     @map("material_composition") // 原材料构成（JSON格式：[{material: "优质毛料M1", tons: 12}, ...]）
+  createdAt           DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@index([productWarehouse])
+  @@index([productionDate])
+  @@map("ProcessingCostInput")
+}
+
+/// 加工成本配置表（上月吨加工成本）
+model ProcessingCostConfig {
+  id                 Int       @id @default(autoincrement()) @map("id")
+  productName        String?   @unique @map("product_name") @db.VarChar(100) // 成品名称
+  unitProcessingCost Decimal?  @map("unit_processing_cost") @db.Decimal(18, 2) // 单位加工成本（元/吨）
+  configMonth        String?   @map("config_month") @db.VarChar(20) // 配置月份（如：2024-01）
+  createdAt          DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt          DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@index([configMonth])
+  @@map("ProcessingCostConfig")
+}
+
+/// 材料成本缓存表（LIFO 预计算结果）
+model MaterialCostCache {
+  id                  Int       @id @default(autoincrement()) @map("id")
+  deliveryNumber      String?   @unique @map("delivery_number") @db.VarChar(100) // 发货单号（唯一标识）
+  productName         String?   @map("product_name") @db.VarChar(100) // 成品名称
+  productWarehouse    String?   @map("product_warehouse") @db.VarChar(100) // 成品仓库
+  deliveryDate        String?   @map("delivery_date") @db.VarChar(50) // 发货日期
+  settlementQuantity  Decimal?  @map("settlement_quantity") @db.Decimal(18, 2) // 结算数量（吨）
+  materialCost        Decimal?  @map("material_cost") @db.Decimal(18, 2) // 材料成本（元）
+  materialComposition Json?     @map("material_composition") // 材料构成 JSON
+  productionRecords   Json?     @map("production_records") // 使用的生产记录 JSON
+  calculatedAt        DateTime? @default(now()) @map("calculated_at") @db.Timestamp(0) // 计算时间
+  updatedAt           DateTime? @updatedAt @map("updated_at") @db.Timestamp(0) // 更新时间
+
+  @@index([deliveryNumber])
+  @@index([productName, productWarehouse])
+  @@index([deliveryDate])
+  @@map("MaterialCostCache")
 }

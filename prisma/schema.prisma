@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
 }
 
 /// 12.4 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -328,4 +327,204 @@ model receiptfg {
   carBrand          String?   @db.VarChar(500)
   createTime        DateTime? @default(now()) @db.Timestamp(0)
   queryDate         DateTime? @db.Date
+}
+
+/// 固废管理 - 工业固体废物信息表
+model WasteManagement {
+  id                Int       @id @default(autoincrement())
+  wasteCode         String?   @db.VarChar(100)  // 固废代码
+  wasteName         String?   @db.VarChar(255)  // 固废名称
+  wasteCategory     String?   @db.VarChar(100)   // 固废类别（危险废物/一般工业固废等）
+  wasteType         String?   @db.VarChar(100)   // 固废种类
+  quantity          Decimal?  @db.Decimal(15, 3)  // 数量
+  unit              String?   @db.VarChar(50)     // 单位（吨、立方米等）
+  source            String?   @db.VarChar(255)    // 产生来源/产生环节
+  flowDirection     String?   @db.VarChar(255)    // 流向（去向）
+  storageLocation   String?   @db.VarChar(255)    // 贮存地点
+  storageMethod     String?   @db.VarChar(255)    // 贮存方式
+  utilizationMethod String?   @db.VarChar(255)     // 利用方式
+  disposalMethod    String?   @db.VarChar(255)     // 处置方式
+  disposalUnit      String?   @db.VarChar(255)     // 处置单位
+  disposalLocation  String?   @db.VarChar(255)     // 处置地点
+  recordDate        DateTime? @db.Date            // 记录日期
+  operator          String?   @db.VarChar(100)     // 操作员/安全员
+  remark            String?   @db.Text              // 备注
+  createTime        DateTime? @default(now()) @db.Timestamp(0)  // 创建时间
+  updateTime        DateTime? @updatedAt @db.Timestamp(0)       // 更新时间
+}
+
+/// 入库单表（采购成本数据）
+model PurchaseWarehouse {
+  id                              Int       @id @default(autoincrement()) @map("id")
+  ledgerNo                        String?   @db.VarChar(100) @map("ledger_no")     // 账套号
+  warehouseNo                     String?   @db.VarChar(100) @map("warehouse_no")      // 入库单号
+  purchaseContractNo              String?   @db.VarChar(100) @map("purchase_contract_no")     // 采购合同编号
+  purchaseOrderNo                 String?   @db.VarChar(100) @map("purchase_order_no")      // 采购订单编号
+  warehouseTime                   String?   @db.VarChar(50) @map("warehouse_time")      // 入库时间
+  status                          String?   @db.VarChar(50) @map("status")      // 状态
+  settlementStatus                String?   @db.VarChar(50) @map("settlement_status")       // 结算状态
+  receiptNo                       String?   @db.VarChar(100) @map("receipt_no")      // 收货单号
+  base                            String?   @db.VarChar(200) @map("base")     // 基地
+  supplier                        String?   @db.VarChar(200) @map("supplier")     // 供应商
+  vehicleNo                       String?   @db.VarChar(100) @map("vehicle_no")      // 车船号
+  warehouse                       String?   @db.VarChar(100) @map("warehouse")      // 仓库
+  warehouseArea                   String?   @db.VarChar(100) @map("warehouse_area")       // 库区
+  material                        String?   @db.VarChar(100) @map("material")      // 物料（废钢类型）
+  grossWeight                     Decimal?  @db.Decimal(18, 2) @map("gross_weight")   // 毛重
+  tareWeight                      Decimal?  @db.Decimal(18, 2) @map("tare_weight")    // 皮重
+  netWeight                       Decimal?  @db.Decimal(18, 2) @map("net_weight")    // 净重
+  deduction                       Decimal?  @db.Decimal(18, 2) @map("deduction")   // 扣杂
+  estimatedDryBasis              Decimal?  @db.Decimal(18, 2) @map("estimated_dry_basis")   // 预估干基
+  supplierWeightData              String?   @db.Text @map("supplier_weight_data")             // 供应商磅单数据
+  qualityInspector                String?   @db.VarChar(100) @map("quality_inspector")      // 质检审批人
+  qualityInspectTime              String?   @db.VarChar(50) @map("quality_inspect_time")       // 质检审批时间
+  unitPriceExcludingTax           Decimal?  @db.Decimal(18, 8) @map("unit_price_excluding_tax")   // 单价（不含税）
+  totalPriceExcludingTax          Decimal?  @db.Decimal(18, 2) @map("total_price_excluding_tax")   // 总价（不含税）
+  warehouseDate                   String?   @db.VarChar(20) @map("warehouse_date")      // 入库日期（字符串格式）
+  remark                          String?   @db.Text @map("remark")              // 备注
+  creator                         String?   @db.VarChar(100) @map("creator")      // 制单人
+  createTime                      String?   @db.VarChar(50) @map("create_time")       // 创建时间
+  shippingVesselNo                String?   @db.VarChar(100) @map("shipping_vessel_no")     // 发运船号
+  qualityChecker                  String?   @db.VarChar(100) @map("quality_checker")     // 质检员
+  inboundWeighingPerson           String?   @db.VarChar(100) @map("inbound_weighing_person")     // 入场称重员
+  inboundTime                     String?   @db.VarChar(50) @map("inbound_time")       // 入场时间
+  outboundWeighingPerson          String?   @db.VarChar(100) @map("outbound_weighing_person")    // 出场称重员
+  confirmDate                     String?   @db.VarChar(50) @map("confirm_date")       // 确认日期
+  taxRate                         Decimal?  @db.Decimal(5, 2) @map("tax_rate")    // 税率
+  taxAmount                       Decimal?  @db.Decimal(18, 2) @map("tax_amount")    // 税额
+  unitPriceIncludingTax           Decimal?  @db.Decimal(18, 8) @map("unit_price_including_tax")   // 单价（含税）
+  totalPriceIncludingTax         Decimal?  @db.Decimal(18, 2) @map("total_price_including_tax")    // 总价（含税）- 成本计算字段
+  grade                           String?   @db.VarChar(100) @map("grade")     // 品位
+  confirmer                       String?   @db.VarChar(100) @map("confirmer")     // 确认人
+  supplierWeightTotalExcludingTax Decimal?  @db.Decimal(18, 2) @map("supplier_weight_total_excluding_tax")  // 供应商磅单总价（不含税）
+  supplierWeightTotalIncludingTax Decimal?  @db.Decimal(18, 2) @map("supplier_weight_total_including_tax") // 供应商磅单总价（含税）
+  businessType                    String?   @db.VarChar(100) @map("business_type")     // 业务类型
+  warehouseType                   String?   @db.VarChar(100) @map("warehouse_type")     // 入库类型
+  endUser                         String?   @db.VarChar(200) @map("end_user")     // 终端用户
+  weighingTime                    String?   @db.VarChar(50) @map("weighing_time")      // 磅单时间
+  supplierNo                      String?   @db.VarChar(100) @map("supplier_no")     // 供货方编号
+  supplierName                    String?   @db.VarChar(200) @map("supplier_name")     // 供货方
+  supplierContact                 String?   @db.VarChar(100) @map("supplier_contact")     // 供货方联系方式
+  qualityUnitPrice                Decimal?  @db.Decimal(18, 8) @map("quality_unit_price")   // 质检单价
+  purchaseContractNo2             String?   @db.VarChar(100) @map("purchase_contract_no_2")     // 采购合同编号（重复字段）
+  purchaseOrderNo2                String?   @db.VarChar(100) @map("purchase_order_no_2")     // 采购订单编号（重复字段）
+  salesOrderNo                    String?   @db.VarChar(100) @map("sales_order_no")     // 销售订单号
+  paymentReceiptNo                String?   @db.VarChar(100) @map("payment_receipt_no")    // 收付单号
+  weighingBatchNo                 String?   @db.VarChar(100) @map("weighing_batch_no")     // 磅单批次号
+  isManualAdd                     String?   @db.VarChar(10) @map("is_manual_add")      // 是否手工新增
+  redFlushStatus                  String?   @db.VarChar(50) @map("red_flush_status")      // 红冲状态
+  redFlushedOrderNo               String?   @db.VarChar(100) @map("red_flushed_order_no")     // 被红冲单号
+  revokeStatus                    String?   @db.VarChar(50) @map("revoke_status")      // 撤销状态
+  revokeFailReason                String?   @db.Text @map("revoke_fail_reason")             // 撤销失败原因
+  revokeApproved                  String?   @db.VarChar(10) @map("revoke_approved")      // 撤销是否审批
+  driverName                      String?   @db.VarChar(100) @map("driver_name")     // 司机姓名
+  driverPhone                     String?   @db.VarChar(100) @map("driver_phone")     // 司机手机号码
+  createdAt                       DateTime? @default(now()) @map("created_at") @db.Timestamp(0)  // 记录创建时间
+  updatedAt                       DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)       // 记录更新时间
+
+  @@index([warehouseNo])
+  @@index([supplier])
+  @@index([material])
+  @@index([status])
+  @@map("PurchaseWarehouse")
+}
+
+/// 钢厂结算表（销售收入数据）
+model DeliverySettlement {
+  id                    Int       @id @default(autoincrement()) @map("id")
+  deliveryNumber        String?   @db.VarChar(50) @map("delivery_number")  // 发货单号
+  customer              String?   @db.VarChar(50) @map("customer")                 // 客户
+  deliveryDate          String?   @db.VarChar(50) @map("delivery_date")            // 发货日期
+  factoryUnloadDate     String?   @db.VarChar(50) @map("factory_unload_date")       // 钢厂卸货日期
+  warehouse             String?   @db.VarChar(100) @map("warehouse")                // 仓库
+  productType           String?   @db.VarChar(50) @map("product_type")              // 品种（成品名称）
+  vehicleNumber         String?   @db.VarChar(50) @map("vehicle_number")           // 车船号
+  netWeight             Decimal?  @db.Decimal(10, 2) @map("net_weight")            // 净重（吨）
+  factoryNetWeight      Decimal?  @db.Decimal(10, 2) @map("factory_net_weight")     // 钢厂净重（吨）
+  deductionRate         Decimal?  @db.Decimal(5, 3) @map("deduction_rate")         // 扣杂率
+  deliveryQuantity      Int?      @map("delivery_quantity")                         // 发货数量
+  settlementQuantity    Decimal?  @db.Decimal(10, 2) @map("settlement_quantity")    // 结算量（吨）
+  totalSettlementAmount Decimal?  @db.Decimal(12, 2) @map("total_settlement_amount") // 合计结算金额（元）- 销售收入
+  createdAt             DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([deliveryDate])
+  @@index([warehouse])
+  @@index([productType])
+  @@map("DeliverySettlement")
+}
+
+/// 利润核算可调参数表（运输费/税费/即征即退/政府扶持/贴现/回款利息等，附图标红参数）
+/// 规则：按结算单发货日期查找，effective_date 起用 value，之前用 previous_value
+model ProfitParamConfig {
+  id            Int       @id @default(autoincrement()) @map("id")
+  paramKey      String    @db.VarChar(80) @map("param_key")           // 参数键（英文）
+  nameCn        String    @db.VarChar(200) @map("name_cn")             // 参数中文名称/注释
+  category      String    @db.VarChar(30) @map("category")            // other_cost / other_income
+  subCategory   String?   @db.VarChar(50) @map("sub_category")        // transport/tax/instant_refund/gov_subsidy/discount/interest
+  steelMill     String?   @db.VarChar(30) @map("steel_mill")           // 萍钢/吉钢/新钢，NULL=通用
+  effectiveDate DateTime  @db.Date @map("effective_date")              // 生效日期（精确到日）
+  value         Decimal   @db.Decimal(18, 6) @map("value")             // 参数值（新标准）
+  previousValue Decimal?  @db.Decimal(18, 6) @map("previous_value")   // 变动前的值（可选）
+  unit          String?   @db.VarChar(30) @map("unit")                 // 单位
+  remark        String?   @db.VarChar(500) @map("remark")
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@unique([paramKey, steelMill, effectiveDate])
+  @@index([paramKey])
+  @@index([effectiveDate])
+  @@index([category])
+  @@map("ProfitParamConfig")
+}
+
+/// 生产情况录入表
+model ProcessingCostInput {
+  id                    Int       @id @default(autoincrement()) @map("id")
+  productName           String?   @db.VarChar(100) @map("product_name")           // 成品名称（如：钢筋压块）
+  productWarehouse      String?   @db.VarChar(100) @map("product_warehouse")      // 成品仓库（如：C1）
+  productTons           Decimal?  @db.Decimal(18, 2) @map("product_tons")          // 成品重量（吨）
+  productionDate        String?   @db.VarChar(50) @map("production_date")         // 生产日期时间（VARCHAR 50格式）
+  materialComposition   Json?     @map("material_composition")                    // 原材料构成（JSON格式：[{material: "优质毛料M1", tons: 12}, ...]）
+  createdAt             DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@index([productWarehouse])
+  @@index([productionDate])
+  @@map("ProcessingCostInput")
+}
+
+/// 加工成本配置表（上月吨加工成本）
+model ProcessingCostConfig {
+  id                    Int       @id @default(autoincrement()) @map("id")
+  productName           String?   @db.VarChar(100) @unique @map("product_name")    // 成品名称
+  unitProcessingCost    Decimal?  @db.Decimal(18, 2) @map("unit_processing_cost")   // 单位加工成本（元/吨）
+  configMonth           String?   @db.VarChar(20) @map("config_month")             // 配置月份（如：2024-01）
+  createdAt             DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@index([configMonth])
+  @@map("ProcessingCostConfig")
+}
+
+/// 材料成本缓存表（LIFO 预计算结果）
+model MaterialCostCache {
+  id                    Int       @id @default(autoincrement()) @map("id")
+  deliveryNumber        String?   @db.VarChar(100) @unique @map("delivery_number")  // 发货单号（唯一标识）
+  productName           String?   @db.VarChar(100) @map("product_name")             // 成品名称
+  productWarehouse      String?   @db.VarChar(100) @map("product_warehouse")        // 成品仓库
+  deliveryDate          String?   @db.VarChar(50) @map("delivery_date")             // 发货日期
+  settlementQuantity    Decimal?  @db.Decimal(18, 2) @map("settlement_quantity")    // 结算数量（吨）
+  materialCost          Decimal?  @db.Decimal(18, 2) @map("material_cost")           // 材料成本（元）
+  materialComposition   Json?     @map("material_composition")                       // 材料构成 JSON
+  productionRecords     Json?     @map("production_records")                        // 使用的生产记录 JSON
+  calculatedAt          DateTime? @default(now()) @map("calculated_at") @db.Timestamp(0)  // 计算时间
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)      // 更新时间
+
+  @@index([deliveryNumber])
+  @@index([productName, productWarehouse])
+  @@index([deliveryDate])
+  @@map("MaterialCostCache")
 }

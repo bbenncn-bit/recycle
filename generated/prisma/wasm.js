@@ -411,6 +411,29 @@ exports.Prisma.ReceiptfgScalarFieldEnum = {
   queryDate: 'queryDate'
 };
 
+exports.Prisma.WasteManagementScalarFieldEnum = {
+  id: 'id',
+  wasteCode: 'wasteCode',
+  wasteName: 'wasteName',
+  wasteCategory: 'wasteCategory',
+  wasteType: 'wasteType',
+  quantity: 'quantity',
+  unit: 'unit',
+  source: 'source',
+  flowDirection: 'flowDirection',
+  storageLocation: 'storageLocation',
+  storageMethod: 'storageMethod',
+  utilizationMethod: 'utilizationMethod',
+  disposalMethod: 'disposalMethod',
+  disposalUnit: 'disposalUnit',
+  disposalLocation: 'disposalLocation',
+  recordDate: 'recordDate',
+  operator: 'operator',
+  remark: 'remark',
+  createTime: 'createTime',
+  updateTime: 'updateTime'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -655,6 +678,24 @@ exports.Prisma.receiptfgOrderByRelevanceFieldEnum = {
   carBrand: 'carBrand'
 };
 
+exports.Prisma.WasteManagementOrderByRelevanceFieldEnum = {
+  wasteCode: 'wasteCode',
+  wasteName: 'wasteName',
+  wasteCategory: 'wasteCategory',
+  wasteType: 'wasteType',
+  unit: 'unit',
+  source: 'source',
+  flowDirection: 'flowDirection',
+  storageLocation: 'storageLocation',
+  storageMethod: 'storageMethod',
+  utilizationMethod: 'utilizationMethod',
+  disposalMethod: 'disposalMethod',
+  disposalUnit: 'disposalUnit',
+  disposalLocation: 'disposalLocation',
+  operator: 'operator',
+  remark: 'remark'
+};
+
 
 exports.Prisma.ModelName = {
   CAHoldings: 'CAHoldings',
@@ -689,7 +730,8 @@ exports.Prisma.ModelName = {
   SCRanking: 'SCRanking',
   SCSankeyData: 'SCSankeyData',
   receiptfc: 'receiptfc',
-  receiptfg: 'receiptfg'
+  receiptfg: 'receiptfg',
+  WasteManagement: 'WasteManagement'
 };
 
 /**

@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/library.js';
+import * as runtime from './runtime/client.js';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -15,52 +15,52 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 /**
  * Model CAHoldings
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 12.4 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CAHoldings = $Result.DefaultSelection<Prisma.$CAHoldingsPayload>
 /**
  * Model CAMarketCards
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 12.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CAMarketCards = $Result.DefaultSelection<Prisma.$CAMarketCardsPayload>
 /**
  * Model CAPieChart
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 12.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CAPieChart = $Result.DefaultSelection<Prisma.$CAPieChartPayload>
 /**
  * Model CAPriceChart
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 12.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CAPriceChart = $Result.DefaultSelection<Prisma.$CAPriceChartPayload>
 /**
  * Model CBComparisonChart
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 7.2 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CBComparisonChart = $Result.DefaultSelection<Prisma.$CBComparisonChartPayload>
 /**
  * Model CBMonthlyDetails
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 7.3 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CBMonthlyDetails = $Result.DefaultSelection<Prisma.$CBMonthlyDetailsPayload>
 /**
  * Model CBSummaryCards
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 7.1 This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CBSummaryCards = $Result.DefaultSelection<Prisma.$CBSummaryCardsPayload>
 /**
  * Model CFDetails
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 9.3This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CFDetails = $Result.DefaultSelection<Prisma.$CFDetailsPayload>
 /**
  * Model CFPieChart
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 9.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CFPieChart = $Result.DefaultSelection<Prisma.$CFPieChartPayload>
 /**
  * Model CFTrendChart
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 9.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type CFTrendChart = $Result.DefaultSelection<Prisma.$CFTrendChartPayload>
 /**
@@ -160,12 +160,12 @@ export type EFSankeyNodes = $Result.DefaultSelection<Prisma.$EFSankeyNodesPayloa
 export type EFSummaryTable = $Result.DefaultSelection<Prisma.$EFSummaryTablePayload>
 /**
  * Model SCRanking
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 10.2This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type SCRanking = $Result.DefaultSelection<Prisma.$SCRankingPayload>
 /**
  * Model SCSankeyData
- * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * 10.1This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
 export type SCSankeyData = $Result.DefaultSelection<Prisma.$SCSankeyDataPayload>
 /**
@@ -178,6 +178,36 @@ export type receiptfc = $Result.DefaultSelection<Prisma.$receiptfcPayload>
  * 
  */
 export type receiptfg = $Result.DefaultSelection<Prisma.$receiptfgPayload>
+/**
+ * Model WasteManagement
+ * 固废管理 - 工业固体废物信息表
+ */
+export type WasteManagement = $Result.DefaultSelection<Prisma.$WasteManagementPayload>
+/**
+ * Model PurchaseWarehouse
+ * 入库单表（采购成本数据）
+ */
+export type PurchaseWarehouse = $Result.DefaultSelection<Prisma.$PurchaseWarehousePayload>
+/**
+ * Model DeliverySettlement
+ * 钢厂结算表（销售收入数据）
+ */
+export type DeliverySettlement = $Result.DefaultSelection<Prisma.$DeliverySettlementPayload>
+/**
+ * Model ProcessingCostInput
+ * 生产情况录入表
+ */
+export type ProcessingCostInput = $Result.DefaultSelection<Prisma.$ProcessingCostInputPayload>
+/**
+ * Model ProcessingCostConfig
+ * 加工成本配置表（上月吨加工成本）
+ */
+export type ProcessingCostConfig = $Result.DefaultSelection<Prisma.$ProcessingCostConfigPayload>
+/**
+ * Model MaterialCostCache
+ * 材料成本缓存表（LIFO 预计算结果）
+ */
+export type MaterialCostCache = $Result.DefaultSelection<Prisma.$MaterialCostCachePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -191,11 +221,11 @@ export type receiptfg = $Result.DefaultSelection<Prisma.$receiptfgPayload>
  * ```
  *
  *
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -212,7 +242,7 @@ export class PrismaClient<
    * ```
    *
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
@@ -228,13 +258,6 @@ export class PrismaClient<
    */
   $disconnect(): $Utils.JsPromise<void>;
 
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
-
 /**
    * Executes a prepared raw query and returns the number of affected rows.
    * @example
@@ -242,7 +265,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -254,7 +277,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -265,7 +288,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -277,7 +300,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -298,7 +321,6 @@ export class PrismaClient<
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
-
 
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
     extArgs: ExtArgs
@@ -633,6 +655,66 @@ export class PrismaClient<
     * ```
     */
   get receiptfg(): Prisma.receiptfgDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.wasteManagement`: Exposes CRUD operations for the **WasteManagement** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WasteManagements
+    * const wasteManagements = await prisma.wasteManagement.findMany()
+    * ```
+    */
+  get wasteManagement(): Prisma.WasteManagementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.purchaseWarehouse`: Exposes CRUD operations for the **PurchaseWarehouse** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PurchaseWarehouses
+    * const purchaseWarehouses = await prisma.purchaseWarehouse.findMany()
+    * ```
+    */
+  get purchaseWarehouse(): Prisma.PurchaseWarehouseDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.deliverySettlement`: Exposes CRUD operations for the **DeliverySettlement** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeliverySettlements
+    * const deliverySettlements = await prisma.deliverySettlement.findMany()
+    * ```
+    */
+  get deliverySettlement(): Prisma.DeliverySettlementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.processingCostInput`: Exposes CRUD operations for the **ProcessingCostInput** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProcessingCostInputs
+    * const processingCostInputs = await prisma.processingCostInput.findMany()
+    * ```
+    */
+  get processingCostInput(): Prisma.ProcessingCostInputDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.processingCostConfig`: Exposes CRUD operations for the **ProcessingCostConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProcessingCostConfigs
+    * const processingCostConfigs = await prisma.processingCostConfig.findMany()
+    * ```
+    */
+  get processingCostConfig(): Prisma.ProcessingCostConfigDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.materialCostCache`: Exposes CRUD operations for the **MaterialCostCache** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MaterialCostCaches
+    * const materialCostCaches = await prisma.materialCostCache.findMany()
+    * ```
+    */
+  get materialCostCache(): Prisma.MaterialCostCacheDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -673,14 +755,6 @@ export namespace Prisma {
   export type DecimalJsLike = runtime.DecimalJsLike
 
   /**
-   * Metrics
-   */
-  export type Metrics = runtime.Metrics
-  export type Metric<T> = runtime.Metric<T>
-  export type MetricHistogram = runtime.MetricHistogram
-  export type MetricHistogramBucket = runtime.MetricHistogramBucket
-
-  /**
   * Extensions
   */
   export import Extension = $Extensions.UserArgs
@@ -691,11 +765,12 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.10.1
-   * Query Engine version: 9b628578b3b7cae625e8c927178f15a170e74a9c
+   * Prisma Client JS version: 7.2.0
+   * Query Engine version: 0c8ef2ce45c83248ab3df073180d5eda9e8be7a3
    */
   export type PrismaVersion = {
     client: string
+    engine: string
   }
 
   export const prismaVersion: PrismaVersion
@@ -705,6 +780,7 @@ export namespace Prisma {
    */
 
 
+  export import Bytes = runtime.Bytes
   export import JsonObject = runtime.JsonObject
   export import JsonArray = runtime.JsonArray
   export import JsonValue = runtime.JsonValue
@@ -1105,15 +1181,18 @@ export namespace Prisma {
     SCRanking: 'SCRanking',
     SCSankeyData: 'SCSankeyData',
     receiptfc: 'receiptfc',
-    receiptfg: 'receiptfg'
+    receiptfg: 'receiptfg',
+    WasteManagement: 'WasteManagement',
+    PurchaseWarehouse: 'PurchaseWarehouse',
+    DeliverySettlement: 'DeliverySettlement',
+    ProcessingCostInput: 'ProcessingCostInput',
+    ProcessingCostConfig: 'ProcessingCostConfig',
+    MaterialCostCache: 'MaterialCostCache'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 
-  export type Datasources = {
-    db?: Datasource
-  }
 
   interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
     returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
@@ -1124,7 +1203,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg"
+      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "processingCostInput" | "processingCostConfig" | "materialCostCache"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3306,6 +3385,402 @@ export namespace Prisma {
           }
         }
       }
+      WasteManagement: {
+        payload: Prisma.$WasteManagementPayload<ExtArgs>
+        fields: Prisma.WasteManagementFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WasteManagementFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WasteManagementFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          findFirst: {
+            args: Prisma.WasteManagementFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WasteManagementFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          findMany: {
+            args: Prisma.WasteManagementFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>[]
+          }
+          create: {
+            args: Prisma.WasteManagementCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          createMany: {
+            args: Prisma.WasteManagementCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.WasteManagementDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          update: {
+            args: Prisma.WasteManagementUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          deleteMany: {
+            args: Prisma.WasteManagementDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WasteManagementUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.WasteManagementUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WasteManagementPayload>
+          }
+          aggregate: {
+            args: Prisma.WasteManagementAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWasteManagement>
+          }
+          groupBy: {
+            args: Prisma.WasteManagementGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WasteManagementGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WasteManagementCountArgs<ExtArgs>
+            result: $Utils.Optional<WasteManagementCountAggregateOutputType> | number
+          }
+        }
+      }
+      PurchaseWarehouse: {
+        payload: Prisma.$PurchaseWarehousePayload<ExtArgs>
+        fields: Prisma.PurchaseWarehouseFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PurchaseWarehouseFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PurchaseWarehouseFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          findFirst: {
+            args: Prisma.PurchaseWarehouseFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PurchaseWarehouseFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          findMany: {
+            args: Prisma.PurchaseWarehouseFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>[]
+          }
+          create: {
+            args: Prisma.PurchaseWarehouseCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          createMany: {
+            args: Prisma.PurchaseWarehouseCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PurchaseWarehouseDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          update: {
+            args: Prisma.PurchaseWarehouseUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          deleteMany: {
+            args: Prisma.PurchaseWarehouseDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PurchaseWarehouseUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PurchaseWarehouseUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PurchaseWarehousePayload>
+          }
+          aggregate: {
+            args: Prisma.PurchaseWarehouseAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePurchaseWarehouse>
+          }
+          groupBy: {
+            args: Prisma.PurchaseWarehouseGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PurchaseWarehouseGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PurchaseWarehouseCountArgs<ExtArgs>
+            result: $Utils.Optional<PurchaseWarehouseCountAggregateOutputType> | number
+          }
+        }
+      }
+      DeliverySettlement: {
+        payload: Prisma.$DeliverySettlementPayload<ExtArgs>
+        fields: Prisma.DeliverySettlementFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeliverySettlementFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeliverySettlementFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          findFirst: {
+            args: Prisma.DeliverySettlementFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeliverySettlementFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          findMany: {
+            args: Prisma.DeliverySettlementFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>[]
+          }
+          create: {
+            args: Prisma.DeliverySettlementCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          createMany: {
+            args: Prisma.DeliverySettlementCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.DeliverySettlementDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          update: {
+            args: Prisma.DeliverySettlementUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeliverySettlementDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeliverySettlementUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeliverySettlementUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeliverySettlementPayload>
+          }
+          aggregate: {
+            args: Prisma.DeliverySettlementAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeliverySettlement>
+          }
+          groupBy: {
+            args: Prisma.DeliverySettlementGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeliverySettlementGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeliverySettlementCountArgs<ExtArgs>
+            result: $Utils.Optional<DeliverySettlementCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProcessingCostInput: {
+        payload: Prisma.$ProcessingCostInputPayload<ExtArgs>
+        fields: Prisma.ProcessingCostInputFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProcessingCostInputFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProcessingCostInputFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          findFirst: {
+            args: Prisma.ProcessingCostInputFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProcessingCostInputFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          findMany: {
+            args: Prisma.ProcessingCostInputFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>[]
+          }
+          create: {
+            args: Prisma.ProcessingCostInputCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          createMany: {
+            args: Prisma.ProcessingCostInputCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProcessingCostInputDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          update: {
+            args: Prisma.ProcessingCostInputUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProcessingCostInputDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProcessingCostInputUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProcessingCostInputUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostInputPayload>
+          }
+          aggregate: {
+            args: Prisma.ProcessingCostInputAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProcessingCostInput>
+          }
+          groupBy: {
+            args: Prisma.ProcessingCostInputGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProcessingCostInputGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProcessingCostInputCountArgs<ExtArgs>
+            result: $Utils.Optional<ProcessingCostInputCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProcessingCostConfig: {
+        payload: Prisma.$ProcessingCostConfigPayload<ExtArgs>
+        fields: Prisma.ProcessingCostConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProcessingCostConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProcessingCostConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.ProcessingCostConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProcessingCostConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          findMany: {
+            args: Prisma.ProcessingCostConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>[]
+          }
+          create: {
+            args: Prisma.ProcessingCostConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          createMany: {
+            args: Prisma.ProcessingCostConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProcessingCostConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          update: {
+            args: Prisma.ProcessingCostConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProcessingCostConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProcessingCostConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProcessingCostConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProcessingCostConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.ProcessingCostConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProcessingCostConfig>
+          }
+          groupBy: {
+            args: Prisma.ProcessingCostConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProcessingCostConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProcessingCostConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<ProcessingCostConfigCountAggregateOutputType> | number
+          }
+        }
+      }
+      MaterialCostCache: {
+        payload: Prisma.$MaterialCostCachePayload<ExtArgs>
+        fields: Prisma.MaterialCostCacheFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaterialCostCacheFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaterialCostCacheFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          findFirst: {
+            args: Prisma.MaterialCostCacheFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaterialCostCacheFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          findMany: {
+            args: Prisma.MaterialCostCacheFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>[]
+          }
+          create: {
+            args: Prisma.MaterialCostCacheCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          createMany: {
+            args: Prisma.MaterialCostCacheCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MaterialCostCacheDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          update: {
+            args: Prisma.MaterialCostCacheUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          deleteMany: {
+            args: Prisma.MaterialCostCacheDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaterialCostCacheUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MaterialCostCacheUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCachePayload>
+          }
+          aggregate: {
+            args: Prisma.MaterialCostCacheAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaterialCostCache>
+          }
+          groupBy: {
+            args: Prisma.MaterialCostCacheGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaterialCostCacheGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaterialCostCacheCountArgs<ExtArgs>
+            result: $Utils.Optional<MaterialCostCacheCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3335,32 +3810,32 @@ export namespace Prisma {
   export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
   export interface PrismaClientOptions {
     /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasources?: Datasources
-    /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasourceUrl?: string
-    /**
      * @default "colorless"
      */
     errorFormat?: ErrorFormat
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
-     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+     * Read more in our [docs](https://pris.ly/d/logging).
      */
     log?: (LogLevel | LogDefinition)[]
     /**
@@ -3373,6 +3848,14 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
+    /**
+     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     */
+    adapter?: runtime.SqlDriverAdapterFactory
+    /**
+     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
+     */
+    accelerateUrl?: string
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -3388,6 +3871,22 @@ export namespace Prisma {
      * ```
      */
     omit?: Prisma.GlobalOmitConfig
+    /**
+     * SQL commenter plugins that add metadata to SQL queries as comments.
+     * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   adapter,
+     *   comments: [
+     *     traceContext(),
+     *     queryInsights(),
+     *   ],
+     * })
+     * ```
+     */
+    comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
     cAHoldings?: CAHoldingsOmit
@@ -3423,6 +3922,12 @@ export namespace Prisma {
     sCSankeyData?: SCSankeyDataOmit
     receiptfc?: receiptfcOmit
     receiptfg?: receiptfgOmit
+    wasteManagement?: WasteManagementOmit
+    purchaseWarehouse?: PurchaseWarehouseOmit
+    deliverySettlement?: DeliverySettlementOmit
+    processingCostInput?: ProcessingCostInputOmit
+    processingCostConfig?: ProcessingCostConfigOmit
+    materialCostCache?: MaterialCostCacheOmit
   }
 
   /* Types for Logging */
@@ -3432,10 +3937,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -3475,25 +3985,6 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
-
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -34151,6 +34642,6657 @@ export namespace Prisma {
 
 
   /**
+   * Model WasteManagement
+   */
+
+  export type AggregateWasteManagement = {
+    _count: WasteManagementCountAggregateOutputType | null
+    _avg: WasteManagementAvgAggregateOutputType | null
+    _sum: WasteManagementSumAggregateOutputType | null
+    _min: WasteManagementMinAggregateOutputType | null
+    _max: WasteManagementMaxAggregateOutputType | null
+  }
+
+  export type WasteManagementAvgAggregateOutputType = {
+    id: number | null
+    quantity: Decimal | null
+  }
+
+  export type WasteManagementSumAggregateOutputType = {
+    id: number | null
+    quantity: Decimal | null
+  }
+
+  export type WasteManagementMinAggregateOutputType = {
+    id: number | null
+    wasteCode: string | null
+    wasteName: string | null
+    wasteCategory: string | null
+    wasteType: string | null
+    quantity: Decimal | null
+    unit: string | null
+    source: string | null
+    flowDirection: string | null
+    storageLocation: string | null
+    storageMethod: string | null
+    utilizationMethod: string | null
+    disposalMethod: string | null
+    disposalUnit: string | null
+    disposalLocation: string | null
+    recordDate: Date | null
+    operator: string | null
+    remark: string | null
+    createTime: Date | null
+    updateTime: Date | null
+  }
+
+  export type WasteManagementMaxAggregateOutputType = {
+    id: number | null
+    wasteCode: string | null
+    wasteName: string | null
+    wasteCategory: string | null
+    wasteType: string | null
+    quantity: Decimal | null
+    unit: string | null
+    source: string | null
+    flowDirection: string | null
+    storageLocation: string | null
+    storageMethod: string | null
+    utilizationMethod: string | null
+    disposalMethod: string | null
+    disposalUnit: string | null
+    disposalLocation: string | null
+    recordDate: Date | null
+    operator: string | null
+    remark: string | null
+    createTime: Date | null
+    updateTime: Date | null
+  }
+
+  export type WasteManagementCountAggregateOutputType = {
+    id: number
+    wasteCode: number
+    wasteName: number
+    wasteCategory: number
+    wasteType: number
+    quantity: number
+    unit: number
+    source: number
+    flowDirection: number
+    storageLocation: number
+    storageMethod: number
+    utilizationMethod: number
+    disposalMethod: number
+    disposalUnit: number
+    disposalLocation: number
+    recordDate: number
+    operator: number
+    remark: number
+    createTime: number
+    updateTime: number
+    _all: number
+  }
+
+
+  export type WasteManagementAvgAggregateInputType = {
+    id?: true
+    quantity?: true
+  }
+
+  export type WasteManagementSumAggregateInputType = {
+    id?: true
+    quantity?: true
+  }
+
+  export type WasteManagementMinAggregateInputType = {
+    id?: true
+    wasteCode?: true
+    wasteName?: true
+    wasteCategory?: true
+    wasteType?: true
+    quantity?: true
+    unit?: true
+    source?: true
+    flowDirection?: true
+    storageLocation?: true
+    storageMethod?: true
+    utilizationMethod?: true
+    disposalMethod?: true
+    disposalUnit?: true
+    disposalLocation?: true
+    recordDate?: true
+    operator?: true
+    remark?: true
+    createTime?: true
+    updateTime?: true
+  }
+
+  export type WasteManagementMaxAggregateInputType = {
+    id?: true
+    wasteCode?: true
+    wasteName?: true
+    wasteCategory?: true
+    wasteType?: true
+    quantity?: true
+    unit?: true
+    source?: true
+    flowDirection?: true
+    storageLocation?: true
+    storageMethod?: true
+    utilizationMethod?: true
+    disposalMethod?: true
+    disposalUnit?: true
+    disposalLocation?: true
+    recordDate?: true
+    operator?: true
+    remark?: true
+    createTime?: true
+    updateTime?: true
+  }
+
+  export type WasteManagementCountAggregateInputType = {
+    id?: true
+    wasteCode?: true
+    wasteName?: true
+    wasteCategory?: true
+    wasteType?: true
+    quantity?: true
+    unit?: true
+    source?: true
+    flowDirection?: true
+    storageLocation?: true
+    storageMethod?: true
+    utilizationMethod?: true
+    disposalMethod?: true
+    disposalUnit?: true
+    disposalLocation?: true
+    recordDate?: true
+    operator?: true
+    remark?: true
+    createTime?: true
+    updateTime?: true
+    _all?: true
+  }
+
+  export type WasteManagementAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WasteManagement to aggregate.
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WasteManagements to fetch.
+     */
+    orderBy?: WasteManagementOrderByWithRelationInput | WasteManagementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WasteManagementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WasteManagements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WasteManagements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WasteManagements
+    **/
+    _count?: true | WasteManagementCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: WasteManagementAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: WasteManagementSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WasteManagementMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WasteManagementMaxAggregateInputType
+  }
+
+  export type GetWasteManagementAggregateType<T extends WasteManagementAggregateArgs> = {
+        [P in keyof T & keyof AggregateWasteManagement]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWasteManagement[P]>
+      : GetScalarType<T[P], AggregateWasteManagement[P]>
+  }
+
+
+
+
+  export type WasteManagementGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WasteManagementWhereInput
+    orderBy?: WasteManagementOrderByWithAggregationInput | WasteManagementOrderByWithAggregationInput[]
+    by: WasteManagementScalarFieldEnum[] | WasteManagementScalarFieldEnum
+    having?: WasteManagementScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WasteManagementCountAggregateInputType | true
+    _avg?: WasteManagementAvgAggregateInputType
+    _sum?: WasteManagementSumAggregateInputType
+    _min?: WasteManagementMinAggregateInputType
+    _max?: WasteManagementMaxAggregateInputType
+  }
+
+  export type WasteManagementGroupByOutputType = {
+    id: number
+    wasteCode: string | null
+    wasteName: string | null
+    wasteCategory: string | null
+    wasteType: string | null
+    quantity: Decimal | null
+    unit: string | null
+    source: string | null
+    flowDirection: string | null
+    storageLocation: string | null
+    storageMethod: string | null
+    utilizationMethod: string | null
+    disposalMethod: string | null
+    disposalUnit: string | null
+    disposalLocation: string | null
+    recordDate: Date | null
+    operator: string | null
+    remark: string | null
+    createTime: Date | null
+    updateTime: Date | null
+    _count: WasteManagementCountAggregateOutputType | null
+    _avg: WasteManagementAvgAggregateOutputType | null
+    _sum: WasteManagementSumAggregateOutputType | null
+    _min: WasteManagementMinAggregateOutputType | null
+    _max: WasteManagementMaxAggregateOutputType | null
+  }
+
+  type GetWasteManagementGroupByPayload<T extends WasteManagementGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WasteManagementGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WasteManagementGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WasteManagementGroupByOutputType[P]>
+            : GetScalarType<T[P], WasteManagementGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WasteManagementSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    wasteCode?: boolean
+    wasteName?: boolean
+    wasteCategory?: boolean
+    wasteType?: boolean
+    quantity?: boolean
+    unit?: boolean
+    source?: boolean
+    flowDirection?: boolean
+    storageLocation?: boolean
+    storageMethod?: boolean
+    utilizationMethod?: boolean
+    disposalMethod?: boolean
+    disposalUnit?: boolean
+    disposalLocation?: boolean
+    recordDate?: boolean
+    operator?: boolean
+    remark?: boolean
+    createTime?: boolean
+    updateTime?: boolean
+  }, ExtArgs["result"]["wasteManagement"]>
+
+
+
+  export type WasteManagementSelectScalar = {
+    id?: boolean
+    wasteCode?: boolean
+    wasteName?: boolean
+    wasteCategory?: boolean
+    wasteType?: boolean
+    quantity?: boolean
+    unit?: boolean
+    source?: boolean
+    flowDirection?: boolean
+    storageLocation?: boolean
+    storageMethod?: boolean
+    utilizationMethod?: boolean
+    disposalMethod?: boolean
+    disposalUnit?: boolean
+    disposalLocation?: boolean
+    recordDate?: boolean
+    operator?: boolean
+    remark?: boolean
+    createTime?: boolean
+    updateTime?: boolean
+  }
+
+  export type WasteManagementOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "wasteCode" | "wasteName" | "wasteCategory" | "wasteType" | "quantity" | "unit" | "source" | "flowDirection" | "storageLocation" | "storageMethod" | "utilizationMethod" | "disposalMethod" | "disposalUnit" | "disposalLocation" | "recordDate" | "operator" | "remark" | "createTime" | "updateTime", ExtArgs["result"]["wasteManagement"]>
+
+  export type $WasteManagementPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WasteManagement"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      wasteCode: string | null
+      wasteName: string | null
+      wasteCategory: string | null
+      wasteType: string | null
+      quantity: Prisma.Decimal | null
+      unit: string | null
+      source: string | null
+      flowDirection: string | null
+      storageLocation: string | null
+      storageMethod: string | null
+      utilizationMethod: string | null
+      disposalMethod: string | null
+      disposalUnit: string | null
+      disposalLocation: string | null
+      recordDate: Date | null
+      operator: string | null
+      remark: string | null
+      createTime: Date | null
+      updateTime: Date | null
+    }, ExtArgs["result"]["wasteManagement"]>
+    composites: {}
+  }
+
+  type WasteManagementGetPayload<S extends boolean | null | undefined | WasteManagementDefaultArgs> = $Result.GetResult<Prisma.$WasteManagementPayload, S>
+
+  type WasteManagementCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WasteManagementFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WasteManagementCountAggregateInputType | true
+    }
+
+  export interface WasteManagementDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WasteManagement'], meta: { name: 'WasteManagement' } }
+    /**
+     * Find zero or one WasteManagement that matches the filter.
+     * @param {WasteManagementFindUniqueArgs} args - Arguments to find a WasteManagement
+     * @example
+     * // Get one WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WasteManagementFindUniqueArgs>(args: SelectSubset<T, WasteManagementFindUniqueArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WasteManagement that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WasteManagementFindUniqueOrThrowArgs} args - Arguments to find a WasteManagement
+     * @example
+     * // Get one WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WasteManagementFindUniqueOrThrowArgs>(args: SelectSubset<T, WasteManagementFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WasteManagement that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementFindFirstArgs} args - Arguments to find a WasteManagement
+     * @example
+     * // Get one WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WasteManagementFindFirstArgs>(args?: SelectSubset<T, WasteManagementFindFirstArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WasteManagement that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementFindFirstOrThrowArgs} args - Arguments to find a WasteManagement
+     * @example
+     * // Get one WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WasteManagementFindFirstOrThrowArgs>(args?: SelectSubset<T, WasteManagementFindFirstOrThrowArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WasteManagements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WasteManagements
+     * const wasteManagements = await prisma.wasteManagement.findMany()
+     * 
+     * // Get first 10 WasteManagements
+     * const wasteManagements = await prisma.wasteManagement.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const wasteManagementWithIdOnly = await prisma.wasteManagement.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WasteManagementFindManyArgs>(args?: SelectSubset<T, WasteManagementFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WasteManagement.
+     * @param {WasteManagementCreateArgs} args - Arguments to create a WasteManagement.
+     * @example
+     * // Create one WasteManagement
+     * const WasteManagement = await prisma.wasteManagement.create({
+     *   data: {
+     *     // ... data to create a WasteManagement
+     *   }
+     * })
+     * 
+     */
+    create<T extends WasteManagementCreateArgs>(args: SelectSubset<T, WasteManagementCreateArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WasteManagements.
+     * @param {WasteManagementCreateManyArgs} args - Arguments to create many WasteManagements.
+     * @example
+     * // Create many WasteManagements
+     * const wasteManagement = await prisma.wasteManagement.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WasteManagementCreateManyArgs>(args?: SelectSubset<T, WasteManagementCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a WasteManagement.
+     * @param {WasteManagementDeleteArgs} args - Arguments to delete one WasteManagement.
+     * @example
+     * // Delete one WasteManagement
+     * const WasteManagement = await prisma.wasteManagement.delete({
+     *   where: {
+     *     // ... filter to delete one WasteManagement
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WasteManagementDeleteArgs>(args: SelectSubset<T, WasteManagementDeleteArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WasteManagement.
+     * @param {WasteManagementUpdateArgs} args - Arguments to update one WasteManagement.
+     * @example
+     * // Update one WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WasteManagementUpdateArgs>(args: SelectSubset<T, WasteManagementUpdateArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WasteManagements.
+     * @param {WasteManagementDeleteManyArgs} args - Arguments to filter WasteManagements to delete.
+     * @example
+     * // Delete a few WasteManagements
+     * const { count } = await prisma.wasteManagement.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WasteManagementDeleteManyArgs>(args?: SelectSubset<T, WasteManagementDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WasteManagements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WasteManagements
+     * const wasteManagement = await prisma.wasteManagement.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WasteManagementUpdateManyArgs>(args: SelectSubset<T, WasteManagementUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one WasteManagement.
+     * @param {WasteManagementUpsertArgs} args - Arguments to update or create a WasteManagement.
+     * @example
+     * // Update or create a WasteManagement
+     * const wasteManagement = await prisma.wasteManagement.upsert({
+     *   create: {
+     *     // ... data to create a WasteManagement
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WasteManagement we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WasteManagementUpsertArgs>(args: SelectSubset<T, WasteManagementUpsertArgs<ExtArgs>>): Prisma__WasteManagementClient<$Result.GetResult<Prisma.$WasteManagementPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WasteManagements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementCountArgs} args - Arguments to filter WasteManagements to count.
+     * @example
+     * // Count the number of WasteManagements
+     * const count = await prisma.wasteManagement.count({
+     *   where: {
+     *     // ... the filter for the WasteManagements we want to count
+     *   }
+     * })
+    **/
+    count<T extends WasteManagementCountArgs>(
+      args?: Subset<T, WasteManagementCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WasteManagementCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WasteManagement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WasteManagementAggregateArgs>(args: Subset<T, WasteManagementAggregateArgs>): Prisma.PrismaPromise<GetWasteManagementAggregateType<T>>
+
+    /**
+     * Group by WasteManagement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WasteManagementGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WasteManagementGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WasteManagementGroupByArgs['orderBy'] }
+        : { orderBy?: WasteManagementGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WasteManagementGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWasteManagementGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WasteManagement model
+   */
+  readonly fields: WasteManagementFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WasteManagement.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WasteManagementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WasteManagement model
+   */
+  interface WasteManagementFieldRefs {
+    readonly id: FieldRef<"WasteManagement", 'Int'>
+    readonly wasteCode: FieldRef<"WasteManagement", 'String'>
+    readonly wasteName: FieldRef<"WasteManagement", 'String'>
+    readonly wasteCategory: FieldRef<"WasteManagement", 'String'>
+    readonly wasteType: FieldRef<"WasteManagement", 'String'>
+    readonly quantity: FieldRef<"WasteManagement", 'Decimal'>
+    readonly unit: FieldRef<"WasteManagement", 'String'>
+    readonly source: FieldRef<"WasteManagement", 'String'>
+    readonly flowDirection: FieldRef<"WasteManagement", 'String'>
+    readonly storageLocation: FieldRef<"WasteManagement", 'String'>
+    readonly storageMethod: FieldRef<"WasteManagement", 'String'>
+    readonly utilizationMethod: FieldRef<"WasteManagement", 'String'>
+    readonly disposalMethod: FieldRef<"WasteManagement", 'String'>
+    readonly disposalUnit: FieldRef<"WasteManagement", 'String'>
+    readonly disposalLocation: FieldRef<"WasteManagement", 'String'>
+    readonly recordDate: FieldRef<"WasteManagement", 'DateTime'>
+    readonly operator: FieldRef<"WasteManagement", 'String'>
+    readonly remark: FieldRef<"WasteManagement", 'String'>
+    readonly createTime: FieldRef<"WasteManagement", 'DateTime'>
+    readonly updateTime: FieldRef<"WasteManagement", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WasteManagement findUnique
+   */
+  export type WasteManagementFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter, which WasteManagement to fetch.
+     */
+    where: WasteManagementWhereUniqueInput
+  }
+
+  /**
+   * WasteManagement findUniqueOrThrow
+   */
+  export type WasteManagementFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter, which WasteManagement to fetch.
+     */
+    where: WasteManagementWhereUniqueInput
+  }
+
+  /**
+   * WasteManagement findFirst
+   */
+  export type WasteManagementFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter, which WasteManagement to fetch.
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WasteManagements to fetch.
+     */
+    orderBy?: WasteManagementOrderByWithRelationInput | WasteManagementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WasteManagements.
+     */
+    cursor?: WasteManagementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WasteManagements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WasteManagements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WasteManagements.
+     */
+    distinct?: WasteManagementScalarFieldEnum | WasteManagementScalarFieldEnum[]
+  }
+
+  /**
+   * WasteManagement findFirstOrThrow
+   */
+  export type WasteManagementFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter, which WasteManagement to fetch.
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WasteManagements to fetch.
+     */
+    orderBy?: WasteManagementOrderByWithRelationInput | WasteManagementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WasteManagements.
+     */
+    cursor?: WasteManagementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WasteManagements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WasteManagements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WasteManagements.
+     */
+    distinct?: WasteManagementScalarFieldEnum | WasteManagementScalarFieldEnum[]
+  }
+
+  /**
+   * WasteManagement findMany
+   */
+  export type WasteManagementFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter, which WasteManagements to fetch.
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WasteManagements to fetch.
+     */
+    orderBy?: WasteManagementOrderByWithRelationInput | WasteManagementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WasteManagements.
+     */
+    cursor?: WasteManagementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WasteManagements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WasteManagements.
+     */
+    skip?: number
+    distinct?: WasteManagementScalarFieldEnum | WasteManagementScalarFieldEnum[]
+  }
+
+  /**
+   * WasteManagement create
+   */
+  export type WasteManagementCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * The data needed to create a WasteManagement.
+     */
+    data?: XOR<WasteManagementCreateInput, WasteManagementUncheckedCreateInput>
+  }
+
+  /**
+   * WasteManagement createMany
+   */
+  export type WasteManagementCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WasteManagements.
+     */
+    data: WasteManagementCreateManyInput | WasteManagementCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WasteManagement update
+   */
+  export type WasteManagementUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * The data needed to update a WasteManagement.
+     */
+    data: XOR<WasteManagementUpdateInput, WasteManagementUncheckedUpdateInput>
+    /**
+     * Choose, which WasteManagement to update.
+     */
+    where: WasteManagementWhereUniqueInput
+  }
+
+  /**
+   * WasteManagement updateMany
+   */
+  export type WasteManagementUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WasteManagements.
+     */
+    data: XOR<WasteManagementUpdateManyMutationInput, WasteManagementUncheckedUpdateManyInput>
+    /**
+     * Filter which WasteManagements to update
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * Limit how many WasteManagements to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WasteManagement upsert
+   */
+  export type WasteManagementUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * The filter to search for the WasteManagement to update in case it exists.
+     */
+    where: WasteManagementWhereUniqueInput
+    /**
+     * In case the WasteManagement found by the `where` argument doesn't exist, create a new WasteManagement with this data.
+     */
+    create: XOR<WasteManagementCreateInput, WasteManagementUncheckedCreateInput>
+    /**
+     * In case the WasteManagement was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WasteManagementUpdateInput, WasteManagementUncheckedUpdateInput>
+  }
+
+  /**
+   * WasteManagement delete
+   */
+  export type WasteManagementDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+    /**
+     * Filter which WasteManagement to delete.
+     */
+    where: WasteManagementWhereUniqueInput
+  }
+
+  /**
+   * WasteManagement deleteMany
+   */
+  export type WasteManagementDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WasteManagements to delete
+     */
+    where?: WasteManagementWhereInput
+    /**
+     * Limit how many WasteManagements to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WasteManagement without action
+   */
+  export type WasteManagementDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WasteManagement
+     */
+    select?: WasteManagementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WasteManagement
+     */
+    omit?: WasteManagementOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PurchaseWarehouse
+   */
+
+  export type AggregatePurchaseWarehouse = {
+    _count: PurchaseWarehouseCountAggregateOutputType | null
+    _avg: PurchaseWarehouseAvgAggregateOutputType | null
+    _sum: PurchaseWarehouseSumAggregateOutputType | null
+    _min: PurchaseWarehouseMinAggregateOutputType | null
+    _max: PurchaseWarehouseMaxAggregateOutputType | null
+  }
+
+  export type PurchaseWarehouseAvgAggregateOutputType = {
+    id: number | null
+    grossWeight: Decimal | null
+    tareWeight: Decimal | null
+    netWeight: Decimal | null
+    deduction: Decimal | null
+    estimatedDryBasis: Decimal | null
+    unitPriceExcludingTax: Decimal | null
+    totalPriceExcludingTax: Decimal | null
+    taxRate: Decimal | null
+    taxAmount: Decimal | null
+    unitPriceIncludingTax: Decimal | null
+    totalPriceIncludingTax: Decimal | null
+    supplierWeightTotalExcludingTax: Decimal | null
+    supplierWeightTotalIncludingTax: Decimal | null
+    qualityUnitPrice: Decimal | null
+  }
+
+  export type PurchaseWarehouseSumAggregateOutputType = {
+    id: number | null
+    grossWeight: Decimal | null
+    tareWeight: Decimal | null
+    netWeight: Decimal | null
+    deduction: Decimal | null
+    estimatedDryBasis: Decimal | null
+    unitPriceExcludingTax: Decimal | null
+    totalPriceExcludingTax: Decimal | null
+    taxRate: Decimal | null
+    taxAmount: Decimal | null
+    unitPriceIncludingTax: Decimal | null
+    totalPriceIncludingTax: Decimal | null
+    supplierWeightTotalExcludingTax: Decimal | null
+    supplierWeightTotalIncludingTax: Decimal | null
+    qualityUnitPrice: Decimal | null
+  }
+
+  export type PurchaseWarehouseMinAggregateOutputType = {
+    id: number | null
+    ledgerNo: string | null
+    warehouseNo: string | null
+    purchaseContractNo: string | null
+    purchaseOrderNo: string | null
+    warehouseTime: string | null
+    status: string | null
+    settlementStatus: string | null
+    receiptNo: string | null
+    base: string | null
+    supplier: string | null
+    vehicleNo: string | null
+    warehouse: string | null
+    warehouseArea: string | null
+    material: string | null
+    grossWeight: Decimal | null
+    tareWeight: Decimal | null
+    netWeight: Decimal | null
+    deduction: Decimal | null
+    estimatedDryBasis: Decimal | null
+    supplierWeightData: string | null
+    qualityInspector: string | null
+    qualityInspectTime: string | null
+    unitPriceExcludingTax: Decimal | null
+    totalPriceExcludingTax: Decimal | null
+    warehouseDate: string | null
+    remark: string | null
+    creator: string | null
+    createTime: string | null
+    shippingVesselNo: string | null
+    qualityChecker: string | null
+    inboundWeighingPerson: string | null
+    inboundTime: string | null
+    outboundWeighingPerson: string | null
+    confirmDate: string | null
+    taxRate: Decimal | null
+    taxAmount: Decimal | null
+    unitPriceIncludingTax: Decimal | null
+    totalPriceIncludingTax: Decimal | null
+    grade: string | null
+    confirmer: string | null
+    supplierWeightTotalExcludingTax: Decimal | null
+    supplierWeightTotalIncludingTax: Decimal | null
+    businessType: string | null
+    warehouseType: string | null
+    endUser: string | null
+    weighingTime: string | null
+    supplierNo: string | null
+    supplierName: string | null
+    supplierContact: string | null
+    qualityUnitPrice: Decimal | null
+    purchaseContractNo2: string | null
+    purchaseOrderNo2: string | null
+    salesOrderNo: string | null
+    paymentReceiptNo: string | null
+    weighingBatchNo: string | null
+    isManualAdd: string | null
+    redFlushStatus: string | null
+    redFlushedOrderNo: string | null
+    revokeStatus: string | null
+    revokeFailReason: string | null
+    revokeApproved: string | null
+    driverName: string | null
+    driverPhone: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PurchaseWarehouseMaxAggregateOutputType = {
+    id: number | null
+    ledgerNo: string | null
+    warehouseNo: string | null
+    purchaseContractNo: string | null
+    purchaseOrderNo: string | null
+    warehouseTime: string | null
+    status: string | null
+    settlementStatus: string | null
+    receiptNo: string | null
+    base: string | null
+    supplier: string | null
+    vehicleNo: string | null
+    warehouse: string | null
+    warehouseArea: string | null
+    material: string | null
+    grossWeight: Decimal | null
+    tareWeight: Decimal | null
+    netWeight: Decimal | null
+    deduction: Decimal | null
+    estimatedDryBasis: Decimal | null
+    supplierWeightData: string | null
+    qualityInspector: string | null
+    qualityInspectTime: string | null
+    unitPriceExcludingTax: Decimal | null
+    totalPriceExcludingTax: Decimal | null
+    warehouseDate: string | null
+    remark: string | null
+    creator: string | null
+    createTime: string | null
+    shippingVesselNo: string | null
+    qualityChecker: string | null
+    inboundWeighingPerson: string | null
+    inboundTime: string | null
+    outboundWeighingPerson: string | null
+    confirmDate: string | null
+    taxRate: Decimal | null
+    taxAmount: Decimal | null
+    unitPriceIncludingTax: Decimal | null
+    totalPriceIncludingTax: Decimal | null
+    grade: string | null
+    confirmer: string | null
+    supplierWeightTotalExcludingTax: Decimal | null
+    supplierWeightTotalIncludingTax: Decimal | null
+    businessType: string | null
+    warehouseType: string | null
+    endUser: string | null
+    weighingTime: string | null
+    supplierNo: string | null
+    supplierName: string | null
+    supplierContact: string | null
+    qualityUnitPrice: Decimal | null
+    purchaseContractNo2: string | null
+    purchaseOrderNo2: string | null
+    salesOrderNo: string | null
+    paymentReceiptNo: string | null
+    weighingBatchNo: string | null
+    isManualAdd: string | null
+    redFlushStatus: string | null
+    redFlushedOrderNo: string | null
+    revokeStatus: string | null
+    revokeFailReason: string | null
+    revokeApproved: string | null
+    driverName: string | null
+    driverPhone: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PurchaseWarehouseCountAggregateOutputType = {
+    id: number
+    ledgerNo: number
+    warehouseNo: number
+    purchaseContractNo: number
+    purchaseOrderNo: number
+    warehouseTime: number
+    status: number
+    settlementStatus: number
+    receiptNo: number
+    base: number
+    supplier: number
+    vehicleNo: number
+    warehouse: number
+    warehouseArea: number
+    material: number
+    grossWeight: number
+    tareWeight: number
+    netWeight: number
+    deduction: number
+    estimatedDryBasis: number
+    supplierWeightData: number
+    qualityInspector: number
+    qualityInspectTime: number
+    unitPriceExcludingTax: number
+    totalPriceExcludingTax: number
+    warehouseDate: number
+    remark: number
+    creator: number
+    createTime: number
+    shippingVesselNo: number
+    qualityChecker: number
+    inboundWeighingPerson: number
+    inboundTime: number
+    outboundWeighingPerson: number
+    confirmDate: number
+    taxRate: number
+    taxAmount: number
+    unitPriceIncludingTax: number
+    totalPriceIncludingTax: number
+    grade: number
+    confirmer: number
+    supplierWeightTotalExcludingTax: number
+    supplierWeightTotalIncludingTax: number
+    businessType: number
+    warehouseType: number
+    endUser: number
+    weighingTime: number
+    supplierNo: number
+    supplierName: number
+    supplierContact: number
+    qualityUnitPrice: number
+    purchaseContractNo2: number
+    purchaseOrderNo2: number
+    salesOrderNo: number
+    paymentReceiptNo: number
+    weighingBatchNo: number
+    isManualAdd: number
+    redFlushStatus: number
+    redFlushedOrderNo: number
+    revokeStatus: number
+    revokeFailReason: number
+    revokeApproved: number
+    driverName: number
+    driverPhone: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PurchaseWarehouseAvgAggregateInputType = {
+    id?: true
+    grossWeight?: true
+    tareWeight?: true
+    netWeight?: true
+    deduction?: true
+    estimatedDryBasis?: true
+    unitPriceExcludingTax?: true
+    totalPriceExcludingTax?: true
+    taxRate?: true
+    taxAmount?: true
+    unitPriceIncludingTax?: true
+    totalPriceIncludingTax?: true
+    supplierWeightTotalExcludingTax?: true
+    supplierWeightTotalIncludingTax?: true
+    qualityUnitPrice?: true
+  }
+
+  export type PurchaseWarehouseSumAggregateInputType = {
+    id?: true
+    grossWeight?: true
+    tareWeight?: true
+    netWeight?: true
+    deduction?: true
+    estimatedDryBasis?: true
+    unitPriceExcludingTax?: true
+    totalPriceExcludingTax?: true
+    taxRate?: true
+    taxAmount?: true
+    unitPriceIncludingTax?: true
+    totalPriceIncludingTax?: true
+    supplierWeightTotalExcludingTax?: true
+    supplierWeightTotalIncludingTax?: true
+    qualityUnitPrice?: true
+  }
+
+  export type PurchaseWarehouseMinAggregateInputType = {
+    id?: true
+    ledgerNo?: true
+    warehouseNo?: true
+    purchaseContractNo?: true
+    purchaseOrderNo?: true
+    warehouseTime?: true
+    status?: true
+    settlementStatus?: true
+    receiptNo?: true
+    base?: true
+    supplier?: true
+    vehicleNo?: true
+    warehouse?: true
+    warehouseArea?: true
+    material?: true
+    grossWeight?: true
+    tareWeight?: true
+    netWeight?: true
+    deduction?: true
+    estimatedDryBasis?: true
+    supplierWeightData?: true
+    qualityInspector?: true
+    qualityInspectTime?: true
+    unitPriceExcludingTax?: true
+    totalPriceExcludingTax?: true
+    warehouseDate?: true
+    remark?: true
+    creator?: true
+    createTime?: true
+    shippingVesselNo?: true
+    qualityChecker?: true
+    inboundWeighingPerson?: true
+    inboundTime?: true
+    outboundWeighingPerson?: true
+    confirmDate?: true
+    taxRate?: true
+    taxAmount?: true
+    unitPriceIncludingTax?: true
+    totalPriceIncludingTax?: true
+    grade?: true
+    confirmer?: true
+    supplierWeightTotalExcludingTax?: true
+    supplierWeightTotalIncludingTax?: true
+    businessType?: true
+    warehouseType?: true
+    endUser?: true
+    weighingTime?: true
+    supplierNo?: true
+    supplierName?: true
+    supplierContact?: true
+    qualityUnitPrice?: true
+    purchaseContractNo2?: true
+    purchaseOrderNo2?: true
+    salesOrderNo?: true
+    paymentReceiptNo?: true
+    weighingBatchNo?: true
+    isManualAdd?: true
+    redFlushStatus?: true
+    redFlushedOrderNo?: true
+    revokeStatus?: true
+    revokeFailReason?: true
+    revokeApproved?: true
+    driverName?: true
+    driverPhone?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PurchaseWarehouseMaxAggregateInputType = {
+    id?: true
+    ledgerNo?: true
+    warehouseNo?: true
+    purchaseContractNo?: true
+    purchaseOrderNo?: true
+    warehouseTime?: true
+    status?: true
+    settlementStatus?: true
+    receiptNo?: true
+    base?: true
+    supplier?: true
+    vehicleNo?: true
+    warehouse?: true
+    warehouseArea?: true
+    material?: true
+    grossWeight?: true
+    tareWeight?: true
+    netWeight?: true
+    deduction?: true
+    estimatedDryBasis?: true
+    supplierWeightData?: true
+    qualityInspector?: true
+    qualityInspectTime?: true
+    unitPriceExcludingTax?: true
+    totalPriceExcludingTax?: true
+    warehouseDate?: true
+    remark?: true
+    creator?: true
+    createTime?: true
+    shippingVesselNo?: true
+    qualityChecker?: true
+    inboundWeighingPerson?: true
+    inboundTime?: true
+    outboundWeighingPerson?: true
+    confirmDate?: true
+    taxRate?: true
+    taxAmount?: true
+    unitPriceIncludingTax?: true
+    totalPriceIncludingTax?: true
+    grade?: true
+    confirmer?: true
+    supplierWeightTotalExcludingTax?: true
+    supplierWeightTotalIncludingTax?: true
+    businessType?: true
+    warehouseType?: true
+    endUser?: true
+    weighingTime?: true
+    supplierNo?: true
+    supplierName?: true
+    supplierContact?: true
+    qualityUnitPrice?: true
+    purchaseContractNo2?: true
+    purchaseOrderNo2?: true
+    salesOrderNo?: true
+    paymentReceiptNo?: true
+    weighingBatchNo?: true
+    isManualAdd?: true
+    redFlushStatus?: true
+    redFlushedOrderNo?: true
+    revokeStatus?: true
+    revokeFailReason?: true
+    revokeApproved?: true
+    driverName?: true
+    driverPhone?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PurchaseWarehouseCountAggregateInputType = {
+    id?: true
+    ledgerNo?: true
+    warehouseNo?: true
+    purchaseContractNo?: true
+    purchaseOrderNo?: true
+    warehouseTime?: true
+    status?: true
+    settlementStatus?: true
+    receiptNo?: true
+    base?: true
+    supplier?: true
+    vehicleNo?: true
+    warehouse?: true
+    warehouseArea?: true
+    material?: true
+    grossWeight?: true
+    tareWeight?: true
+    netWeight?: true
+    deduction?: true
+    estimatedDryBasis?: true
+    supplierWeightData?: true
+    qualityInspector?: true
+    qualityInspectTime?: true
+    unitPriceExcludingTax?: true
+    totalPriceExcludingTax?: true
+    warehouseDate?: true
+    remark?: true
+    creator?: true
+    createTime?: true
+    shippingVesselNo?: true
+    qualityChecker?: true
+    inboundWeighingPerson?: true
+    inboundTime?: true
+    outboundWeighingPerson?: true
+    confirmDate?: true
+    taxRate?: true
+    taxAmount?: true
+    unitPriceIncludingTax?: true
+    totalPriceIncludingTax?: true
+    grade?: true
+    confirmer?: true
+    supplierWeightTotalExcludingTax?: true
+    supplierWeightTotalIncludingTax?: true
+    businessType?: true
+    warehouseType?: true
+    endUser?: true
+    weighingTime?: true
+    supplierNo?: true
+    supplierName?: true
+    supplierContact?: true
+    qualityUnitPrice?: true
+    purchaseContractNo2?: true
+    purchaseOrderNo2?: true
+    salesOrderNo?: true
+    paymentReceiptNo?: true
+    weighingBatchNo?: true
+    isManualAdd?: true
+    redFlushStatus?: true
+    redFlushedOrderNo?: true
+    revokeStatus?: true
+    revokeFailReason?: true
+    revokeApproved?: true
+    driverName?: true
+    driverPhone?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PurchaseWarehouseAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PurchaseWarehouse to aggregate.
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PurchaseWarehouses to fetch.
+     */
+    orderBy?: PurchaseWarehouseOrderByWithRelationInput | PurchaseWarehouseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PurchaseWarehouseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PurchaseWarehouses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PurchaseWarehouses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PurchaseWarehouses
+    **/
+    _count?: true | PurchaseWarehouseCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PurchaseWarehouseAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PurchaseWarehouseSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PurchaseWarehouseMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PurchaseWarehouseMaxAggregateInputType
+  }
+
+  export type GetPurchaseWarehouseAggregateType<T extends PurchaseWarehouseAggregateArgs> = {
+        [P in keyof T & keyof AggregatePurchaseWarehouse]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePurchaseWarehouse[P]>
+      : GetScalarType<T[P], AggregatePurchaseWarehouse[P]>
+  }
+
+
+
+
+  export type PurchaseWarehouseGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PurchaseWarehouseWhereInput
+    orderBy?: PurchaseWarehouseOrderByWithAggregationInput | PurchaseWarehouseOrderByWithAggregationInput[]
+    by: PurchaseWarehouseScalarFieldEnum[] | PurchaseWarehouseScalarFieldEnum
+    having?: PurchaseWarehouseScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PurchaseWarehouseCountAggregateInputType | true
+    _avg?: PurchaseWarehouseAvgAggregateInputType
+    _sum?: PurchaseWarehouseSumAggregateInputType
+    _min?: PurchaseWarehouseMinAggregateInputType
+    _max?: PurchaseWarehouseMaxAggregateInputType
+  }
+
+  export type PurchaseWarehouseGroupByOutputType = {
+    id: number
+    ledgerNo: string | null
+    warehouseNo: string | null
+    purchaseContractNo: string | null
+    purchaseOrderNo: string | null
+    warehouseTime: string | null
+    status: string | null
+    settlementStatus: string | null
+    receiptNo: string | null
+    base: string | null
+    supplier: string | null
+    vehicleNo: string | null
+    warehouse: string | null
+    warehouseArea: string | null
+    material: string | null
+    grossWeight: Decimal | null
+    tareWeight: Decimal | null
+    netWeight: Decimal | null
+    deduction: Decimal | null
+    estimatedDryBasis: Decimal | null
+    supplierWeightData: string | null
+    qualityInspector: string | null
+    qualityInspectTime: string | null
+    unitPriceExcludingTax: Decimal | null
+    totalPriceExcludingTax: Decimal | null
+    warehouseDate: string | null
+    remark: string | null
+    creator: string | null
+    createTime: string | null
+    shippingVesselNo: string | null
+    qualityChecker: string | null
+    inboundWeighingPerson: string | null
+    inboundTime: string | null
+    outboundWeighingPerson: string | null
+    confirmDate: string | null
+    taxRate: Decimal | null
+    taxAmount: Decimal | null
+    unitPriceIncludingTax: Decimal | null
+    totalPriceIncludingTax: Decimal | null
+    grade: string | null
+    confirmer: string | null
+    supplierWeightTotalExcludingTax: Decimal | null
+    supplierWeightTotalIncludingTax: Decimal | null
+    businessType: string | null
+    warehouseType: string | null
+    endUser: string | null
+    weighingTime: string | null
+    supplierNo: string | null
+    supplierName: string | null
+    supplierContact: string | null
+    qualityUnitPrice: Decimal | null
+    purchaseContractNo2: string | null
+    purchaseOrderNo2: string | null
+    salesOrderNo: string | null
+    paymentReceiptNo: string | null
+    weighingBatchNo: string | null
+    isManualAdd: string | null
+    redFlushStatus: string | null
+    redFlushedOrderNo: string | null
+    revokeStatus: string | null
+    revokeFailReason: string | null
+    revokeApproved: string | null
+    driverName: string | null
+    driverPhone: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    _count: PurchaseWarehouseCountAggregateOutputType | null
+    _avg: PurchaseWarehouseAvgAggregateOutputType | null
+    _sum: PurchaseWarehouseSumAggregateOutputType | null
+    _min: PurchaseWarehouseMinAggregateOutputType | null
+    _max: PurchaseWarehouseMaxAggregateOutputType | null
+  }
+
+  type GetPurchaseWarehouseGroupByPayload<T extends PurchaseWarehouseGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PurchaseWarehouseGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PurchaseWarehouseGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PurchaseWarehouseGroupByOutputType[P]>
+            : GetScalarType<T[P], PurchaseWarehouseGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PurchaseWarehouseSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ledgerNo?: boolean
+    warehouseNo?: boolean
+    purchaseContractNo?: boolean
+    purchaseOrderNo?: boolean
+    warehouseTime?: boolean
+    status?: boolean
+    settlementStatus?: boolean
+    receiptNo?: boolean
+    base?: boolean
+    supplier?: boolean
+    vehicleNo?: boolean
+    warehouse?: boolean
+    warehouseArea?: boolean
+    material?: boolean
+    grossWeight?: boolean
+    tareWeight?: boolean
+    netWeight?: boolean
+    deduction?: boolean
+    estimatedDryBasis?: boolean
+    supplierWeightData?: boolean
+    qualityInspector?: boolean
+    qualityInspectTime?: boolean
+    unitPriceExcludingTax?: boolean
+    totalPriceExcludingTax?: boolean
+    warehouseDate?: boolean
+    remark?: boolean
+    creator?: boolean
+    createTime?: boolean
+    shippingVesselNo?: boolean
+    qualityChecker?: boolean
+    inboundWeighingPerson?: boolean
+    inboundTime?: boolean
+    outboundWeighingPerson?: boolean
+    confirmDate?: boolean
+    taxRate?: boolean
+    taxAmount?: boolean
+    unitPriceIncludingTax?: boolean
+    totalPriceIncludingTax?: boolean
+    grade?: boolean
+    confirmer?: boolean
+    supplierWeightTotalExcludingTax?: boolean
+    supplierWeightTotalIncludingTax?: boolean
+    businessType?: boolean
+    warehouseType?: boolean
+    endUser?: boolean
+    weighingTime?: boolean
+    supplierNo?: boolean
+    supplierName?: boolean
+    supplierContact?: boolean
+    qualityUnitPrice?: boolean
+    purchaseContractNo2?: boolean
+    purchaseOrderNo2?: boolean
+    salesOrderNo?: boolean
+    paymentReceiptNo?: boolean
+    weighingBatchNo?: boolean
+    isManualAdd?: boolean
+    redFlushStatus?: boolean
+    redFlushedOrderNo?: boolean
+    revokeStatus?: boolean
+    revokeFailReason?: boolean
+    revokeApproved?: boolean
+    driverName?: boolean
+    driverPhone?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["purchaseWarehouse"]>
+
+
+
+  export type PurchaseWarehouseSelectScalar = {
+    id?: boolean
+    ledgerNo?: boolean
+    warehouseNo?: boolean
+    purchaseContractNo?: boolean
+    purchaseOrderNo?: boolean
+    warehouseTime?: boolean
+    status?: boolean
+    settlementStatus?: boolean
+    receiptNo?: boolean
+    base?: boolean
+    supplier?: boolean
+    vehicleNo?: boolean
+    warehouse?: boolean
+    warehouseArea?: boolean
+    material?: boolean
+    grossWeight?: boolean
+    tareWeight?: boolean
+    netWeight?: boolean
+    deduction?: boolean
+    estimatedDryBasis?: boolean
+    supplierWeightData?: boolean
+    qualityInspector?: boolean
+    qualityInspectTime?: boolean
+    unitPriceExcludingTax?: boolean
+    totalPriceExcludingTax?: boolean
+    warehouseDate?: boolean
+    remark?: boolean
+    creator?: boolean
+    createTime?: boolean
+    shippingVesselNo?: boolean
+    qualityChecker?: boolean
+    inboundWeighingPerson?: boolean
+    inboundTime?: boolean
+    outboundWeighingPerson?: boolean
+    confirmDate?: boolean
+    taxRate?: boolean
+    taxAmount?: boolean
+    unitPriceIncludingTax?: boolean
+    totalPriceIncludingTax?: boolean
+    grade?: boolean
+    confirmer?: boolean
+    supplierWeightTotalExcludingTax?: boolean
+    supplierWeightTotalIncludingTax?: boolean
+    businessType?: boolean
+    warehouseType?: boolean
+    endUser?: boolean
+    weighingTime?: boolean
+    supplierNo?: boolean
+    supplierName?: boolean
+    supplierContact?: boolean
+    qualityUnitPrice?: boolean
+    purchaseContractNo2?: boolean
+    purchaseOrderNo2?: boolean
+    salesOrderNo?: boolean
+    paymentReceiptNo?: boolean
+    weighingBatchNo?: boolean
+    isManualAdd?: boolean
+    redFlushStatus?: boolean
+    redFlushedOrderNo?: boolean
+    revokeStatus?: boolean
+    revokeFailReason?: boolean
+    revokeApproved?: boolean
+    driverName?: boolean
+    driverPhone?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PurchaseWarehouseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ledgerNo" | "warehouseNo" | "purchaseContractNo" | "purchaseOrderNo" | "warehouseTime" | "status" | "settlementStatus" | "receiptNo" | "base" | "supplier" | "vehicleNo" | "warehouse" | "warehouseArea" | "material" | "grossWeight" | "tareWeight" | "netWeight" | "deduction" | "estimatedDryBasis" | "supplierWeightData" | "qualityInspector" | "qualityInspectTime" | "unitPriceExcludingTax" | "totalPriceExcludingTax" | "warehouseDate" | "remark" | "creator" | "createTime" | "shippingVesselNo" | "qualityChecker" | "inboundWeighingPerson" | "inboundTime" | "outboundWeighingPerson" | "confirmDate" | "taxRate" | "taxAmount" | "unitPriceIncludingTax" | "totalPriceIncludingTax" | "grade" | "confirmer" | "supplierWeightTotalExcludingTax" | "supplierWeightTotalIncludingTax" | "businessType" | "warehouseType" | "endUser" | "weighingTime" | "supplierNo" | "supplierName" | "supplierContact" | "qualityUnitPrice" | "purchaseContractNo2" | "purchaseOrderNo2" | "salesOrderNo" | "paymentReceiptNo" | "weighingBatchNo" | "isManualAdd" | "redFlushStatus" | "redFlushedOrderNo" | "revokeStatus" | "revokeFailReason" | "revokeApproved" | "driverName" | "driverPhone" | "createdAt" | "updatedAt", ExtArgs["result"]["purchaseWarehouse"]>
+
+  export type $PurchaseWarehousePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PurchaseWarehouse"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      ledgerNo: string | null
+      warehouseNo: string | null
+      purchaseContractNo: string | null
+      purchaseOrderNo: string | null
+      warehouseTime: string | null
+      status: string | null
+      settlementStatus: string | null
+      receiptNo: string | null
+      base: string | null
+      supplier: string | null
+      vehicleNo: string | null
+      warehouse: string | null
+      warehouseArea: string | null
+      material: string | null
+      grossWeight: Prisma.Decimal | null
+      tareWeight: Prisma.Decimal | null
+      netWeight: Prisma.Decimal | null
+      deduction: Prisma.Decimal | null
+      estimatedDryBasis: Prisma.Decimal | null
+      supplierWeightData: string | null
+      qualityInspector: string | null
+      qualityInspectTime: string | null
+      unitPriceExcludingTax: Prisma.Decimal | null
+      totalPriceExcludingTax: Prisma.Decimal | null
+      warehouseDate: string | null
+      remark: string | null
+      creator: string | null
+      createTime: string | null
+      shippingVesselNo: string | null
+      qualityChecker: string | null
+      inboundWeighingPerson: string | null
+      inboundTime: string | null
+      outboundWeighingPerson: string | null
+      confirmDate: string | null
+      taxRate: Prisma.Decimal | null
+      taxAmount: Prisma.Decimal | null
+      unitPriceIncludingTax: Prisma.Decimal | null
+      totalPriceIncludingTax: Prisma.Decimal | null
+      grade: string | null
+      confirmer: string | null
+      supplierWeightTotalExcludingTax: Prisma.Decimal | null
+      supplierWeightTotalIncludingTax: Prisma.Decimal | null
+      businessType: string | null
+      warehouseType: string | null
+      endUser: string | null
+      weighingTime: string | null
+      supplierNo: string | null
+      supplierName: string | null
+      supplierContact: string | null
+      qualityUnitPrice: Prisma.Decimal | null
+      purchaseContractNo2: string | null
+      purchaseOrderNo2: string | null
+      salesOrderNo: string | null
+      paymentReceiptNo: string | null
+      weighingBatchNo: string | null
+      isManualAdd: string | null
+      redFlushStatus: string | null
+      redFlushedOrderNo: string | null
+      revokeStatus: string | null
+      revokeFailReason: string | null
+      revokeApproved: string | null
+      driverName: string | null
+      driverPhone: string | null
+      createdAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["purchaseWarehouse"]>
+    composites: {}
+  }
+
+  type PurchaseWarehouseGetPayload<S extends boolean | null | undefined | PurchaseWarehouseDefaultArgs> = $Result.GetResult<Prisma.$PurchaseWarehousePayload, S>
+
+  type PurchaseWarehouseCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PurchaseWarehouseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PurchaseWarehouseCountAggregateInputType | true
+    }
+
+  export interface PurchaseWarehouseDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PurchaseWarehouse'], meta: { name: 'PurchaseWarehouse' } }
+    /**
+     * Find zero or one PurchaseWarehouse that matches the filter.
+     * @param {PurchaseWarehouseFindUniqueArgs} args - Arguments to find a PurchaseWarehouse
+     * @example
+     * // Get one PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PurchaseWarehouseFindUniqueArgs>(args: SelectSubset<T, PurchaseWarehouseFindUniqueArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PurchaseWarehouse that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PurchaseWarehouseFindUniqueOrThrowArgs} args - Arguments to find a PurchaseWarehouse
+     * @example
+     * // Get one PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PurchaseWarehouseFindUniqueOrThrowArgs>(args: SelectSubset<T, PurchaseWarehouseFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PurchaseWarehouse that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseFindFirstArgs} args - Arguments to find a PurchaseWarehouse
+     * @example
+     * // Get one PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PurchaseWarehouseFindFirstArgs>(args?: SelectSubset<T, PurchaseWarehouseFindFirstArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PurchaseWarehouse that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseFindFirstOrThrowArgs} args - Arguments to find a PurchaseWarehouse
+     * @example
+     * // Get one PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PurchaseWarehouseFindFirstOrThrowArgs>(args?: SelectSubset<T, PurchaseWarehouseFindFirstOrThrowArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PurchaseWarehouses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PurchaseWarehouses
+     * const purchaseWarehouses = await prisma.purchaseWarehouse.findMany()
+     * 
+     * // Get first 10 PurchaseWarehouses
+     * const purchaseWarehouses = await prisma.purchaseWarehouse.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const purchaseWarehouseWithIdOnly = await prisma.purchaseWarehouse.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PurchaseWarehouseFindManyArgs>(args?: SelectSubset<T, PurchaseWarehouseFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PurchaseWarehouse.
+     * @param {PurchaseWarehouseCreateArgs} args - Arguments to create a PurchaseWarehouse.
+     * @example
+     * // Create one PurchaseWarehouse
+     * const PurchaseWarehouse = await prisma.purchaseWarehouse.create({
+     *   data: {
+     *     // ... data to create a PurchaseWarehouse
+     *   }
+     * })
+     * 
+     */
+    create<T extends PurchaseWarehouseCreateArgs>(args: SelectSubset<T, PurchaseWarehouseCreateArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PurchaseWarehouses.
+     * @param {PurchaseWarehouseCreateManyArgs} args - Arguments to create many PurchaseWarehouses.
+     * @example
+     * // Create many PurchaseWarehouses
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PurchaseWarehouseCreateManyArgs>(args?: SelectSubset<T, PurchaseWarehouseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a PurchaseWarehouse.
+     * @param {PurchaseWarehouseDeleteArgs} args - Arguments to delete one PurchaseWarehouse.
+     * @example
+     * // Delete one PurchaseWarehouse
+     * const PurchaseWarehouse = await prisma.purchaseWarehouse.delete({
+     *   where: {
+     *     // ... filter to delete one PurchaseWarehouse
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PurchaseWarehouseDeleteArgs>(args: SelectSubset<T, PurchaseWarehouseDeleteArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PurchaseWarehouse.
+     * @param {PurchaseWarehouseUpdateArgs} args - Arguments to update one PurchaseWarehouse.
+     * @example
+     * // Update one PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PurchaseWarehouseUpdateArgs>(args: SelectSubset<T, PurchaseWarehouseUpdateArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PurchaseWarehouses.
+     * @param {PurchaseWarehouseDeleteManyArgs} args - Arguments to filter PurchaseWarehouses to delete.
+     * @example
+     * // Delete a few PurchaseWarehouses
+     * const { count } = await prisma.purchaseWarehouse.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PurchaseWarehouseDeleteManyArgs>(args?: SelectSubset<T, PurchaseWarehouseDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PurchaseWarehouses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PurchaseWarehouses
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PurchaseWarehouseUpdateManyArgs>(args: SelectSubset<T, PurchaseWarehouseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PurchaseWarehouse.
+     * @param {PurchaseWarehouseUpsertArgs} args - Arguments to update or create a PurchaseWarehouse.
+     * @example
+     * // Update or create a PurchaseWarehouse
+     * const purchaseWarehouse = await prisma.purchaseWarehouse.upsert({
+     *   create: {
+     *     // ... data to create a PurchaseWarehouse
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PurchaseWarehouse we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PurchaseWarehouseUpsertArgs>(args: SelectSubset<T, PurchaseWarehouseUpsertArgs<ExtArgs>>): Prisma__PurchaseWarehouseClient<$Result.GetResult<Prisma.$PurchaseWarehousePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PurchaseWarehouses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseCountArgs} args - Arguments to filter PurchaseWarehouses to count.
+     * @example
+     * // Count the number of PurchaseWarehouses
+     * const count = await prisma.purchaseWarehouse.count({
+     *   where: {
+     *     // ... the filter for the PurchaseWarehouses we want to count
+     *   }
+     * })
+    **/
+    count<T extends PurchaseWarehouseCountArgs>(
+      args?: Subset<T, PurchaseWarehouseCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PurchaseWarehouseCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PurchaseWarehouse.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PurchaseWarehouseAggregateArgs>(args: Subset<T, PurchaseWarehouseAggregateArgs>): Prisma.PrismaPromise<GetPurchaseWarehouseAggregateType<T>>
+
+    /**
+     * Group by PurchaseWarehouse.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PurchaseWarehouseGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PurchaseWarehouseGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PurchaseWarehouseGroupByArgs['orderBy'] }
+        : { orderBy?: PurchaseWarehouseGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PurchaseWarehouseGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPurchaseWarehouseGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PurchaseWarehouse model
+   */
+  readonly fields: PurchaseWarehouseFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PurchaseWarehouse.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PurchaseWarehouseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PurchaseWarehouse model
+   */
+  interface PurchaseWarehouseFieldRefs {
+    readonly id: FieldRef<"PurchaseWarehouse", 'Int'>
+    readonly ledgerNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly warehouseNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly purchaseContractNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly purchaseOrderNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly warehouseTime: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly status: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly settlementStatus: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly receiptNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly base: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly supplier: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly vehicleNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly warehouse: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly warehouseArea: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly material: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly grossWeight: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly tareWeight: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly netWeight: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly deduction: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly estimatedDryBasis: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly supplierWeightData: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly qualityInspector: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly qualityInspectTime: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly unitPriceExcludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly totalPriceExcludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly warehouseDate: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly remark: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly creator: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly createTime: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly shippingVesselNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly qualityChecker: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly inboundWeighingPerson: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly inboundTime: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly outboundWeighingPerson: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly confirmDate: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly taxRate: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly taxAmount: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly unitPriceIncludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly totalPriceIncludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly grade: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly confirmer: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly supplierWeightTotalExcludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly supplierWeightTotalIncludingTax: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly businessType: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly warehouseType: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly endUser: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly weighingTime: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly supplierNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly supplierName: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly supplierContact: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly qualityUnitPrice: FieldRef<"PurchaseWarehouse", 'Decimal'>
+    readonly purchaseContractNo2: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly purchaseOrderNo2: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly salesOrderNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly paymentReceiptNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly weighingBatchNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly isManualAdd: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly redFlushStatus: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly redFlushedOrderNo: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly revokeStatus: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly revokeFailReason: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly revokeApproved: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly driverName: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly driverPhone: FieldRef<"PurchaseWarehouse", 'String'>
+    readonly createdAt: FieldRef<"PurchaseWarehouse", 'DateTime'>
+    readonly updatedAt: FieldRef<"PurchaseWarehouse", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PurchaseWarehouse findUnique
+   */
+  export type PurchaseWarehouseFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter, which PurchaseWarehouse to fetch.
+     */
+    where: PurchaseWarehouseWhereUniqueInput
+  }
+
+  /**
+   * PurchaseWarehouse findUniqueOrThrow
+   */
+  export type PurchaseWarehouseFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter, which PurchaseWarehouse to fetch.
+     */
+    where: PurchaseWarehouseWhereUniqueInput
+  }
+
+  /**
+   * PurchaseWarehouse findFirst
+   */
+  export type PurchaseWarehouseFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter, which PurchaseWarehouse to fetch.
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PurchaseWarehouses to fetch.
+     */
+    orderBy?: PurchaseWarehouseOrderByWithRelationInput | PurchaseWarehouseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PurchaseWarehouses.
+     */
+    cursor?: PurchaseWarehouseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PurchaseWarehouses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PurchaseWarehouses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PurchaseWarehouses.
+     */
+    distinct?: PurchaseWarehouseScalarFieldEnum | PurchaseWarehouseScalarFieldEnum[]
+  }
+
+  /**
+   * PurchaseWarehouse findFirstOrThrow
+   */
+  export type PurchaseWarehouseFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter, which PurchaseWarehouse to fetch.
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PurchaseWarehouses to fetch.
+     */
+    orderBy?: PurchaseWarehouseOrderByWithRelationInput | PurchaseWarehouseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PurchaseWarehouses.
+     */
+    cursor?: PurchaseWarehouseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PurchaseWarehouses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PurchaseWarehouses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PurchaseWarehouses.
+     */
+    distinct?: PurchaseWarehouseScalarFieldEnum | PurchaseWarehouseScalarFieldEnum[]
+  }
+
+  /**
+   * PurchaseWarehouse findMany
+   */
+  export type PurchaseWarehouseFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter, which PurchaseWarehouses to fetch.
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PurchaseWarehouses to fetch.
+     */
+    orderBy?: PurchaseWarehouseOrderByWithRelationInput | PurchaseWarehouseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PurchaseWarehouses.
+     */
+    cursor?: PurchaseWarehouseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PurchaseWarehouses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PurchaseWarehouses.
+     */
+    skip?: number
+    distinct?: PurchaseWarehouseScalarFieldEnum | PurchaseWarehouseScalarFieldEnum[]
+  }
+
+  /**
+   * PurchaseWarehouse create
+   */
+  export type PurchaseWarehouseCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PurchaseWarehouse.
+     */
+    data?: XOR<PurchaseWarehouseCreateInput, PurchaseWarehouseUncheckedCreateInput>
+  }
+
+  /**
+   * PurchaseWarehouse createMany
+   */
+  export type PurchaseWarehouseCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PurchaseWarehouses.
+     */
+    data: PurchaseWarehouseCreateManyInput | PurchaseWarehouseCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PurchaseWarehouse update
+   */
+  export type PurchaseWarehouseUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PurchaseWarehouse.
+     */
+    data: XOR<PurchaseWarehouseUpdateInput, PurchaseWarehouseUncheckedUpdateInput>
+    /**
+     * Choose, which PurchaseWarehouse to update.
+     */
+    where: PurchaseWarehouseWhereUniqueInput
+  }
+
+  /**
+   * PurchaseWarehouse updateMany
+   */
+  export type PurchaseWarehouseUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PurchaseWarehouses.
+     */
+    data: XOR<PurchaseWarehouseUpdateManyMutationInput, PurchaseWarehouseUncheckedUpdateManyInput>
+    /**
+     * Filter which PurchaseWarehouses to update
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * Limit how many PurchaseWarehouses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PurchaseWarehouse upsert
+   */
+  export type PurchaseWarehouseUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PurchaseWarehouse to update in case it exists.
+     */
+    where: PurchaseWarehouseWhereUniqueInput
+    /**
+     * In case the PurchaseWarehouse found by the `where` argument doesn't exist, create a new PurchaseWarehouse with this data.
+     */
+    create: XOR<PurchaseWarehouseCreateInput, PurchaseWarehouseUncheckedCreateInput>
+    /**
+     * In case the PurchaseWarehouse was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PurchaseWarehouseUpdateInput, PurchaseWarehouseUncheckedUpdateInput>
+  }
+
+  /**
+   * PurchaseWarehouse delete
+   */
+  export type PurchaseWarehouseDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+    /**
+     * Filter which PurchaseWarehouse to delete.
+     */
+    where: PurchaseWarehouseWhereUniqueInput
+  }
+
+  /**
+   * PurchaseWarehouse deleteMany
+   */
+  export type PurchaseWarehouseDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PurchaseWarehouses to delete
+     */
+    where?: PurchaseWarehouseWhereInput
+    /**
+     * Limit how many PurchaseWarehouses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PurchaseWarehouse without action
+   */
+  export type PurchaseWarehouseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PurchaseWarehouse
+     */
+    select?: PurchaseWarehouseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PurchaseWarehouse
+     */
+    omit?: PurchaseWarehouseOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeliverySettlement
+   */
+
+  export type AggregateDeliverySettlement = {
+    _count: DeliverySettlementCountAggregateOutputType | null
+    _avg: DeliverySettlementAvgAggregateOutputType | null
+    _sum: DeliverySettlementSumAggregateOutputType | null
+    _min: DeliverySettlementMinAggregateOutputType | null
+    _max: DeliverySettlementMaxAggregateOutputType | null
+  }
+
+  export type DeliverySettlementAvgAggregateOutputType = {
+    id: number | null
+    netWeight: Decimal | null
+    factoryNetWeight: Decimal | null
+    deductionRate: Decimal | null
+    deliveryQuantity: number | null
+    settlementQuantity: Decimal | null
+    totalSettlementAmount: Decimal | null
+  }
+
+  export type DeliverySettlementSumAggregateOutputType = {
+    id: number | null
+    netWeight: Decimal | null
+    factoryNetWeight: Decimal | null
+    deductionRate: Decimal | null
+    deliveryQuantity: number | null
+    settlementQuantity: Decimal | null
+    totalSettlementAmount: Decimal | null
+  }
+
+  export type DeliverySettlementMinAggregateOutputType = {
+    id: number | null
+    deliveryNumber: string | null
+    customer: string | null
+    deliveryDate: string | null
+    factoryUnloadDate: string | null
+    warehouse: string | null
+    productType: string | null
+    vehicleNumber: string | null
+    netWeight: Decimal | null
+    factoryNetWeight: Decimal | null
+    deductionRate: Decimal | null
+    deliveryQuantity: number | null
+    settlementQuantity: Decimal | null
+    totalSettlementAmount: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeliverySettlementMaxAggregateOutputType = {
+    id: number | null
+    deliveryNumber: string | null
+    customer: string | null
+    deliveryDate: string | null
+    factoryUnloadDate: string | null
+    warehouse: string | null
+    productType: string | null
+    vehicleNumber: string | null
+    netWeight: Decimal | null
+    factoryNetWeight: Decimal | null
+    deductionRate: Decimal | null
+    deliveryQuantity: number | null
+    settlementQuantity: Decimal | null
+    totalSettlementAmount: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeliverySettlementCountAggregateOutputType = {
+    id: number
+    deliveryNumber: number
+    customer: number
+    deliveryDate: number
+    factoryUnloadDate: number
+    warehouse: number
+    productType: number
+    vehicleNumber: number
+    netWeight: number
+    factoryNetWeight: number
+    deductionRate: number
+    deliveryQuantity: number
+    settlementQuantity: number
+    totalSettlementAmount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeliverySettlementAvgAggregateInputType = {
+    id?: true
+    netWeight?: true
+    factoryNetWeight?: true
+    deductionRate?: true
+    deliveryQuantity?: true
+    settlementQuantity?: true
+    totalSettlementAmount?: true
+  }
+
+  export type DeliverySettlementSumAggregateInputType = {
+    id?: true
+    netWeight?: true
+    factoryNetWeight?: true
+    deductionRate?: true
+    deliveryQuantity?: true
+    settlementQuantity?: true
+    totalSettlementAmount?: true
+  }
+
+  export type DeliverySettlementMinAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    customer?: true
+    deliveryDate?: true
+    factoryUnloadDate?: true
+    warehouse?: true
+    productType?: true
+    vehicleNumber?: true
+    netWeight?: true
+    factoryNetWeight?: true
+    deductionRate?: true
+    deliveryQuantity?: true
+    settlementQuantity?: true
+    totalSettlementAmount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeliverySettlementMaxAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    customer?: true
+    deliveryDate?: true
+    factoryUnloadDate?: true
+    warehouse?: true
+    productType?: true
+    vehicleNumber?: true
+    netWeight?: true
+    factoryNetWeight?: true
+    deductionRate?: true
+    deliveryQuantity?: true
+    settlementQuantity?: true
+    totalSettlementAmount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeliverySettlementCountAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    customer?: true
+    deliveryDate?: true
+    factoryUnloadDate?: true
+    warehouse?: true
+    productType?: true
+    vehicleNumber?: true
+    netWeight?: true
+    factoryNetWeight?: true
+    deductionRate?: true
+    deliveryQuantity?: true
+    settlementQuantity?: true
+    totalSettlementAmount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeliverySettlementAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeliverySettlement to aggregate.
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeliverySettlements to fetch.
+     */
+    orderBy?: DeliverySettlementOrderByWithRelationInput | DeliverySettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeliverySettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeliverySettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeliverySettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeliverySettlements
+    **/
+    _count?: true | DeliverySettlementCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DeliverySettlementAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DeliverySettlementSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeliverySettlementMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeliverySettlementMaxAggregateInputType
+  }
+
+  export type GetDeliverySettlementAggregateType<T extends DeliverySettlementAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeliverySettlement]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeliverySettlement[P]>
+      : GetScalarType<T[P], AggregateDeliverySettlement[P]>
+  }
+
+
+
+
+  export type DeliverySettlementGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeliverySettlementWhereInput
+    orderBy?: DeliverySettlementOrderByWithAggregationInput | DeliverySettlementOrderByWithAggregationInput[]
+    by: DeliverySettlementScalarFieldEnum[] | DeliverySettlementScalarFieldEnum
+    having?: DeliverySettlementScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeliverySettlementCountAggregateInputType | true
+    _avg?: DeliverySettlementAvgAggregateInputType
+    _sum?: DeliverySettlementSumAggregateInputType
+    _min?: DeliverySettlementMinAggregateInputType
+    _max?: DeliverySettlementMaxAggregateInputType
+  }
+
+  export type DeliverySettlementGroupByOutputType = {
+    id: number
+    deliveryNumber: string | null
+    customer: string | null
+    deliveryDate: string | null
+    factoryUnloadDate: string | null
+    warehouse: string | null
+    productType: string | null
+    vehicleNumber: string | null
+    netWeight: Decimal | null
+    factoryNetWeight: Decimal | null
+    deductionRate: Decimal | null
+    deliveryQuantity: number | null
+    settlementQuantity: Decimal | null
+    totalSettlementAmount: Decimal | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    _count: DeliverySettlementCountAggregateOutputType | null
+    _avg: DeliverySettlementAvgAggregateOutputType | null
+    _sum: DeliverySettlementSumAggregateOutputType | null
+    _min: DeliverySettlementMinAggregateOutputType | null
+    _max: DeliverySettlementMaxAggregateOutputType | null
+  }
+
+  type GetDeliverySettlementGroupByPayload<T extends DeliverySettlementGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeliverySettlementGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeliverySettlementGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeliverySettlementGroupByOutputType[P]>
+            : GetScalarType<T[P], DeliverySettlementGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeliverySettlementSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deliveryNumber?: boolean
+    customer?: boolean
+    deliveryDate?: boolean
+    factoryUnloadDate?: boolean
+    warehouse?: boolean
+    productType?: boolean
+    vehicleNumber?: boolean
+    netWeight?: boolean
+    factoryNetWeight?: boolean
+    deductionRate?: boolean
+    deliveryQuantity?: boolean
+    settlementQuantity?: boolean
+    totalSettlementAmount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["deliverySettlement"]>
+
+
+
+  export type DeliverySettlementSelectScalar = {
+    id?: boolean
+    deliveryNumber?: boolean
+    customer?: boolean
+    deliveryDate?: boolean
+    factoryUnloadDate?: boolean
+    warehouse?: boolean
+    productType?: boolean
+    vehicleNumber?: boolean
+    netWeight?: boolean
+    factoryNetWeight?: boolean
+    deductionRate?: boolean
+    deliveryQuantity?: boolean
+    settlementQuantity?: boolean
+    totalSettlementAmount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeliverySettlementOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "deliveryNumber" | "customer" | "deliveryDate" | "factoryUnloadDate" | "warehouse" | "productType" | "vehicleNumber" | "netWeight" | "factoryNetWeight" | "deductionRate" | "deliveryQuantity" | "settlementQuantity" | "totalSettlementAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["deliverySettlement"]>
+
+  export type $DeliverySettlementPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeliverySettlement"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      deliveryNumber: string | null
+      customer: string | null
+      deliveryDate: string | null
+      factoryUnloadDate: string | null
+      warehouse: string | null
+      productType: string | null
+      vehicleNumber: string | null
+      netWeight: Prisma.Decimal | null
+      factoryNetWeight: Prisma.Decimal | null
+      deductionRate: Prisma.Decimal | null
+      deliveryQuantity: number | null
+      settlementQuantity: Prisma.Decimal | null
+      totalSettlementAmount: Prisma.Decimal | null
+      createdAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["deliverySettlement"]>
+    composites: {}
+  }
+
+  type DeliverySettlementGetPayload<S extends boolean | null | undefined | DeliverySettlementDefaultArgs> = $Result.GetResult<Prisma.$DeliverySettlementPayload, S>
+
+  type DeliverySettlementCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DeliverySettlementFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DeliverySettlementCountAggregateInputType | true
+    }
+
+  export interface DeliverySettlementDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeliverySettlement'], meta: { name: 'DeliverySettlement' } }
+    /**
+     * Find zero or one DeliverySettlement that matches the filter.
+     * @param {DeliverySettlementFindUniqueArgs} args - Arguments to find a DeliverySettlement
+     * @example
+     * // Get one DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeliverySettlementFindUniqueArgs>(args: SelectSubset<T, DeliverySettlementFindUniqueArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DeliverySettlement that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DeliverySettlementFindUniqueOrThrowArgs} args - Arguments to find a DeliverySettlement
+     * @example
+     * // Get one DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeliverySettlementFindUniqueOrThrowArgs>(args: SelectSubset<T, DeliverySettlementFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeliverySettlement that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementFindFirstArgs} args - Arguments to find a DeliverySettlement
+     * @example
+     * // Get one DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeliverySettlementFindFirstArgs>(args?: SelectSubset<T, DeliverySettlementFindFirstArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeliverySettlement that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementFindFirstOrThrowArgs} args - Arguments to find a DeliverySettlement
+     * @example
+     * // Get one DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeliverySettlementFindFirstOrThrowArgs>(args?: SelectSubset<T, DeliverySettlementFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DeliverySettlements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeliverySettlements
+     * const deliverySettlements = await prisma.deliverySettlement.findMany()
+     * 
+     * // Get first 10 DeliverySettlements
+     * const deliverySettlements = await prisma.deliverySettlement.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deliverySettlementWithIdOnly = await prisma.deliverySettlement.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeliverySettlementFindManyArgs>(args?: SelectSubset<T, DeliverySettlementFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DeliverySettlement.
+     * @param {DeliverySettlementCreateArgs} args - Arguments to create a DeliverySettlement.
+     * @example
+     * // Create one DeliverySettlement
+     * const DeliverySettlement = await prisma.deliverySettlement.create({
+     *   data: {
+     *     // ... data to create a DeliverySettlement
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeliverySettlementCreateArgs>(args: SelectSubset<T, DeliverySettlementCreateArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DeliverySettlements.
+     * @param {DeliverySettlementCreateManyArgs} args - Arguments to create many DeliverySettlements.
+     * @example
+     * // Create many DeliverySettlements
+     * const deliverySettlement = await prisma.deliverySettlement.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeliverySettlementCreateManyArgs>(args?: SelectSubset<T, DeliverySettlementCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a DeliverySettlement.
+     * @param {DeliverySettlementDeleteArgs} args - Arguments to delete one DeliverySettlement.
+     * @example
+     * // Delete one DeliverySettlement
+     * const DeliverySettlement = await prisma.deliverySettlement.delete({
+     *   where: {
+     *     // ... filter to delete one DeliverySettlement
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeliverySettlementDeleteArgs>(args: SelectSubset<T, DeliverySettlementDeleteArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DeliverySettlement.
+     * @param {DeliverySettlementUpdateArgs} args - Arguments to update one DeliverySettlement.
+     * @example
+     * // Update one DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeliverySettlementUpdateArgs>(args: SelectSubset<T, DeliverySettlementUpdateArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DeliverySettlements.
+     * @param {DeliverySettlementDeleteManyArgs} args - Arguments to filter DeliverySettlements to delete.
+     * @example
+     * // Delete a few DeliverySettlements
+     * const { count } = await prisma.deliverySettlement.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeliverySettlementDeleteManyArgs>(args?: SelectSubset<T, DeliverySettlementDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeliverySettlements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeliverySettlements
+     * const deliverySettlement = await prisma.deliverySettlement.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeliverySettlementUpdateManyArgs>(args: SelectSubset<T, DeliverySettlementUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DeliverySettlement.
+     * @param {DeliverySettlementUpsertArgs} args - Arguments to update or create a DeliverySettlement.
+     * @example
+     * // Update or create a DeliverySettlement
+     * const deliverySettlement = await prisma.deliverySettlement.upsert({
+     *   create: {
+     *     // ... data to create a DeliverySettlement
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeliverySettlement we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeliverySettlementUpsertArgs>(args: SelectSubset<T, DeliverySettlementUpsertArgs<ExtArgs>>): Prisma__DeliverySettlementClient<$Result.GetResult<Prisma.$DeliverySettlementPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DeliverySettlements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementCountArgs} args - Arguments to filter DeliverySettlements to count.
+     * @example
+     * // Count the number of DeliverySettlements
+     * const count = await prisma.deliverySettlement.count({
+     *   where: {
+     *     // ... the filter for the DeliverySettlements we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeliverySettlementCountArgs>(
+      args?: Subset<T, DeliverySettlementCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeliverySettlementCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeliverySettlement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeliverySettlementAggregateArgs>(args: Subset<T, DeliverySettlementAggregateArgs>): Prisma.PrismaPromise<GetDeliverySettlementAggregateType<T>>
+
+    /**
+     * Group by DeliverySettlement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeliverySettlementGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeliverySettlementGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeliverySettlementGroupByArgs['orderBy'] }
+        : { orderBy?: DeliverySettlementGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeliverySettlementGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeliverySettlementGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeliverySettlement model
+   */
+  readonly fields: DeliverySettlementFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeliverySettlement.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeliverySettlementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeliverySettlement model
+   */
+  interface DeliverySettlementFieldRefs {
+    readonly id: FieldRef<"DeliverySettlement", 'Int'>
+    readonly deliveryNumber: FieldRef<"DeliverySettlement", 'String'>
+    readonly customer: FieldRef<"DeliverySettlement", 'String'>
+    readonly deliveryDate: FieldRef<"DeliverySettlement", 'String'>
+    readonly factoryUnloadDate: FieldRef<"DeliverySettlement", 'String'>
+    readonly warehouse: FieldRef<"DeliverySettlement", 'String'>
+    readonly productType: FieldRef<"DeliverySettlement", 'String'>
+    readonly vehicleNumber: FieldRef<"DeliverySettlement", 'String'>
+    readonly netWeight: FieldRef<"DeliverySettlement", 'Decimal'>
+    readonly factoryNetWeight: FieldRef<"DeliverySettlement", 'Decimal'>
+    readonly deductionRate: FieldRef<"DeliverySettlement", 'Decimal'>
+    readonly deliveryQuantity: FieldRef<"DeliverySettlement", 'Int'>
+    readonly settlementQuantity: FieldRef<"DeliverySettlement", 'Decimal'>
+    readonly totalSettlementAmount: FieldRef<"DeliverySettlement", 'Decimal'>
+    readonly createdAt: FieldRef<"DeliverySettlement", 'DateTime'>
+    readonly updatedAt: FieldRef<"DeliverySettlement", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeliverySettlement findUnique
+   */
+  export type DeliverySettlementFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter, which DeliverySettlement to fetch.
+     */
+    where: DeliverySettlementWhereUniqueInput
+  }
+
+  /**
+   * DeliverySettlement findUniqueOrThrow
+   */
+  export type DeliverySettlementFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter, which DeliverySettlement to fetch.
+     */
+    where: DeliverySettlementWhereUniqueInput
+  }
+
+  /**
+   * DeliverySettlement findFirst
+   */
+  export type DeliverySettlementFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter, which DeliverySettlement to fetch.
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeliverySettlements to fetch.
+     */
+    orderBy?: DeliverySettlementOrderByWithRelationInput | DeliverySettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeliverySettlements.
+     */
+    cursor?: DeliverySettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeliverySettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeliverySettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeliverySettlements.
+     */
+    distinct?: DeliverySettlementScalarFieldEnum | DeliverySettlementScalarFieldEnum[]
+  }
+
+  /**
+   * DeliverySettlement findFirstOrThrow
+   */
+  export type DeliverySettlementFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter, which DeliverySettlement to fetch.
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeliverySettlements to fetch.
+     */
+    orderBy?: DeliverySettlementOrderByWithRelationInput | DeliverySettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeliverySettlements.
+     */
+    cursor?: DeliverySettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeliverySettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeliverySettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeliverySettlements.
+     */
+    distinct?: DeliverySettlementScalarFieldEnum | DeliverySettlementScalarFieldEnum[]
+  }
+
+  /**
+   * DeliverySettlement findMany
+   */
+  export type DeliverySettlementFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter, which DeliverySettlements to fetch.
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeliverySettlements to fetch.
+     */
+    orderBy?: DeliverySettlementOrderByWithRelationInput | DeliverySettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeliverySettlements.
+     */
+    cursor?: DeliverySettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeliverySettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeliverySettlements.
+     */
+    skip?: number
+    distinct?: DeliverySettlementScalarFieldEnum | DeliverySettlementScalarFieldEnum[]
+  }
+
+  /**
+   * DeliverySettlement create
+   */
+  export type DeliverySettlementCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * The data needed to create a DeliverySettlement.
+     */
+    data?: XOR<DeliverySettlementCreateInput, DeliverySettlementUncheckedCreateInput>
+  }
+
+  /**
+   * DeliverySettlement createMany
+   */
+  export type DeliverySettlementCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeliverySettlements.
+     */
+    data: DeliverySettlementCreateManyInput | DeliverySettlementCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeliverySettlement update
+   */
+  export type DeliverySettlementUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * The data needed to update a DeliverySettlement.
+     */
+    data: XOR<DeliverySettlementUpdateInput, DeliverySettlementUncheckedUpdateInput>
+    /**
+     * Choose, which DeliverySettlement to update.
+     */
+    where: DeliverySettlementWhereUniqueInput
+  }
+
+  /**
+   * DeliverySettlement updateMany
+   */
+  export type DeliverySettlementUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeliverySettlements.
+     */
+    data: XOR<DeliverySettlementUpdateManyMutationInput, DeliverySettlementUncheckedUpdateManyInput>
+    /**
+     * Filter which DeliverySettlements to update
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * Limit how many DeliverySettlements to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeliverySettlement upsert
+   */
+  export type DeliverySettlementUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * The filter to search for the DeliverySettlement to update in case it exists.
+     */
+    where: DeliverySettlementWhereUniqueInput
+    /**
+     * In case the DeliverySettlement found by the `where` argument doesn't exist, create a new DeliverySettlement with this data.
+     */
+    create: XOR<DeliverySettlementCreateInput, DeliverySettlementUncheckedCreateInput>
+    /**
+     * In case the DeliverySettlement was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeliverySettlementUpdateInput, DeliverySettlementUncheckedUpdateInput>
+  }
+
+  /**
+   * DeliverySettlement delete
+   */
+  export type DeliverySettlementDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+    /**
+     * Filter which DeliverySettlement to delete.
+     */
+    where: DeliverySettlementWhereUniqueInput
+  }
+
+  /**
+   * DeliverySettlement deleteMany
+   */
+  export type DeliverySettlementDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeliverySettlements to delete
+     */
+    where?: DeliverySettlementWhereInput
+    /**
+     * Limit how many DeliverySettlements to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeliverySettlement without action
+   */
+  export type DeliverySettlementDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeliverySettlement
+     */
+    select?: DeliverySettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeliverySettlement
+     */
+    omit?: DeliverySettlementOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProcessingCostInput
+   */
+
+  export type AggregateProcessingCostInput = {
+    _count: ProcessingCostInputCountAggregateOutputType | null
+    _avg: ProcessingCostInputAvgAggregateOutputType | null
+    _sum: ProcessingCostInputSumAggregateOutputType | null
+    _min: ProcessingCostInputMinAggregateOutputType | null
+    _max: ProcessingCostInputMaxAggregateOutputType | null
+  }
+
+  export type ProcessingCostInputAvgAggregateOutputType = {
+    id: number | null
+    productTons: Decimal | null
+  }
+
+  export type ProcessingCostInputSumAggregateOutputType = {
+    id: number | null
+    productTons: Decimal | null
+  }
+
+  export type ProcessingCostInputMinAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    productWarehouse: string | null
+    productTons: Decimal | null
+    productionDate: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProcessingCostInputMaxAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    productWarehouse: string | null
+    productTons: Decimal | null
+    productionDate: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProcessingCostInputCountAggregateOutputType = {
+    id: number
+    productName: number
+    productWarehouse: number
+    productTons: number
+    productionDate: number
+    materialComposition: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProcessingCostInputAvgAggregateInputType = {
+    id?: true
+    productTons?: true
+  }
+
+  export type ProcessingCostInputSumAggregateInputType = {
+    id?: true
+    productTons?: true
+  }
+
+  export type ProcessingCostInputMinAggregateInputType = {
+    id?: true
+    productName?: true
+    productWarehouse?: true
+    productTons?: true
+    productionDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProcessingCostInputMaxAggregateInputType = {
+    id?: true
+    productName?: true
+    productWarehouse?: true
+    productTons?: true
+    productionDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProcessingCostInputCountAggregateInputType = {
+    id?: true
+    productName?: true
+    productWarehouse?: true
+    productTons?: true
+    productionDate?: true
+    materialComposition?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProcessingCostInputAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProcessingCostInput to aggregate.
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostInputs to fetch.
+     */
+    orderBy?: ProcessingCostInputOrderByWithRelationInput | ProcessingCostInputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProcessingCostInputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostInputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostInputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProcessingCostInputs
+    **/
+    _count?: true | ProcessingCostInputCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProcessingCostInputAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProcessingCostInputSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProcessingCostInputMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProcessingCostInputMaxAggregateInputType
+  }
+
+  export type GetProcessingCostInputAggregateType<T extends ProcessingCostInputAggregateArgs> = {
+        [P in keyof T & keyof AggregateProcessingCostInput]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProcessingCostInput[P]>
+      : GetScalarType<T[P], AggregateProcessingCostInput[P]>
+  }
+
+
+
+
+  export type ProcessingCostInputGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProcessingCostInputWhereInput
+    orderBy?: ProcessingCostInputOrderByWithAggregationInput | ProcessingCostInputOrderByWithAggregationInput[]
+    by: ProcessingCostInputScalarFieldEnum[] | ProcessingCostInputScalarFieldEnum
+    having?: ProcessingCostInputScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProcessingCostInputCountAggregateInputType | true
+    _avg?: ProcessingCostInputAvgAggregateInputType
+    _sum?: ProcessingCostInputSumAggregateInputType
+    _min?: ProcessingCostInputMinAggregateInputType
+    _max?: ProcessingCostInputMaxAggregateInputType
+  }
+
+  export type ProcessingCostInputGroupByOutputType = {
+    id: number
+    productName: string | null
+    productWarehouse: string | null
+    productTons: Decimal | null
+    productionDate: string | null
+    materialComposition: JsonValue | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    _count: ProcessingCostInputCountAggregateOutputType | null
+    _avg: ProcessingCostInputAvgAggregateOutputType | null
+    _sum: ProcessingCostInputSumAggregateOutputType | null
+    _min: ProcessingCostInputMinAggregateOutputType | null
+    _max: ProcessingCostInputMaxAggregateOutputType | null
+  }
+
+  type GetProcessingCostInputGroupByPayload<T extends ProcessingCostInputGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProcessingCostInputGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProcessingCostInputGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProcessingCostInputGroupByOutputType[P]>
+            : GetScalarType<T[P], ProcessingCostInputGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProcessingCostInputSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productName?: boolean
+    productWarehouse?: boolean
+    productTons?: boolean
+    productionDate?: boolean
+    materialComposition?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["processingCostInput"]>
+
+
+
+  export type ProcessingCostInputSelectScalar = {
+    id?: boolean
+    productName?: boolean
+    productWarehouse?: boolean
+    productTons?: boolean
+    productionDate?: boolean
+    materialComposition?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ProcessingCostInputOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "productWarehouse" | "productTons" | "productionDate" | "materialComposition" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostInput"]>
+
+  export type $ProcessingCostInputPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProcessingCostInput"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      productName: string | null
+      productWarehouse: string | null
+      productTons: Prisma.Decimal | null
+      productionDate: string | null
+      materialComposition: Prisma.JsonValue | null
+      createdAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["processingCostInput"]>
+    composites: {}
+  }
+
+  type ProcessingCostInputGetPayload<S extends boolean | null | undefined | ProcessingCostInputDefaultArgs> = $Result.GetResult<Prisma.$ProcessingCostInputPayload, S>
+
+  type ProcessingCostInputCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProcessingCostInputFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProcessingCostInputCountAggregateInputType | true
+    }
+
+  export interface ProcessingCostInputDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProcessingCostInput'], meta: { name: 'ProcessingCostInput' } }
+    /**
+     * Find zero or one ProcessingCostInput that matches the filter.
+     * @param {ProcessingCostInputFindUniqueArgs} args - Arguments to find a ProcessingCostInput
+     * @example
+     * // Get one ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProcessingCostInputFindUniqueArgs>(args: SelectSubset<T, ProcessingCostInputFindUniqueArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProcessingCostInput that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProcessingCostInputFindUniqueOrThrowArgs} args - Arguments to find a ProcessingCostInput
+     * @example
+     * // Get one ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProcessingCostInputFindUniqueOrThrowArgs>(args: SelectSubset<T, ProcessingCostInputFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProcessingCostInput that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputFindFirstArgs} args - Arguments to find a ProcessingCostInput
+     * @example
+     * // Get one ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProcessingCostInputFindFirstArgs>(args?: SelectSubset<T, ProcessingCostInputFindFirstArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProcessingCostInput that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputFindFirstOrThrowArgs} args - Arguments to find a ProcessingCostInput
+     * @example
+     * // Get one ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProcessingCostInputFindFirstOrThrowArgs>(args?: SelectSubset<T, ProcessingCostInputFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProcessingCostInputs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProcessingCostInputs
+     * const processingCostInputs = await prisma.processingCostInput.findMany()
+     * 
+     * // Get first 10 ProcessingCostInputs
+     * const processingCostInputs = await prisma.processingCostInput.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const processingCostInputWithIdOnly = await prisma.processingCostInput.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProcessingCostInputFindManyArgs>(args?: SelectSubset<T, ProcessingCostInputFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProcessingCostInput.
+     * @param {ProcessingCostInputCreateArgs} args - Arguments to create a ProcessingCostInput.
+     * @example
+     * // Create one ProcessingCostInput
+     * const ProcessingCostInput = await prisma.processingCostInput.create({
+     *   data: {
+     *     // ... data to create a ProcessingCostInput
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProcessingCostInputCreateArgs>(args: SelectSubset<T, ProcessingCostInputCreateArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProcessingCostInputs.
+     * @param {ProcessingCostInputCreateManyArgs} args - Arguments to create many ProcessingCostInputs.
+     * @example
+     * // Create many ProcessingCostInputs
+     * const processingCostInput = await prisma.processingCostInput.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProcessingCostInputCreateManyArgs>(args?: SelectSubset<T, ProcessingCostInputCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProcessingCostInput.
+     * @param {ProcessingCostInputDeleteArgs} args - Arguments to delete one ProcessingCostInput.
+     * @example
+     * // Delete one ProcessingCostInput
+     * const ProcessingCostInput = await prisma.processingCostInput.delete({
+     *   where: {
+     *     // ... filter to delete one ProcessingCostInput
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProcessingCostInputDeleteArgs>(args: SelectSubset<T, ProcessingCostInputDeleteArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProcessingCostInput.
+     * @param {ProcessingCostInputUpdateArgs} args - Arguments to update one ProcessingCostInput.
+     * @example
+     * // Update one ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProcessingCostInputUpdateArgs>(args: SelectSubset<T, ProcessingCostInputUpdateArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProcessingCostInputs.
+     * @param {ProcessingCostInputDeleteManyArgs} args - Arguments to filter ProcessingCostInputs to delete.
+     * @example
+     * // Delete a few ProcessingCostInputs
+     * const { count } = await prisma.processingCostInput.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProcessingCostInputDeleteManyArgs>(args?: SelectSubset<T, ProcessingCostInputDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProcessingCostInputs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProcessingCostInputs
+     * const processingCostInput = await prisma.processingCostInput.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProcessingCostInputUpdateManyArgs>(args: SelectSubset<T, ProcessingCostInputUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProcessingCostInput.
+     * @param {ProcessingCostInputUpsertArgs} args - Arguments to update or create a ProcessingCostInput.
+     * @example
+     * // Update or create a ProcessingCostInput
+     * const processingCostInput = await prisma.processingCostInput.upsert({
+     *   create: {
+     *     // ... data to create a ProcessingCostInput
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProcessingCostInput we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProcessingCostInputUpsertArgs>(args: SelectSubset<T, ProcessingCostInputUpsertArgs<ExtArgs>>): Prisma__ProcessingCostInputClient<$Result.GetResult<Prisma.$ProcessingCostInputPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProcessingCostInputs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputCountArgs} args - Arguments to filter ProcessingCostInputs to count.
+     * @example
+     * // Count the number of ProcessingCostInputs
+     * const count = await prisma.processingCostInput.count({
+     *   where: {
+     *     // ... the filter for the ProcessingCostInputs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProcessingCostInputCountArgs>(
+      args?: Subset<T, ProcessingCostInputCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProcessingCostInputCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProcessingCostInput.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProcessingCostInputAggregateArgs>(args: Subset<T, ProcessingCostInputAggregateArgs>): Prisma.PrismaPromise<GetProcessingCostInputAggregateType<T>>
+
+    /**
+     * Group by ProcessingCostInput.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostInputGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProcessingCostInputGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProcessingCostInputGroupByArgs['orderBy'] }
+        : { orderBy?: ProcessingCostInputGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProcessingCostInputGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProcessingCostInputGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProcessingCostInput model
+   */
+  readonly fields: ProcessingCostInputFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProcessingCostInput.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProcessingCostInputClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProcessingCostInput model
+   */
+  interface ProcessingCostInputFieldRefs {
+    readonly id: FieldRef<"ProcessingCostInput", 'Int'>
+    readonly productName: FieldRef<"ProcessingCostInput", 'String'>
+    readonly productWarehouse: FieldRef<"ProcessingCostInput", 'String'>
+    readonly productTons: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly productionDate: FieldRef<"ProcessingCostInput", 'String'>
+    readonly materialComposition: FieldRef<"ProcessingCostInput", 'Json'>
+    readonly createdAt: FieldRef<"ProcessingCostInput", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProcessingCostInput", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProcessingCostInput findUnique
+   */
+  export type ProcessingCostInputFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostInput to fetch.
+     */
+    where: ProcessingCostInputWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostInput findUniqueOrThrow
+   */
+  export type ProcessingCostInputFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostInput to fetch.
+     */
+    where: ProcessingCostInputWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostInput findFirst
+   */
+  export type ProcessingCostInputFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostInput to fetch.
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostInputs to fetch.
+     */
+    orderBy?: ProcessingCostInputOrderByWithRelationInput | ProcessingCostInputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProcessingCostInputs.
+     */
+    cursor?: ProcessingCostInputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostInputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostInputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProcessingCostInputs.
+     */
+    distinct?: ProcessingCostInputScalarFieldEnum | ProcessingCostInputScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostInput findFirstOrThrow
+   */
+  export type ProcessingCostInputFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostInput to fetch.
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostInputs to fetch.
+     */
+    orderBy?: ProcessingCostInputOrderByWithRelationInput | ProcessingCostInputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProcessingCostInputs.
+     */
+    cursor?: ProcessingCostInputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostInputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostInputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProcessingCostInputs.
+     */
+    distinct?: ProcessingCostInputScalarFieldEnum | ProcessingCostInputScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostInput findMany
+   */
+  export type ProcessingCostInputFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostInputs to fetch.
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostInputs to fetch.
+     */
+    orderBy?: ProcessingCostInputOrderByWithRelationInput | ProcessingCostInputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProcessingCostInputs.
+     */
+    cursor?: ProcessingCostInputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostInputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostInputs.
+     */
+    skip?: number
+    distinct?: ProcessingCostInputScalarFieldEnum | ProcessingCostInputScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostInput create
+   */
+  export type ProcessingCostInputCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProcessingCostInput.
+     */
+    data?: XOR<ProcessingCostInputCreateInput, ProcessingCostInputUncheckedCreateInput>
+  }
+
+  /**
+   * ProcessingCostInput createMany
+   */
+  export type ProcessingCostInputCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProcessingCostInputs.
+     */
+    data: ProcessingCostInputCreateManyInput | ProcessingCostInputCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProcessingCostInput update
+   */
+  export type ProcessingCostInputUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProcessingCostInput.
+     */
+    data: XOR<ProcessingCostInputUpdateInput, ProcessingCostInputUncheckedUpdateInput>
+    /**
+     * Choose, which ProcessingCostInput to update.
+     */
+    where: ProcessingCostInputWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostInput updateMany
+   */
+  export type ProcessingCostInputUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProcessingCostInputs.
+     */
+    data: XOR<ProcessingCostInputUpdateManyMutationInput, ProcessingCostInputUncheckedUpdateManyInput>
+    /**
+     * Filter which ProcessingCostInputs to update
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * Limit how many ProcessingCostInputs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProcessingCostInput upsert
+   */
+  export type ProcessingCostInputUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProcessingCostInput to update in case it exists.
+     */
+    where: ProcessingCostInputWhereUniqueInput
+    /**
+     * In case the ProcessingCostInput found by the `where` argument doesn't exist, create a new ProcessingCostInput with this data.
+     */
+    create: XOR<ProcessingCostInputCreateInput, ProcessingCostInputUncheckedCreateInput>
+    /**
+     * In case the ProcessingCostInput was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProcessingCostInputUpdateInput, ProcessingCostInputUncheckedUpdateInput>
+  }
+
+  /**
+   * ProcessingCostInput delete
+   */
+  export type ProcessingCostInputDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+    /**
+     * Filter which ProcessingCostInput to delete.
+     */
+    where: ProcessingCostInputWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostInput deleteMany
+   */
+  export type ProcessingCostInputDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProcessingCostInputs to delete
+     */
+    where?: ProcessingCostInputWhereInput
+    /**
+     * Limit how many ProcessingCostInputs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProcessingCostInput without action
+   */
+  export type ProcessingCostInputDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostInput
+     */
+    select?: ProcessingCostInputSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostInput
+     */
+    omit?: ProcessingCostInputOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProcessingCostConfig
+   */
+
+  export type AggregateProcessingCostConfig = {
+    _count: ProcessingCostConfigCountAggregateOutputType | null
+    _avg: ProcessingCostConfigAvgAggregateOutputType | null
+    _sum: ProcessingCostConfigSumAggregateOutputType | null
+    _min: ProcessingCostConfigMinAggregateOutputType | null
+    _max: ProcessingCostConfigMaxAggregateOutputType | null
+  }
+
+  export type ProcessingCostConfigAvgAggregateOutputType = {
+    id: number | null
+    unitProcessingCost: Decimal | null
+  }
+
+  export type ProcessingCostConfigSumAggregateOutputType = {
+    id: number | null
+    unitProcessingCost: Decimal | null
+  }
+
+  export type ProcessingCostConfigMinAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    unitProcessingCost: Decimal | null
+    configMonth: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProcessingCostConfigMaxAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    unitProcessingCost: Decimal | null
+    configMonth: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProcessingCostConfigCountAggregateOutputType = {
+    id: number
+    productName: number
+    unitProcessingCost: number
+    configMonth: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProcessingCostConfigAvgAggregateInputType = {
+    id?: true
+    unitProcessingCost?: true
+  }
+
+  export type ProcessingCostConfigSumAggregateInputType = {
+    id?: true
+    unitProcessingCost?: true
+  }
+
+  export type ProcessingCostConfigMinAggregateInputType = {
+    id?: true
+    productName?: true
+    unitProcessingCost?: true
+    configMonth?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProcessingCostConfigMaxAggregateInputType = {
+    id?: true
+    productName?: true
+    unitProcessingCost?: true
+    configMonth?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProcessingCostConfigCountAggregateInputType = {
+    id?: true
+    productName?: true
+    unitProcessingCost?: true
+    configMonth?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProcessingCostConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProcessingCostConfig to aggregate.
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostConfigs to fetch.
+     */
+    orderBy?: ProcessingCostConfigOrderByWithRelationInput | ProcessingCostConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProcessingCostConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProcessingCostConfigs
+    **/
+    _count?: true | ProcessingCostConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProcessingCostConfigAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProcessingCostConfigSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProcessingCostConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProcessingCostConfigMaxAggregateInputType
+  }
+
+  export type GetProcessingCostConfigAggregateType<T extends ProcessingCostConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateProcessingCostConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProcessingCostConfig[P]>
+      : GetScalarType<T[P], AggregateProcessingCostConfig[P]>
+  }
+
+
+
+
+  export type ProcessingCostConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProcessingCostConfigWhereInput
+    orderBy?: ProcessingCostConfigOrderByWithAggregationInput | ProcessingCostConfigOrderByWithAggregationInput[]
+    by: ProcessingCostConfigScalarFieldEnum[] | ProcessingCostConfigScalarFieldEnum
+    having?: ProcessingCostConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProcessingCostConfigCountAggregateInputType | true
+    _avg?: ProcessingCostConfigAvgAggregateInputType
+    _sum?: ProcessingCostConfigSumAggregateInputType
+    _min?: ProcessingCostConfigMinAggregateInputType
+    _max?: ProcessingCostConfigMaxAggregateInputType
+  }
+
+  export type ProcessingCostConfigGroupByOutputType = {
+    id: number
+    productName: string | null
+    unitProcessingCost: Decimal | null
+    configMonth: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    _count: ProcessingCostConfigCountAggregateOutputType | null
+    _avg: ProcessingCostConfigAvgAggregateOutputType | null
+    _sum: ProcessingCostConfigSumAggregateOutputType | null
+    _min: ProcessingCostConfigMinAggregateOutputType | null
+    _max: ProcessingCostConfigMaxAggregateOutputType | null
+  }
+
+  type GetProcessingCostConfigGroupByPayload<T extends ProcessingCostConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProcessingCostConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProcessingCostConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProcessingCostConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], ProcessingCostConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProcessingCostConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productName?: boolean
+    unitProcessingCost?: boolean
+    configMonth?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["processingCostConfig"]>
+
+
+
+  export type ProcessingCostConfigSelectScalar = {
+    id?: boolean
+    productName?: boolean
+    unitProcessingCost?: boolean
+    configMonth?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ProcessingCostConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "unitProcessingCost" | "configMonth" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostConfig"]>
+
+  export type $ProcessingCostConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProcessingCostConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      productName: string | null
+      unitProcessingCost: Prisma.Decimal | null
+      configMonth: string | null
+      createdAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["processingCostConfig"]>
+    composites: {}
+  }
+
+  type ProcessingCostConfigGetPayload<S extends boolean | null | undefined | ProcessingCostConfigDefaultArgs> = $Result.GetResult<Prisma.$ProcessingCostConfigPayload, S>
+
+  type ProcessingCostConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProcessingCostConfigFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProcessingCostConfigCountAggregateInputType | true
+    }
+
+  export interface ProcessingCostConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProcessingCostConfig'], meta: { name: 'ProcessingCostConfig' } }
+    /**
+     * Find zero or one ProcessingCostConfig that matches the filter.
+     * @param {ProcessingCostConfigFindUniqueArgs} args - Arguments to find a ProcessingCostConfig
+     * @example
+     * // Get one ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProcessingCostConfigFindUniqueArgs>(args: SelectSubset<T, ProcessingCostConfigFindUniqueArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProcessingCostConfig that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProcessingCostConfigFindUniqueOrThrowArgs} args - Arguments to find a ProcessingCostConfig
+     * @example
+     * // Get one ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProcessingCostConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, ProcessingCostConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProcessingCostConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigFindFirstArgs} args - Arguments to find a ProcessingCostConfig
+     * @example
+     * // Get one ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProcessingCostConfigFindFirstArgs>(args?: SelectSubset<T, ProcessingCostConfigFindFirstArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProcessingCostConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigFindFirstOrThrowArgs} args - Arguments to find a ProcessingCostConfig
+     * @example
+     * // Get one ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProcessingCostConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, ProcessingCostConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProcessingCostConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProcessingCostConfigs
+     * const processingCostConfigs = await prisma.processingCostConfig.findMany()
+     * 
+     * // Get first 10 ProcessingCostConfigs
+     * const processingCostConfigs = await prisma.processingCostConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const processingCostConfigWithIdOnly = await prisma.processingCostConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProcessingCostConfigFindManyArgs>(args?: SelectSubset<T, ProcessingCostConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProcessingCostConfig.
+     * @param {ProcessingCostConfigCreateArgs} args - Arguments to create a ProcessingCostConfig.
+     * @example
+     * // Create one ProcessingCostConfig
+     * const ProcessingCostConfig = await prisma.processingCostConfig.create({
+     *   data: {
+     *     // ... data to create a ProcessingCostConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProcessingCostConfigCreateArgs>(args: SelectSubset<T, ProcessingCostConfigCreateArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProcessingCostConfigs.
+     * @param {ProcessingCostConfigCreateManyArgs} args - Arguments to create many ProcessingCostConfigs.
+     * @example
+     * // Create many ProcessingCostConfigs
+     * const processingCostConfig = await prisma.processingCostConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProcessingCostConfigCreateManyArgs>(args?: SelectSubset<T, ProcessingCostConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProcessingCostConfig.
+     * @param {ProcessingCostConfigDeleteArgs} args - Arguments to delete one ProcessingCostConfig.
+     * @example
+     * // Delete one ProcessingCostConfig
+     * const ProcessingCostConfig = await prisma.processingCostConfig.delete({
+     *   where: {
+     *     // ... filter to delete one ProcessingCostConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProcessingCostConfigDeleteArgs>(args: SelectSubset<T, ProcessingCostConfigDeleteArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProcessingCostConfig.
+     * @param {ProcessingCostConfigUpdateArgs} args - Arguments to update one ProcessingCostConfig.
+     * @example
+     * // Update one ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProcessingCostConfigUpdateArgs>(args: SelectSubset<T, ProcessingCostConfigUpdateArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProcessingCostConfigs.
+     * @param {ProcessingCostConfigDeleteManyArgs} args - Arguments to filter ProcessingCostConfigs to delete.
+     * @example
+     * // Delete a few ProcessingCostConfigs
+     * const { count } = await prisma.processingCostConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProcessingCostConfigDeleteManyArgs>(args?: SelectSubset<T, ProcessingCostConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProcessingCostConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProcessingCostConfigs
+     * const processingCostConfig = await prisma.processingCostConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProcessingCostConfigUpdateManyArgs>(args: SelectSubset<T, ProcessingCostConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProcessingCostConfig.
+     * @param {ProcessingCostConfigUpsertArgs} args - Arguments to update or create a ProcessingCostConfig.
+     * @example
+     * // Update or create a ProcessingCostConfig
+     * const processingCostConfig = await prisma.processingCostConfig.upsert({
+     *   create: {
+     *     // ... data to create a ProcessingCostConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProcessingCostConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProcessingCostConfigUpsertArgs>(args: SelectSubset<T, ProcessingCostConfigUpsertArgs<ExtArgs>>): Prisma__ProcessingCostConfigClient<$Result.GetResult<Prisma.$ProcessingCostConfigPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProcessingCostConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigCountArgs} args - Arguments to filter ProcessingCostConfigs to count.
+     * @example
+     * // Count the number of ProcessingCostConfigs
+     * const count = await prisma.processingCostConfig.count({
+     *   where: {
+     *     // ... the filter for the ProcessingCostConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProcessingCostConfigCountArgs>(
+      args?: Subset<T, ProcessingCostConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProcessingCostConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProcessingCostConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProcessingCostConfigAggregateArgs>(args: Subset<T, ProcessingCostConfigAggregateArgs>): Prisma.PrismaPromise<GetProcessingCostConfigAggregateType<T>>
+
+    /**
+     * Group by ProcessingCostConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProcessingCostConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProcessingCostConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProcessingCostConfigGroupByArgs['orderBy'] }
+        : { orderBy?: ProcessingCostConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProcessingCostConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProcessingCostConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProcessingCostConfig model
+   */
+  readonly fields: ProcessingCostConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProcessingCostConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProcessingCostConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProcessingCostConfig model
+   */
+  interface ProcessingCostConfigFieldRefs {
+    readonly id: FieldRef<"ProcessingCostConfig", 'Int'>
+    readonly productName: FieldRef<"ProcessingCostConfig", 'String'>
+    readonly unitProcessingCost: FieldRef<"ProcessingCostConfig", 'Decimal'>
+    readonly configMonth: FieldRef<"ProcessingCostConfig", 'String'>
+    readonly createdAt: FieldRef<"ProcessingCostConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProcessingCostConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProcessingCostConfig findUnique
+   */
+  export type ProcessingCostConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostConfig to fetch.
+     */
+    where: ProcessingCostConfigWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostConfig findUniqueOrThrow
+   */
+  export type ProcessingCostConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostConfig to fetch.
+     */
+    where: ProcessingCostConfigWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostConfig findFirst
+   */
+  export type ProcessingCostConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostConfig to fetch.
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostConfigs to fetch.
+     */
+    orderBy?: ProcessingCostConfigOrderByWithRelationInput | ProcessingCostConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProcessingCostConfigs.
+     */
+    cursor?: ProcessingCostConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProcessingCostConfigs.
+     */
+    distinct?: ProcessingCostConfigScalarFieldEnum | ProcessingCostConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostConfig findFirstOrThrow
+   */
+  export type ProcessingCostConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostConfig to fetch.
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostConfigs to fetch.
+     */
+    orderBy?: ProcessingCostConfigOrderByWithRelationInput | ProcessingCostConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProcessingCostConfigs.
+     */
+    cursor?: ProcessingCostConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProcessingCostConfigs.
+     */
+    distinct?: ProcessingCostConfigScalarFieldEnum | ProcessingCostConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostConfig findMany
+   */
+  export type ProcessingCostConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProcessingCostConfigs to fetch.
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProcessingCostConfigs to fetch.
+     */
+    orderBy?: ProcessingCostConfigOrderByWithRelationInput | ProcessingCostConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProcessingCostConfigs.
+     */
+    cursor?: ProcessingCostConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProcessingCostConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProcessingCostConfigs.
+     */
+    skip?: number
+    distinct?: ProcessingCostConfigScalarFieldEnum | ProcessingCostConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProcessingCostConfig create
+   */
+  export type ProcessingCostConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProcessingCostConfig.
+     */
+    data?: XOR<ProcessingCostConfigCreateInput, ProcessingCostConfigUncheckedCreateInput>
+  }
+
+  /**
+   * ProcessingCostConfig createMany
+   */
+  export type ProcessingCostConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProcessingCostConfigs.
+     */
+    data: ProcessingCostConfigCreateManyInput | ProcessingCostConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProcessingCostConfig update
+   */
+  export type ProcessingCostConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProcessingCostConfig.
+     */
+    data: XOR<ProcessingCostConfigUpdateInput, ProcessingCostConfigUncheckedUpdateInput>
+    /**
+     * Choose, which ProcessingCostConfig to update.
+     */
+    where: ProcessingCostConfigWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostConfig updateMany
+   */
+  export type ProcessingCostConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProcessingCostConfigs.
+     */
+    data: XOR<ProcessingCostConfigUpdateManyMutationInput, ProcessingCostConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which ProcessingCostConfigs to update
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * Limit how many ProcessingCostConfigs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProcessingCostConfig upsert
+   */
+  export type ProcessingCostConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProcessingCostConfig to update in case it exists.
+     */
+    where: ProcessingCostConfigWhereUniqueInput
+    /**
+     * In case the ProcessingCostConfig found by the `where` argument doesn't exist, create a new ProcessingCostConfig with this data.
+     */
+    create: XOR<ProcessingCostConfigCreateInput, ProcessingCostConfigUncheckedCreateInput>
+    /**
+     * In case the ProcessingCostConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProcessingCostConfigUpdateInput, ProcessingCostConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * ProcessingCostConfig delete
+   */
+  export type ProcessingCostConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+    /**
+     * Filter which ProcessingCostConfig to delete.
+     */
+    where: ProcessingCostConfigWhereUniqueInput
+  }
+
+  /**
+   * ProcessingCostConfig deleteMany
+   */
+  export type ProcessingCostConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProcessingCostConfigs to delete
+     */
+    where?: ProcessingCostConfigWhereInput
+    /**
+     * Limit how many ProcessingCostConfigs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProcessingCostConfig without action
+   */
+  export type ProcessingCostConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProcessingCostConfig
+     */
+    select?: ProcessingCostConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProcessingCostConfig
+     */
+    omit?: ProcessingCostConfigOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MaterialCostCache
+   */
+
+  export type AggregateMaterialCostCache = {
+    _count: MaterialCostCacheCountAggregateOutputType | null
+    _avg: MaterialCostCacheAvgAggregateOutputType | null
+    _sum: MaterialCostCacheSumAggregateOutputType | null
+    _min: MaterialCostCacheMinAggregateOutputType | null
+    _max: MaterialCostCacheMaxAggregateOutputType | null
+  }
+
+  export type MaterialCostCacheAvgAggregateOutputType = {
+    id: number | null
+    settlementQuantity: Decimal | null
+    materialCost: Decimal | null
+  }
+
+  export type MaterialCostCacheSumAggregateOutputType = {
+    id: number | null
+    settlementQuantity: Decimal | null
+    materialCost: Decimal | null
+  }
+
+  export type MaterialCostCacheMinAggregateOutputType = {
+    id: number | null
+    deliveryNumber: string | null
+    productName: string | null
+    productWarehouse: string | null
+    deliveryDate: string | null
+    settlementQuantity: Decimal | null
+    materialCost: Decimal | null
+    calculatedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MaterialCostCacheMaxAggregateOutputType = {
+    id: number | null
+    deliveryNumber: string | null
+    productName: string | null
+    productWarehouse: string | null
+    deliveryDate: string | null
+    settlementQuantity: Decimal | null
+    materialCost: Decimal | null
+    calculatedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MaterialCostCacheCountAggregateOutputType = {
+    id: number
+    deliveryNumber: number
+    productName: number
+    productWarehouse: number
+    deliveryDate: number
+    settlementQuantity: number
+    materialCost: number
+    materialComposition: number
+    productionRecords: number
+    calculatedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MaterialCostCacheAvgAggregateInputType = {
+    id?: true
+    settlementQuantity?: true
+    materialCost?: true
+  }
+
+  export type MaterialCostCacheSumAggregateInputType = {
+    id?: true
+    settlementQuantity?: true
+    materialCost?: true
+  }
+
+  export type MaterialCostCacheMinAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    productName?: true
+    productWarehouse?: true
+    deliveryDate?: true
+    settlementQuantity?: true
+    materialCost?: true
+    calculatedAt?: true
+    updatedAt?: true
+  }
+
+  export type MaterialCostCacheMaxAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    productName?: true
+    productWarehouse?: true
+    deliveryDate?: true
+    settlementQuantity?: true
+    materialCost?: true
+    calculatedAt?: true
+    updatedAt?: true
+  }
+
+  export type MaterialCostCacheCountAggregateInputType = {
+    id?: true
+    deliveryNumber?: true
+    productName?: true
+    productWarehouse?: true
+    deliveryDate?: true
+    settlementQuantity?: true
+    materialCost?: true
+    materialComposition?: true
+    productionRecords?: true
+    calculatedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MaterialCostCacheAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialCostCache to aggregate.
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCaches to fetch.
+     */
+    orderBy?: MaterialCostCacheOrderByWithRelationInput | MaterialCostCacheOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaterialCostCacheWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCaches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCaches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MaterialCostCaches
+    **/
+    _count?: true | MaterialCostCacheCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaterialCostCacheAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaterialCostCacheSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaterialCostCacheMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaterialCostCacheMaxAggregateInputType
+  }
+
+  export type GetMaterialCostCacheAggregateType<T extends MaterialCostCacheAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaterialCostCache]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaterialCostCache[P]>
+      : GetScalarType<T[P], AggregateMaterialCostCache[P]>
+  }
+
+
+
+
+  export type MaterialCostCacheGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialCostCacheWhereInput
+    orderBy?: MaterialCostCacheOrderByWithAggregationInput | MaterialCostCacheOrderByWithAggregationInput[]
+    by: MaterialCostCacheScalarFieldEnum[] | MaterialCostCacheScalarFieldEnum
+    having?: MaterialCostCacheScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaterialCostCacheCountAggregateInputType | true
+    _avg?: MaterialCostCacheAvgAggregateInputType
+    _sum?: MaterialCostCacheSumAggregateInputType
+    _min?: MaterialCostCacheMinAggregateInputType
+    _max?: MaterialCostCacheMaxAggregateInputType
+  }
+
+  export type MaterialCostCacheGroupByOutputType = {
+    id: number
+    deliveryNumber: string | null
+    productName: string | null
+    productWarehouse: string | null
+    deliveryDate: string | null
+    settlementQuantity: Decimal | null
+    materialCost: Decimal | null
+    materialComposition: JsonValue | null
+    productionRecords: JsonValue | null
+    calculatedAt: Date | null
+    updatedAt: Date | null
+    _count: MaterialCostCacheCountAggregateOutputType | null
+    _avg: MaterialCostCacheAvgAggregateOutputType | null
+    _sum: MaterialCostCacheSumAggregateOutputType | null
+    _min: MaterialCostCacheMinAggregateOutputType | null
+    _max: MaterialCostCacheMaxAggregateOutputType | null
+  }
+
+  type GetMaterialCostCacheGroupByPayload<T extends MaterialCostCacheGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaterialCostCacheGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaterialCostCacheGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaterialCostCacheGroupByOutputType[P]>
+            : GetScalarType<T[P], MaterialCostCacheGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaterialCostCacheSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deliveryNumber?: boolean
+    productName?: boolean
+    productWarehouse?: boolean
+    deliveryDate?: boolean
+    settlementQuantity?: boolean
+    materialCost?: boolean
+    materialComposition?: boolean
+    productionRecords?: boolean
+    calculatedAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["materialCostCache"]>
+
+
+
+  export type MaterialCostCacheSelectScalar = {
+    id?: boolean
+    deliveryNumber?: boolean
+    productName?: boolean
+    productWarehouse?: boolean
+    deliveryDate?: boolean
+    settlementQuantity?: boolean
+    materialCost?: boolean
+    materialComposition?: boolean
+    productionRecords?: boolean
+    calculatedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MaterialCostCacheOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "deliveryNumber" | "productName" | "productWarehouse" | "deliveryDate" | "settlementQuantity" | "materialCost" | "materialComposition" | "productionRecords" | "calculatedAt" | "updatedAt", ExtArgs["result"]["materialCostCache"]>
+
+  export type $MaterialCostCachePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MaterialCostCache"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      deliveryNumber: string | null
+      productName: string | null
+      productWarehouse: string | null
+      deliveryDate: string | null
+      settlementQuantity: Prisma.Decimal | null
+      materialCost: Prisma.Decimal | null
+      materialComposition: Prisma.JsonValue | null
+      productionRecords: Prisma.JsonValue | null
+      calculatedAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["materialCostCache"]>
+    composites: {}
+  }
+
+  type MaterialCostCacheGetPayload<S extends boolean | null | undefined | MaterialCostCacheDefaultArgs> = $Result.GetResult<Prisma.$MaterialCostCachePayload, S>
+
+  type MaterialCostCacheCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaterialCostCacheFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaterialCostCacheCountAggregateInputType | true
+    }
+
+  export interface MaterialCostCacheDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MaterialCostCache'], meta: { name: 'MaterialCostCache' } }
+    /**
+     * Find zero or one MaterialCostCache that matches the filter.
+     * @param {MaterialCostCacheFindUniqueArgs} args - Arguments to find a MaterialCostCache
+     * @example
+     * // Get one MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaterialCostCacheFindUniqueArgs>(args: SelectSubset<T, MaterialCostCacheFindUniqueArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MaterialCostCache that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaterialCostCacheFindUniqueOrThrowArgs} args - Arguments to find a MaterialCostCache
+     * @example
+     * // Get one MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaterialCostCacheFindUniqueOrThrowArgs>(args: SelectSubset<T, MaterialCostCacheFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialCostCache that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheFindFirstArgs} args - Arguments to find a MaterialCostCache
+     * @example
+     * // Get one MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaterialCostCacheFindFirstArgs>(args?: SelectSubset<T, MaterialCostCacheFindFirstArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialCostCache that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheFindFirstOrThrowArgs} args - Arguments to find a MaterialCostCache
+     * @example
+     * // Get one MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaterialCostCacheFindFirstOrThrowArgs>(args?: SelectSubset<T, MaterialCostCacheFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MaterialCostCaches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MaterialCostCaches
+     * const materialCostCaches = await prisma.materialCostCache.findMany()
+     * 
+     * // Get first 10 MaterialCostCaches
+     * const materialCostCaches = await prisma.materialCostCache.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const materialCostCacheWithIdOnly = await prisma.materialCostCache.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaterialCostCacheFindManyArgs>(args?: SelectSubset<T, MaterialCostCacheFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MaterialCostCache.
+     * @param {MaterialCostCacheCreateArgs} args - Arguments to create a MaterialCostCache.
+     * @example
+     * // Create one MaterialCostCache
+     * const MaterialCostCache = await prisma.materialCostCache.create({
+     *   data: {
+     *     // ... data to create a MaterialCostCache
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaterialCostCacheCreateArgs>(args: SelectSubset<T, MaterialCostCacheCreateArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MaterialCostCaches.
+     * @param {MaterialCostCacheCreateManyArgs} args - Arguments to create many MaterialCostCaches.
+     * @example
+     * // Create many MaterialCostCaches
+     * const materialCostCache = await prisma.materialCostCache.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaterialCostCacheCreateManyArgs>(args?: SelectSubset<T, MaterialCostCacheCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a MaterialCostCache.
+     * @param {MaterialCostCacheDeleteArgs} args - Arguments to delete one MaterialCostCache.
+     * @example
+     * // Delete one MaterialCostCache
+     * const MaterialCostCache = await prisma.materialCostCache.delete({
+     *   where: {
+     *     // ... filter to delete one MaterialCostCache
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaterialCostCacheDeleteArgs>(args: SelectSubset<T, MaterialCostCacheDeleteArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MaterialCostCache.
+     * @param {MaterialCostCacheUpdateArgs} args - Arguments to update one MaterialCostCache.
+     * @example
+     * // Update one MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaterialCostCacheUpdateArgs>(args: SelectSubset<T, MaterialCostCacheUpdateArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MaterialCostCaches.
+     * @param {MaterialCostCacheDeleteManyArgs} args - Arguments to filter MaterialCostCaches to delete.
+     * @example
+     * // Delete a few MaterialCostCaches
+     * const { count } = await prisma.materialCostCache.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaterialCostCacheDeleteManyArgs>(args?: SelectSubset<T, MaterialCostCacheDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialCostCaches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MaterialCostCaches
+     * const materialCostCache = await prisma.materialCostCache.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaterialCostCacheUpdateManyArgs>(args: SelectSubset<T, MaterialCostCacheUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MaterialCostCache.
+     * @param {MaterialCostCacheUpsertArgs} args - Arguments to update or create a MaterialCostCache.
+     * @example
+     * // Update or create a MaterialCostCache
+     * const materialCostCache = await prisma.materialCostCache.upsert({
+     *   create: {
+     *     // ... data to create a MaterialCostCache
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MaterialCostCache we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaterialCostCacheUpsertArgs>(args: SelectSubset<T, MaterialCostCacheUpsertArgs<ExtArgs>>): Prisma__MaterialCostCacheClient<$Result.GetResult<Prisma.$MaterialCostCachePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MaterialCostCaches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheCountArgs} args - Arguments to filter MaterialCostCaches to count.
+     * @example
+     * // Count the number of MaterialCostCaches
+     * const count = await prisma.materialCostCache.count({
+     *   where: {
+     *     // ... the filter for the MaterialCostCaches we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaterialCostCacheCountArgs>(
+      args?: Subset<T, MaterialCostCacheCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaterialCostCacheCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MaterialCostCache.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaterialCostCacheAggregateArgs>(args: Subset<T, MaterialCostCacheAggregateArgs>): Prisma.PrismaPromise<GetMaterialCostCacheAggregateType<T>>
+
+    /**
+     * Group by MaterialCostCache.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaterialCostCacheGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaterialCostCacheGroupByArgs['orderBy'] }
+        : { orderBy?: MaterialCostCacheGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaterialCostCacheGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaterialCostCacheGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MaterialCostCache model
+   */
+  readonly fields: MaterialCostCacheFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MaterialCostCache.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaterialCostCacheClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MaterialCostCache model
+   */
+  interface MaterialCostCacheFieldRefs {
+    readonly id: FieldRef<"MaterialCostCache", 'Int'>
+    readonly deliveryNumber: FieldRef<"MaterialCostCache", 'String'>
+    readonly productName: FieldRef<"MaterialCostCache", 'String'>
+    readonly productWarehouse: FieldRef<"MaterialCostCache", 'String'>
+    readonly deliveryDate: FieldRef<"MaterialCostCache", 'String'>
+    readonly settlementQuantity: FieldRef<"MaterialCostCache", 'Decimal'>
+    readonly materialCost: FieldRef<"MaterialCostCache", 'Decimal'>
+    readonly materialComposition: FieldRef<"MaterialCostCache", 'Json'>
+    readonly productionRecords: FieldRef<"MaterialCostCache", 'Json'>
+    readonly calculatedAt: FieldRef<"MaterialCostCache", 'DateTime'>
+    readonly updatedAt: FieldRef<"MaterialCostCache", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MaterialCostCache findUnique
+   */
+  export type MaterialCostCacheFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCache to fetch.
+     */
+    where: MaterialCostCacheWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCache findUniqueOrThrow
+   */
+  export type MaterialCostCacheFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCache to fetch.
+     */
+    where: MaterialCostCacheWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCache findFirst
+   */
+  export type MaterialCostCacheFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCache to fetch.
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCaches to fetch.
+     */
+    orderBy?: MaterialCostCacheOrderByWithRelationInput | MaterialCostCacheOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialCostCaches.
+     */
+    cursor?: MaterialCostCacheWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCaches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCaches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialCostCaches.
+     */
+    distinct?: MaterialCostCacheScalarFieldEnum | MaterialCostCacheScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCache findFirstOrThrow
+   */
+  export type MaterialCostCacheFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCache to fetch.
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCaches to fetch.
+     */
+    orderBy?: MaterialCostCacheOrderByWithRelationInput | MaterialCostCacheOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialCostCaches.
+     */
+    cursor?: MaterialCostCacheWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCaches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCaches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialCostCaches.
+     */
+    distinct?: MaterialCostCacheScalarFieldEnum | MaterialCostCacheScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCache findMany
+   */
+  export type MaterialCostCacheFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCaches to fetch.
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCaches to fetch.
+     */
+    orderBy?: MaterialCostCacheOrderByWithRelationInput | MaterialCostCacheOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MaterialCostCaches.
+     */
+    cursor?: MaterialCostCacheWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCaches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCaches.
+     */
+    skip?: number
+    distinct?: MaterialCostCacheScalarFieldEnum | MaterialCostCacheScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCache create
+   */
+  export type MaterialCostCacheCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MaterialCostCache.
+     */
+    data?: XOR<MaterialCostCacheCreateInput, MaterialCostCacheUncheckedCreateInput>
+  }
+
+  /**
+   * MaterialCostCache createMany
+   */
+  export type MaterialCostCacheCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MaterialCostCaches.
+     */
+    data: MaterialCostCacheCreateManyInput | MaterialCostCacheCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MaterialCostCache update
+   */
+  export type MaterialCostCacheUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MaterialCostCache.
+     */
+    data: XOR<MaterialCostCacheUpdateInput, MaterialCostCacheUncheckedUpdateInput>
+    /**
+     * Choose, which MaterialCostCache to update.
+     */
+    where: MaterialCostCacheWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCache updateMany
+   */
+  export type MaterialCostCacheUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MaterialCostCaches.
+     */
+    data: XOR<MaterialCostCacheUpdateManyMutationInput, MaterialCostCacheUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialCostCaches to update
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * Limit how many MaterialCostCaches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialCostCache upsert
+   */
+  export type MaterialCostCacheUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MaterialCostCache to update in case it exists.
+     */
+    where: MaterialCostCacheWhereUniqueInput
+    /**
+     * In case the MaterialCostCache found by the `where` argument doesn't exist, create a new MaterialCostCache with this data.
+     */
+    create: XOR<MaterialCostCacheCreateInput, MaterialCostCacheUncheckedCreateInput>
+    /**
+     * In case the MaterialCostCache was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaterialCostCacheUpdateInput, MaterialCostCacheUncheckedUpdateInput>
+  }
+
+  /**
+   * MaterialCostCache delete
+   */
+  export type MaterialCostCacheDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+    /**
+     * Filter which MaterialCostCache to delete.
+     */
+    where: MaterialCostCacheWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCache deleteMany
+   */
+  export type MaterialCostCacheDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialCostCaches to delete
+     */
+    where?: MaterialCostCacheWhereInput
+    /**
+     * Limit how many MaterialCostCaches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialCostCache without action
+   */
+  export type MaterialCostCacheDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCache
+     */
+    select?: MaterialCostCacheSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCache
+     */
+    omit?: MaterialCostCacheOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -34554,6 +41696,169 @@ export namespace Prisma {
   export type ReceiptfgScalarFieldEnum = (typeof ReceiptfgScalarFieldEnum)[keyof typeof ReceiptfgScalarFieldEnum]
 
 
+  export const WasteManagementScalarFieldEnum: {
+    id: 'id',
+    wasteCode: 'wasteCode',
+    wasteName: 'wasteName',
+    wasteCategory: 'wasteCategory',
+    wasteType: 'wasteType',
+    quantity: 'quantity',
+    unit: 'unit',
+    source: 'source',
+    flowDirection: 'flowDirection',
+    storageLocation: 'storageLocation',
+    storageMethod: 'storageMethod',
+    utilizationMethod: 'utilizationMethod',
+    disposalMethod: 'disposalMethod',
+    disposalUnit: 'disposalUnit',
+    disposalLocation: 'disposalLocation',
+    recordDate: 'recordDate',
+    operator: 'operator',
+    remark: 'remark',
+    createTime: 'createTime',
+    updateTime: 'updateTime'
+  };
+
+  export type WasteManagementScalarFieldEnum = (typeof WasteManagementScalarFieldEnum)[keyof typeof WasteManagementScalarFieldEnum]
+
+
+  export const PurchaseWarehouseScalarFieldEnum: {
+    id: 'id',
+    ledgerNo: 'ledgerNo',
+    warehouseNo: 'warehouseNo',
+    purchaseContractNo: 'purchaseContractNo',
+    purchaseOrderNo: 'purchaseOrderNo',
+    warehouseTime: 'warehouseTime',
+    status: 'status',
+    settlementStatus: 'settlementStatus',
+    receiptNo: 'receiptNo',
+    base: 'base',
+    supplier: 'supplier',
+    vehicleNo: 'vehicleNo',
+    warehouse: 'warehouse',
+    warehouseArea: 'warehouseArea',
+    material: 'material',
+    grossWeight: 'grossWeight',
+    tareWeight: 'tareWeight',
+    netWeight: 'netWeight',
+    deduction: 'deduction',
+    estimatedDryBasis: 'estimatedDryBasis',
+    supplierWeightData: 'supplierWeightData',
+    qualityInspector: 'qualityInspector',
+    qualityInspectTime: 'qualityInspectTime',
+    unitPriceExcludingTax: 'unitPriceExcludingTax',
+    totalPriceExcludingTax: 'totalPriceExcludingTax',
+    warehouseDate: 'warehouseDate',
+    remark: 'remark',
+    creator: 'creator',
+    createTime: 'createTime',
+    shippingVesselNo: 'shippingVesselNo',
+    qualityChecker: 'qualityChecker',
+    inboundWeighingPerson: 'inboundWeighingPerson',
+    inboundTime: 'inboundTime',
+    outboundWeighingPerson: 'outboundWeighingPerson',
+    confirmDate: 'confirmDate',
+    taxRate: 'taxRate',
+    taxAmount: 'taxAmount',
+    unitPriceIncludingTax: 'unitPriceIncludingTax',
+    totalPriceIncludingTax: 'totalPriceIncludingTax',
+    grade: 'grade',
+    confirmer: 'confirmer',
+    supplierWeightTotalExcludingTax: 'supplierWeightTotalExcludingTax',
+    supplierWeightTotalIncludingTax: 'supplierWeightTotalIncludingTax',
+    businessType: 'businessType',
+    warehouseType: 'warehouseType',
+    endUser: 'endUser',
+    weighingTime: 'weighingTime',
+    supplierNo: 'supplierNo',
+    supplierName: 'supplierName',
+    supplierContact: 'supplierContact',
+    qualityUnitPrice: 'qualityUnitPrice',
+    purchaseContractNo2: 'purchaseContractNo2',
+    purchaseOrderNo2: 'purchaseOrderNo2',
+    salesOrderNo: 'salesOrderNo',
+    paymentReceiptNo: 'paymentReceiptNo',
+    weighingBatchNo: 'weighingBatchNo',
+    isManualAdd: 'isManualAdd',
+    redFlushStatus: 'redFlushStatus',
+    redFlushedOrderNo: 'redFlushedOrderNo',
+    revokeStatus: 'revokeStatus',
+    revokeFailReason: 'revokeFailReason',
+    revokeApproved: 'revokeApproved',
+    driverName: 'driverName',
+    driverPhone: 'driverPhone',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PurchaseWarehouseScalarFieldEnum = (typeof PurchaseWarehouseScalarFieldEnum)[keyof typeof PurchaseWarehouseScalarFieldEnum]
+
+
+  export const DeliverySettlementScalarFieldEnum: {
+    id: 'id',
+    deliveryNumber: 'deliveryNumber',
+    customer: 'customer',
+    deliveryDate: 'deliveryDate',
+    factoryUnloadDate: 'factoryUnloadDate',
+    warehouse: 'warehouse',
+    productType: 'productType',
+    vehicleNumber: 'vehicleNumber',
+    netWeight: 'netWeight',
+    factoryNetWeight: 'factoryNetWeight',
+    deductionRate: 'deductionRate',
+    deliveryQuantity: 'deliveryQuantity',
+    settlementQuantity: 'settlementQuantity',
+    totalSettlementAmount: 'totalSettlementAmount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeliverySettlementScalarFieldEnum = (typeof DeliverySettlementScalarFieldEnum)[keyof typeof DeliverySettlementScalarFieldEnum]
+
+
+  export const ProcessingCostInputScalarFieldEnum: {
+    id: 'id',
+    productName: 'productName',
+    productWarehouse: 'productWarehouse',
+    productTons: 'productTons',
+    productionDate: 'productionDate',
+    materialComposition: 'materialComposition',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProcessingCostInputScalarFieldEnum = (typeof ProcessingCostInputScalarFieldEnum)[keyof typeof ProcessingCostInputScalarFieldEnum]
+
+
+  export const ProcessingCostConfigScalarFieldEnum: {
+    id: 'id',
+    productName: 'productName',
+    unitProcessingCost: 'unitProcessingCost',
+    configMonth: 'configMonth',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProcessingCostConfigScalarFieldEnum = (typeof ProcessingCostConfigScalarFieldEnum)[keyof typeof ProcessingCostConfigScalarFieldEnum]
+
+
+  export const MaterialCostCacheScalarFieldEnum: {
+    id: 'id',
+    deliveryNumber: 'deliveryNumber',
+    productName: 'productName',
+    productWarehouse: 'productWarehouse',
+    deliveryDate: 'deliveryDate',
+    settlementQuantity: 'settlementQuantity',
+    materialCost: 'materialCost',
+    materialComposition: 'materialComposition',
+    productionRecords: 'productionRecords',
+    calculatedAt: 'calculatedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MaterialCostCacheScalarFieldEnum = (typeof MaterialCostCacheScalarFieldEnum)[keyof typeof MaterialCostCacheScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -34910,6 +42215,122 @@ export namespace Prisma {
   };
 
   export type receiptfgOrderByRelevanceFieldEnum = (typeof receiptfgOrderByRelevanceFieldEnum)[keyof typeof receiptfgOrderByRelevanceFieldEnum]
+
+
+  export const WasteManagementOrderByRelevanceFieldEnum: {
+    wasteCode: 'wasteCode',
+    wasteName: 'wasteName',
+    wasteCategory: 'wasteCategory',
+    wasteType: 'wasteType',
+    unit: 'unit',
+    source: 'source',
+    flowDirection: 'flowDirection',
+    storageLocation: 'storageLocation',
+    storageMethod: 'storageMethod',
+    utilizationMethod: 'utilizationMethod',
+    disposalMethod: 'disposalMethod',
+    disposalUnit: 'disposalUnit',
+    disposalLocation: 'disposalLocation',
+    operator: 'operator',
+    remark: 'remark'
+  };
+
+  export type WasteManagementOrderByRelevanceFieldEnum = (typeof WasteManagementOrderByRelevanceFieldEnum)[keyof typeof WasteManagementOrderByRelevanceFieldEnum]
+
+
+  export const PurchaseWarehouseOrderByRelevanceFieldEnum: {
+    ledgerNo: 'ledgerNo',
+    warehouseNo: 'warehouseNo',
+    purchaseContractNo: 'purchaseContractNo',
+    purchaseOrderNo: 'purchaseOrderNo',
+    warehouseTime: 'warehouseTime',
+    status: 'status',
+    settlementStatus: 'settlementStatus',
+    receiptNo: 'receiptNo',
+    base: 'base',
+    supplier: 'supplier',
+    vehicleNo: 'vehicleNo',
+    warehouse: 'warehouse',
+    warehouseArea: 'warehouseArea',
+    material: 'material',
+    supplierWeightData: 'supplierWeightData',
+    qualityInspector: 'qualityInspector',
+    qualityInspectTime: 'qualityInspectTime',
+    warehouseDate: 'warehouseDate',
+    remark: 'remark',
+    creator: 'creator',
+    createTime: 'createTime',
+    shippingVesselNo: 'shippingVesselNo',
+    qualityChecker: 'qualityChecker',
+    inboundWeighingPerson: 'inboundWeighingPerson',
+    inboundTime: 'inboundTime',
+    outboundWeighingPerson: 'outboundWeighingPerson',
+    confirmDate: 'confirmDate',
+    grade: 'grade',
+    confirmer: 'confirmer',
+    businessType: 'businessType',
+    warehouseType: 'warehouseType',
+    endUser: 'endUser',
+    weighingTime: 'weighingTime',
+    supplierNo: 'supplierNo',
+    supplierName: 'supplierName',
+    supplierContact: 'supplierContact',
+    purchaseContractNo2: 'purchaseContractNo2',
+    purchaseOrderNo2: 'purchaseOrderNo2',
+    salesOrderNo: 'salesOrderNo',
+    paymentReceiptNo: 'paymentReceiptNo',
+    weighingBatchNo: 'weighingBatchNo',
+    isManualAdd: 'isManualAdd',
+    redFlushStatus: 'redFlushStatus',
+    redFlushedOrderNo: 'redFlushedOrderNo',
+    revokeStatus: 'revokeStatus',
+    revokeFailReason: 'revokeFailReason',
+    revokeApproved: 'revokeApproved',
+    driverName: 'driverName',
+    driverPhone: 'driverPhone'
+  };
+
+  export type PurchaseWarehouseOrderByRelevanceFieldEnum = (typeof PurchaseWarehouseOrderByRelevanceFieldEnum)[keyof typeof PurchaseWarehouseOrderByRelevanceFieldEnum]
+
+
+  export const DeliverySettlementOrderByRelevanceFieldEnum: {
+    deliveryNumber: 'deliveryNumber',
+    customer: 'customer',
+    deliveryDate: 'deliveryDate',
+    factoryUnloadDate: 'factoryUnloadDate',
+    warehouse: 'warehouse',
+    productType: 'productType',
+    vehicleNumber: 'vehicleNumber'
+  };
+
+  export type DeliverySettlementOrderByRelevanceFieldEnum = (typeof DeliverySettlementOrderByRelevanceFieldEnum)[keyof typeof DeliverySettlementOrderByRelevanceFieldEnum]
+
+
+  export const ProcessingCostInputOrderByRelevanceFieldEnum: {
+    productName: 'productName',
+    productWarehouse: 'productWarehouse',
+    productionDate: 'productionDate'
+  };
+
+  export type ProcessingCostInputOrderByRelevanceFieldEnum = (typeof ProcessingCostInputOrderByRelevanceFieldEnum)[keyof typeof ProcessingCostInputOrderByRelevanceFieldEnum]
+
+
+  export const ProcessingCostConfigOrderByRelevanceFieldEnum: {
+    productName: 'productName',
+    configMonth: 'configMonth'
+  };
+
+  export type ProcessingCostConfigOrderByRelevanceFieldEnum = (typeof ProcessingCostConfigOrderByRelevanceFieldEnum)[keyof typeof ProcessingCostConfigOrderByRelevanceFieldEnum]
+
+
+  export const MaterialCostCacheOrderByRelevanceFieldEnum: {
+    deliveryNumber: 'deliveryNumber',
+    productName: 'productName',
+    productWarehouse: 'productWarehouse',
+    deliveryDate: 'deliveryDate'
+  };
+
+  export type MaterialCostCacheOrderByRelevanceFieldEnum = (typeof MaterialCostCacheOrderByRelevanceFieldEnum)[keyof typeof MaterialCostCacheOrderByRelevanceFieldEnum]
 
 
   /**
@@ -36919,6 +44340,821 @@ export namespace Prisma {
     queryDate?: DateTimeNullableWithAggregatesFilter<"receiptfg"> | Date | string | null
   }
 
+  export type WasteManagementWhereInput = {
+    AND?: WasteManagementWhereInput | WasteManagementWhereInput[]
+    OR?: WasteManagementWhereInput[]
+    NOT?: WasteManagementWhereInput | WasteManagementWhereInput[]
+    id?: IntFilter<"WasteManagement"> | number
+    wasteCode?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteName?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteCategory?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteType?: StringNullableFilter<"WasteManagement"> | string | null
+    quantity?: DecimalNullableFilter<"WasteManagement"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableFilter<"WasteManagement"> | string | null
+    source?: StringNullableFilter<"WasteManagement"> | string | null
+    flowDirection?: StringNullableFilter<"WasteManagement"> | string | null
+    storageLocation?: StringNullableFilter<"WasteManagement"> | string | null
+    storageMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    utilizationMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalUnit?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalLocation?: StringNullableFilter<"WasteManagement"> | string | null
+    recordDate?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+    operator?: StringNullableFilter<"WasteManagement"> | string | null
+    remark?: StringNullableFilter<"WasteManagement"> | string | null
+    createTime?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+    updateTime?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+  }
+
+  export type WasteManagementOrderByWithRelationInput = {
+    id?: SortOrder
+    wasteCode?: SortOrderInput | SortOrder
+    wasteName?: SortOrderInput | SortOrder
+    wasteCategory?: SortOrderInput | SortOrder
+    wasteType?: SortOrderInput | SortOrder
+    quantity?: SortOrderInput | SortOrder
+    unit?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    flowDirection?: SortOrderInput | SortOrder
+    storageLocation?: SortOrderInput | SortOrder
+    storageMethod?: SortOrderInput | SortOrder
+    utilizationMethod?: SortOrderInput | SortOrder
+    disposalMethod?: SortOrderInput | SortOrder
+    disposalUnit?: SortOrderInput | SortOrder
+    disposalLocation?: SortOrderInput | SortOrder
+    recordDate?: SortOrderInput | SortOrder
+    operator?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    updateTime?: SortOrderInput | SortOrder
+    _relevance?: WasteManagementOrderByRelevanceInput
+  }
+
+  export type WasteManagementWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: WasteManagementWhereInput | WasteManagementWhereInput[]
+    OR?: WasteManagementWhereInput[]
+    NOT?: WasteManagementWhereInput | WasteManagementWhereInput[]
+    wasteCode?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteName?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteCategory?: StringNullableFilter<"WasteManagement"> | string | null
+    wasteType?: StringNullableFilter<"WasteManagement"> | string | null
+    quantity?: DecimalNullableFilter<"WasteManagement"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableFilter<"WasteManagement"> | string | null
+    source?: StringNullableFilter<"WasteManagement"> | string | null
+    flowDirection?: StringNullableFilter<"WasteManagement"> | string | null
+    storageLocation?: StringNullableFilter<"WasteManagement"> | string | null
+    storageMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    utilizationMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalMethod?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalUnit?: StringNullableFilter<"WasteManagement"> | string | null
+    disposalLocation?: StringNullableFilter<"WasteManagement"> | string | null
+    recordDate?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+    operator?: StringNullableFilter<"WasteManagement"> | string | null
+    remark?: StringNullableFilter<"WasteManagement"> | string | null
+    createTime?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+    updateTime?: DateTimeNullableFilter<"WasteManagement"> | Date | string | null
+  }, "id">
+
+  export type WasteManagementOrderByWithAggregationInput = {
+    id?: SortOrder
+    wasteCode?: SortOrderInput | SortOrder
+    wasteName?: SortOrderInput | SortOrder
+    wasteCategory?: SortOrderInput | SortOrder
+    wasteType?: SortOrderInput | SortOrder
+    quantity?: SortOrderInput | SortOrder
+    unit?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    flowDirection?: SortOrderInput | SortOrder
+    storageLocation?: SortOrderInput | SortOrder
+    storageMethod?: SortOrderInput | SortOrder
+    utilizationMethod?: SortOrderInput | SortOrder
+    disposalMethod?: SortOrderInput | SortOrder
+    disposalUnit?: SortOrderInput | SortOrder
+    disposalLocation?: SortOrderInput | SortOrder
+    recordDate?: SortOrderInput | SortOrder
+    operator?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    updateTime?: SortOrderInput | SortOrder
+    _count?: WasteManagementCountOrderByAggregateInput
+    _avg?: WasteManagementAvgOrderByAggregateInput
+    _max?: WasteManagementMaxOrderByAggregateInput
+    _min?: WasteManagementMinOrderByAggregateInput
+    _sum?: WasteManagementSumOrderByAggregateInput
+  }
+
+  export type WasteManagementScalarWhereWithAggregatesInput = {
+    AND?: WasteManagementScalarWhereWithAggregatesInput | WasteManagementScalarWhereWithAggregatesInput[]
+    OR?: WasteManagementScalarWhereWithAggregatesInput[]
+    NOT?: WasteManagementScalarWhereWithAggregatesInput | WasteManagementScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"WasteManagement"> | number
+    wasteCode?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    wasteName?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    wasteCategory?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    wasteType?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    quantity?: DecimalNullableWithAggregatesFilter<"WasteManagement"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    source?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    flowDirection?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    storageLocation?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    storageMethod?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    utilizationMethod?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    disposalMethod?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    disposalUnit?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    disposalLocation?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    recordDate?: DateTimeNullableWithAggregatesFilter<"WasteManagement"> | Date | string | null
+    operator?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    remark?: StringNullableWithAggregatesFilter<"WasteManagement"> | string | null
+    createTime?: DateTimeNullableWithAggregatesFilter<"WasteManagement"> | Date | string | null
+    updateTime?: DateTimeNullableWithAggregatesFilter<"WasteManagement"> | Date | string | null
+  }
+
+  export type PurchaseWarehouseWhereInput = {
+    AND?: PurchaseWarehouseWhereInput | PurchaseWarehouseWhereInput[]
+    OR?: PurchaseWarehouseWhereInput[]
+    NOT?: PurchaseWarehouseWhereInput | PurchaseWarehouseWhereInput[]
+    id?: IntFilter<"PurchaseWarehouse"> | number
+    ledgerNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseContractNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    status?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    settlementStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    receiptNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    base?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplier?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    vehicleNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouse?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseArea?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    material?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    grossWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    netWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    deduction?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityInspector?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityInspectTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    unitPriceExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    remark?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    creator?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    createTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    shippingVesselNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityChecker?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    inboundWeighingPerson?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    inboundTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    outboundWeighingPerson?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    confirmDate?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    taxRate?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    grade?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    confirmer?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierWeightTotalExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    businessType?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseType?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    endUser?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    weighingTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierName?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierContact?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityUnitPrice?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo2?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    salesOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    paymentReceiptNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    weighingBatchNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    isManualAdd?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    redFlushStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    redFlushedOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeFailReason?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeApproved?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    driverName?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    driverPhone?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    createdAt?: DateTimeNullableFilter<"PurchaseWarehouse"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"PurchaseWarehouse"> | Date | string | null
+  }
+
+  export type PurchaseWarehouseOrderByWithRelationInput = {
+    id?: SortOrder
+    ledgerNo?: SortOrderInput | SortOrder
+    warehouseNo?: SortOrderInput | SortOrder
+    purchaseContractNo?: SortOrderInput | SortOrder
+    purchaseOrderNo?: SortOrderInput | SortOrder
+    warehouseTime?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    settlementStatus?: SortOrderInput | SortOrder
+    receiptNo?: SortOrderInput | SortOrder
+    base?: SortOrderInput | SortOrder
+    supplier?: SortOrderInput | SortOrder
+    vehicleNo?: SortOrderInput | SortOrder
+    warehouse?: SortOrderInput | SortOrder
+    warehouseArea?: SortOrderInput | SortOrder
+    material?: SortOrderInput | SortOrder
+    grossWeight?: SortOrderInput | SortOrder
+    tareWeight?: SortOrderInput | SortOrder
+    netWeight?: SortOrderInput | SortOrder
+    deduction?: SortOrderInput | SortOrder
+    estimatedDryBasis?: SortOrderInput | SortOrder
+    supplierWeightData?: SortOrderInput | SortOrder
+    qualityInspector?: SortOrderInput | SortOrder
+    qualityInspectTime?: SortOrderInput | SortOrder
+    unitPriceExcludingTax?: SortOrderInput | SortOrder
+    totalPriceExcludingTax?: SortOrderInput | SortOrder
+    warehouseDate?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    creator?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    shippingVesselNo?: SortOrderInput | SortOrder
+    qualityChecker?: SortOrderInput | SortOrder
+    inboundWeighingPerson?: SortOrderInput | SortOrder
+    inboundTime?: SortOrderInput | SortOrder
+    outboundWeighingPerson?: SortOrderInput | SortOrder
+    confirmDate?: SortOrderInput | SortOrder
+    taxRate?: SortOrderInput | SortOrder
+    taxAmount?: SortOrderInput | SortOrder
+    unitPriceIncludingTax?: SortOrderInput | SortOrder
+    totalPriceIncludingTax?: SortOrderInput | SortOrder
+    grade?: SortOrderInput | SortOrder
+    confirmer?: SortOrderInput | SortOrder
+    supplierWeightTotalExcludingTax?: SortOrderInput | SortOrder
+    supplierWeightTotalIncludingTax?: SortOrderInput | SortOrder
+    businessType?: SortOrderInput | SortOrder
+    warehouseType?: SortOrderInput | SortOrder
+    endUser?: SortOrderInput | SortOrder
+    weighingTime?: SortOrderInput | SortOrder
+    supplierNo?: SortOrderInput | SortOrder
+    supplierName?: SortOrderInput | SortOrder
+    supplierContact?: SortOrderInput | SortOrder
+    qualityUnitPrice?: SortOrderInput | SortOrder
+    purchaseContractNo2?: SortOrderInput | SortOrder
+    purchaseOrderNo2?: SortOrderInput | SortOrder
+    salesOrderNo?: SortOrderInput | SortOrder
+    paymentReceiptNo?: SortOrderInput | SortOrder
+    weighingBatchNo?: SortOrderInput | SortOrder
+    isManualAdd?: SortOrderInput | SortOrder
+    redFlushStatus?: SortOrderInput | SortOrder
+    redFlushedOrderNo?: SortOrderInput | SortOrder
+    revokeStatus?: SortOrderInput | SortOrder
+    revokeFailReason?: SortOrderInput | SortOrder
+    revokeApproved?: SortOrderInput | SortOrder
+    driverName?: SortOrderInput | SortOrder
+    driverPhone?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: PurchaseWarehouseOrderByRelevanceInput
+  }
+
+  export type PurchaseWarehouseWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PurchaseWarehouseWhereInput | PurchaseWarehouseWhereInput[]
+    OR?: PurchaseWarehouseWhereInput[]
+    NOT?: PurchaseWarehouseWhereInput | PurchaseWarehouseWhereInput[]
+    ledgerNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseContractNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    status?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    settlementStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    receiptNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    base?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplier?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    vehicleNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouse?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseArea?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    material?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    grossWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    netWeight?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    deduction?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityInspector?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityInspectTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    unitPriceExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    remark?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    creator?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    createTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    shippingVesselNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityChecker?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    inboundWeighingPerson?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    inboundTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    outboundWeighingPerson?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    confirmDate?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    taxRate?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    grade?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    confirmer?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierWeightTotalExcludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    businessType?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    warehouseType?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    endUser?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    weighingTime?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierName?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    supplierContact?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    qualityUnitPrice?: DecimalNullableFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo2?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    salesOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    paymentReceiptNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    weighingBatchNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    isManualAdd?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    redFlushStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    redFlushedOrderNo?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeStatus?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeFailReason?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    revokeApproved?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    driverName?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    driverPhone?: StringNullableFilter<"PurchaseWarehouse"> | string | null
+    createdAt?: DateTimeNullableFilter<"PurchaseWarehouse"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"PurchaseWarehouse"> | Date | string | null
+  }, "id">
+
+  export type PurchaseWarehouseOrderByWithAggregationInput = {
+    id?: SortOrder
+    ledgerNo?: SortOrderInput | SortOrder
+    warehouseNo?: SortOrderInput | SortOrder
+    purchaseContractNo?: SortOrderInput | SortOrder
+    purchaseOrderNo?: SortOrderInput | SortOrder
+    warehouseTime?: SortOrderInput | SortOrder
+    status?: SortOrderInput | SortOrder
+    settlementStatus?: SortOrderInput | SortOrder
+    receiptNo?: SortOrderInput | SortOrder
+    base?: SortOrderInput | SortOrder
+    supplier?: SortOrderInput | SortOrder
+    vehicleNo?: SortOrderInput | SortOrder
+    warehouse?: SortOrderInput | SortOrder
+    warehouseArea?: SortOrderInput | SortOrder
+    material?: SortOrderInput | SortOrder
+    grossWeight?: SortOrderInput | SortOrder
+    tareWeight?: SortOrderInput | SortOrder
+    netWeight?: SortOrderInput | SortOrder
+    deduction?: SortOrderInput | SortOrder
+    estimatedDryBasis?: SortOrderInput | SortOrder
+    supplierWeightData?: SortOrderInput | SortOrder
+    qualityInspector?: SortOrderInput | SortOrder
+    qualityInspectTime?: SortOrderInput | SortOrder
+    unitPriceExcludingTax?: SortOrderInput | SortOrder
+    totalPriceExcludingTax?: SortOrderInput | SortOrder
+    warehouseDate?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    creator?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    shippingVesselNo?: SortOrderInput | SortOrder
+    qualityChecker?: SortOrderInput | SortOrder
+    inboundWeighingPerson?: SortOrderInput | SortOrder
+    inboundTime?: SortOrderInput | SortOrder
+    outboundWeighingPerson?: SortOrderInput | SortOrder
+    confirmDate?: SortOrderInput | SortOrder
+    taxRate?: SortOrderInput | SortOrder
+    taxAmount?: SortOrderInput | SortOrder
+    unitPriceIncludingTax?: SortOrderInput | SortOrder
+    totalPriceIncludingTax?: SortOrderInput | SortOrder
+    grade?: SortOrderInput | SortOrder
+    confirmer?: SortOrderInput | SortOrder
+    supplierWeightTotalExcludingTax?: SortOrderInput | SortOrder
+    supplierWeightTotalIncludingTax?: SortOrderInput | SortOrder
+    businessType?: SortOrderInput | SortOrder
+    warehouseType?: SortOrderInput | SortOrder
+    endUser?: SortOrderInput | SortOrder
+    weighingTime?: SortOrderInput | SortOrder
+    supplierNo?: SortOrderInput | SortOrder
+    supplierName?: SortOrderInput | SortOrder
+    supplierContact?: SortOrderInput | SortOrder
+    qualityUnitPrice?: SortOrderInput | SortOrder
+    purchaseContractNo2?: SortOrderInput | SortOrder
+    purchaseOrderNo2?: SortOrderInput | SortOrder
+    salesOrderNo?: SortOrderInput | SortOrder
+    paymentReceiptNo?: SortOrderInput | SortOrder
+    weighingBatchNo?: SortOrderInput | SortOrder
+    isManualAdd?: SortOrderInput | SortOrder
+    redFlushStatus?: SortOrderInput | SortOrder
+    redFlushedOrderNo?: SortOrderInput | SortOrder
+    revokeStatus?: SortOrderInput | SortOrder
+    revokeFailReason?: SortOrderInput | SortOrder
+    revokeApproved?: SortOrderInput | SortOrder
+    driverName?: SortOrderInput | SortOrder
+    driverPhone?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: PurchaseWarehouseCountOrderByAggregateInput
+    _avg?: PurchaseWarehouseAvgOrderByAggregateInput
+    _max?: PurchaseWarehouseMaxOrderByAggregateInput
+    _min?: PurchaseWarehouseMinOrderByAggregateInput
+    _sum?: PurchaseWarehouseSumOrderByAggregateInput
+  }
+
+  export type PurchaseWarehouseScalarWhereWithAggregatesInput = {
+    AND?: PurchaseWarehouseScalarWhereWithAggregatesInput | PurchaseWarehouseScalarWhereWithAggregatesInput[]
+    OR?: PurchaseWarehouseScalarWhereWithAggregatesInput[]
+    NOT?: PurchaseWarehouseScalarWhereWithAggregatesInput | PurchaseWarehouseScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PurchaseWarehouse"> | number
+    ledgerNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    warehouseNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    purchaseContractNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    warehouseTime?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    status?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    settlementStatus?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    receiptNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    base?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    supplier?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    vehicleNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    warehouse?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    warehouseArea?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    material?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    grossWeight?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    netWeight?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    deduction?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    qualityInspector?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    qualityInspectTime?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    unitPriceExcludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    remark?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    creator?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    createTime?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    shippingVesselNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    qualityChecker?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    inboundWeighingPerson?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    inboundTime?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    outboundWeighingPerson?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    confirmDate?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    taxRate?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    grade?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    confirmer?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    supplierWeightTotalExcludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    businessType?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    warehouseType?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    endUser?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    weighingTime?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    supplierNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    supplierName?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    supplierContact?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    qualityUnitPrice?: DecimalNullableWithAggregatesFilter<"PurchaseWarehouse"> | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    purchaseOrderNo2?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    salesOrderNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    paymentReceiptNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    weighingBatchNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    isManualAdd?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    redFlushStatus?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    redFlushedOrderNo?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    revokeStatus?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    revokeFailReason?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    revokeApproved?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    driverName?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    driverPhone?: StringNullableWithAggregatesFilter<"PurchaseWarehouse"> | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"PurchaseWarehouse"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"PurchaseWarehouse"> | Date | string | null
+  }
+
+  export type DeliverySettlementWhereInput = {
+    AND?: DeliverySettlementWhereInput | DeliverySettlementWhereInput[]
+    OR?: DeliverySettlementWhereInput[]
+    NOT?: DeliverySettlementWhereInput | DeliverySettlementWhereInput[]
+    id?: IntFilter<"DeliverySettlement"> | number
+    deliveryNumber?: StringNullableFilter<"DeliverySettlement"> | string | null
+    customer?: StringNullableFilter<"DeliverySettlement"> | string | null
+    deliveryDate?: StringNullableFilter<"DeliverySettlement"> | string | null
+    factoryUnloadDate?: StringNullableFilter<"DeliverySettlement"> | string | null
+    warehouse?: StringNullableFilter<"DeliverySettlement"> | string | null
+    productType?: StringNullableFilter<"DeliverySettlement"> | string | null
+    vehicleNumber?: StringNullableFilter<"DeliverySettlement"> | string | null
+    netWeight?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: IntNullableFilter<"DeliverySettlement"> | number | null
+    settlementQuantity?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableFilter<"DeliverySettlement"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"DeliverySettlement"> | Date | string | null
+  }
+
+  export type DeliverySettlementOrderByWithRelationInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    customer?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    factoryUnloadDate?: SortOrderInput | SortOrder
+    warehouse?: SortOrderInput | SortOrder
+    productType?: SortOrderInput | SortOrder
+    vehicleNumber?: SortOrderInput | SortOrder
+    netWeight?: SortOrderInput | SortOrder
+    factoryNetWeight?: SortOrderInput | SortOrder
+    deductionRate?: SortOrderInput | SortOrder
+    deliveryQuantity?: SortOrderInput | SortOrder
+    settlementQuantity?: SortOrderInput | SortOrder
+    totalSettlementAmount?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: DeliverySettlementOrderByRelevanceInput
+  }
+
+  export type DeliverySettlementWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: DeliverySettlementWhereInput | DeliverySettlementWhereInput[]
+    OR?: DeliverySettlementWhereInput[]
+    NOT?: DeliverySettlementWhereInput | DeliverySettlementWhereInput[]
+    deliveryNumber?: StringNullableFilter<"DeliverySettlement"> | string | null
+    customer?: StringNullableFilter<"DeliverySettlement"> | string | null
+    deliveryDate?: StringNullableFilter<"DeliverySettlement"> | string | null
+    factoryUnloadDate?: StringNullableFilter<"DeliverySettlement"> | string | null
+    warehouse?: StringNullableFilter<"DeliverySettlement"> | string | null
+    productType?: StringNullableFilter<"DeliverySettlement"> | string | null
+    vehicleNumber?: StringNullableFilter<"DeliverySettlement"> | string | null
+    netWeight?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: IntNullableFilter<"DeliverySettlement"> | number | null
+    settlementQuantity?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: DecimalNullableFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableFilter<"DeliverySettlement"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"DeliverySettlement"> | Date | string | null
+  }, "id">
+
+  export type DeliverySettlementOrderByWithAggregationInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    customer?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    factoryUnloadDate?: SortOrderInput | SortOrder
+    warehouse?: SortOrderInput | SortOrder
+    productType?: SortOrderInput | SortOrder
+    vehicleNumber?: SortOrderInput | SortOrder
+    netWeight?: SortOrderInput | SortOrder
+    factoryNetWeight?: SortOrderInput | SortOrder
+    deductionRate?: SortOrderInput | SortOrder
+    deliveryQuantity?: SortOrderInput | SortOrder
+    settlementQuantity?: SortOrderInput | SortOrder
+    totalSettlementAmount?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: DeliverySettlementCountOrderByAggregateInput
+    _avg?: DeliverySettlementAvgOrderByAggregateInput
+    _max?: DeliverySettlementMaxOrderByAggregateInput
+    _min?: DeliverySettlementMinOrderByAggregateInput
+    _sum?: DeliverySettlementSumOrderByAggregateInput
+  }
+
+  export type DeliverySettlementScalarWhereWithAggregatesInput = {
+    AND?: DeliverySettlementScalarWhereWithAggregatesInput | DeliverySettlementScalarWhereWithAggregatesInput[]
+    OR?: DeliverySettlementScalarWhereWithAggregatesInput[]
+    NOT?: DeliverySettlementScalarWhereWithAggregatesInput | DeliverySettlementScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"DeliverySettlement"> | number
+    deliveryNumber?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    customer?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    deliveryDate?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    factoryUnloadDate?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    warehouse?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    productType?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    vehicleNumber?: StringNullableWithAggregatesFilter<"DeliverySettlement"> | string | null
+    netWeight?: DecimalNullableWithAggregatesFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: DecimalNullableWithAggregatesFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: DecimalNullableWithAggregatesFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: IntNullableWithAggregatesFilter<"DeliverySettlement"> | number | null
+    settlementQuantity?: DecimalNullableWithAggregatesFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: DecimalNullableWithAggregatesFilter<"DeliverySettlement"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"DeliverySettlement"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"DeliverySettlement"> | Date | string | null
+  }
+
+  export type ProcessingCostInputWhereInput = {
+    AND?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
+    OR?: ProcessingCostInputWhereInput[]
+    NOT?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
+    id?: IntFilter<"ProcessingCostInput"> | number
+    productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    materialComposition?: JsonNullableFilter<"ProcessingCostInput">
+    createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
+  }
+
+  export type ProcessingCostInputOrderByWithRelationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    productWarehouse?: SortOrderInput | SortOrder
+    productTons?: SortOrderInput | SortOrder
+    productionDate?: SortOrderInput | SortOrder
+    materialComposition?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: ProcessingCostInputOrderByRelevanceInput
+  }
+
+  export type ProcessingCostInputWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
+    OR?: ProcessingCostInputWhereInput[]
+    NOT?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
+    productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    materialComposition?: JsonNullableFilter<"ProcessingCostInput">
+    createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
+  }, "id">
+
+  export type ProcessingCostInputOrderByWithAggregationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    productWarehouse?: SortOrderInput | SortOrder
+    productTons?: SortOrderInput | SortOrder
+    productionDate?: SortOrderInput | SortOrder
+    materialComposition?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: ProcessingCostInputCountOrderByAggregateInput
+    _avg?: ProcessingCostInputAvgOrderByAggregateInput
+    _max?: ProcessingCostInputMaxOrderByAggregateInput
+    _min?: ProcessingCostInputMinOrderByAggregateInput
+    _sum?: ProcessingCostInputSumOrderByAggregateInput
+  }
+
+  export type ProcessingCostInputScalarWhereWithAggregatesInput = {
+    AND?: ProcessingCostInputScalarWhereWithAggregatesInput | ProcessingCostInputScalarWhereWithAggregatesInput[]
+    OR?: ProcessingCostInputScalarWhereWithAggregatesInput[]
+    NOT?: ProcessingCostInputScalarWhereWithAggregatesInput | ProcessingCostInputScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ProcessingCostInput"> | number
+    productName?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    productWarehouse?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    productionDate?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    materialComposition?: JsonNullableWithAggregatesFilter<"ProcessingCostInput">
+    createdAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
+  }
+
+  export type ProcessingCostConfigWhereInput = {
+    AND?: ProcessingCostConfigWhereInput | ProcessingCostConfigWhereInput[]
+    OR?: ProcessingCostConfigWhereInput[]
+    NOT?: ProcessingCostConfigWhereInput | ProcessingCostConfigWhereInput[]
+    id?: IntFilter<"ProcessingCostConfig"> | number
+    productName?: StringNullableFilter<"ProcessingCostConfig"> | string | null
+    unitProcessingCost?: DecimalNullableFilter<"ProcessingCostConfig"> | Decimal | DecimalJsLike | number | string | null
+    configMonth?: StringNullableFilter<"ProcessingCostConfig"> | string | null
+    createdAt?: DateTimeNullableFilter<"ProcessingCostConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProcessingCostConfig"> | Date | string | null
+  }
+
+  export type ProcessingCostConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    unitProcessingCost?: SortOrderInput | SortOrder
+    configMonth?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: ProcessingCostConfigOrderByRelevanceInput
+  }
+
+  export type ProcessingCostConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    productName?: string
+    AND?: ProcessingCostConfigWhereInput | ProcessingCostConfigWhereInput[]
+    OR?: ProcessingCostConfigWhereInput[]
+    NOT?: ProcessingCostConfigWhereInput | ProcessingCostConfigWhereInput[]
+    unitProcessingCost?: DecimalNullableFilter<"ProcessingCostConfig"> | Decimal | DecimalJsLike | number | string | null
+    configMonth?: StringNullableFilter<"ProcessingCostConfig"> | string | null
+    createdAt?: DateTimeNullableFilter<"ProcessingCostConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProcessingCostConfig"> | Date | string | null
+  }, "id" | "productName">
+
+  export type ProcessingCostConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    unitProcessingCost?: SortOrderInput | SortOrder
+    configMonth?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: ProcessingCostConfigCountOrderByAggregateInput
+    _avg?: ProcessingCostConfigAvgOrderByAggregateInput
+    _max?: ProcessingCostConfigMaxOrderByAggregateInput
+    _min?: ProcessingCostConfigMinOrderByAggregateInput
+    _sum?: ProcessingCostConfigSumOrderByAggregateInput
+  }
+
+  export type ProcessingCostConfigScalarWhereWithAggregatesInput = {
+    AND?: ProcessingCostConfigScalarWhereWithAggregatesInput | ProcessingCostConfigScalarWhereWithAggregatesInput[]
+    OR?: ProcessingCostConfigScalarWhereWithAggregatesInput[]
+    NOT?: ProcessingCostConfigScalarWhereWithAggregatesInput | ProcessingCostConfigScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ProcessingCostConfig"> | number
+    productName?: StringNullableWithAggregatesFilter<"ProcessingCostConfig"> | string | null
+    unitProcessingCost?: DecimalNullableWithAggregatesFilter<"ProcessingCostConfig"> | Decimal | DecimalJsLike | number | string | null
+    configMonth?: StringNullableWithAggregatesFilter<"ProcessingCostConfig"> | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostConfig"> | Date | string | null
+  }
+
+  export type MaterialCostCacheWhereInput = {
+    AND?: MaterialCostCacheWhereInput | MaterialCostCacheWhereInput[]
+    OR?: MaterialCostCacheWhereInput[]
+    NOT?: MaterialCostCacheWhereInput | MaterialCostCacheWhereInput[]
+    id?: IntFilter<"MaterialCostCache"> | number
+    deliveryNumber?: StringNullableFilter<"MaterialCostCache"> | string | null
+    productName?: StringNullableFilter<"MaterialCostCache"> | string | null
+    productWarehouse?: StringNullableFilter<"MaterialCostCache"> | string | null
+    deliveryDate?: StringNullableFilter<"MaterialCostCache"> | string | null
+    settlementQuantity?: DecimalNullableFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialCost?: DecimalNullableFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: JsonNullableFilter<"MaterialCostCache">
+    productionRecords?: JsonNullableFilter<"MaterialCostCache">
+    calculatedAt?: DateTimeNullableFilter<"MaterialCostCache"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"MaterialCostCache"> | Date | string | null
+  }
+
+  export type MaterialCostCacheOrderByWithRelationInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    productName?: SortOrderInput | SortOrder
+    productWarehouse?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    settlementQuantity?: SortOrderInput | SortOrder
+    materialCost?: SortOrderInput | SortOrder
+    materialComposition?: SortOrderInput | SortOrder
+    productionRecords?: SortOrderInput | SortOrder
+    calculatedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: MaterialCostCacheOrderByRelevanceInput
+  }
+
+  export type MaterialCostCacheWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    deliveryNumber?: string
+    AND?: MaterialCostCacheWhereInput | MaterialCostCacheWhereInput[]
+    OR?: MaterialCostCacheWhereInput[]
+    NOT?: MaterialCostCacheWhereInput | MaterialCostCacheWhereInput[]
+    productName?: StringNullableFilter<"MaterialCostCache"> | string | null
+    productWarehouse?: StringNullableFilter<"MaterialCostCache"> | string | null
+    deliveryDate?: StringNullableFilter<"MaterialCostCache"> | string | null
+    settlementQuantity?: DecimalNullableFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialCost?: DecimalNullableFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: JsonNullableFilter<"MaterialCostCache">
+    productionRecords?: JsonNullableFilter<"MaterialCostCache">
+    calculatedAt?: DateTimeNullableFilter<"MaterialCostCache"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"MaterialCostCache"> | Date | string | null
+  }, "id" | "deliveryNumber">
+
+  export type MaterialCostCacheOrderByWithAggregationInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    productName?: SortOrderInput | SortOrder
+    productWarehouse?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    settlementQuantity?: SortOrderInput | SortOrder
+    materialCost?: SortOrderInput | SortOrder
+    materialComposition?: SortOrderInput | SortOrder
+    productionRecords?: SortOrderInput | SortOrder
+    calculatedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: MaterialCostCacheCountOrderByAggregateInput
+    _avg?: MaterialCostCacheAvgOrderByAggregateInput
+    _max?: MaterialCostCacheMaxOrderByAggregateInput
+    _min?: MaterialCostCacheMinOrderByAggregateInput
+    _sum?: MaterialCostCacheSumOrderByAggregateInput
+  }
+
+  export type MaterialCostCacheScalarWhereWithAggregatesInput = {
+    AND?: MaterialCostCacheScalarWhereWithAggregatesInput | MaterialCostCacheScalarWhereWithAggregatesInput[]
+    OR?: MaterialCostCacheScalarWhereWithAggregatesInput[]
+    NOT?: MaterialCostCacheScalarWhereWithAggregatesInput | MaterialCostCacheScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MaterialCostCache"> | number
+    deliveryNumber?: StringNullableWithAggregatesFilter<"MaterialCostCache"> | string | null
+    productName?: StringNullableWithAggregatesFilter<"MaterialCostCache"> | string | null
+    productWarehouse?: StringNullableWithAggregatesFilter<"MaterialCostCache"> | string | null
+    deliveryDate?: StringNullableWithAggregatesFilter<"MaterialCostCache"> | string | null
+    settlementQuantity?: DecimalNullableWithAggregatesFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialCost?: DecimalNullableWithAggregatesFilter<"MaterialCostCache"> | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: JsonNullableWithAggregatesFilter<"MaterialCostCache">
+    productionRecords?: JsonNullableWithAggregatesFilter<"MaterialCostCache">
+    calculatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
+  }
+
   export type CAHoldingsCreateInput = {
     asset?: string | null
     quantity?: string | null
@@ -38857,6 +47093,1003 @@ export namespace Prisma {
     queryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type WasteManagementCreateInput = {
+    wasteCode?: string | null
+    wasteName?: string | null
+    wasteCategory?: string | null
+    wasteType?: string | null
+    quantity?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    source?: string | null
+    flowDirection?: string | null
+    storageLocation?: string | null
+    storageMethod?: string | null
+    utilizationMethod?: string | null
+    disposalMethod?: string | null
+    disposalUnit?: string | null
+    disposalLocation?: string | null
+    recordDate?: Date | string | null
+    operator?: string | null
+    remark?: string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type WasteManagementUncheckedCreateInput = {
+    id?: number
+    wasteCode?: string | null
+    wasteName?: string | null
+    wasteCategory?: string | null
+    wasteType?: string | null
+    quantity?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    source?: string | null
+    flowDirection?: string | null
+    storageLocation?: string | null
+    storageMethod?: string | null
+    utilizationMethod?: string | null
+    disposalMethod?: string | null
+    disposalUnit?: string | null
+    disposalLocation?: string | null
+    recordDate?: Date | string | null
+    operator?: string | null
+    remark?: string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type WasteManagementUpdateInput = {
+    wasteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteName?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    flowDirection?: NullableStringFieldUpdateOperationsInput | string | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    storageMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    utilizationMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    recordDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    operator?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type WasteManagementUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    wasteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteName?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    flowDirection?: NullableStringFieldUpdateOperationsInput | string | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    storageMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    utilizationMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    recordDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    operator?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type WasteManagementCreateManyInput = {
+    id?: number
+    wasteCode?: string | null
+    wasteName?: string | null
+    wasteCategory?: string | null
+    wasteType?: string | null
+    quantity?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    source?: string | null
+    flowDirection?: string | null
+    storageLocation?: string | null
+    storageMethod?: string | null
+    utilizationMethod?: string | null
+    disposalMethod?: string | null
+    disposalUnit?: string | null
+    disposalLocation?: string | null
+    recordDate?: Date | string | null
+    operator?: string | null
+    remark?: string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type WasteManagementUpdateManyMutationInput = {
+    wasteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteName?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    flowDirection?: NullableStringFieldUpdateOperationsInput | string | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    storageMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    utilizationMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    recordDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    operator?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type WasteManagementUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    wasteCode?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteName?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    wasteType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    flowDirection?: NullableStringFieldUpdateOperationsInput | string | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    storageMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    utilizationMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    disposalLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    recordDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    operator?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PurchaseWarehouseCreateInput = {
+    ledgerNo?: string | null
+    warehouseNo?: string | null
+    purchaseContractNo?: string | null
+    purchaseOrderNo?: string | null
+    warehouseTime?: string | null
+    status?: string | null
+    settlementStatus?: string | null
+    receiptNo?: string | null
+    base?: string | null
+    supplier?: string | null
+    vehicleNo?: string | null
+    warehouse?: string | null
+    warehouseArea?: string | null
+    material?: string | null
+    grossWeight?: Decimal | DecimalJsLike | number | string | null
+    tareWeight?: Decimal | DecimalJsLike | number | string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    deduction?: Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: string | null
+    qualityInspector?: string | null
+    qualityInspectTime?: string | null
+    unitPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: string | null
+    remark?: string | null
+    creator?: string | null
+    createTime?: string | null
+    shippingVesselNo?: string | null
+    qualityChecker?: string | null
+    inboundWeighingPerson?: string | null
+    inboundTime?: string | null
+    outboundWeighingPerson?: string | null
+    confirmDate?: string | null
+    taxRate?: Decimal | DecimalJsLike | number | string | null
+    taxAmount?: Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    grade?: string | null
+    confirmer?: string | null
+    supplierWeightTotalExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    businessType?: string | null
+    warehouseType?: string | null
+    endUser?: string | null
+    weighingTime?: string | null
+    supplierNo?: string | null
+    supplierName?: string | null
+    supplierContact?: string | null
+    qualityUnitPrice?: Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: string | null
+    purchaseOrderNo2?: string | null
+    salesOrderNo?: string | null
+    paymentReceiptNo?: string | null
+    weighingBatchNo?: string | null
+    isManualAdd?: string | null
+    redFlushStatus?: string | null
+    redFlushedOrderNo?: string | null
+    revokeStatus?: string | null
+    revokeFailReason?: string | null
+    revokeApproved?: string | null
+    driverName?: string | null
+    driverPhone?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type PurchaseWarehouseUncheckedCreateInput = {
+    id?: number
+    ledgerNo?: string | null
+    warehouseNo?: string | null
+    purchaseContractNo?: string | null
+    purchaseOrderNo?: string | null
+    warehouseTime?: string | null
+    status?: string | null
+    settlementStatus?: string | null
+    receiptNo?: string | null
+    base?: string | null
+    supplier?: string | null
+    vehicleNo?: string | null
+    warehouse?: string | null
+    warehouseArea?: string | null
+    material?: string | null
+    grossWeight?: Decimal | DecimalJsLike | number | string | null
+    tareWeight?: Decimal | DecimalJsLike | number | string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    deduction?: Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: string | null
+    qualityInspector?: string | null
+    qualityInspectTime?: string | null
+    unitPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: string | null
+    remark?: string | null
+    creator?: string | null
+    createTime?: string | null
+    shippingVesselNo?: string | null
+    qualityChecker?: string | null
+    inboundWeighingPerson?: string | null
+    inboundTime?: string | null
+    outboundWeighingPerson?: string | null
+    confirmDate?: string | null
+    taxRate?: Decimal | DecimalJsLike | number | string | null
+    taxAmount?: Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    grade?: string | null
+    confirmer?: string | null
+    supplierWeightTotalExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    businessType?: string | null
+    warehouseType?: string | null
+    endUser?: string | null
+    weighingTime?: string | null
+    supplierNo?: string | null
+    supplierName?: string | null
+    supplierContact?: string | null
+    qualityUnitPrice?: Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: string | null
+    purchaseOrderNo2?: string | null
+    salesOrderNo?: string | null
+    paymentReceiptNo?: string | null
+    weighingBatchNo?: string | null
+    isManualAdd?: string | null
+    redFlushStatus?: string | null
+    redFlushedOrderNo?: string | null
+    revokeStatus?: string | null
+    revokeFailReason?: string | null
+    revokeApproved?: string | null
+    driverName?: string | null
+    driverPhone?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type PurchaseWarehouseUpdateInput = {
+    ledgerNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseContractNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    base?: NullableStringFieldUpdateOperationsInput | string | null
+    supplier?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseArea?: NullableStringFieldUpdateOperationsInput | string | null
+    material?: NullableStringFieldUpdateOperationsInput | string | null
+    grossWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deduction?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspector?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspectTime?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    creator?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingVesselNo?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityChecker?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundTime?: NullableStringFieldUpdateOperationsInput | string | null
+    outboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmDate?: NullableStringFieldUpdateOperationsInput | string | null
+    taxRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    grade?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierWeightTotalExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    businessType?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseType?: NullableStringFieldUpdateOperationsInput | string | null
+    endUser?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingTime?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierNo?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierContact?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityUnitPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    salesOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingBatchNo?: NullableStringFieldUpdateOperationsInput | string | null
+    isManualAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushedOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeFailReason?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeApproved?: NullableStringFieldUpdateOperationsInput | string | null
+    driverName?: NullableStringFieldUpdateOperationsInput | string | null
+    driverPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PurchaseWarehouseUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ledgerNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseContractNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    base?: NullableStringFieldUpdateOperationsInput | string | null
+    supplier?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseArea?: NullableStringFieldUpdateOperationsInput | string | null
+    material?: NullableStringFieldUpdateOperationsInput | string | null
+    grossWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deduction?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspector?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspectTime?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    creator?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingVesselNo?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityChecker?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundTime?: NullableStringFieldUpdateOperationsInput | string | null
+    outboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmDate?: NullableStringFieldUpdateOperationsInput | string | null
+    taxRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    grade?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierWeightTotalExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    businessType?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseType?: NullableStringFieldUpdateOperationsInput | string | null
+    endUser?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingTime?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierNo?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierContact?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityUnitPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    salesOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingBatchNo?: NullableStringFieldUpdateOperationsInput | string | null
+    isManualAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushedOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeFailReason?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeApproved?: NullableStringFieldUpdateOperationsInput | string | null
+    driverName?: NullableStringFieldUpdateOperationsInput | string | null
+    driverPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PurchaseWarehouseCreateManyInput = {
+    id?: number
+    ledgerNo?: string | null
+    warehouseNo?: string | null
+    purchaseContractNo?: string | null
+    purchaseOrderNo?: string | null
+    warehouseTime?: string | null
+    status?: string | null
+    settlementStatus?: string | null
+    receiptNo?: string | null
+    base?: string | null
+    supplier?: string | null
+    vehicleNo?: string | null
+    warehouse?: string | null
+    warehouseArea?: string | null
+    material?: string | null
+    grossWeight?: Decimal | DecimalJsLike | number | string | null
+    tareWeight?: Decimal | DecimalJsLike | number | string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    deduction?: Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: string | null
+    qualityInspector?: string | null
+    qualityInspectTime?: string | null
+    unitPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: string | null
+    remark?: string | null
+    creator?: string | null
+    createTime?: string | null
+    shippingVesselNo?: string | null
+    qualityChecker?: string | null
+    inboundWeighingPerson?: string | null
+    inboundTime?: string | null
+    outboundWeighingPerson?: string | null
+    confirmDate?: string | null
+    taxRate?: Decimal | DecimalJsLike | number | string | null
+    taxAmount?: Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    grade?: string | null
+    confirmer?: string | null
+    supplierWeightTotalExcludingTax?: Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: Decimal | DecimalJsLike | number | string | null
+    businessType?: string | null
+    warehouseType?: string | null
+    endUser?: string | null
+    weighingTime?: string | null
+    supplierNo?: string | null
+    supplierName?: string | null
+    supplierContact?: string | null
+    qualityUnitPrice?: Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: string | null
+    purchaseOrderNo2?: string | null
+    salesOrderNo?: string | null
+    paymentReceiptNo?: string | null
+    weighingBatchNo?: string | null
+    isManualAdd?: string | null
+    redFlushStatus?: string | null
+    redFlushedOrderNo?: string | null
+    revokeStatus?: string | null
+    revokeFailReason?: string | null
+    revokeApproved?: string | null
+    driverName?: string | null
+    driverPhone?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type PurchaseWarehouseUpdateManyMutationInput = {
+    ledgerNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseContractNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    base?: NullableStringFieldUpdateOperationsInput | string | null
+    supplier?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseArea?: NullableStringFieldUpdateOperationsInput | string | null
+    material?: NullableStringFieldUpdateOperationsInput | string | null
+    grossWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deduction?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspector?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspectTime?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    creator?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingVesselNo?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityChecker?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundTime?: NullableStringFieldUpdateOperationsInput | string | null
+    outboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmDate?: NullableStringFieldUpdateOperationsInput | string | null
+    taxRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    grade?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierWeightTotalExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    businessType?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseType?: NullableStringFieldUpdateOperationsInput | string | null
+    endUser?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingTime?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierNo?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierContact?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityUnitPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    salesOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingBatchNo?: NullableStringFieldUpdateOperationsInput | string | null
+    isManualAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushedOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeFailReason?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeApproved?: NullableStringFieldUpdateOperationsInput | string | null
+    driverName?: NullableStringFieldUpdateOperationsInput | string | null
+    driverPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type PurchaseWarehouseUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ledgerNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseContractNo?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseTime?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    base?: NullableStringFieldUpdateOperationsInput | string | null
+    supplier?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNo?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseArea?: NullableStringFieldUpdateOperationsInput | string | null
+    material?: NullableStringFieldUpdateOperationsInput | string | null
+    grossWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    tareWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deduction?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estimatedDryBasis?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightData?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspector?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityInspectTime?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    warehouseDate?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    creator?: NullableStringFieldUpdateOperationsInput | string | null
+    createTime?: NullableStringFieldUpdateOperationsInput | string | null
+    shippingVesselNo?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityChecker?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundTime?: NullableStringFieldUpdateOperationsInput | string | null
+    outboundWeighingPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmDate?: NullableStringFieldUpdateOperationsInput | string | null
+    taxRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    taxAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unitPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPriceIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    grade?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierWeightTotalExcludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    supplierWeightTotalIncludingTax?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    businessType?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseType?: NullableStringFieldUpdateOperationsInput | string | null
+    endUser?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingTime?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierNo?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierContact?: NullableStringFieldUpdateOperationsInput | string | null
+    qualityUnitPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    purchaseContractNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNo2?: NullableStringFieldUpdateOperationsInput | string | null
+    salesOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptNo?: NullableStringFieldUpdateOperationsInput | string | null
+    weighingBatchNo?: NullableStringFieldUpdateOperationsInput | string | null
+    isManualAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    redFlushedOrderNo?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeStatus?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeFailReason?: NullableStringFieldUpdateOperationsInput | string | null
+    revokeApproved?: NullableStringFieldUpdateOperationsInput | string | null
+    driverName?: NullableStringFieldUpdateOperationsInput | string | null
+    driverPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeliverySettlementCreateInput = {
+    deliveryNumber?: string | null
+    customer?: string | null
+    deliveryDate?: string | null
+    factoryUnloadDate?: string | null
+    warehouse?: string | null
+    productType?: string | null
+    vehicleNumber?: string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: Decimal | DecimalJsLike | number | string | null
+    deductionRate?: Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: number | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type DeliverySettlementUncheckedCreateInput = {
+    id?: number
+    deliveryNumber?: string | null
+    customer?: string | null
+    deliveryDate?: string | null
+    factoryUnloadDate?: string | null
+    warehouse?: string | null
+    productType?: string | null
+    vehicleNumber?: string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: Decimal | DecimalJsLike | number | string | null
+    deductionRate?: Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: number | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type DeliverySettlementUpdateInput = {
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    factoryUnloadDate?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productType?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeliverySettlementUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    factoryUnloadDate?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productType?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeliverySettlementCreateManyInput = {
+    id?: number
+    deliveryNumber?: string | null
+    customer?: string | null
+    deliveryDate?: string | null
+    factoryUnloadDate?: string | null
+    warehouse?: string | null
+    productType?: string | null
+    vehicleNumber?: string | null
+    netWeight?: Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: Decimal | DecimalJsLike | number | string | null
+    deductionRate?: Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: number | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type DeliverySettlementUpdateManyMutationInput = {
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    factoryUnloadDate?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productType?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeliverySettlementUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    customer?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    factoryUnloadDate?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productType?: NullableStringFieldUpdateOperationsInput | string | null
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    netWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    factoryNetWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deductionRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    deliveryQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalSettlementAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostInputCreateInput = {
+    productName?: string | null
+    productWarehouse?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
+    productionDate?: string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostInputUncheckedCreateInput = {
+    id?: number
+    productName?: string | null
+    productWarehouse?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
+    productionDate?: string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostInputUpdateInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    productionDate?: NullableStringFieldUpdateOperationsInput | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostInputUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    productionDate?: NullableStringFieldUpdateOperationsInput | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostInputCreateManyInput = {
+    id?: number
+    productName?: string | null
+    productWarehouse?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
+    productionDate?: string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostInputUpdateManyMutationInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    productionDate?: NullableStringFieldUpdateOperationsInput | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostInputUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    productionDate?: NullableStringFieldUpdateOperationsInput | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostConfigCreateInput = {
+    productName?: string | null
+    unitProcessingCost?: Decimal | DecimalJsLike | number | string | null
+    configMonth?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostConfigUncheckedCreateInput = {
+    id?: number
+    productName?: string | null
+    unitProcessingCost?: Decimal | DecimalJsLike | number | string | null
+    configMonth?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostConfigUpdateInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    unitProcessingCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    configMonth?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostConfigUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    unitProcessingCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    configMonth?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostConfigCreateManyInput = {
+    id?: number
+    productName?: string | null
+    unitProcessingCost?: Decimal | DecimalJsLike | number | string | null
+    configMonth?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProcessingCostConfigUpdateManyMutationInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    unitProcessingCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    configMonth?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProcessingCostConfigUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    unitProcessingCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    configMonth?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MaterialCostCacheCreateInput = {
+    deliveryNumber?: string | null
+    productName?: string | null
+    productWarehouse?: string | null
+    deliveryDate?: string | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    materialCost?: Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type MaterialCostCacheUncheckedCreateInput = {
+    id?: number
+    deliveryNumber?: string | null
+    productName?: string | null
+    productWarehouse?: string | null
+    deliveryDate?: string | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    materialCost?: Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type MaterialCostCacheUpdateInput = {
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MaterialCostCacheUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MaterialCostCacheCreateManyInput = {
+    id?: number
+    deliveryNumber?: string | null
+    productName?: string | null
+    productWarehouse?: string | null
+    deliveryDate?: string | null
+    settlementQuantity?: Decimal | DecimalJsLike | number | string | null
+    materialCost?: Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type MaterialCostCacheUpdateManyMutationInput = {
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MaterialCostCacheUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
+    deliveryDate?: NullableStringFieldUpdateOperationsInput | string | null
+    settlementQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialCost?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    productionRecords?: NullableJsonNullValueInput | InputJsonValue
+    calculatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -40437,6 +49670,569 @@ export namespace Prisma {
     taxInclu?: SortOrder
     unitpriceIncluTax?: SortOrder
     weight?: SortOrder
+  }
+
+  export type WasteManagementOrderByRelevanceInput = {
+    fields: WasteManagementOrderByRelevanceFieldEnum | WasteManagementOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type WasteManagementCountOrderByAggregateInput = {
+    id?: SortOrder
+    wasteCode?: SortOrder
+    wasteName?: SortOrder
+    wasteCategory?: SortOrder
+    wasteType?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    source?: SortOrder
+    flowDirection?: SortOrder
+    storageLocation?: SortOrder
+    storageMethod?: SortOrder
+    utilizationMethod?: SortOrder
+    disposalMethod?: SortOrder
+    disposalUnit?: SortOrder
+    disposalLocation?: SortOrder
+    recordDate?: SortOrder
+    operator?: SortOrder
+    remark?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type WasteManagementAvgOrderByAggregateInput = {
+    id?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type WasteManagementMaxOrderByAggregateInput = {
+    id?: SortOrder
+    wasteCode?: SortOrder
+    wasteName?: SortOrder
+    wasteCategory?: SortOrder
+    wasteType?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    source?: SortOrder
+    flowDirection?: SortOrder
+    storageLocation?: SortOrder
+    storageMethod?: SortOrder
+    utilizationMethod?: SortOrder
+    disposalMethod?: SortOrder
+    disposalUnit?: SortOrder
+    disposalLocation?: SortOrder
+    recordDate?: SortOrder
+    operator?: SortOrder
+    remark?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type WasteManagementMinOrderByAggregateInput = {
+    id?: SortOrder
+    wasteCode?: SortOrder
+    wasteName?: SortOrder
+    wasteCategory?: SortOrder
+    wasteType?: SortOrder
+    quantity?: SortOrder
+    unit?: SortOrder
+    source?: SortOrder
+    flowDirection?: SortOrder
+    storageLocation?: SortOrder
+    storageMethod?: SortOrder
+    utilizationMethod?: SortOrder
+    disposalMethod?: SortOrder
+    disposalUnit?: SortOrder
+    disposalLocation?: SortOrder
+    recordDate?: SortOrder
+    operator?: SortOrder
+    remark?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type WasteManagementSumOrderByAggregateInput = {
+    id?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type PurchaseWarehouseOrderByRelevanceInput = {
+    fields: PurchaseWarehouseOrderByRelevanceFieldEnum | PurchaseWarehouseOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type PurchaseWarehouseCountOrderByAggregateInput = {
+    id?: SortOrder
+    ledgerNo?: SortOrder
+    warehouseNo?: SortOrder
+    purchaseContractNo?: SortOrder
+    purchaseOrderNo?: SortOrder
+    warehouseTime?: SortOrder
+    status?: SortOrder
+    settlementStatus?: SortOrder
+    receiptNo?: SortOrder
+    base?: SortOrder
+    supplier?: SortOrder
+    vehicleNo?: SortOrder
+    warehouse?: SortOrder
+    warehouseArea?: SortOrder
+    material?: SortOrder
+    grossWeight?: SortOrder
+    tareWeight?: SortOrder
+    netWeight?: SortOrder
+    deduction?: SortOrder
+    estimatedDryBasis?: SortOrder
+    supplierWeightData?: SortOrder
+    qualityInspector?: SortOrder
+    qualityInspectTime?: SortOrder
+    unitPriceExcludingTax?: SortOrder
+    totalPriceExcludingTax?: SortOrder
+    warehouseDate?: SortOrder
+    remark?: SortOrder
+    creator?: SortOrder
+    createTime?: SortOrder
+    shippingVesselNo?: SortOrder
+    qualityChecker?: SortOrder
+    inboundWeighingPerson?: SortOrder
+    inboundTime?: SortOrder
+    outboundWeighingPerson?: SortOrder
+    confirmDate?: SortOrder
+    taxRate?: SortOrder
+    taxAmount?: SortOrder
+    unitPriceIncludingTax?: SortOrder
+    totalPriceIncludingTax?: SortOrder
+    grade?: SortOrder
+    confirmer?: SortOrder
+    supplierWeightTotalExcludingTax?: SortOrder
+    supplierWeightTotalIncludingTax?: SortOrder
+    businessType?: SortOrder
+    warehouseType?: SortOrder
+    endUser?: SortOrder
+    weighingTime?: SortOrder
+    supplierNo?: SortOrder
+    supplierName?: SortOrder
+    supplierContact?: SortOrder
+    qualityUnitPrice?: SortOrder
+    purchaseContractNo2?: SortOrder
+    purchaseOrderNo2?: SortOrder
+    salesOrderNo?: SortOrder
+    paymentReceiptNo?: SortOrder
+    weighingBatchNo?: SortOrder
+    isManualAdd?: SortOrder
+    redFlushStatus?: SortOrder
+    redFlushedOrderNo?: SortOrder
+    revokeStatus?: SortOrder
+    revokeFailReason?: SortOrder
+    revokeApproved?: SortOrder
+    driverName?: SortOrder
+    driverPhone?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PurchaseWarehouseAvgOrderByAggregateInput = {
+    id?: SortOrder
+    grossWeight?: SortOrder
+    tareWeight?: SortOrder
+    netWeight?: SortOrder
+    deduction?: SortOrder
+    estimatedDryBasis?: SortOrder
+    unitPriceExcludingTax?: SortOrder
+    totalPriceExcludingTax?: SortOrder
+    taxRate?: SortOrder
+    taxAmount?: SortOrder
+    unitPriceIncludingTax?: SortOrder
+    totalPriceIncludingTax?: SortOrder
+    supplierWeightTotalExcludingTax?: SortOrder
+    supplierWeightTotalIncludingTax?: SortOrder
+    qualityUnitPrice?: SortOrder
+  }
+
+  export type PurchaseWarehouseMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ledgerNo?: SortOrder
+    warehouseNo?: SortOrder
+    purchaseContractNo?: SortOrder
+    purchaseOrderNo?: SortOrder
+    warehouseTime?: SortOrder
+    status?: SortOrder
+    settlementStatus?: SortOrder
+    receiptNo?: SortOrder
+    base?: SortOrder
+    supplier?: SortOrder
+    vehicleNo?: SortOrder
+    warehouse?: SortOrder
+    warehouseArea?: SortOrder
+    material?: SortOrder
+    grossWeight?: SortOrder
+    tareWeight?: SortOrder
+    netWeight?: SortOrder
+    deduction?: SortOrder
+    estimatedDryBasis?: SortOrder
+    supplierWeightData?: SortOrder
+    qualityInspector?: SortOrder
+    qualityInspectTime?: SortOrder
+    unitPriceExcludingTax?: SortOrder
+    totalPriceExcludingTax?: SortOrder
+    warehouseDate?: SortOrder
+    remark?: SortOrder
+    creator?: SortOrder
+    createTime?: SortOrder
+    shippingVesselNo?: SortOrder
+    qualityChecker?: SortOrder
+    inboundWeighingPerson?: SortOrder
+    inboundTime?: SortOrder
+    outboundWeighingPerson?: SortOrder
+    confirmDate?: SortOrder
+    taxRate?: SortOrder
+    taxAmount?: SortOrder
+    unitPriceIncludingTax?: SortOrder
+    totalPriceIncludingTax?: SortOrder
+    grade?: SortOrder
+    confirmer?: SortOrder
+    supplierWeightTotalExcludingTax?: SortOrder
+    supplierWeightTotalIncludingTax?: SortOrder
+    businessType?: SortOrder
+    warehouseType?: SortOrder
+    endUser?: SortOrder
+    weighingTime?: SortOrder
+    supplierNo?: SortOrder
+    supplierName?: SortOrder
+    supplierContact?: SortOrder
+    qualityUnitPrice?: SortOrder
+    purchaseContractNo2?: SortOrder
+    purchaseOrderNo2?: SortOrder
+    salesOrderNo?: SortOrder
+    paymentReceiptNo?: SortOrder
+    weighingBatchNo?: SortOrder
+    isManualAdd?: SortOrder
+    redFlushStatus?: SortOrder
+    redFlushedOrderNo?: SortOrder
+    revokeStatus?: SortOrder
+    revokeFailReason?: SortOrder
+    revokeApproved?: SortOrder
+    driverName?: SortOrder
+    driverPhone?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PurchaseWarehouseMinOrderByAggregateInput = {
+    id?: SortOrder
+    ledgerNo?: SortOrder
+    warehouseNo?: SortOrder
+    purchaseContractNo?: SortOrder
+    purchaseOrderNo?: SortOrder
+    warehouseTime?: SortOrder
+    status?: SortOrder
+    settlementStatus?: SortOrder
+    receiptNo?: SortOrder
+    base?: SortOrder
+    supplier?: SortOrder
+    vehicleNo?: SortOrder
+    warehouse?: SortOrder
+    warehouseArea?: SortOrder
+    material?: SortOrder
+    grossWeight?: SortOrder
+    tareWeight?: SortOrder
+    netWeight?: SortOrder
+    deduction?: SortOrder
+    estimatedDryBasis?: SortOrder
+    supplierWeightData?: SortOrder
+    qualityInspector?: SortOrder
+    qualityInspectTime?: SortOrder
+    unitPriceExcludingTax?: SortOrder
+    totalPriceExcludingTax?: SortOrder
+    warehouseDate?: SortOrder
+    remark?: SortOrder
+    creator?: SortOrder
+    createTime?: SortOrder
+    shippingVesselNo?: SortOrder
+    qualityChecker?: SortOrder
+    inboundWeighingPerson?: SortOrder
+    inboundTime?: SortOrder
+    outboundWeighingPerson?: SortOrder
+    confirmDate?: SortOrder
+    taxRate?: SortOrder
+    taxAmount?: SortOrder
+    unitPriceIncludingTax?: SortOrder
+    totalPriceIncludingTax?: SortOrder
+    grade?: SortOrder
+    confirmer?: SortOrder
+    supplierWeightTotalExcludingTax?: SortOrder
+    supplierWeightTotalIncludingTax?: SortOrder
+    businessType?: SortOrder
+    warehouseType?: SortOrder
+    endUser?: SortOrder
+    weighingTime?: SortOrder
+    supplierNo?: SortOrder
+    supplierName?: SortOrder
+    supplierContact?: SortOrder
+    qualityUnitPrice?: SortOrder
+    purchaseContractNo2?: SortOrder
+    purchaseOrderNo2?: SortOrder
+    salesOrderNo?: SortOrder
+    paymentReceiptNo?: SortOrder
+    weighingBatchNo?: SortOrder
+    isManualAdd?: SortOrder
+    redFlushStatus?: SortOrder
+    redFlushedOrderNo?: SortOrder
+    revokeStatus?: SortOrder
+    revokeFailReason?: SortOrder
+    revokeApproved?: SortOrder
+    driverName?: SortOrder
+    driverPhone?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PurchaseWarehouseSumOrderByAggregateInput = {
+    id?: SortOrder
+    grossWeight?: SortOrder
+    tareWeight?: SortOrder
+    netWeight?: SortOrder
+    deduction?: SortOrder
+    estimatedDryBasis?: SortOrder
+    unitPriceExcludingTax?: SortOrder
+    totalPriceExcludingTax?: SortOrder
+    taxRate?: SortOrder
+    taxAmount?: SortOrder
+    unitPriceIncludingTax?: SortOrder
+    totalPriceIncludingTax?: SortOrder
+    supplierWeightTotalExcludingTax?: SortOrder
+    supplierWeightTotalIncludingTax?: SortOrder
+    qualityUnitPrice?: SortOrder
+  }
+
+  export type DeliverySettlementOrderByRelevanceInput = {
+    fields: DeliverySettlementOrderByRelevanceFieldEnum | DeliverySettlementOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type DeliverySettlementCountOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    customer?: SortOrder
+    deliveryDate?: SortOrder
+    factoryUnloadDate?: SortOrder
+    warehouse?: SortOrder
+    productType?: SortOrder
+    vehicleNumber?: SortOrder
+    netWeight?: SortOrder
+    factoryNetWeight?: SortOrder
+    deductionRate?: SortOrder
+    deliveryQuantity?: SortOrder
+    settlementQuantity?: SortOrder
+    totalSettlementAmount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeliverySettlementAvgOrderByAggregateInput = {
+    id?: SortOrder
+    netWeight?: SortOrder
+    factoryNetWeight?: SortOrder
+    deductionRate?: SortOrder
+    deliveryQuantity?: SortOrder
+    settlementQuantity?: SortOrder
+    totalSettlementAmount?: SortOrder
+  }
+
+  export type DeliverySettlementMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    customer?: SortOrder
+    deliveryDate?: SortOrder
+    factoryUnloadDate?: SortOrder
+    warehouse?: SortOrder
+    productType?: SortOrder
+    vehicleNumber?: SortOrder
+    netWeight?: SortOrder
+    factoryNetWeight?: SortOrder
+    deductionRate?: SortOrder
+    deliveryQuantity?: SortOrder
+    settlementQuantity?: SortOrder
+    totalSettlementAmount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeliverySettlementMinOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    customer?: SortOrder
+    deliveryDate?: SortOrder
+    factoryUnloadDate?: SortOrder
+    warehouse?: SortOrder
+    productType?: SortOrder
+    vehicleNumber?: SortOrder
+    netWeight?: SortOrder
+    factoryNetWeight?: SortOrder
+    deductionRate?: SortOrder
+    deliveryQuantity?: SortOrder
+    settlementQuantity?: SortOrder
+    totalSettlementAmount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeliverySettlementSumOrderByAggregateInput = {
+    id?: SortOrder
+    netWeight?: SortOrder
+    factoryNetWeight?: SortOrder
+    deductionRate?: SortOrder
+    deliveryQuantity?: SortOrder
+    settlementQuantity?: SortOrder
+    totalSettlementAmount?: SortOrder
+  }
+
+  export type ProcessingCostInputOrderByRelevanceInput = {
+    fields: ProcessingCostInputOrderByRelevanceFieldEnum | ProcessingCostInputOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProcessingCostInputCountOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    productTons?: SortOrder
+    productionDate?: SortOrder
+    materialComposition?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostInputAvgOrderByAggregateInput = {
+    id?: SortOrder
+    productTons?: SortOrder
+  }
+
+  export type ProcessingCostInputMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    productTons?: SortOrder
+    productionDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostInputMinOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    productTons?: SortOrder
+    productionDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostInputSumOrderByAggregateInput = {
+    id?: SortOrder
+    productTons?: SortOrder
+  }
+
+  export type ProcessingCostConfigOrderByRelevanceInput = {
+    fields: ProcessingCostConfigOrderByRelevanceFieldEnum | ProcessingCostConfigOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProcessingCostConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    unitProcessingCost?: SortOrder
+    configMonth?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostConfigAvgOrderByAggregateInput = {
+    id?: SortOrder
+    unitProcessingCost?: SortOrder
+  }
+
+  export type ProcessingCostConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    unitProcessingCost?: SortOrder
+    configMonth?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    unitProcessingCost?: SortOrder
+    configMonth?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProcessingCostConfigSumOrderByAggregateInput = {
+    id?: SortOrder
+    unitProcessingCost?: SortOrder
+  }
+
+  export type MaterialCostCacheOrderByRelevanceInput = {
+    fields: MaterialCostCacheOrderByRelevanceFieldEnum | MaterialCostCacheOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MaterialCostCacheCountOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    deliveryDate?: SortOrder
+    settlementQuantity?: SortOrder
+    materialCost?: SortOrder
+    materialComposition?: SortOrder
+    productionRecords?: SortOrder
+    calculatedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialCostCacheAvgOrderByAggregateInput = {
+    id?: SortOrder
+    settlementQuantity?: SortOrder
+    materialCost?: SortOrder
+  }
+
+  export type MaterialCostCacheMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    deliveryDate?: SortOrder
+    settlementQuantity?: SortOrder
+    materialCost?: SortOrder
+    calculatedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialCostCacheMinOrderByAggregateInput = {
+    id?: SortOrder
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    productWarehouse?: SortOrder
+    deliveryDate?: SortOrder
+    settlementQuantity?: SortOrder
+    materialCost?: SortOrder
+    calculatedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialCostCacheSumOrderByAggregateInput = {
+    id?: SortOrder
+    settlementQuantity?: SortOrder
+    materialCost?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {

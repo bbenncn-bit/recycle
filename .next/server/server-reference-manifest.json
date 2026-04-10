@@ -1,5 +1,28 @@
 {
-  "node": {},
+  "node": {
+    "40dd528f04fa8250447e525bb51b1127121e469ee9": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfg%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%2240dd528f04fa8250447e525bb51b1127121e469ee9%22%2C%22exportedName%22%3A%22getReceiptfgDataBatch%22%7D%5D%5D%2C%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfc%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%22401f0c62d6d732bc97e961cdc0742dbfefe40725cc%22%2C%22exportedName%22%3A%22getReceiptfcDataBatch%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    },
+    "401f0c62d6d732bc97e961cdc0742dbfefe40725cc": {
+      "workers": {
+        "app/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfg%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%2240dd528f04fa8250447e525bb51b1127121e469ee9%22%2C%22exportedName%22%3A%22getReceiptfgDataBatch%22%7D%5D%5D%2C%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfc%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%22401f0c62d6d732bc97e961cdc0742dbfefe40725cc%22%2C%22exportedName%22%3A%22getReceiptfcDataBatch%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "h29gS76KfrhXtIObm0QU+K6nsYpIT60qw2hDOFpuAEM="
+  "encryptionKey": "8pwCwqL/9wMADc70UWjrCvtN5GpLv+UFUe6/UPSBytQ="
 }

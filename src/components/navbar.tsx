@@ -10,6 +10,14 @@ import ThemeToggle from './theme-toggle';
 const navigation = [
   { name: '首页', href: '/'},
   { 
+    name: '算账经营', 
+    href: '/profit-management/cost-analysis', 
+    dropdown: [
+      { name: '成本分析', href: '/profit-management/cost-analysis' },
+      { name: '利润分析', href: '/profit-management/profit-analysis' },
+    ]
+  },
+  { 
     name: '能碳管理', 
     href: '/energy/consumption-query', 
     dropdown: [
@@ -22,20 +30,16 @@ const navigation = [
       { name: '能碳预测管理', href: '/energy/prediction-management' },
       { name: '碳排放核算', href: '/energy/carbon-accounting' },
       { name: '更多', href: '/energy/more' },
+      { name: '固废管理', href: '/waste-management' },
+      { name: '固废录入', href: '/waste-management/input' },
     ]
   },
   { 
-    name: '物资处置', 
+    name: '处置采购', 
     href: '/disposal/auction', 
     dropdown: [
       { name: '竞价拍卖', href: '/disposal/auction' },
       { name: '一口价销售', href: '/disposal/fixedprice' },
-    ]
-  },
-  { 
-    name: '物资采购', 
-    href: '/purchase/scrapsteel', 
-    dropdown: [
       { name: '废钢铁', href: '/purchase/scrapsteel' },
       { name: '报废车', href: '/purchase/scrapcar' },
       { name: '废动力电池', href: '/purchase/evbattery' },

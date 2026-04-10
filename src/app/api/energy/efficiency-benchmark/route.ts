@@ -103,8 +103,6 @@ export async function GET() {
       data: {
         benchmarkCards: benchmarkCards,
         gaugeMetrics: gaugeMetrics,
-        rankingList: rankingList,
-        trendData: trendData,
         ...benchmarkData
       }
     });
