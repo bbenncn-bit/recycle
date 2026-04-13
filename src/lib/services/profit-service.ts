@@ -304,18 +304,44 @@ export async function getCostAnalysisData(
   startDate?: Date,
   endDate?: Date
 ): Promise<CostAnalysisData> {
+  const devLog = process.env.NODE_ENV === 'development';
+
   // 设置默认日期范围（最近30天）
   const today = new Date();
   today.setHours(23, 59, 59, 999);
   const defaultStartDate = new Date(today);
   defaultStartDate.setDate(defaultStartDate.getDate() - 30);
   defaultStartDate.setHours(0, 0, 0, 0);
-  
+
   const queryStartDate = startDate || defaultStartDate;
   const queryEndDate = endDate || today;
-  
-  // 查询数据
-  // 注意：由于 warehouseDate 是字符串，我们需要查询所有数据然后在内存中过滤
+
+  const todayForCalc = new Date();
+  todayForCalc.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(todayForCalc);
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const lastMonthStart = new Date(todayForCalc);
+  lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
+  lastMonthStart.setDate(1);
+  lastMonthStart.setHours(0, 0, 0, 0);
+
+  const trendStartDate = new Date(todayForCalc);
+  trendStartDate.setDate(trendStartDate.getDate() - 29);
+  trendStartDate.setHours(0, 0, 0, 0);
+
+  // 库内字符串日期多为 YYYY-MM-DD，用下界缩小全表扫描（上月起 + 趋势窗 + 自定义起期，再留 7 天缓冲）
+  const scanStart = new Date(
+    Math.min(
+      lastMonthStart.getTime(),
+      trendStartDate.getTime(),
+      queryStartDate.getTime()
+    )
+  );
+  scanStart.setDate(scanStart.getDate() - 7);
+  const minWarehouseDateStr = formatDate(scanStart);
+
+  // 查询数据（带日期下界；status 仍在内存过滤）
   let allData;
   try {
     allData = await prisma.purchaseWarehouse.findMany({
@@ -323,7 +349,10 @@ export async function getCostAnalysisData(
         totalPriceIncludingTax: {
           not: null,
         },
-        // 不在这里过滤 status，因为可能的值不确定，在内存中处理
+        warehouseDate: {
+          not: null,
+          gte: minWarehouseDateStr,
+        },
       },
       select: {
         warehouseDate: true,
@@ -335,20 +364,13 @@ export async function getCostAnalysisData(
         netWeight: true, // 净重
       },
     });
-    console.log(`✅ 成功查询到 ${allData.length} 条 PurchaseWarehouse 数据`);
-    
-    // 调试：检查前几条数据的格式
-    if (allData.length > 0) {
-      console.log('📊 前3条数据示例:');
-      allData.slice(0, 3).forEach((item, idx) => {
-        console.log(`  数据${idx + 1}:`, {
-          warehouseDate: item.warehouseDate,
-          material: item.material,
-          totalPriceIncludingTax: item.totalPriceIncludingTax,
-          status: item.status,
-          receiptNo: item.receiptNo,
-        });
-      });
+    if (devLog) {
+      console.log(
+        `✅ PurchaseWarehouse 查询 ${allData.length} 条（warehouse_date >= ${minWarehouseDateStr}）`
+      );
+      if (allData.length > 0) {
+        console.log('📊 前3条数据示例:', allData.slice(0, 3));
+      }
     }
   } catch (dbError) {
     console.error('❌ 查询 PurchaseWarehouse 表失败:', dbError);
@@ -420,8 +442,8 @@ export async function getCostAnalysisData(
     return true;
   });
   
-  console.log(`📋 过滤后有效数据: ${validData.length} 条`);
-  
+  if (devLog) console.log(`📋 过滤后有效数据: ${validData.length} 条`);
+
   // 调试：检查日期解析情况
   const dateParseStats = {
     total: validData.length,
@@ -445,11 +467,13 @@ export async function getCostAnalysisData(
     }
   });
   
-  console.log('📅 日期解析统计:', {
-    ...dateParseStats,
-    sampleInvalidDates: dateParseStats.sampleDates,
-  });
-  
+  if (devLog) {
+    console.log('📅 日期解析统计:', {
+      ...dateParseStats,
+      sampleInvalidDates: dateParseStats.sampleDates,
+    });
+  }
+
   // 调试：检查价格数据
   const priceStats = {
     total: validData.length,
@@ -476,14 +500,9 @@ export async function getCostAnalysisData(
     }
   });
   
-  console.log('💰 价格数据统计:', priceStats);
-  
+  if (devLog) console.log('💰 价格数据统计:', priceStats);
+
   // 计算今日、本周、本月成本（使用所有有效数据，不受查询日期范围限制）
-  const todayForCalc = new Date();
-  todayForCalc.setHours(0, 0, 0, 0);
-  const todayEnd = new Date(todayForCalc);
-  todayEnd.setHours(23, 59, 59, 999);
-  
   const last7DaysStart = new Date(todayForCalc);
   last7DaysStart.setDate(todayForCalc.getDate() - 6);
   last7DaysStart.setHours(0, 0, 0, 0);
@@ -516,34 +535,42 @@ export async function getCostAnalysisData(
     .filter(d => d !== null)
     .sort();
   
-  console.log('📊 日期过滤结果:', {
-    todayData: todayData.length,
-    weekData: weekData.length,
-    monthData: monthData.length,
-    todayRange: `${formatDate(todayForCalc)} ~ ${formatDate(todayEnd)}`,
-    weekRange: `${formatDate(last7DaysStart)} ~ ${formatDate(todayEnd)}`,
-    monthRange: `${formatDate(monthStart)} ~ ${formatDate(todayEnd)}`,
-    allDatesRange: allParsedDates.length > 0 ? `${allParsedDates[0]} ~ ${allParsedDates[allParsedDates.length - 1]}` : '无有效日期',
-    sampleDates: allParsedDates.slice(0, 5),
-  });
-  
-  // 调试：检查价格计算
-  if (todayData.length > 0) {
-    const todayCostSample = todayData.slice(0, 3).map(item => ({
-      warehouseDate: item.warehouseDate,
-      totalPriceIncludingTax: item.totalPriceIncludingTax,
-      processed: processCostData(item.totalPriceIncludingTax),
-    }));
-    console.log('💰 今日数据示例:', todayCostSample);
+  if (devLog) {
+    console.log('📊 日期过滤结果:', {
+      todayData: todayData.length,
+      weekData: weekData.length,
+      monthData: monthData.length,
+      todayRange: `${formatDate(todayForCalc)} ~ ${formatDate(todayEnd)}`,
+      weekRange: `${formatDate(last7DaysStart)} ~ ${formatDate(todayEnd)}`,
+      monthRange: `${formatDate(monthStart)} ~ ${formatDate(todayEnd)}`,
+      allDatesRange:
+        allParsedDates.length > 0
+          ? `${allParsedDates[0]} ~ ${allParsedDates[allParsedDates.length - 1]}`
+          : '无有效日期',
+      sampleDates: allParsedDates.slice(0, 5),
+    });
   }
   
-  if (weekData.length > 0) {
-    const weekCostSample = weekData.slice(0, 3).map(item => ({
-      warehouseDate: item.warehouseDate,
-      totalPriceIncludingTax: item.totalPriceIncludingTax,
-      processed: processCostData(item.totalPriceIncludingTax),
-    }));
-    console.log('💰 本周数据示例:', weekCostSample);
+  if (devLog && todayData.length > 0) {
+    console.log(
+      '💰 今日数据示例:',
+      todayData.slice(0, 3).map((item) => ({
+        warehouseDate: item.warehouseDate,
+        totalPriceIncludingTax: item.totalPriceIncludingTax,
+        processed: processCostData(item.totalPriceIncludingTax),
+      }))
+    );
+  }
+
+  if (devLog && weekData.length > 0) {
+    console.log(
+      '💰 本周数据示例:',
+      weekData.slice(0, 3).map((item) => ({
+        warehouseDate: item.warehouseDate,
+        totalPriceIncludingTax: item.totalPriceIncludingTax,
+        processed: processCostData(item.totalPriceIncludingTax),
+      }))
+    );
   }
   
   // 过滤日期范围用于趋势图（使用查询的日期范围）
@@ -590,12 +617,7 @@ export async function getCostAnalysisData(
   const daysInCurrentMonth = Math.max(1, Math.floor((todayEnd.getTime() - currentMonthStart.getTime()) / (1000 * 60 * 60 * 24)) + 1);
   const avgDailyCost = parseFloat((currentMonthTotal / daysInCurrentMonth).toFixed(2));
   
-  // 计算日成本趋势（滚动最近30天）
-  // 如当前是1月15日，则显示12月16日-1月15日的数据
-  // 如明天1月16日，则显示12月17日-1月16日的数据
-  const trendStartDate = new Date(todayForCalc);
-  trendStartDate.setDate(trendStartDate.getDate() - 29); // 最近30天（包含今天）
-  trendStartDate.setHours(0, 0, 0, 0);
+  // 计算日成本趋势（滚动最近30天，trendStartDate 已在查询下界处计算）
   const dailyTrend = calculateDailyCost(
     filteredData,
     trendStartDate,
@@ -630,11 +652,7 @@ export async function getCostAnalysisData(
   const categoryDistributionBaseSelf = calculateCategoryCost(baseSelfData);
   const categoryDistributionBasePurchase = calculateCategoryCost(basePurchaseData);
   
-  // 计算上月数据用于成本对比图
-  const lastMonthStart = new Date(todayForCalc);
-  lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
-  lastMonthStart.setDate(1);
-  lastMonthStart.setHours(0, 0, 0, 0);
+  // 计算上月数据用于成本对比图（lastMonthStart 与查询下界处一致）
   const lastMonthEnd = new Date(todayForCalc);
   lastMonthEnd.setDate(0); // 上个月最后一天
   lastMonthEnd.setHours(23, 59, 59, 999);

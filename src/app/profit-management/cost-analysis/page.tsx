@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
+import { CostAnalysisSkeleton } from '@/components/profit-dashboard-skeletons';
 import { normalizeMaterialCategoryLabel } from '@/lib/material-label';
 
 /** 上月均价：先精确匹配料型名，再按规范化名称对齐（与后端 calculateCategoryCost 一致） */
@@ -162,17 +163,21 @@ export default function CostAnalysis() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600 dark:text-gray-400">加载中...</div>
-      </div>
-    );
+    return <CostAnalysisSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-red-600 dark:text-red-400">错误: {error}</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200"
+            role="alert"
+          >
+            <p className="font-medium">加载失败</p>
+            <p className="mt-1 text-sm opacity-90">{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -864,7 +869,7 @@ export default function CostAnalysis() {
                 {data.summary.weekCost.toFixed(2)} 万元
               </p>
             </div>
-            <ReactECharts
+            <LazyReactECharts
               option={{
                 tooltip: {
                   trigger: 'axis',
@@ -1086,7 +1091,7 @@ export default function CostAnalysis() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* 日成本趋势图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={dailyTrendOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -1094,7 +1099,7 @@ export default function CostAnalysis() {
 
           {/* 基地收货废钢类型成本分布饼图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={categoryPieOptionBaseSelf}
               style={{ height: '400px', width: '100%' }}
             />
@@ -1104,7 +1109,7 @@ export default function CostAnalysis() {
 
         {/* 基地买货废钢类型成本分布饼图 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <ReactECharts
+          <LazyReactECharts
             option={categoryPieOptionBasePurchase}
             style={{ height: '400px', width: '100%' }}
           />
@@ -1114,7 +1119,7 @@ export default function CostAnalysis() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* 基地收货废钢类型成本对比柱状图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={categoryBarOptionBaseSelf}
               style={{ height: '400px', width: '100%' }}
             />
@@ -1122,7 +1127,7 @@ export default function CostAnalysis() {
 
           {/* 基地买货废钢类型成本对比柱状图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={categoryBarOptionBasePurchase}
               style={{ height: '400px', width: '100%' }}
             />

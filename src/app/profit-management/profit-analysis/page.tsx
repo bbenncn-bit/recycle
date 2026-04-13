@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
+import { ProfitAnalysisSkeleton } from '@/components/profit-dashboard-skeletons';
 
 const SALES_DETAILS_PAGE_SIZE = 10;
 
@@ -230,17 +231,21 @@ export default function ProfitAnalysis() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600 dark:text-gray-400">加载中...</div>
-      </div>
-    );
+    return <ProfitAnalysisSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-red-600 dark:text-red-400">错误: {error}</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div
+            className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200"
+            role="alert"
+          >
+            <p className="font-medium">加载失败</p>
+            <p className="mt-1 text-sm opacity-90">{error}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -253,14 +258,41 @@ export default function ProfitAnalysis() {
     );
   }
 
-  // 日利润趋势图配置（堆叠面积图）
+  // 日利润趋势：堆叠总高度 = 销售收入（材料+加工+其它净值+利润），利润用面积展示占比
+  const revenueArr = data.dailyTrend.revenue || [];
+  const materialArr = data.dailyTrend.materialCost || [];
+  const processingArr = data.dailyTrend.processingCost || [];
+  const profitArr = data.dailyTrend.profit || [];
+  const otherNetForStack: number[] = [];
+  const profitStackSlice: number[] = [];
+  const trendLen = Math.max(
+    revenueArr.length,
+    materialArr.length,
+    processingArr.length,
+    profitArr.length
+  );
+  for (let i = 0; i < trendLen; i++) {
+    const r = revenueArr[i] ?? 0;
+    const m = materialArr[i] ?? 0;
+    const p = processingArr[i] ?? 0;
+    const pr = profitArr[i] ?? 0;
+    const otherNet = r - m - p - pr;
+    otherNetForStack.push(Math.max(0, otherNet));
+    profitStackSlice.push(pr + Math.min(0, otherNet));
+  }
+
   const dailyTrendOption = {
     title: {
       text: '日利润趋势（最近30天）',
+      subtext: '堆叠高度为销售收入；绿色为利润区块（其它净收入为负时与利润合并为一层）',
       left: 'center',
       textStyle: {
         color: '#333',
         fontSize: 18
+      },
+      subtextStyle: {
+        color: '#666',
+        fontSize: 12
       }
     },
     tooltip: {
@@ -272,26 +304,36 @@ export default function ProfitAnalysis() {
         }
       },
       formatter: (params: any) => {
-        let result = params[0].name + '<br/>';
-        const order = ['销售收入', '材料成本', '加工成本', '利润'];
-        order.forEach(seriesName => {
-          const param = params.find((p: any) => p.seriesName === seriesName);
-          if (param) {
-            result += `${param.marker}${param.seriesName}: ${param.value.toFixed(2)} 万元<br/>`;
-          }
-        });
+        if (!params?.length) return '';
+        const idx = params[0].dataIndex ?? 0;
+        const r = revenueArr[idx] ?? 0;
+        const m = materialArr[idx] ?? 0;
+        const p = processingArr[idx] ?? 0;
+        const pr = profitArr[idx] ?? 0;
+        const otherNet = r - m - p - pr;
+        const name = params[0].name;
+        let result = `${name}<br/>`;
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#5470c6;"></span>销售收入: ${r.toFixed(2)} 万元<br/>`;
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#ee6666;"></span>材料成本: ${m.toFixed(2)} 万元<br/>`;
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#fac858;"></span>加工成本: ${p.toFixed(2)} 万元<br/>`;
+        if (Math.abs(otherNet) >= 0.005) {
+          const label = otherNet >= 0 ? '其它收支净值（支出类净额）' : '其它收支净值（净收入等）';
+          result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#9ca3af;"></span>${label}: ${otherNet.toFixed(2)} 万元<br/>`;
+        }
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#91cc75;"></span><b>利润: ${pr.toFixed(2)} 万元</b><br/>`;
+        result += `<span style="opacity:0.85">材料+加工+利润+其它净值 = ${(m + p + pr + otherNet).toFixed(2)} 万元</span>`;
         return result;
       }
     },
     legend: {
-      data: ['销售收入', '材料成本', '加工成本', '利润'],
+      data: ['材料成本', '加工成本', '其它收支净值', '利润'],
       bottom: 0
     },
     grid: {
       left: '3%',
       right: '4%',
       bottom: '15%',
-      top: '10%',
+      top: '18%',
       containLabel: true
     },
     xAxis: {
@@ -307,33 +349,19 @@ export default function ProfitAnalysis() {
     },
     yAxis: {
       type: 'value',
-      name: '金额（万元）'
+      name: '金额（万元）',
+      nameTextStyle: {
+        color: '#333'
+      }
     },
     series: [
       {
-        name: '销售收入',
-        type: 'line',
-        stack: 'cost',
-        smooth: true,
-        areaStyle: {
-          opacity: 0.8
-        },
-        itemStyle: {
-          color: '#5470c6'
-        },
-        lineStyle: {
-          color: '#5470c6',
-          width: 1
-        },
-        data: data.dailyTrend.revenue || []
-      },
-      {
         name: '材料成本',
         type: 'line',
-        stack: 'cost',
+        stack: 'revenue',
         smooth: true,
         areaStyle: {
-          opacity: 0.8
+          opacity: 0.85
         },
         itemStyle: {
           color: '#ee6666'
@@ -342,15 +370,16 @@ export default function ProfitAnalysis() {
           color: '#ee6666',
           width: 1
         },
-        data: data.dailyTrend.materialCost || []
+        emphasis: { focus: 'series' },
+        data: materialArr
       },
       {
         name: '加工成本',
         type: 'line',
-        stack: 'cost',
+        stack: 'revenue',
         smooth: true,
         areaStyle: {
-          opacity: 0.8
+          opacity: 0.85
         },
         itemStyle: {
           color: '#fac858'
@@ -359,20 +388,44 @@ export default function ProfitAnalysis() {
           color: '#fac858',
           width: 1
         },
-        data: data.dailyTrend.processingCost || []
+        emphasis: { focus: 'series' },
+        data: processingArr
+      },
+      {
+        name: '其它收支净值',
+        type: 'line',
+        stack: 'revenue',
+        smooth: true,
+        areaStyle: {
+          opacity: 0.55
+        },
+        itemStyle: {
+          color: '#9ca3af'
+        },
+        lineStyle: {
+          color: '#9ca3af',
+          width: 1
+        },
+        emphasis: { focus: 'series' },
+        data: otherNetForStack
       },
       {
         name: '利润',
         type: 'line',
+        stack: 'revenue',
         smooth: true,
+        areaStyle: {
+          opacity: 0.9
+        },
         itemStyle: {
           color: '#91cc75'
         },
         lineStyle: {
           color: '#91cc75',
-          width: 2
+          width: 1
         },
-        data: data.dailyTrend.profit || []
+        emphasis: { focus: 'series' },
+        data: profitStackSlice
       }
     ]
   };
@@ -690,7 +743,7 @@ export default function ProfitAnalysis() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* 日利润趋势图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={dailyTrendOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -698,7 +751,7 @@ export default function ProfitAnalysis() {
 
           {/* 周利润分解图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={weekBreakdownOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -882,7 +935,7 @@ export default function ProfitAnalysis() {
         {/* 成品对比分析图 */}
         {data.productComparison.products.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-            <ReactECharts
+            <LazyReactECharts
               option={productComparisonOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -975,7 +1028,7 @@ export default function ProfitAnalysis() {
                       平均生产日期: {avgProdDate}
                     </div>
                   )}
-                  <ReactECharts
+                  <LazyReactECharts
                     option={{
                       tooltip: {
                         trigger: 'item',

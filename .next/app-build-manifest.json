@@ -21,10 +21,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/receiptfg/route.js"
     ],
-    "/_not-found/page": [
+    "/profit-management/cost-analysis/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/profit-management/cost-analysis/page.js"
+    ],
+    "/api/profit-management/cost-analysis/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/cost-analysis/route.js"
+    ],
+    "/profit-management/profit-analysis/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profit-management/profit-analysis/page.js"
+    ],
+    "/api/profit-management/profit-analysis/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/profit-analysis/route.js"
     ]
   }
 }

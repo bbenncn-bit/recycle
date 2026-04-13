@@ -1,5 +1,20 @@
 import { prisma } from '@/lib/prismadb';
 
+const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** 将 YYYY-MM-DD 解析为本地日历日的 [start, end)（用于用户选择的交易日） */
+function localDayRangeFromDateKey(dateKey: string): { start: Date; end: Date } | null {
+  if (!DATE_KEY_RE.test(dateKey)) return null;
+  const parts = dateKey.split('-').map(Number);
+  const y = parts[0];
+  const mo = parts[1];
+  const d = parts[2];
+  if (!y || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const start = new Date(y, mo - 1, d, 0, 0, 0, 0);
+  const end = new Date(y, mo - 1, d + 1, 0, 0, 0, 0);
+  return { start, end };
+}
+
 export interface ReceiptData {
   id: number;
   saleMemberId: string | null;
@@ -35,6 +50,8 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   offset?: number;
+  /** YYYY-MM-DD（本地日历日 0:00～次日 0:00）；传入则查询该日，不传则仍用库中最新有数据的日期 */
+  date?: string;
 }
 
 export interface PaginatedResult<T> {
@@ -53,6 +70,22 @@ export interface PaginatedResult<T> {
  * 报废车数据服务
  */
 export class ReceiptfcService {
+  private static async resolveOrderDayRange(
+    params: PaginationParams
+  ): Promise<{ start: Date; end: Date } | null> {
+    if (params.date) {
+      const r = localDayRangeFromDateKey(params.date);
+      if (r) return r;
+    }
+    const latestDate = await this.getLatestOrderDate();
+    if (!latestDate) return null;
+    const dateStart = new Date(latestDate);
+    dateStart.setUTCHours(0, 0, 0, 0);
+    const dateEnd = new Date(dateStart);
+    dateEnd.setUTCDate(dateEnd.getUTCDate() + 1);
+    return { start: dateStart, end: dateEnd };
+  }
+
   /**
    * 获取最新日期的报废车数据
    */
@@ -105,9 +138,8 @@ export class ReceiptfcService {
 
       console.log(`🔄 获取报废车数据 - 页码: ${page}, 限制: ${limit}, 偏移: ${actualOffset}`);
 
-      // 获取最新日期
-      const latestDate = await this.getLatestOrderDate();
-      if (!latestDate) {
+      const range = await this.resolveOrderDayRange(params);
+      if (!range) {
         return {
           data: [],
           pagination: {
@@ -120,12 +152,7 @@ export class ReceiptfcService {
         };
       }
 
-      // 正确计算当天的开始和结束时间（UTC）
-      const dateStart = new Date(latestDate);
-      dateStart.setUTCHours(0, 0, 0, 0); // 当天开始
-      
-      const dateEnd = new Date(dateStart);
-      dateEnd.setUTCDate(dateEnd.getUTCDate() + 1); // 下一天开始
+      const { start: dateStart, end: dateEnd } = range;
 
       console.log(`🔍 分页查询报废车数据 - 日期范围: ${dateStart.toISOString()} 到 ${dateEnd.toISOString()}`);
 
@@ -281,6 +308,22 @@ export class ReceiptfcService {
  * 废钢数据服务
  */
 export class ReceiptfgService {
+  private static async resolveOrderDayRange(
+    params: PaginationParams
+  ): Promise<{ start: Date; end: Date } | null> {
+    if (params.date) {
+      const r = localDayRangeFromDateKey(params.date);
+      if (r) return r;
+    }
+    const latestDate = await this.getLatestOrderDate();
+    if (!latestDate) return null;
+    const dateStart = new Date(latestDate);
+    dateStart.setUTCHours(0, 0, 0, 0);
+    const dateEnd = new Date(dateStart);
+    dateEnd.setUTCDate(dateEnd.getUTCDate() + 1);
+    return { start: dateStart, end: dateEnd };
+  }
+
   /**
    * 获取最新日期的废钢数据
    */
@@ -332,9 +375,8 @@ export class ReceiptfgService {
 
       console.log(`🔄 获取废钢数据 - 页码: ${page}, 限制: ${limit}, 偏移: ${actualOffset}`);
 
-      // 获取最新日期
-      const latestDate = await this.getLatestOrderDate();
-      if (!latestDate) {
+      const range = await this.resolveOrderDayRange(params);
+      if (!range) {
         return {
           data: [],
           pagination: {
@@ -347,12 +389,7 @@ export class ReceiptfgService {
         };
       }
 
-      // 正确计算当天的开始和结束时间（UTC）
-      const dateStart = new Date(latestDate);
-      dateStart.setUTCHours(0, 0, 0, 0); // 当天开始
-      
-      const dateEnd = new Date(dateStart);
-      dateEnd.setUTCDate(dateEnd.getUTCDate() + 1); // 下一天开始
+      const { start: dateStart, end: dateEnd } = range;
 
       console.log(`🔍 分页查询废钢数据 - 日期范围: ${dateStart.toISOString()} 到 ${dateEnd.toISOString()}`);
 

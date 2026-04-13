@@ -32,7 +32,9 @@ interface ProgressiveTableWithPaginationProps {
   title: string;
   subtitle: string;
   bgColor: string;
-  fetchBatchData: (params: { page: number; limit: number }) => Promise<{
+  /** 当前选中的交易日 YYYY-MM-DD（由页面统一选择） */
+  selectedDate: string;
+  fetchBatchData: (params: { page: number; limit: number; date: string }) => Promise<{
     data: TableData[];
     pagination: {
       page: number;
@@ -205,6 +207,7 @@ export default function ProgressiveTableWithPagination({
   title,
   subtitle,
   bgColor,
+  selectedDate,
   fetchBatchData,
   itemsPerPage = 10
 }: ProgressiveTableWithPaginationProps) {
@@ -221,9 +224,8 @@ export default function ProgressiveTableWithPagination({
     hasMore: false
   });
   
-  // 用于缓存已加载的页面数据
+  // 用于缓存已加载的页面数据（按当前交易日隔离）
   const pageCache = useRef<{ [key: number]: TableData[] }>({});
-  const isInitialMount = useRef(true);
 
   // 加载指定页面的数据
   const loadPageData = useCallback(async (page: number, showPageLoading = true) => {
@@ -244,7 +246,7 @@ export default function ProgressiveTableWithPagination({
       setError(null);
       
       console.log(`🚀 开始加载${title}第${page}页数据...`);
-      const result = await fetchBatchData({ page, limit: itemsPerPage });
+      const result = await fetchBatchData({ page, limit: itemsPerPage, date: selectedDate });
       
       // 缓存数据
       pageCache.current[page] = result.data;
@@ -262,7 +264,7 @@ export default function ProgressiveTableWithPagination({
       setLoading(false);
       setPageLoading(false);
     }
-  }, [title, fetchBatchData, itemsPerPage]);
+  }, [title, fetchBatchData, itemsPerPage, selectedDate]);
 
   // 仅用于预加载的函数（不会更改当前页面状态）
   const preloadPageData = useCallback(async (page: number) => {
@@ -273,7 +275,7 @@ export default function ProgressiveTableWithPagination({
       }
       
       console.log(`🔄 后台预加载${title}第${page}页数据...`);
-      const result = await fetchBatchData({ page, limit: itemsPerPage });
+      const result = await fetchBatchData({ page, limit: itemsPerPage, date: selectedDate });
       
       // 仅缓存数据，不更改当前页面状态
       pageCache.current[page] = result.data;
@@ -283,7 +285,7 @@ export default function ProgressiveTableWithPagination({
     } catch (err) {
       console.warn(`⚠️ 预加载${title}第${page}页数据失败:`, err);
     }
-  }, [title, fetchBatchData, itemsPerPage]);
+  }, [title, fetchBatchData, itemsPerPage, selectedDate]);
 
   // 处理页面切换
   const handlePageChange = useCallback((page: number) => {
@@ -292,13 +294,25 @@ export default function ProgressiveTableWithPagination({
     }
   }, [currentPage, pagination.totalPages, loadPageData]);
 
-  // 初始加载第一页
+  // 交易日或请求函数变化时清空缓存并重新拉第一页
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      loadPageData(1, false);
+    if (!selectedDate?.trim()) {
+      setLoading(false);
+      setCurrentPageData([]);
+      setPagination({
+        page: 1,
+        limit: itemsPerPage,
+        total: 0,
+        totalPages: 0,
+        hasMore: false,
+      });
+      return;
     }
-  }, [loadPageData]);
+    pageCache.current = {};
+    setCurrentPage(1);
+    setLoading(true);
+    loadPageData(1, false);
+  }, [selectedDate, loadPageData, itemsPerPage]);
 
   // 后台预加载策略（在第一页加载完成后，预加载第2-3页）
   useEffect(() => {
@@ -316,7 +330,7 @@ export default function ProgressiveTableWithPagination({
         }
       }, 2000);
     }
-  }, [loading, currentPage, pagination.totalPages, loadPageData, preloadPageData]);
+  }, [loading, currentPage, pagination.totalPages, preloadPageData]);
 
   // 如果正在加载第一页，显示完整骨架屏
   if (loading) {
@@ -379,7 +393,7 @@ export default function ProgressiveTableWithPagination({
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          {subtitle} (第 {currentPage}/{pagination.totalPages} 页，共 {pagination.total} 条记录)
+          {subtitle} (第 {currentPage}/{Math.max(pagination.totalPages, 1)} 页，共 {pagination.total} 条记录)
           {pageLoading && (
             <span className="ml-2 inline-flex items-center">
               <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600 mr-1 inline-block"></span>

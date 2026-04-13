@@ -608,6 +608,16 @@ export async function getProfitAnalysisData(
   const queryStartDate = startDate || defaultStartDate;
   const queryEndDate = endDate || today;
 
+  /** 发货日期字符串下界（YYYY-MM-DD），缩小全表扫描；可通过环境变量拉长窗口 */
+  const lookbackYears = Math.min(
+    30,
+    Math.max(1, parseInt(process.env.PROFIT_SALES_LOOKBACK_YEARS || '10', 10) || 10)
+  );
+  const salesScanStart = new Date(today);
+  salesScanStart.setFullYear(salesScanStart.getFullYear() - lookbackYears);
+  salesScanStart.setHours(0, 0, 0, 0);
+  const minDeliveryDateStr = formatDate(salesScanStart);
+
   // 查询销售数据
   let salesData;
   try {
@@ -618,6 +628,10 @@ export async function getProfitAnalysisData(
         },
         settlementQuantity: {
           not: null,
+        },
+        deliveryDate: {
+          not: null,
+          gte: minDeliveryDateStr,
         },
       },
       select: {
@@ -630,7 +644,11 @@ export async function getProfitAnalysisData(
         totalSettlementAmount: true,
       },
     });
-    console.log(`✅ 成功查询到 ${salesData.length} 条销售数据`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `✅ 销售数据 ${salesData.length} 条（delivery_date >= ${minDeliveryDateStr}，回溯 ${lookbackYears} 年）`
+      );
+    }
   } catch (error) {
     console.error('查询销售数据失败:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -662,7 +680,7 @@ export async function getProfitAnalysisData(
     console.log('⚠️ 未查询到销售数据，返回空结果');
   }
 
-  // 销售明细：使用全部有有效日期的数据，不按 30 天过滤，以便展示所有利润分析明细
+  // 销售明细：在发货日期下界之后、有有效日期的数据（明细表仍展示窗口内全部单）
   const validSalesForDetails = salesData.filter(sale => parseDeliveryDate(sale.deliveryDate) !== null);
   // 汇总/图表仍基于 salesDetails 再按 queryStartDate/queryEndDate 过滤计算
 
@@ -700,8 +718,8 @@ export async function getProfitAnalysisData(
     console.warn('获取加工成本配置失败（表可能不存在）:', error);
   }
 
-  // 批量处理销售数据（限制并发数）- 使用全部明细数据
-  const BATCH_SIZE = 10;
+  // 批量处理销售数据（适当提高并发，减轻总耗时）
+  const BATCH_SIZE = 24;
   for (let i = 0; i < validSalesForDetails.length; i += BATCH_SIZE) {
     const batch = validSalesForDetails.slice(i, i + BATCH_SIZE);
     const batchResults = await Promise.all(
