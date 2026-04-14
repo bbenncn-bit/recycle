@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
 
@@ -36,6 +36,7 @@ export async function GET(request: Request) {
       select: {
         warehouseDate: true,
         inboundTime: true,
+        warehouseArea: true,
         material: true,
         estimatedDryBasis: true,
         deduction: true,
@@ -60,10 +61,11 @@ export async function GET(request: Request) {
       return !!date && date >= startDate && date <= endDate;
     });
 
-    // 按毛料类型汇总：总扣杂、总结算吨位、总结算金额、平均采购单价、平均扣杂率
+    // 按 库区 + 毛料类型 汇总：总扣杂、总结算吨位、总结算金额、平均采购单价、平均扣杂率
     const grouped = new Map<
       string,
       {
+        area: string;
         material: string;
         totalDeduction: number;
         totalQty: number;
@@ -72,6 +74,7 @@ export async function GET(request: Request) {
     >();
 
     for (const row of filtered) {
+      const area = (row.warehouseArea || '未分区').trim() || '未分区';
       const material = (row.material || '未分类').trim() || '未分类';
       const qty = row.estimatedDryBasis != null ? Number(row.estimatedDryBasis.toString()) : 0;
       const deduction = row.deduction != null ? Number(row.deduction.toString()) : 0;
@@ -80,7 +83,9 @@ export async function GET(request: Request) {
           ? Number(row.totalPriceExcludingTax.toString())
           : (row.unitPriceExcludingTax != null ? Number(row.unitPriceExcludingTax.toString()) : 0) * qty;
 
-      const existing = grouped.get(material) || {
+      const key = `${area}__${material}`;
+      const existing = grouped.get(key) || {
+        area,
         material,
         totalDeduction: 0,
         totalQty: 0,
@@ -89,7 +94,7 @@ export async function GET(request: Request) {
       existing.totalDeduction += Number.isFinite(deduction) ? deduction : 0;
       existing.totalQty += Number.isFinite(qty) ? qty : 0;
       existing.totalAmount += Number.isFinite(amount) ? amount : 0;
-      grouped.set(material, existing);
+      grouped.set(key, existing);
     }
 
     const exportRows = Array.from(grouped.values())
@@ -99,19 +104,75 @@ export async function GET(request: Request) {
         const avgDeductionRate = item.totalQty > 0 ? (item.totalDeduction / item.totalQty) * 100 : 0;
         return {
           序号: index + 1,
+          库区: item.area,
           毛料类型: item.material,
-          总扣杂: Number(item.totalDeduction.toFixed(3)),
-          总结算吨位: Number(item.totalQty.toFixed(3)),
-          总结算金额: Number(item.totalAmount.toFixed(2)),
-          平均采购单价: Number(avgUnitPrice.toFixed(2)),
+          '总扣杂/吨': Number(item.totalDeduction.toFixed(3)),
+          '总结算吨位/吨': Number(item.totalQty.toFixed(3)),
+          '总结算金额/元': Number(item.totalAmount.toFixed(2)),
+          '平均采购单价/元': Number(avgUnitPrice.toFixed(2)),
           平均扣杂率: `${avgDeductionRate.toFixed(2)}%`,
         };
       });
 
-    const worksheet = XLSX.utils.json_to_sheet(exportRows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, '成本分析导出');
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('毛料汇总');
+
+    const columns = [
+      { header: '序号', key: '序号' },
+      { header: '库区', key: '库区' },
+      { header: '毛料类型', key: '毛料类型' },
+      { header: '总扣杂/吨', key: '总扣杂/吨' },
+      { header: '总结算吨位/吨', key: '总结算吨位/吨' },
+      { header: '总结算金额/元', key: '总结算金额/元' },
+      { header: '平均采购单价/元', key: '平均采购单价/元' },
+      { header: '平均扣杂率', key: '平均扣杂率' },
+    ] as const;
+
+    sheet.columns = columns.map((c) => ({
+      header: c.header,
+      key: c.key,
+      width: Math.max(12, c.header.length + 2),
+    }));
+
+    exportRows.forEach((row) => sheet.addRow(row));
+
+    // 统一字体与边框
+    sheet.eachRow((row, rowNumber) => {
+      row.eachCell((cell) => {
+        cell.font = {
+          name: 'Microsoft YaHei',
+          size: 11,
+          bold: rowNumber === 1,
+        };
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+    });
+
+    // 头行强调
+    const headerRow = sheet.getRow(1);
+    headerRow.height = 22;
+
+    // 按内容自动扩宽，避免挤在一起
+    sheet.columns.forEach((col) => {
+      let maxLength = col.width ?? 10;
+      col.eachCell?.({ includeEmpty: true }, (cell) => {
+        const text = cell.value == null ? '' : String(cell.value);
+        maxLength = Math.max(maxLength, text.length + 4);
+      });
+      col.width = Math.min(Math.max(maxLength, 12), 40);
+    });
+
+    const arrayBuffer = await workbook.xlsx.writeBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     const filename = `毛料采购汇总_${startDateStr}_至_${endDateStr}.xlsx`;
     return new NextResponse(buffer, {
