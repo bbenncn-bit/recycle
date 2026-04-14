@@ -21,28 +21,6 @@
       "layer": {
         "app/page": "action-browser"
       }
-    },
-    "007bdc543d6c02c9b56604da0b10dc24e64a584e4e": {
-      "workers": {
-        "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfg%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%2240dd528f04fa8250447e525bb51b1127121e469ee9%22%2C%22exportedName%22%3A%22getReceiptfgDataBatch%22%7D%5D%5D%2C%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfc%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%22401f0c62d6d732bc97e961cdc0742dbfefe40725cc%22%2C%22exportedName%22%3A%22getReceiptfcDataBatch%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/page": "action-browser"
-      }
-    },
-    "00bee44bb756429f91e60e658dcf3363a5544b655a": {
-      "workers": {
-        "app/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfg%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%2240dd528f04fa8250447e525bb51b1127121e469ee9%22%2C%22exportedName%22%3A%22getReceiptfgDataBatch%22%7D%5D%5D%2C%5B%22E%3A%5C%5Cpxrecycle%5C%5Csrc%5C%5Capp%5C%5Capi%5C%5Creceiptfc%5C%5Cfetch-batch.ts%22%2C%5B%7B%22id%22%3A%22401f0c62d6d732bc97e961cdc0742dbfefe40725cc%22%2C%22exportedName%22%3A%22getReceiptfcDataBatch%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/page": "action-browser"
-      }
     }
   },
   "edge": {},

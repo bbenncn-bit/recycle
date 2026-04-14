@@ -45,6 +45,25 @@ export interface ProfitAnalysisData {
     immediateRefund: number;       // 即征即退（元）
     governmentSupport: number;     // 政府扶持资金（元）
     profit: number;                // 利润（元）
+    costParamSnapshot?: {          // 其它成本核算参数快照（用于前端核对）
+      salesUnitExclTax: number;                // 销售单价（不含税，元/吨）
+      materialUnitExclTax: number;             // 材料单价（不含税，元/吨）
+      warehouseTaxRate: number;                // 入库单加权税率（小数，如 0.13 表示 13%）
+      transportPerTon: number;                 // 运输费（元/吨）
+      processingFeeForRefundPerTon: number;    // 加工费参数（元/吨）
+      taxMainRate: number;                     // 主税率（小数，如 0.10）
+      taxExtraRate: number;                    // 附加税率（小数，如 0.0005）
+      taxBasePerTon: number;                   // 税费基数（元/吨）
+      taxPerTon: number;                       // 税费（元/吨）
+      instantRefundRate: number;               // 即征即退比例（小数）
+      govSubsidyRate41: number;                // 政府扶持比例 41%（小数）
+      govSubsidyRate70: number;                // 政府扶持比例 70%（小数）
+      govSubsidyRate38: number;                // 政府扶持比例 38%（小数）
+      govSubsidyRate10: number;                // 政府扶持比例 10%（小数）
+      govSubsidyRate80: number;                // 政府扶持比例 80%（小数）
+      govSubsidyRate003: number;               // 政府扶持比例 0.03%（小数）
+      govSubsidyRate100: number;               // 政府扶持比例 100%（小数）
+    };
     materialComposition: Array<{   // 原材料构成（与 MaterialCostCache 一致：quantity 吨, cost 元）
       material: string;
       quantity: number;
@@ -464,18 +483,19 @@ function buildParamSnapshot(
     taxRateExtra: v('tax_rate_extra') || 0.05,
     processingFeeForRefund: v('processing_fee_for_refund') || DEFAULT_PROCESSING_COST_PER_TON,
     instantRefundRate: v('instant_refund_rate') || 30,
-    govSubsidyRate41: v('gov_subsidy_rate_41') ?? 41,
-    govSubsidyRate10: v('gov_subsidy_rate_10') ?? 10,
-    govSubsidyRate80: v('gov_subsidy_rate_80') ?? 80,
-    govSubsidyRate003: v('gov_subsidy_rate_003') ?? 0.03,
-    govSubsidyRate100: v('gov_subsidy_rate_100') ?? 100,
-    govSubsidyRate70: v('gov_subsidy_rate_70') ?? 70,
-    govSubsidyRate38: v('gov_subsidy_rate_38') ?? 38,
-    discountRatePinggang: vMill('discount_rate_pinggang') ?? 2.175,
-    collectionDaysPinggang: vMill('collection_days_pinggang') ?? 18,
-    collectionDaysJigang: vMill('collection_days_jigang') ?? 12,
-    collectionDaysXingang: vMill('collection_days_xingang') ?? 37,
-    interestRateAnnual: v('interest_rate_annual') ?? 3,
+    // getEffectiveParamValue 未命中时返回 0，这里用 || 回退默认值，避免关键参数被 0 覆盖
+    govSubsidyRate41: v('gov_subsidy_rate_41') || 41,
+    govSubsidyRate10: v('gov_subsidy_rate_10') || 10,
+    govSubsidyRate80: v('gov_subsidy_rate_80') || 80,
+    govSubsidyRate003: v('gov_subsidy_rate_003') || 0.03,
+    govSubsidyRate100: v('gov_subsidy_rate_100') || 100,
+    govSubsidyRate70: v('gov_subsidy_rate_70') || 70,
+    govSubsidyRate38: v('gov_subsidy_rate_38') || 38,
+    discountRatePinggang: vMill('discount_rate_pinggang') || 2.175,
+    collectionDaysPinggang: vMill('collection_days_pinggang') || 18,
+    collectionDaysJigang: vMill('collection_days_jigang') || 12,
+    collectionDaysXingang: vMill('collection_days_xingang') || 37,
+    interestRateAnnual: v('interest_rate_annual') || 3,
   };
 }
 
@@ -504,6 +524,20 @@ async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
     console.warn('加载 ProfitParamConfig 失败，将使用默认常量:', e);
     return [];
   }
+}
+
+/**
+ * 归一化入库税率到「小数比率」：
+ * - 13   -> 0.13（13%）
+ * - 1    -> 0.01（1%）
+ * - 0.13 -> 0.13（13%，部分来源直接存小数）
+ */
+function normalizeWarehouseTaxRate(raw: number): number {
+  const v = Number.isFinite(raw) ? raw : 0;
+  if (v <= 0) return 0;
+  if (v > 1) return v / 100;
+  if (v === 1) return 0.01;
+  return v;
 }
 
 /**
@@ -545,7 +579,7 @@ async function getWeightedAvgTaxRate(
         if (row.taxRate == null) continue;
         if (!bestDate || whDate.getTime() > bestDate.getTime()) {
           bestDate = whDate;
-          bestRate = processDecimal(row.taxRate) / 100;
+          bestRate = normalizeWarehouseTaxRate(processDecimal(row.taxRate));
         }
       }
       if (bestRate != null) taxRates.set(mat, bestRate);
@@ -779,13 +813,16 @@ export async function getProfitAnalysisData(
           const transportPerTon = getTransportPerTonFromSnapshot(paramSnapshot, customer);
           const taxMain = paramSnapshot.taxRateMain / 100;
           const taxExtra = paramSnapshot.taxRateExtra / 100;
+          const taxBasePerTon =
+            quantity > 0
+              ? salesUnitExclTax * 0.13 -
+                materialUnitExclTax * warehouseTaxRate -
+                transportPerTon * 0.03 -
+                paramSnapshot.processingFeeForRefund * 0.09
+              : 0;
           const taxPerTon =
             quantity > 0
-              ? (salesUnitExclTax * 0.13 -
-                  materialUnitExclTax * warehouseTaxRate -
-                  transportPerTon * 0.03 -
-                  paramSnapshot.processingFeeForRefund * 0.09) *
-                  taxMain +
+              ? taxBasePerTon * taxMain +
                 (salesUnitExclTax + materialUnitExclTax) * taxExtra
               : 0;
           const discountPerTon = getDiscountPerTonFromSnapshot(salesUnitExclTax, customer, paramSnapshot);
@@ -801,7 +838,7 @@ export async function getProfitAnalysisData(
           // 其它收入项：即征即退 + 政府扶持资金（参数来自 ProfitParamConfig，按发货日期取生效值）
           let immediateRefundPerTon = 0;
           let governmentSupportPerTon = 0;
-          if (customer === '萍钢' || customer === '新钢') {
+          if (customer === '萍钢' || customer === '新钢' || customer === '吉钢') {
             const baseTransport = getTransportPerTonFromSnapshot(paramSnapshot, customer);
             const taxBasePerTon =
               salesUnitExclTax * 0.13 -
@@ -809,19 +846,27 @@ export async function getProfitAnalysisData(
               baseTransport * 0.03 -
               paramSnapshot.processingFeeForRefund * 0.09;
 
-            const irRate = paramSnapshot.instantRefundRate / 100;
-            immediateRefundPerTon = taxBasePerTon * irRate;
-
             const r70 = paramSnapshot.govSubsidyRate70 / 100;
             const r38 = paramSnapshot.govSubsidyRate38 / 100;
+            const r41 = paramSnapshot.govSubsidyRate41 / 100;
             const r10 = paramSnapshot.govSubsidyRate10 / 100;
             const r80 = paramSnapshot.govSubsidyRate80 / 100;
             const r003 = paramSnapshot.govSubsidyRate003 / 100;
             const r100 = paramSnapshot.govSubsidyRate100 / 100;
-            governmentSupportPerTon =
-              taxBasePerTon * r70 * r38 +
+            const commonSupportPerTon =
               taxBasePerTon * r10 * r80 +
               (salesUnitExclTax + materialUnitExclTax) * r003 * r100;
+
+            if (customer === '吉钢') {
+              // 吉钢：无即征即退；政府扶持按「税费基数×41% + 税费基数×10%×80% + (销+材)×0.03%×100%」
+              immediateRefundPerTon = 0;
+              governmentSupportPerTon = taxBasePerTon * r41 + commonSupportPerTon;
+            } else {
+              // 萍钢/新钢：含即征即退；政府扶持按「税费基数×70%×38% + 税费基数×10%×80% + (销+材)×0.03%×100%」
+              const irRate = paramSnapshot.instantRefundRate / 100;
+              immediateRefundPerTon = taxBasePerTon * irRate;
+              governmentSupportPerTon = taxBasePerTon * r70 * r38 + commonSupportPerTon;
+            }
           }
 
           const immediateRefund = immediateRefundPerTon * quantity;
@@ -849,6 +894,25 @@ export async function getProfitAnalysisData(
             immediateRefund,
             governmentSupport,
             profit,
+            costParamSnapshot: {
+              salesUnitExclTax,
+              materialUnitExclTax,
+              warehouseTaxRate,
+              transportPerTon,
+              processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,
+              taxMainRate: taxMain,
+              taxExtraRate: taxExtra,
+              taxBasePerTon,
+              taxPerTon,
+              instantRefundRate: paramSnapshot.instantRefundRate / 100,
+              govSubsidyRate41: paramSnapshot.govSubsidyRate41 / 100,
+              govSubsidyRate70: paramSnapshot.govSubsidyRate70 / 100,
+              govSubsidyRate38: paramSnapshot.govSubsidyRate38 / 100,
+              govSubsidyRate10: paramSnapshot.govSubsidyRate10 / 100,
+              govSubsidyRate80: paramSnapshot.govSubsidyRate80 / 100,
+              govSubsidyRate003: paramSnapshot.govSubsidyRate003 / 100,
+              govSubsidyRate100: paramSnapshot.govSubsidyRate100 / 100,
+            },
             materialComposition: composition,
             productionRecords,
           };
@@ -873,6 +937,25 @@ export async function getProfitAnalysisData(
             immediateRefund: 0,
             governmentSupport: 0,
             profit: 0,
+            costParamSnapshot: {
+              salesUnitExclTax: 0,
+              materialUnitExclTax: 0,
+              warehouseTaxRate: 0,
+              transportPerTon: 0,
+              processingFeeForRefundPerTon: 0,
+              taxMainRate: 0,
+              taxExtraRate: 0,
+              taxBasePerTon: 0,
+              taxPerTon: 0,
+              instantRefundRate: 0,
+              govSubsidyRate41: 0,
+              govSubsidyRate70: 0,
+              govSubsidyRate38: 0,
+              govSubsidyRate10: 0,
+              govSubsidyRate80: 0,
+              govSubsidyRate003: 0,
+              govSubsidyRate100: 0,
+            },
             materialComposition: [],
             productionRecords: [],
           };

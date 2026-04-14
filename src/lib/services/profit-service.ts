@@ -7,6 +7,18 @@ export interface CostAnalysisData {
     weekCost: number;
     monthCost: number;
     avgDailyCost: number;
+    todayBaseSelfCost: number;
+    todayBaseSelfQty: number;
+    todayBasePurchaseCost: number;
+    todayBasePurchaseQty: number;
+    weekBaseSelfCost: number;
+    weekBaseSelfQty: number;
+    weekBasePurchaseCost: number;
+    weekBasePurchaseQty: number;
+    monthBaseSelfCost: number;
+    monthBaseSelfQty: number;
+    monthBasePurchaseCost: number;
+    monthBasePurchaseQty: number;
   };
   weekCostBreakdown: {
     days: string[]; // 周一到周日
@@ -28,6 +40,9 @@ export interface CostAnalysisData {
     baseSelf: number[]; // 基地收货（SH）
     basePurchase: number[]; // 基地买货（TH）
     collaboration: number[]; // 协同业务（其他）
+    baseSelfQty: number[]; // 基地收货吨数（吨）
+    basePurchaseQty: number[]; // 基地买货吨数（吨）
+    collaborationQty: number[]; // 协同业务吨数（吨）
   };
   // 基地收货（SH）的物料类型分布
   categoryDistributionBaseSelf: {
@@ -151,11 +166,26 @@ function processCostData(value: any): number {
  * 按 receiptNo 分类：基地收货（SH）、基地买货（TH）、协同业务（其他）
  */
 function calculateDailyCost(
-  data: Array<{ warehouseDate: string | null; totalPriceIncludingTax: any; receiptNo: string | null }>,
+  data: Array<{ warehouseDate: string | null; totalPriceIncludingTax: any; receiptNo: string | null; netWeight: any }>,
   startDate: Date,
   endDate: Date
-): { dates: string[]; baseSelf: number[]; basePurchase: number[]; collaboration: number[] } {
-  const dateMap = new Map<string, { baseSelf: number; basePurchase: number; collaboration: number }>();
+): {
+  dates: string[];
+  baseSelf: number[];
+  basePurchase: number[];
+  collaboration: number[];
+  baseSelfQty: number[];
+  basePurchaseQty: number[];
+  collaborationQty: number[];
+} {
+  const dateMap = new Map<string, {
+    baseSelf: number;
+    basePurchase: number;
+    collaboration: number;
+    baseSelfQty: number;
+    basePurchaseQty: number;
+    collaborationQty: number;
+  }>();
   
   // 获取今天日期，确保不包含未来日期
   const today = new Date();
@@ -166,7 +196,14 @@ function calculateDailyCost(
   const currentDate = new Date(startDate);
   while (currentDate <= actualEndDate) {
     const dateKey = formatDate(currentDate);
-    dateMap.set(dateKey, { baseSelf: 0, basePurchase: 0, collaboration: 0 });
+    dateMap.set(dateKey, {
+      baseSelf: 0,
+      basePurchase: 0,
+      collaboration: 0,
+      baseSelfQty: 0,
+      basePurchaseQty: 0,
+      collaborationQty: 0,
+    });
     currentDate.setDate(currentDate.getDate() + 1);
   }
   
@@ -181,16 +218,27 @@ function calculateDailyCost(
     if (date >= startDate && date <= actualEndDate) {
       const dateKey = formatDate(date);
       const cost = processCostData(item.totalPriceIncludingTax);
-      const dayData = dateMap.get(dateKey) || { baseSelf: 0, basePurchase: 0, collaboration: 0 };
+      const qty = processCostData(item.netWeight);
+      const dayData = dateMap.get(dateKey) || {
+        baseSelf: 0,
+        basePurchase: 0,
+        collaboration: 0,
+        baseSelfQty: 0,
+        basePurchaseQty: 0,
+        collaborationQty: 0,
+      };
       
       // 根据 receiptNo 前两个字母分类
       const receiptNo = (item.receiptNo || '').toUpperCase();
       if (receiptNo.startsWith('SH')) {
         dayData.baseSelf += cost;
+        dayData.baseSelfQty += qty;
       } else if (receiptNo.startsWith('TH')) {
         dayData.basePurchase += cost;
+        dayData.basePurchaseQty += qty;
       } else {
         dayData.collaboration += cost;
+        dayData.collaborationQty += qty;
       }
       
       dateMap.set(dateKey, dayData);
@@ -207,6 +255,9 @@ function calculateDailyCost(
     baseSelf: sortedEntries.map(([, data]) => parseFloat((data.baseSelf / 10000).toFixed(2))), // 转换为万元，保留2位小数
     basePurchase: sortedEntries.map(([, data]) => parseFloat((data.basePurchase / 10000).toFixed(2))),
     collaboration: sortedEntries.map(([, data]) => parseFloat((data.collaboration / 10000).toFixed(2))),
+    baseSelfQty: sortedEntries.map(([, data]) => parseFloat(data.baseSelfQty.toFixed(2))),
+    basePurchaseQty: sortedEntries.map(([, data]) => parseFloat(data.basePurchaseQty.toFixed(2))),
+    collaborationQty: sortedEntries.map(([, data]) => parseFloat(data.collaborationQty.toFixed(2))),
   };
 }
 
@@ -596,6 +647,37 @@ export async function getCostAnalysisData(
     (sum, item) => sum + processCostData(item.totalPriceIncludingTax),
     0
   ) / 10000).toFixed(2));
+
+  const summarizeBaseSelfAndPurchase = (
+    rows: Array<{ receiptNo: string | null; totalPriceIncludingTax: any; netWeight: any }>
+  ) => {
+    let baseSelfCost = 0;
+    let baseSelfQty = 0;
+    let basePurchaseCost = 0;
+    let basePurchaseQty = 0;
+    for (const row of rows) {
+      const receiptNo = (row.receiptNo || '').toUpperCase();
+      const cost = processCostData(row.totalPriceIncludingTax);
+      const qty = processCostData(row.netWeight);
+      if (receiptNo.startsWith('SH')) {
+        baseSelfCost += cost;
+        baseSelfQty += qty;
+      } else if (receiptNo.startsWith('TH')) {
+        basePurchaseCost += cost;
+        basePurchaseQty += qty;
+      }
+    }
+    return {
+      baseSelfCost: parseFloat((baseSelfCost / 10000).toFixed(2)),
+      baseSelfQty: parseFloat(baseSelfQty.toFixed(2)),
+      basePurchaseCost: parseFloat((basePurchaseCost / 10000).toFixed(2)),
+      basePurchaseQty: parseFloat(basePurchaseQty.toFixed(2)),
+    };
+  };
+
+  const todaySplit = summarizeBaseSelfAndPurchase(todayData);
+  const weekSplit = summarizeBaseSelfAndPurchase(weekData);
+  const monthSplit = summarizeBaseSelfAndPurchase(monthData);
   
   // 计算当月平均日成本（从当月1日到当前日期）
   const currentMonthStart = new Date(todayForCalc);
@@ -687,6 +769,18 @@ export async function getCostAnalysisData(
       weekCost: weekCost || 0,
       monthCost: monthCost || 0,
       avgDailyCost: avgDailyCost || 0,
+      todayBaseSelfCost: todaySplit.baseSelfCost,
+      todayBaseSelfQty: todaySplit.baseSelfQty,
+      todayBasePurchaseCost: todaySplit.basePurchaseCost,
+      todayBasePurchaseQty: todaySplit.basePurchaseQty,
+      weekBaseSelfCost: weekSplit.baseSelfCost,
+      weekBaseSelfQty: weekSplit.baseSelfQty,
+      weekBasePurchaseCost: weekSplit.basePurchaseCost,
+      weekBasePurchaseQty: weekSplit.basePurchaseQty,
+      monthBaseSelfCost: monthSplit.baseSelfCost,
+      monthBaseSelfQty: monthSplit.baseSelfQty,
+      monthBasePurchaseCost: monthSplit.basePurchaseCost,
+      monthBasePurchaseQty: monthSplit.basePurchaseQty,
     },
     weekCostBreakdown: {
       days: weekCostBreakdown.days.length > 0 ? weekCostBreakdown.days : ['周一\n--', '周二\n--', '周三\n--', '周四\n--', '周五\n--', '周六\n--', '周日\n--'],
@@ -700,6 +794,9 @@ export async function getCostAnalysisData(
       baseSelf: dailyTrend.baseSelf.length > 0 ? dailyTrend.baseSelf : [],
       basePurchase: dailyTrend.basePurchase.length > 0 ? dailyTrend.basePurchase : [],
       collaboration: dailyTrend.collaboration.length > 0 ? dailyTrend.collaboration : [],
+      baseSelfQty: dailyTrend.baseSelfQty.length > 0 ? dailyTrend.baseSelfQty : [],
+      basePurchaseQty: dailyTrend.basePurchaseQty.length > 0 ? dailyTrend.basePurchaseQty : [],
+      collaborationQty: dailyTrend.collaborationQty.length > 0 ? dailyTrend.collaborationQty : [],
     },
     categoryDistributionBaseSelf: {
       categories: categoryDistributionBaseSelf.categories.length > 0 ? categoryDistributionBaseSelf.categories : [],

@@ -63,6 +63,25 @@ interface ProfitAnalysisData {
     immediateRefund: number;
     governmentSupport: number;
     profit: number;
+    costParamSnapshot?: {
+      salesUnitExclTax: number;
+      materialUnitExclTax: number;
+      warehouseTaxRate: number;
+      transportPerTon: number;
+      processingFeeForRefundPerTon: number;
+      taxMainRate: number;
+      taxExtraRate: number;
+      taxBasePerTon: number;
+      taxPerTon: number;
+      instantRefundRate: number;
+      govSubsidyRate41: number;
+      govSubsidyRate70: number;
+      govSubsidyRate38: number;
+      govSubsidyRate10: number;
+      govSubsidyRate80: number;
+      govSubsidyRate003: number;
+      govSubsidyRate100: number;
+    };
     materialComposition: Array<{
       material: string;
       quantity: number;
@@ -1084,6 +1103,24 @@ export default function ProfitAnalysis() {
               const interestPerTon = qty > 0 ? interest / qty : 0;
               const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
               const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
+              const snap = s.costParamSnapshot;
+              const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
+              const snapMaterialExTax = snap?.materialUnitExclTax ?? materialUnitExclTax;
+              const snapWarehouseTaxRate = snap?.warehouseTaxRate ?? 0;
+              const snapTransportPerTon = snap?.transportPerTon ?? transportPerTon;
+              const snapProcessFeePerTon = snap?.processingFeeForRefundPerTon ?? 0;
+              const snapTaxMain = snap?.taxMainRate ?? 0;
+              const snapTaxExtra = snap?.taxExtraRate ?? 0;
+              const snapTaxBasePerTon =
+                snap?.taxBasePerTon ??
+                (snapSalesExTax * 0.13 -
+                  snapMaterialExTax * snapWarehouseTaxRate -
+                  snapTransportPerTon * 0.03 -
+                  snapProcessFeePerTon * 0.09);
+              const snapTaxPerTon = snap?.taxPerTon ?? taxPerTon;
+              const snapTaxFormulaMainPerTon = snapTaxBasePerTon * snapTaxMain;
+              const snapTaxFormulaExtraPerTon =
+                (snapSalesExTax + snapMaterialExTax) * snapTaxExtra;
               return (
                 <>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -1105,13 +1142,27 @@ export default function ProfitAnalysis() {
                   </div>
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
                     <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                      本单实际参数快照（系统用于核算）
+                    </h4>
+                    <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside mb-2">
+                      <li>销售单价(不含税): {snapSalesExTax.toFixed(2)} 元/吨</li>
+                      <li>材料单价(不含税): {snapMaterialExTax.toFixed(2)} 元/吨</li>
+                      <li>入库单加权税率: {(snapWarehouseTaxRate * 100).toFixed(4)}%</li>
+                      <li>运输费: {snapTransportPerTon.toFixed(2)} 元/吨；加工费参数: {snapProcessFeePerTon.toFixed(2)} 元/吨</li>
+                      <li>主税率: {(snapTaxMain * 100).toFixed(2)}%；附加税率: {(snapTaxExtra * 100).toFixed(4)}%</li>
+                      <li>税费基数: {snapTaxBasePerTon.toFixed(4)} 元/吨；税费: {snapTaxPerTon.toFixed(4)} 元/吨</li>
+                    </ul>
+                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
                       计算公式（按吨）概览
                     </h4>
                     <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
-                      <li>销售单价(不含税) ≈ {salesUnitExclTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
-                      <li>材料单价(不含税) ≈ {materialUnitExclTax.toFixed(2)} 元/吨 = 材料成本 / 结算量</li>
+                      <li>销售单价(不含税) ≈ {snapSalesExTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
+                      <li>材料单价(不含税) ≈ {snapMaterialExTax.toFixed(2)} 元/吨 = 材料成本 / 结算量</li>
                       <li>运输费: 客户对应的运价(含税/1.03) × 结算量</li>
                       <li>税费: (销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%)×10% + (销售单价+材料单价)×0.05%</li>
+                      <li className="text-amber-700 dark:text-amber-300">
+                        代入: ({snapSalesExTax.toFixed(2)}×13% − {snapMaterialExTax.toFixed(2)}×{(snapWarehouseTaxRate * 100).toFixed(4)}% − {snapTransportPerTon.toFixed(2)}×3% − {snapProcessFeePerTon.toFixed(2)}×9%)×{(snapTaxMain * 100).toFixed(2)}% + ({snapSalesExTax.toFixed(2)}+{snapMaterialExTax.toFixed(2)})×{(snapTaxExtra * 100).toFixed(4)}% = {snapTaxFormulaMainPerTon.toFixed(4)} + {snapTaxFormulaExtraPerTon.toFixed(4)} = {snapTaxPerTon.toFixed(4)} 元/吨（本单税费 {tax.toFixed(2)} 元）
+                      </li>
                       <li>贴现费用: 仅萍钢 = 销售单价×1.13×2.175%</li>
                       <li>回款利息: 销售单价×1.13×3%/360×回款天数（萍钢18/吉钢12/新钢37）</li>
                     </ul>
@@ -1147,6 +1198,34 @@ export default function ProfitAnalysis() {
               const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
               const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
               const baseTransport = s.customer === '萍钢' ? 20.6 / 1.03 : s.customer === '新钢' ? 48 / 1.03 : 0;
+              const snap = s.costParamSnapshot;
+              const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
+              const snapMaterialExTax = snap?.materialUnitExclTax ?? materialUnitExclTax;
+              const snapWarehouseTaxRate = snap?.warehouseTaxRate ?? 0;
+              const snapTransportPerTon = snap?.transportPerTon ?? baseTransport;
+              const snapProcessFeePerTon = snap?.processingFeeForRefundPerTon ?? 0;
+              const snapTaxBasePerTon =
+                snap?.taxBasePerTon ??
+                (snapSalesExTax * 0.13 -
+                  snapMaterialExTax * snapWarehouseTaxRate -
+                  snapTransportPerTon * 0.03 -
+                  snapProcessFeePerTon * 0.09);
+              const snapIrRate = snap?.instantRefundRate ?? 0.3;
+              const r41 = snap?.govSubsidyRate41 ?? 0.41;
+              const r70 = snap?.govSubsidyRate70 ?? 0.7;
+              const r38 = snap?.govSubsidyRate38 ?? 0.38;
+              const r10 = snap?.govSubsidyRate10 ?? 0.1;
+              const r80 = snap?.govSubsidyRate80 ?? 0.8;
+              const r003 = snap?.govSubsidyRate003 ?? 0.0003;
+              const r100 = snap?.govSubsidyRate100 ?? 1;
+              const govTerm10x80PerTon = snapTaxBasePerTon * r10 * r80;
+              const govTerm003PerTon = (snapSalesExTax + snapMaterialExTax) * r003 * r100;
+              const immFormulaPerTon = snapTaxBasePerTon * snapIrRate;
+              const govFormulaMainPerTon =
+                s.customer === '吉钢'
+                  ? snapTaxBasePerTon * r41
+                  : snapTaxBasePerTon * r70 * r38;
+              const govFormulaPerTon = govFormulaMainPerTon + govTerm10x80PerTon + govTerm003PerTon;
               return (
                 <>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -1164,7 +1243,7 @@ export default function ProfitAnalysis() {
                       合计: {total.toFixed(2)} 元
                     </div>
                   </div>
-                  {(s.customer === '萍钢' || s.customer === '新钢') && (
+                  {(s.customer === '萍钢' || s.customer === '新钢' || s.customer === '吉钢') && (
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
                       <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
                         计算公式（按吨）概览
@@ -1174,8 +1253,29 @@ export default function ProfitAnalysis() {
                       </p>
                       <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
                         <li>税费基数 = 销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%</li>
-                        <li>即征即退 = 税费基数 × 30%</li>
-                        <li>政府扶持资金 = 税费基数×70%×38% + 税费基数×10%×80% + (销售单价+材料单价)×0.05%×100%</li>
+                        {s.customer === '吉钢' ? (
+                          <>
+                            <li>即征即退 = 0（吉钢不参与即征即退）</li>
+                            <li>政府扶持资金 = 税费基数×41% + 税费基数×10%×80% + (销售单价+材料单价)×0.03%×100%</li>
+                            <li className="text-emerald-700 dark:text-emerald-300">
+                              代入(即征即退): 0 元/吨
+                            </li>
+                            <li className="text-emerald-700 dark:text-emerald-300">
+                              代入(政府扶持): {snapTaxBasePerTon.toFixed(4)}×{(r41 * 100).toFixed(2)}% + {snapTaxBasePerTon.toFixed(4)}×{(r10 * 100).toFixed(2)}%×{(r80 * 100).toFixed(2)}% + ({snapSalesExTax.toFixed(2)}+{snapMaterialExTax.toFixed(2)})×{(r003 * 100).toFixed(4)}%×{(r100 * 100).toFixed(0)}% = {govFormulaMainPerTon.toFixed(4)} + {govTerm10x80PerTon.toFixed(4)} + {govTerm003PerTon.toFixed(4)} = {govFormulaPerTon.toFixed(4)} 元/吨（本单政府扶持 {gov.toFixed(2)} 元）
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            <li>即征即退 = 税费基数 × 30%</li>
+                            <li>政府扶持资金 = 税费基数×70%×38% + 税费基数×10%×80% + (销售单价+材料单价)×0.03%×100%</li>
+                            <li className="text-emerald-700 dark:text-emerald-300">
+                              代入(即征即退): {snapTaxBasePerTon.toFixed(4)}×{(snapIrRate * 100).toFixed(2)}% = {immFormulaPerTon.toFixed(4)} 元/吨（本单即征即退 {imm.toFixed(2)} 元）
+                            </li>
+                            <li className="text-emerald-700 dark:text-emerald-300">
+                              代入(政府扶持): {snapTaxBasePerTon.toFixed(4)}×{(r70 * 100).toFixed(2)}%×{(r38 * 100).toFixed(2)}% + {snapTaxBasePerTon.toFixed(4)}×{(r10 * 100).toFixed(2)}%×{(r80 * 100).toFixed(2)}% + ({snapSalesExTax.toFixed(2)}+{snapMaterialExTax.toFixed(2)})×{(r003 * 100).toFixed(4)}%×{(r100 * 100).toFixed(0)}% = {govFormulaMainPerTon.toFixed(4)} + {govTerm10x80PerTon.toFixed(4)} + {govTerm003PerTon.toFixed(4)} = {govFormulaPerTon.toFixed(4)} 元/吨（本单政府扶持 {gov.toFixed(2)} 元）
+                            </li>
+                          </>
+                        )}
                       </ul>
                     </div>
                   )}

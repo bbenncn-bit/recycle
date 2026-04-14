@@ -26,6 +26,18 @@ interface CostAnalysisData {
     weekCost: number;
     monthCost: number;
     avgDailyCost: number;
+    todayBaseSelfCost: number;
+    todayBaseSelfQty: number;
+    todayBasePurchaseCost: number;
+    todayBasePurchaseQty: number;
+    weekBaseSelfCost: number;
+    weekBaseSelfQty: number;
+    weekBasePurchaseCost: number;
+    weekBasePurchaseQty: number;
+    monthBaseSelfCost: number;
+    monthBaseSelfQty: number;
+    monthBasePurchaseCost: number;
+    monthBasePurchaseQty: number;
   };
   weekCostBreakdown: {
     days: string[];
@@ -47,6 +59,9 @@ interface CostAnalysisData {
     baseSelf: number[]; // 基地收货（SH）
     basePurchase: number[]; // 基地买货（TH）
     collaboration: number[]; // 协同业务（其他）
+    baseSelfQty: number[];
+    basePurchaseQty: number[];
+    collaborationQty: number[];
   };
   categoryDistributionBaseSelf: {
     categories: string[];
@@ -83,6 +98,9 @@ export default function CostAnalysis() {
   const [data, setData] = useState<CostAnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportStartDate, setExportStartDate] = useState('');
+  const [exportEndDate, setExportEndDate] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,6 +129,18 @@ export default function CostAnalysis() {
             weekCost: 0,
             monthCost: 0,
             avgDailyCost: 0,
+            todayBaseSelfCost: 0,
+            todayBaseSelfQty: 0,
+            todayBasePurchaseCost: 0,
+            todayBasePurchaseQty: 0,
+            weekBaseSelfCost: 0,
+            weekBaseSelfQty: 0,
+            weekBasePurchaseCost: 0,
+            weekBasePurchaseQty: 0,
+            monthBaseSelfCost: 0,
+            monthBaseSelfQty: 0,
+            monthBasePurchaseCost: 0,
+            monthBasePurchaseQty: 0,
           },
           weekCostBreakdown: {
             days: [],
@@ -123,6 +153,9 @@ export default function CostAnalysis() {
             baseSelf: [],
             basePurchase: [],
             collaboration: [],
+            baseSelfQty: [],
+            basePurchaseQty: [],
+            collaborationQty: [],
           },
           categoryDistributionBaseSelf: {
             categories: [],
@@ -161,6 +194,52 @@ export default function CostAnalysis() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    setExportStartDate(`${yyyy}-${mm}-01`);
+    setExportEndDate(`${yyyy}-${mm}-${dd}`);
+  }, []);
+
+  const handleExportData = async () => {
+    if (!exportStartDate || !exportEndDate) {
+      alert('请选择导出日期范围');
+      return;
+    }
+    if (exportStartDate > exportEndDate) {
+      alert('开始日期不能晚于结束日期');
+      return;
+    }
+    try {
+      setExporting(true);
+      const params = new URLSearchParams({
+        startDate: exportStartDate,
+        endDate: exportEndDate,
+      });
+      const response = await fetch(`/api/profit-management/cost-analysis/export?${params.toString()}`);
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || '导出失败');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `成本分析明细_${exportStartDate}_至_${exportEndDate}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '导出失败';
+      alert(msg);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   if (loading) {
     return <CostAnalysisSkeleton />;
@@ -210,17 +289,27 @@ export default function CostAnalysis() {
       },
       formatter: (params: any) => {
         let result = params[0].name + '<br/>';
-        let total = 0;
+        let totalCost = 0;
+        let totalQty = 0;
+        const idx = params?.[0]?.dataIndex ?? 0;
+        const selfQty = data.dailyTrend.baseSelfQty?.[idx] ?? 0;
+        const purchaseQty = data.dailyTrend.basePurchaseQty?.[idx] ?? 0;
+        const collaborationQty = data.dailyTrend.collaborationQty?.[idx] ?? 0;
         // 按顺序显示：基地收货、基地买货、协同业务
         const order = ['基地收货', '基地买货', '协同业务'];
         order.forEach(seriesName => {
           const param = params.find((p: any) => p.seriesName === seriesName);
           if (param) {
-            result += `${param.marker}${param.seriesName}: ${param.value.toFixed(2)} 万元<br/>`;
-            total += param.value;
+            const qty =
+              seriesName === '基地收货' ? selfQty :
+              seriesName === '基地买货' ? purchaseQty :
+              collaborationQty;
+            result += `${param.marker}${param.seriesName}: ${qty.toFixed(2)} 吨，合计 ${param.value.toFixed(2)} 万元<br/>`;
+            totalCost += param.value;
+            totalQty += qty;
           }
         });
-        result += `<b>总计: ${total.toFixed(2)} 万元</b>`;
+        result += `<b>总计: ${totalQty.toFixed(2)} 吨，${totalCost.toFixed(2)} 万元</b>`;
         return result;
       }
     },
@@ -331,7 +420,8 @@ export default function CostAnalysis() {
         const index = data.categoryDistributionBaseSelf.categories.indexOf(params.name);
         const avgPrice = index >= 0 ? data.categoryDistributionBaseSelf.avgPrices[index] : 0;
         const quantity = index >= 0 ? data.categoryDistributionBaseSelf.quantities[index] : 0;
-        return `${params.name}<br/>月平均采购吨价: ${avgPrice.toFixed(2)} 元/吨<br/>当月采购总吨数: ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
+        const costYuan = (Number(params.value) || 0) * 10000;
+        return `${params.name}<br/>成本: ${costYuan.toFixed(2)} 元<br/>平均单价: ${avgPrice.toFixed(2)} 元/吨<br/>数量: ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
       }
     },
     legend: {
@@ -356,7 +446,8 @@ export default function CostAnalysis() {
             const index = data.categoryDistributionBaseSelf.categories.indexOf(params.name);
             const avgPrice = index >= 0 ? data.categoryDistributionBaseSelf.avgPrices[index] : 0;
             const quantity = index >= 0 ? data.categoryDistributionBaseSelf.quantities[index] : 0;
-            return `${params.name}\n${avgPrice.toFixed(2)}元/吨\n${quantity.toFixed(2)}吨\n(${params.percent.toFixed(2)}%)`;
+            const costYuan = (Number(params.value) || 0) * 10000;
+            return `${params.name}\n成本:${costYuan.toFixed(2)}元\n平均单价:${avgPrice.toFixed(2)}元/吨\n数量:${quantity.toFixed(2)}吨\n(${params.percent.toFixed(2)}%)`;
           }
         },
         emphasis: {
@@ -816,17 +907,49 @@ export default function CostAnalysis() {
     ]
   };
 
+  const todayTotalQty = data.summary.todayBaseSelfQty + data.summary.todayBasePurchaseQty;
+  const weekTotalQty = data.summary.weekBaseSelfQty + data.summary.weekBasePurchaseQty;
+  const monthTotalQty = data.summary.monthBaseSelfQty + data.summary.monthBasePurchaseQty;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* 页面标题 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            成本分析
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            实时监控废钢采购成本，为经营决策提供数据支持
-          </p>
+        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              成本分析
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              实时监控废钢采购成本，为经营决策提供数据支持
+            </p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">导出数据（PurchaseWarehouse）</div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                type="date"
+                value={exportStartDate}
+                onChange={(e) => setExportStartDate(e.target.value)}
+                className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              <span className="text-gray-500 dark:text-gray-400 text-sm">至</span>
+              <input
+                type="date"
+                value={exportEndDate}
+                onChange={(e) => setExportEndDate(e.target.value)}
+                className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              <button
+                type="button"
+                onClick={handleExportData}
+                disabled={exporting}
+                className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {exporting ? '导出中...' : '导出数据'}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 统计卡片 */}
@@ -841,7 +964,13 @@ export default function CostAnalysis() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {data.summary.todayCost.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  万元，吨数 {todayTotalQty.toFixed(2)} 吨
+                </p>
+                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  <div>基地收货 {data.summary.todayBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.todayBaseSelfQty.toFixed(2)} 吨</div>
+                  <div>基地买货 {data.summary.todayBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.todayBasePurchaseQty.toFixed(2)} 吨</div>
+                </div>
                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                     平均日成本
@@ -868,6 +997,13 @@ export default function CostAnalysis() {
               <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                 {data.summary.weekCost.toFixed(2)} 万元
               </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                吨数 {weekTotalQty.toFixed(2)} 吨
+              </p>
+              <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <div>基地收货 {data.summary.weekBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.weekBaseSelfQty.toFixed(2)} 吨</div>
+                <div>基地买货 {data.summary.weekBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.weekBasePurchaseQty.toFixed(2)} 吨</div>
+              </div>
             </div>
             <LazyReactECharts
               option={{
@@ -1075,7 +1211,13 @@ export default function CostAnalysis() {
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {data.summary.monthCost.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  万元，吨数 {monthTotalQty.toFixed(2)} 吨
+                </p>
+                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  <div>基地收货 {data.summary.monthBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.monthBaseSelfQty.toFixed(2)} 吨</div>
+                  <div>基地买货 {data.summary.monthBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.monthBasePurchaseQty.toFixed(2)} 吨</div>
+                </div>
               </div>
               <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3">
                 <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

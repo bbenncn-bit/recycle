@@ -1,9 +1,6 @@
 {
-  "/api/receiptfc/route": "app/api/receiptfc/route.js",
-  "/api/receiptfg/route": "app/api/receiptfg/route.js",
-  "/api/profit-management/cost-analysis/route": "app/api/profit-management/cost-analysis/route.js",
-  "/api/profit-management/profit-analysis/route": "app/api/profit-management/profit-analysis/route.js",
-  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js",
+  "/api/profit-management/cost-analysis/export/route": "app/api/profit-management/cost-analysis/export/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/profit-management/profit-analysis/page": "app/profit-management/profit-analysis/page.js"
+  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js"
 }

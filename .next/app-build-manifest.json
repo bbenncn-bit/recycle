@@ -31,15 +31,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/profit-management/cost-analysis/route.js"
     ],
-    "/profit-management/profit-analysis/page": [
+    "/api/profit-management/cost-analysis/export/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/profit-management/profit-analysis/page.js"
+      "static/chunks/app/api/profit-management/cost-analysis/export/route.js"
     ],
-    "/api/profit-management/profit-analysis/route": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/profit-management/profit-analysis/route.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
