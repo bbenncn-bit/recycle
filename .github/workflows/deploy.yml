@@ -1,0 +1,21 @@
+name: Deploy to Win10 Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          cd "${{ secrets.PROJECT_PATH }}"
+          git pull origin main
+          npm install
+          npm run build
