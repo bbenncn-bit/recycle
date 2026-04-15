@@ -32,6 +32,7 @@ export interface ProfitAnalysisData {
     warehouse: string;
     customer: string;              // 发往客户
     settlementQuantity: number;   // 结算量（吨）
+    transitLoss: number;          // 途损率（如 0.005 表示 0.5%）
     revenue: number;               // 销售收入（元）
     materialCost: number;          // 材料成本（元）
     processingCost: number;        // 加工成本（元）
@@ -104,6 +105,16 @@ function processDecimal(value: any): number {
     return parseFloat(value.toString()) || 0;
   }
   return 0;
+}
+
+/** 将途损率标准化为小数：0.5% => 0.005；若已是小数则原样返回 */
+function normalizeTransitLossRate(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  // 容错：若传入的是百分数（如 2.316 表示 2.316%），转成小数 0.02316
+  if (value > 1) return value / 100;
+  // 业务上途损通常远小于 1%，若大于 0.2（20%）也按百分数处理，避免口径错配
+  if (value > 0.2) return value / 100;
+  return value;
 }
 
 /**
@@ -398,6 +409,8 @@ async function calculateProcessingCost(
 
 /** 加工费默认元/吨（用于税费公式，仅当 ProfitParamConfig 无配置时回退） */
 const DEFAULT_PROCESSING_COST_PER_TON = 70;
+/** 途损默认值（0.5%），当月无可用值时回退 */
+const DEFAULT_TRANSIT_LOSS_RATE = 0.005;
 
 /** ProfitParamConfig 单行（用于按发货日期取生效参数） */
 type ParamConfigRow = {
@@ -928,6 +941,7 @@ export async function getProfitAnalysisData(
         },
       },
       select: {
+        id: true,
         deliveryNumber: true,
         deliveryDate: true,
         productType: true,
@@ -935,6 +949,7 @@ export async function getProfitAnalysisData(
         customer: true,
         settlementQuantity: true,
         netWeight: true,
+        deductionRate: true,
         totalSettlementAmount: true,
       },
     });
@@ -978,8 +993,51 @@ export async function getProfitAnalysisData(
   const validSalesForDetails = salesData.filter(sale => parseDeliveryDate(sale.deliveryDate) !== null);
   // 汇总/图表仍基于 salesDetails 再按 queryStartDate/queryEndDate 过滤计算
 
+  // 优先从原表 transitloss 列读取途损（该列当前未在 Prisma model 中声明，用原生 SQL 读取）
+  const transitLossBySaleId = new Map<number, number>();
+  try {
+    const transitRows = await prisma.$queryRaw<Array<{ id: number; transitLoss: any }>>`
+      SELECT id, transitloss AS transitLoss
+      FROM DeliverySettlement
+      WHERE delivery_date IS NOT NULL
+        AND delivery_date >= ${minDeliveryDateStr}
+    `;
+    for (const row of transitRows) {
+      const v = normalizeTransitLossRate(processDecimal(row.transitLoss));
+      if (Number.isFinite(v) && v > 0) {
+        transitLossBySaleId.set(Number(row.id), v);
+      }
+    }
+  } catch (e) {
+    // 列不存在或权限受限时回退到 deductionRate（并做比例标准化）
+    console.warn('读取 DeliverySettlement.transitloss 失败，回退 deductionRate:', e);
+  }
+
   // 加载利润可调参数（按发货日期取生效值：变动日期起用 value，之前用 previous_value）
   const allParamRows = await loadAllParamConfigRows();
+  // 以“月”为单位统一途损（来源：DeliverySettlement.deductionRate；缺省回退 0.5%）
+  const monthlyTransitLossMap = new Map<string, number>();
+  const monthlyTransitLossAgg = new Map<string, { sum: number; count: number }>();
+  for (const sale of validSalesForDetails) {
+    const d = parseDeliveryDate(sale.deliveryDate);
+    if (!d) continue;
+    const monthKey = formatDate(d).slice(0, 7);
+    const rateFromTransit = transitLossBySaleId.get(Number(sale.id)) ?? 0;
+    const rateFromDeduction = normalizeTransitLossRate(processDecimal(sale.deductionRate));
+    const rate = rateFromTransit > 0 ? rateFromTransit : rateFromDeduction;
+    if (rate > 0) {
+      const cur = monthlyTransitLossAgg.get(monthKey) || { sum: 0, count: 0 };
+      cur.sum += rate;
+      cur.count += 1;
+      monthlyTransitLossAgg.set(monthKey, cur);
+    }
+  }
+  for (const [monthKey, agg] of monthlyTransitLossAgg.entries()) {
+    monthlyTransitLossMap.set(
+      monthKey,
+      agg.count > 0 ? agg.sum / agg.count : DEFAULT_TRANSIT_LOSS_RATE
+    );
+  }
 
   // 计算每笔销售的利润（按全部明细数据批量处理）
   const salesDetails: ProfitAnalysisData['salesDetails'] = [];
@@ -1022,12 +1080,21 @@ export async function getProfitAnalysisData(
           const revenue = processDecimal(sale.totalSettlementAmount);
           const quantity = processDecimal(sale.settlementQuantity);
           const netWeightQuantity = processDecimal(sale.netWeight);
-          // 材料成本按出厂净重（net_weight）核算；为空/无效时回退结算量
-          const materialCalcQuantity = netWeightQuantity > 0 ? netWeightQuantity : quantity;
           const productType = sale.productType || '';
           const customer = (sale.customer || '').trim();
 
           const deliveryDate = parseDeliveryDate(sale.deliveryDate) || new Date();
+          const monthKey = formatDate(deliveryDate).slice(0, 7);
+          const monthlyTransitLoss = monthlyTransitLossMap.get(monthKey);
+          const rateFromTransit = transitLossBySaleId.get(Number(sale.id)) ?? 0;
+          const rateFromDeduction = normalizeTransitLossRate(processDecimal(sale.deductionRate));
+          const rowTransitLoss = rateFromTransit > 0 ? rateFromTransit : rateFromDeduction;
+          // 当前以 DeliverySettlement.transitloss（月统一）为准，不再被参数表覆盖
+          const transitLoss =
+            monthlyTransitLoss ?? (rowTransitLoss > 0 ? rowTransitLoss : DEFAULT_TRANSIT_LOSS_RATE);
+          // 材料核算量 = 出厂净重 * (1 + 途损)；净重无效时回退结算量 * (1 + 途损)
+          const baseMaterialQty = netWeightQuantity > 0 ? netWeightQuantity : quantity;
+          const materialCalcQuantity = baseMaterialQty * (1 + transitLoss);
           const paramSnapshot = buildParamSnapshot(allParamRows, deliveryDate, customer);
 
           const unitProcessingCost = DEFAULT_PROCESSING_COST_PER_TON;
@@ -1146,6 +1213,7 @@ export async function getProfitAnalysisData(
             warehouse: sale.warehouse || '',
             customer: sale.customer || '',
             settlementQuantity: quantity,
+            transitLoss,
             revenue,
             materialCost,
             processingCost,
@@ -1190,6 +1258,7 @@ export async function getProfitAnalysisData(
             warehouse: sale.warehouse || '',
             customer: sale.customer || '',
             settlementQuantity: 0,
+            transitLoss: 0,
             revenue: 0,
             materialCost: 0,
             processingCost: 0,

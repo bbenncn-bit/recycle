@@ -51,6 +51,7 @@ interface ProfitAnalysisData {
     warehouse: string;
     customer: string;
     settlementQuantity: number;
+    transitLoss: number;
     revenue: number;
     materialCost: number;
     processingCost: number;
@@ -871,6 +872,7 @@ export default function ProfitAnalysis() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发往客户</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">结算量(吨)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">销售收入-含税(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">途损</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">材料成本(元)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">加工成本(元)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它成本项:运输费+税费+贴现+回款利息(元)</th>
@@ -882,7 +884,7 @@ export default function ProfitAnalysis() {
                 {paginatedDetails.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={11}
+                      colSpan={12}
                       className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
                       {data.provisional
@@ -903,6 +905,7 @@ export default function ProfitAnalysis() {
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.customer}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.settlementQuantity.toFixed(2)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.revenue.toFixed(2)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{((sale.transitLoss ?? 0) * 100).toFixed(3)}%</td>
                     <td
                       className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
                       onMouseEnter={(e) => {
