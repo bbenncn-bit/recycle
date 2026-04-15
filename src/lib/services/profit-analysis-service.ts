@@ -48,6 +48,7 @@ export interface ProfitAnalysisData {
     costParamSnapshot?: {          // 其它成本核算参数快照（用于前端核对）
       salesUnitExclTax: number;                // 销售单价（不含税，元/吨）
       materialUnitExclTax: number;             // 材料单价（不含税，元/吨）
+      materialCalcQuantity: number;            // 材料成本核算数量（吨，优先出厂净重 net_weight）
       warehouseTaxRate: number;                // 入库单加权税率（小数，如 0.13 表示 13%）
       transportPerTon: number;                 // 运输费（元/吨）
       processingFeeForRefundPerTon: number;    // 加工费参数（元/吨）
@@ -77,15 +78,15 @@ export interface ProfitAnalysisData {
       totalCost: number;
     }>;
   }>;
-  productComparison: {              // 当月与上月对比
-    products: string[];            // 成品名称列表
+  productComparison: {              // 当月与上月对比（按客户-成品）
+    labels: string[];               // 维度：客户-成品（如 吉钢-钢筋压块）
     currentMonth: {
-      materialUsagePerTon: number[];  // 当月每吨成品原材料使用量（吨）
-      processingCostPerTon: number[]; // 当月每吨成品加工成本（元/吨）
+      quantityTons: number[];       // 当月销量（吨）
+      avgUnitPriceInclTax: number[]; // 当月平均销售单价（含税，元/吨）
     };
     lastMonth: {
-      materialUsagePerTon: number[];  // 上月每吨成品原材料使用量（吨）
-      processingCostPerTon: number[]; // 上月每吨成品加工成本（元/吨）
+      quantityTons: number[];       // 上月销量（吨）
+      avgUnitPriceInclTax: number[]; // 上月平均销售单价（含税，元/吨）
     };
   };
   /** 首屏粗算：仅收入与默认加工费，材料/LIFO 未算，利润等置 0 */
@@ -275,7 +276,7 @@ async function getProductUnitProcessingCost(productName: string): Promise<number
 async function calculateMaterialCost(
   deliveryNumber: string,
   productType: string,
-  settlementQuantity: number,
+  materialCalcQuantity: number,
   deliveryDate: string,
   warehouse?: string | null
 ): Promise<{ 
@@ -289,7 +290,7 @@ async function calculateMaterialCost(
     totalCost: number;
   }>;
 }> {
-  if (settlementQuantity <= 0) {
+  if (materialCalcQuantity <= 0) {
     return { cost: 0, composition: [], productionRecords: [] };
   }
 
@@ -318,7 +319,7 @@ async function calculateMaterialCost(
       const lifoResult = await calculateLIFOMaterialCost(
         productType,
         warehouse || null,
-        settlementQuantity,
+        materialCalcQuantity,
         saleDate
       );
       if (lifoResult.cost > 0) {
@@ -371,7 +372,7 @@ async function calculateMaterialCost(
     const materialDetails: Array<{ material: string; quantity: number; cost: number }> = [];
 
     for (const item of composition) {
-      const qty = settlementQuantity * item.ratio;
+      const qty = materialCalcQuantity * item.ratio;
       const avgPrice = await getMaterialAvgPrice(item.material, saleDate);
       const cost = qty * avgPrice;
       totalCost += cost;
@@ -642,52 +643,97 @@ function getProfitSalesMinDeliveryDateStr(): string {
 }
 
 const EMPTY_PRODUCT_COMPARISON: ProfitAnalysisData['productComparison'] = {
-  products: [],
-  currentMonth: { materialUsagePerTon: [], processingCostPerTon: [] },
-  lastMonth: { materialUsagePerTon: [], processingCostPerTon: [] },
+  labels: [],
+  currentMonth: { quantityTons: [], avgUnitPriceInclTax: [] },
+  lastMonth: { quantityTons: [], avgUnitPriceInclTax: [] },
 };
 
-/** 成品对比（多库表查询，可延后加载） */
-async function buildProfitProductComparisonForProducts(
-  products: string[]
-): Promise<ProfitAnalysisData['productComparison']> {
+/** 成品对比（按 吉钢/萍钢/新钢 × 成品，对比当月与上月销量和平均单价） */
+async function buildProfitProductComparison(): Promise<ProfitAnalysisData['productComparison']> {
   const todayForCalc = new Date();
   todayForCalc.setHours(0, 0, 0, 0);
   const monthStart = new Date(todayForCalc);
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
-  const currentMonthStr = formatDate(monthStart).substring(0, 7);
+  const currentMonthStr = formatDate(monthStart).slice(0, 7);
   const lastMonth = new Date(monthStart);
   lastMonth.setMonth(lastMonth.getMonth() - 1);
-  const lastMonthStr = formatDate(lastMonth).substring(0, 7);
+  const lastMonthStr = formatDate(lastMonth).slice(0, 7);
 
-  const currentMonthMaterialUsage: number[] = [];
-  const currentMonthProcessingCost: number[] = [];
-  const lastMonthMaterialUsage: number[] = [];
-  const lastMonthProcessingCost: number[] = [];
+  const targetCustomers = new Set(['吉钢', '萍钢', '新钢']);
+  const customerOrder = ['吉钢', '萍钢', '新钢'];
+  const rows = await prisma.deliverySettlement.findMany({
+    where: {
+      customer: { in: customerOrder },
+      productType: { not: null },
+      settlementQuantity: { not: null },
+      totalSettlementAmount: { not: null },
+      deliveryDate: { not: null },
+    },
+    select: {
+      customer: true,
+      productType: true,
+      settlementQuantity: true,
+      totalSettlementAmount: true,
+      deliveryDate: true,
+    },
+  });
 
-  for (const product of products) {
-    const currentMonthComposition = await getProductMaterialComposition(product, currentMonthStr);
-    const currentMonthTotalTons = currentMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
-    currentMonthMaterialUsage.push(currentMonthTotalTons);
-    const currentMonthUnitCost = await getProductUnitProcessingCost(product);
-    currentMonthProcessingCost.push(currentMonthUnitCost);
+  type Agg = { qty: number; revenueInclTax: number };
+  type KeyAgg = { current: Agg; last: Agg; customer: string; product: string };
+  const map = new Map<string, KeyAgg>();
 
-    const lastMonthComposition = await getProductMaterialComposition(product, lastMonthStr);
-    const lastMonthTotalTons = lastMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
-    lastMonthMaterialUsage.push(lastMonthTotalTons);
-    lastMonthProcessingCost.push(currentMonthUnitCost);
+  for (const row of rows) {
+    const customer = (row.customer || '').trim();
+    const product = (row.productType || '').trim();
+    if (!customer || !product || !targetCustomers.has(customer)) continue;
+    const d = parseDeliveryDate(row.deliveryDate);
+    if (!d) continue;
+    const monthKey = formatDate(d).slice(0, 7);
+    if (monthKey !== currentMonthStr && monthKey !== lastMonthStr) continue;
+
+    const qty = processDecimal(row.settlementQuantity);
+    const revenueInclTax = processDecimal(row.totalSettlementAmount);
+    const key = `${customer}__${product}`;
+    const slot = map.get(key) || {
+      current: { qty: 0, revenueInclTax: 0 },
+      last: { qty: 0, revenueInclTax: 0 },
+      customer,
+      product,
+    };
+    if (monthKey === currentMonthStr) {
+      slot.current.qty += qty;
+      slot.current.revenueInclTax += revenueInclTax;
+    } else {
+      slot.last.qty += qty;
+      slot.last.revenueInclTax += revenueInclTax;
+    }
+    map.set(key, slot);
   }
 
+  const entries = Array.from(map.values())
+    .filter((e) => e.current.qty > 0 || e.last.qty > 0)
+    .sort((a, b) => {
+      const c = customerOrder.indexOf(a.customer) - customerOrder.indexOf(b.customer);
+      if (c !== 0) return c;
+      return b.current.qty - a.current.qty;
+    });
+
+  const labels = entries.map((e) => `${e.customer}-${e.product}`);
+  const currentQty = entries.map((e) => e.current.qty);
+  const lastQty = entries.map((e) => e.last.qty);
+  const currentAvg = entries.map((e) => (e.current.qty > 0 ? e.current.revenueInclTax / e.current.qty : 0));
+  const lastAvg = entries.map((e) => (e.last.qty > 0 ? e.last.revenueInclTax / e.last.qty : 0));
+
   return {
-    products,
+    labels,
     currentMonth: {
-      materialUsagePerTon: currentMonthMaterialUsage,
-      processingCostPerTon: currentMonthProcessingCost,
+      quantityTons: currentQty,
+      avgUnitPriceInclTax: currentAvg,
     },
     lastMonth: {
-      materialUsagePerTon: lastMonthMaterialUsage,
-      processingCostPerTon: lastMonthProcessingCost,
+      quantityTons: lastQty,
+      avgUnitPriceInclTax: lastAvg,
     },
   };
 }
@@ -841,21 +887,7 @@ export async function getProfitAnalysisShellData(): Promise<ProfitAnalysisData> 
 export async function getProfitAnalysisProductComparisonOnly(): Promise<
   ProfitAnalysisData['productComparison']
 > {
-  const minDeliveryDateStr = getProfitSalesMinDeliveryDateStr();
-  const rows = await prisma.deliverySettlement.findMany({
-    where: {
-      productType: { not: null },
-      deliveryDate: { not: null, gte: minDeliveryDateStr },
-    },
-    select: { productType: true },
-  });
-  const productSet = new Set<string>();
-  for (const r of rows) {
-    if (r.productType) productSet.add(r.productType);
-  }
-  const products = Array.from(productSet).sort();
-  if (products.length === 0) return EMPTY_PRODUCT_COMPARISON;
-  return buildProfitProductComparisonForProducts(products);
+  return buildProfitProductComparison();
 }
 
 /**
@@ -902,6 +934,7 @@ export async function getProfitAnalysisData(
         warehouse: true,
         customer: true,
         settlementQuantity: true,
+        netWeight: true,
         totalSettlementAmount: true,
       },
     });
@@ -988,6 +1021,9 @@ export async function getProfitAnalysisData(
         try {
           const revenue = processDecimal(sale.totalSettlementAmount);
           const quantity = processDecimal(sale.settlementQuantity);
+          const netWeightQuantity = processDecimal(sale.netWeight);
+          // 材料成本按出厂净重（net_weight）核算；为空/无效时回退结算量
+          const materialCalcQuantity = netWeightQuantity > 0 ? netWeightQuantity : quantity;
           const productType = sale.productType || '';
           const customer = (sale.customer || '').trim();
 
@@ -1011,7 +1047,7 @@ export async function getProfitAnalysisData(
             const result = await calculateMaterialCost(
               sale.deliveryNumber || '',
               productType,
-              quantity,
+              materialCalcQuantity,
               sale.deliveryDate || '',
               sale.warehouse || null
             );
@@ -1024,7 +1060,7 @@ export async function getProfitAnalysisData(
 
           // 销售单价(不含税)、材料单价(不含税)
           const salesUnitExclTax = quantity > 0 ? revenue / quantity / 1.13 : 0;
-          const materialUnitExclTax = quantity > 0 ? materialCost / quantity : 0;
+          const materialUnitExclTax = materialCalcQuantity > 0 ? materialCost / materialCalcQuantity : 0;
 
           // 入库单加权平均税率（用于税费公式）
           let warehouseTaxRate = 0;
@@ -1100,7 +1136,8 @@ export async function getProfitAnalysisData(
           const governmentSupport = governmentSupportPerTon * quantity;
           const otherIncome = immediateRefund + governmentSupport;
 
-          const profit = revenue - materialCost - processingCost - otherCosts + otherIncome;
+          const revenueExclTax = revenue / 1.13;
+          const profit = revenueExclTax - materialCost - processingCost - otherCosts + otherIncome;
 
           return {
             deliveryNumber: sale.deliveryNumber || '',
@@ -1124,6 +1161,7 @@ export async function getProfitAnalysisData(
             costParamSnapshot: {
               salesUnitExclTax,
               materialUnitExclTax,
+              materialCalcQuantity,
               warehouseTaxRate,
               transportPerTon,
               processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,
@@ -1167,6 +1205,7 @@ export async function getProfitAnalysisData(
             costParamSnapshot: {
               salesUnitExclTax: 0,
               materialUnitExclTax: 0,
+              materialCalcQuantity: 0,
               warehouseTaxRate: 0,
               transportPerTon: 0,
               processingFeeForRefundPerTon: 0,
@@ -1325,16 +1364,7 @@ export async function getProfitAnalysisData(
 
   let productComparison: ProfitAnalysisData['productComparison'] = EMPTY_PRODUCT_COMPARISON;
   if (includeProductComparison) {
-    const productSet = new Set<string>();
-    for (const sale of salesDetails) {
-      if (sale.productType) {
-        productSet.add(sale.productType);
-      }
-    }
-    const products = Array.from(productSet);
-    if (products.length > 0) {
-      productComparison = await buildProfitProductComparisonForProducts(products);
-    }
+    productComparison = await buildProfitProductComparison();
   }
 
   return {

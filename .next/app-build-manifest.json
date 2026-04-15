@@ -75,6 +75,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/disposal/auction/page.js"
+    ],
+    "/api/profit-management/cost-analysis/export/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/cost-analysis/export/route.js"
     ]
   }
 }

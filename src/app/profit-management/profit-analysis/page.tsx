@@ -66,6 +66,7 @@ interface ProfitAnalysisData {
     costParamSnapshot?: {
       salesUnitExclTax: number;
       materialUnitExclTax: number;
+      materialCalcQuantity: number;
       warehouseTaxRate: number;
       transportPerTon: number;
       processingFeeForRefundPerTon: number;
@@ -96,14 +97,14 @@ interface ProfitAnalysisData {
     }>;
   }>;
   productComparison: {
-    products: string[];
+    labels: string[];
     currentMonth: {
-      materialUsagePerTon: number[];
-      processingCostPerTon: number[];
+      quantityTons: number[];
+      avgUnitPriceInclTax: number[];
     };
     lastMonth: {
-      materialUsagePerTon: number[];
-      processingCostPerTon: number[];
+      quantityTons: number[];
+      avgUnitPriceInclTax: number[];
     };
   };
   /** 与 API 一致：粗算首屏时为 true */
@@ -560,10 +561,10 @@ export default function ProfitAnalysis() {
     ]
   };
 
-  // 成品对比分析图配置（分组柱状图）
+  // 成品对比分析图配置（按客户-成品：销量 + 平均单价）
   const productComparisonOption = {
     title: {
-      text: '成品对比分析（当月 vs 上月）',
+      text: '客户-成品销售对比（当月 vs 上月）',
       left: 'center',
       textStyle: {
         color: '#333',
@@ -577,7 +578,7 @@ export default function ProfitAnalysis() {
       }
     },
     legend: {
-      data: ['当月原材料使用量/吨', '上月原材料使用量/吨', '当月加工成本/元/吨', '上月加工成本/元/吨'],
+      data: ['当月销量/吨', '上月销量/吨', '当月平均单价/元/吨(含税)', '上月平均单价/元/吨(含税)'],
       bottom: 0
     },
     grid: {
@@ -589,7 +590,7 @@ export default function ProfitAnalysis() {
     },
     xAxis: {
       type: 'category',
-      data: data.productComparison.products,
+      data: data.productComparison.labels,
       axisLabel: {
         rotate: 45,
         interval: 0
@@ -598,48 +599,48 @@ export default function ProfitAnalysis() {
     yAxis: [
       {
         type: 'value',
-        name: '原材料使用量（吨/吨成品）',
+        name: '销量（吨）',
         position: 'left'
       },
       {
         type: 'value',
-        name: '加工成本（元/吨）',
+        name: '平均销售单价（元/吨，含税）',
         position: 'right'
       }
     ],
     series: [
       {
-        name: '当月原材料使用量/吨',
+        name: '当月销量/吨',
         type: 'bar',
         yAxisIndex: 0,
-        data: data.productComparison.currentMonth.materialUsagePerTon,
+        data: data.productComparison.currentMonth.quantityTons,
         itemStyle: {
           color: '#5470c6'
         }
       },
       {
-        name: '上月原材料使用量/吨',
+        name: '上月销量/吨',
         type: 'bar',
         yAxisIndex: 0,
-        data: data.productComparison.lastMonth.materialUsagePerTon,
+        data: data.productComparison.lastMonth.quantityTons,
         itemStyle: {
           color: '#91cc75'
         }
       },
       {
-        name: '当月加工成本/元/吨',
+        name: '当月平均单价/元/吨(含税)',
         type: 'line',
         yAxisIndex: 1,
-        data: data.productComparison.currentMonth.processingCostPerTon,
+        data: data.productComparison.currentMonth.avgUnitPriceInclTax,
         itemStyle: {
           color: '#ee6666'
         }
       },
       {
-        name: '上月加工成本/元/吨',
+        name: '上月平均单价/元/吨(含税)',
         type: 'line',
         yAxisIndex: 1,
-        data: data.productComparison.lastMonth.processingCostPerTon,
+        data: data.productComparison.lastMonth.avgUnitPriceInclTax,
         itemStyle: {
           color: '#fac858'
         }
@@ -666,7 +667,7 @@ export default function ProfitAnalysis() {
             利润计算公式
           </h3>
           <p className="text-sm font-normal text-gray-700 dark:text-gray-300 leading-relaxed">
-            利润 = 销售收入 − 总成本（废钢成本 + 加工成本）− 运输费 − 税费 + 即征即退 + 政府扶持资金 − 贴现费用 − 回款周期资金利息
+            利润 = 销售收入/1.13（不含税）− 总成本（废钢成本 + 加工成本）− 运输费 − 税费 + 即征即退 + 政府扶持资金 − 贴现费用 − 回款周期资金利息
           </p>
           <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">
             销售明细表中按每张销售单分别计算：总成本含材料成本与加工成本；其它成本项 = 运输费 + 税费 + 贴现费用 + 回款周期资金利息；其它收入项 = 即征即退 + 政府扶持资金（待配置）。
@@ -820,7 +821,7 @@ export default function ProfitAnalysis() {
 
         {/* 销售明细表格：月份导航 + 分页 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">销售明细</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">销售明细利润分析</h2>
 
           {/* 月份导航（根据 delivery_date 自动累加） */}
           {monthKeys.length > 0 && (
@@ -869,7 +870,7 @@ export default function ProfitAnalysis() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">成品名称</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发往客户</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">结算量(吨)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">销售收入(元)</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">销售收入-含税(元)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">材料成本(元)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">加工成本(元)</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它成本项:运输费+税费+贴现+回款利息(元)</th>
@@ -1014,15 +1015,15 @@ export default function ProfitAnalysis() {
         {/* 成品对比：粗算阶段占位，避免大块空白 */}
         {data.provisional && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 min-h-[280px] flex flex-col items-center justify-center border border-dashed border-gray-300 dark:border-gray-600 text-center gap-2">
-            <p className="text-sm font-medium text-gray-800 dark:text-gray-100">成品对比分析（当月 vs 上月）</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-gray-100">客户-成品销售对比（当月 vs 上月）</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md px-4">
-              精确数据与成品列表就绪后，将在此加载柱状图与折线图。
+              精确数据就绪后，将在此按吉钢/萍钢/新钢各成品展示销量与平均销售单价对比。
             </p>
           </div>
         )}
 
         {/* 成品对比分析图 */}
-        {!data.provisional && data.productComparison.products.length > 0 && (
+        {!data.provisional && data.productComparison.labels.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
             <LazyReactECharts
               option={productComparisonOption}
@@ -1172,7 +1173,8 @@ export default function ProfitAnalysis() {
               const discountPerTon = qty > 0 ? discount / qty : 0;
               const interestPerTon = qty > 0 ? interest / qty : 0;
               const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
-              const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
+              const materialQty = s.costParamSnapshot?.materialCalcQuantity ?? qty;
+              const materialUnitExclTax = materialQty > 0 ? s.materialCost / materialQty : 0;
               const snap = s.costParamSnapshot;
               const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
               const snapMaterialExTax = snap?.materialUnitExclTax ?? materialUnitExclTax;
@@ -1227,7 +1229,7 @@ export default function ProfitAnalysis() {
                     </h4>
                     <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
                       <li>销售单价(不含税) ≈ {snapSalesExTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
-                      <li>材料单价(不含税) ≈ {snapMaterialExTax.toFixed(2)} 元/吨 = 材料成本 / 结算量</li>
+                      <li>材料单价(不含税) ≈ {snapMaterialExTax.toFixed(2)} 元/吨 = 材料成本 / 材料核算量(优先出厂净重)</li>
                       <li>运输费: 客户对应的运价(含税/1.03) × 结算量</li>
                       <li>税费: (销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%)×10% + (销售单价+材料单价)×0.05%</li>
                       <li className="text-amber-700 dark:text-amber-300">
@@ -1266,7 +1268,8 @@ export default function ProfitAnalysis() {
               const immPerTon = qty > 0 ? imm / qty : 0;
               const govPerTon = qty > 0 ? gov / qty : 0;
               const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
-              const materialUnitExclTax = qty > 0 ? s.materialCost / qty : 0;
+              const materialQty = s.costParamSnapshot?.materialCalcQuantity ?? qty;
+              const materialUnitExclTax = materialQty > 0 ? s.materialCost / materialQty : 0;
               const baseTransport = s.customer === '萍钢' ? 20.6 / 1.03 : s.customer === '新钢' ? 48 / 1.03 : 0;
               const snap = s.costParamSnapshot;
               const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
