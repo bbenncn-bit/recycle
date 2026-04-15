@@ -96,103 +96,63 @@ interface CostAnalysisData {
 
 export default function CostAnalysis() {
   const [data, setData] = useState<CostAnalysisData | null>(null);
-  const [loading, setLoading] = useState(true);
+  /** quick：首屏核心指标与趋势已就绪；full：料型分布等已合并 */
+  const [loadStage, setLoadStage] = useState<'idle' | 'quick' | 'full'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchData = async () => {
       try {
-        setLoading(true);
+        setLoadStage('idle');
         setError(null);
-        const response = await fetch('/api/profit-management/cost-analysis');
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        const quickRes = await fetch('/api/profit-management/cost-analysis?phase=quick');
+        if (!quickRes.ok) {
+          const errorData = await quickRes.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${quickRes.status}`);
         }
-        const result = await response.json();
-        if (result.success) {
-          setData(result.data);
-        } else {
-          throw new Error(result.error || '获取数据失败');
+        const quickJson = await quickRes.json();
+        if (!quickJson.success) throw new Error(quickJson.error || '获取数据失败');
+        if (!cancelled) {
+          setData(quickJson.data);
+          setLoadStage('quick');
         }
       } catch (err) {
-        console.error('获取成本分析数据失败:', err);
+        console.error('获取成本分析数据失败（首屏）:', err);
         const errorMessage = err instanceof Error ? err.message : '未知错误';
-        setError(errorMessage);
-        // 即使出错也设置空数据，避免页面崩溃
-        setData({
-          summary: {
-            todayCost: 0,
-            weekCost: 0,
-            monthCost: 0,
-            avgDailyCost: 0,
-            todayBaseSelfCost: 0,
-            todayBaseSelfQty: 0,
-            todayBasePurchaseCost: 0,
-            todayBasePurchaseQty: 0,
-            weekBaseSelfCost: 0,
-            weekBaseSelfQty: 0,
-            weekBasePurchaseCost: 0,
-            weekBasePurchaseQty: 0,
-            monthBaseSelfCost: 0,
-            monthBaseSelfQty: 0,
-            monthBasePurchaseCost: 0,
-            monthBasePurchaseQty: 0,
-          },
-          weekCostBreakdown: {
-            days: [],
-            baseSelf: [],
-            basePurchase: [],
-            collaboration: [],
-          },
-          dailyTrend: {
-            dates: [],
-            baseSelf: [],
-            basePurchase: [],
-            collaboration: [],
-            baseSelfQty: [],
-            basePurchaseQty: [],
-            collaborationQty: [],
-          },
-          categoryDistributionBaseSelf: {
-            categories: [],
-            costs: [],
-            percentages: [],
-            avgPrices: [],
-            quantities: [],
-          },
-          categoryDistributionBasePurchase: {
-            categories: [],
-            costs: [],
-            percentages: [],
-            avgPrices: [],
-            quantities: [],
-          },
-          lastMonthCategoryDistributionBaseSelf: {
-            categories: [],
-            avgPrices: [],
-          },
-          lastMonthCategoryDistributionBasePurchase: {
-            categories: [],
-            avgPrices: [],
-          },
-          baseSelfDailyUnitCost: {
-            dates: [],
-            purchaseCost: [],
-            fixedCost: [],
-            variableCost: [],
-            processingQuantity: [],
-          },
-        });
-      } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setError(errorMessage);
+          setData(null);
+          setLoadStage('idle');
+        }
+        return;
+      }
+
+      try {
+        const fullRes = await fetch('/api/profit-management/cost-analysis');
+        if (!fullRes.ok) {
+          const errorData = await fullRes.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${fullRes.status}`);
+        }
+        const fullJson = await fullRes.json();
+        if (!fullJson.success) throw new Error(fullJson.error || '获取数据失败');
+        if (!cancelled) {
+          setData(fullJson.data);
+          setLoadStage('full');
+        }
+      } catch (e2) {
+        console.warn('成本分析：详图数据加载失败，已保留首屏数据', e2);
       }
     };
 
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -241,11 +201,11 @@ export default function CostAnalysis() {
     }
   };
 
-  if (loading) {
+  if (!data && !error) {
     return <CostAnalysisSkeleton />;
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
         <div className="max-w-7xl mx-auto">
@@ -262,11 +222,7 @@ export default function CostAnalysis() {
   }
 
   if (!data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600 dark:text-gray-400">暂无数据</div>
-      </div>
-    );
+    return null;
   }
 
   // 日成本趋势图配置（堆叠面积图）
@@ -925,7 +881,9 @@ export default function CostAnalysis() {
             </p>
           </div>
           <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">导出数据（PurchaseWarehouse）</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+              导出数据（基地收货汇总：收货单号以 SH 开头；总结算金额为万元）
+            </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
                 type="date"
@@ -951,6 +909,12 @@ export default function CostAnalysis() {
             </div>
           </div>
         </div>
+
+        {loadStage === 'quick' && (
+          <div className="mb-4 rounded-md border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+            料型分布、上月均价对比等图表正在后台加载，请稍候…
+          </div>
+        )}
 
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

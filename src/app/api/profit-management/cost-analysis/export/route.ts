@@ -32,8 +32,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: '日期范围不合法' }, { status: 400 });
     }
 
+    // 仅汇总基地收货：收货单号 receipt_no 以 SH 开头（如 SH2601150013），排除 TH 等基地买货单
     const rows = await prisma.purchaseWarehouse.findMany({
       select: {
+        receiptNo: true,
         warehouseDate: true,
         inboundTime: true,
         warehouseArea: true,
@@ -44,6 +46,7 @@ export async function GET(request: Request) {
         totalPriceExcludingTax: true,
       },
       where: {
+        receiptNo: { startsWith: 'SH' },
         OR: [
           { warehouseDate: { not: null } },
           { inboundTime: { not: null } },
@@ -55,6 +58,8 @@ export async function GET(request: Request) {
     });
 
     const filtered = rows.filter((row) => {
+      const rn = (row.receiptNo || '').trim();
+      if (!rn.toUpperCase().startsWith('SH')) return false;
       const dateByWarehouse = parseWarehouseDate(row.warehouseDate);
       const dateByInbound = parseInboundTime(row.inboundTime);
       const date = dateByWarehouse || dateByInbound;
@@ -102,13 +107,14 @@ export async function GET(request: Request) {
       .map((item, index) => {
         const avgUnitPrice = item.totalQty > 0 ? item.totalAmount / item.totalQty : 0;
         const avgDeductionRate = item.totalQty > 0 ? (item.totalDeduction / item.totalQty) * 100 : 0;
+        const totalAmountWan = item.totalAmount / 10000;
         return {
           序号: index + 1,
           库区: item.area,
           毛料类型: item.material,
           '总扣杂/吨': Number(item.totalDeduction.toFixed(3)),
           '总结算吨位/吨': Number(item.totalQty.toFixed(3)),
-          '总结算金额/元': Number(item.totalAmount.toFixed(2)),
+          '总结算金额/万元': Number(totalAmountWan.toFixed(4)),
           '平均采购单价/元': Number(avgUnitPrice.toFixed(2)),
           平均扣杂率: `${avgDeductionRate.toFixed(2)}%`,
         };
@@ -123,7 +129,7 @@ export async function GET(request: Request) {
       { header: '毛料类型', key: '毛料类型' },
       { header: '总扣杂/吨', key: '总扣杂/吨' },
       { header: '总结算吨位/吨', key: '总结算吨位/吨' },
-      { header: '总结算金额/元', key: '总结算金额/元' },
+      { header: '总结算金额/万元', key: '总结算金额/万元' },
       { header: '平均采购单价/元', key: '平均采购单价/元' },
       { header: '平均扣杂率', key: '平均扣杂率' },
     ] as const;

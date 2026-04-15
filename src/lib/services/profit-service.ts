@@ -348,12 +348,30 @@ function calculateCategoryCost(
   };
 }
 
+/** 内存缓存：quick + full 两阶段共用同一批入库行，避免重复全表查询（约 90s） */
+const COST_VALID_ROWS_TTL_MS = 90_000;
+let costValidRowsCache: {
+  minWarehouseDateStr: string;
+  expiresAt: number;
+  rows: Array<{
+    warehouseDate: string | null;
+    material: string | null;
+    totalPriceIncludingTax: unknown;
+    status: string | null;
+    receiptNo: string | null;
+    unitPriceIncludingTax: unknown;
+    netWeight: unknown;
+  }>;
+} | null = null;
+
 /**
  * 获取成本分析数据
+ * @param phase quick：先返回汇总/趋势/周柱（无料型饼图、无上月对比、无周维度料型钻取）；full：完整数据
  */
 export async function getCostAnalysisData(
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
+  phase: 'quick' | 'full' = 'full'
 ): Promise<CostAnalysisData> {
   const devLog = process.env.NODE_ENV === 'development';
 
@@ -392,9 +410,32 @@ export async function getCostAnalysisData(
   scanStart.setDate(scanStart.getDate() - 7);
   const minWarehouseDateStr = formatDate(scanStart);
 
-  // 查询数据（带日期下界；status 仍在内存过滤）
-  let allData;
-  try {
+  const nowMs = Date.now();
+  let validData: Array<{
+    warehouseDate: string | null;
+    material: string | null;
+    totalPriceIncludingTax: unknown;
+    status: string | null;
+    receiptNo: string | null;
+    unitPriceIncludingTax: unknown;
+    netWeight: unknown;
+  }>;
+
+  if (
+    costValidRowsCache &&
+    costValidRowsCache.minWarehouseDateStr === minWarehouseDateStr &&
+    costValidRowsCache.expiresAt > nowMs
+  ) {
+    validData = costValidRowsCache.rows;
+    if (devLog) {
+      console.log(
+        `[cost-analysis] row cache hit ${validData.length} (minDate=${minWarehouseDateStr})`
+      );
+    }
+  } else {
+    // 查询数据（带日期下界；status 仍在内存过滤）
+    let allData;
+    try {
     allData = await prisma.purchaseWarehouse.findMany({
       where: {
         totalPriceIncludingTax: {
@@ -485,15 +526,21 @@ export async function getCostAnalysisData(
     }
     throw dbError;
   }
-  
-  // 在内存中过滤有效状态（排除红冲、撤销等无效状态）
-  const validData = allData.filter(item => {
-    const status = item.status || '';
-    if (status.includes('红冲') || status.includes('撤销')) return false;
-    return true;
-  });
-  
-  if (devLog) console.log(`📋 过滤后有效数据: ${validData.length} 条`);
+
+    validData = allData.filter((item) => {
+      const status = item.status || '';
+      if (status.includes('红冲') || status.includes('撤销')) return false;
+      return true;
+    });
+
+    if (devLog) console.log('[cost-analysis] filtered rows', validData.length);
+
+    costValidRowsCache = {
+      minWarehouseDateStr,
+      expiresAt: nowMs + COST_VALID_ROWS_TTL_MS,
+      rows: validData,
+    };
+  }
 
   // 调试：检查日期解析情况
   const dateParseStats = {
@@ -714,53 +761,70 @@ export async function getCostAnalysisData(
   const todayForCategory = new Date();
   todayForCategory.setHours(23, 59, 59, 999);
   
-  const categoryData = validData.filter(item => {
-    const date = parseWarehouseDate(item.warehouseDate);
-    if (!date) return false;
-    return date >= currentMonthStartForCategory && date <= todayForCategory;
+  let categoryDistributionBaseSelf: ReturnType<typeof calculateCategoryCost>;
+  let categoryDistributionBasePurchase: ReturnType<typeof calculateCategoryCost>;
+  let lastMonthCategoryDistributionBaseSelf: ReturnType<typeof calculateCategoryCost>;
+  let lastMonthCategoryDistributionBasePurchase: ReturnType<typeof calculateCategoryCost>;
+  const emptyCategoryFull = (): ReturnType<typeof calculateCategoryCost> => ({
+    categories: [],
+    costs: [],
+    percentages: [],
+    avgPrices: [],
+    quantities: [],
   });
-  
-  // 分别计算基地收货（SH）和基地买货（TH）的物料类型分布
-  const baseSelfData = categoryData.filter(item => {
-    const receiptNo = (item.receiptNo || '').toUpperCase();
-    return receiptNo.startsWith('SH');
-  });
-  
-  const basePurchaseData = categoryData.filter(item => {
-    const receiptNo = (item.receiptNo || '').toUpperCase();
-    return receiptNo.startsWith('TH');
-  });
-  
-  const categoryDistributionBaseSelf = calculateCategoryCost(baseSelfData);
-  const categoryDistributionBasePurchase = calculateCategoryCost(basePurchaseData);
-  
-  // 计算上月数据用于成本对比图（lastMonthStart 与查询下界处一致）
-  const lastMonthEnd = new Date(todayForCalc);
-  lastMonthEnd.setDate(0); // 上个月最后一天
-  lastMonthEnd.setHours(23, 59, 59, 999);
-  
-  const lastMonthData = validData.filter(item => {
-    const date = parseWarehouseDate(item.warehouseDate);
-    if (!date) return false;
-    return date >= lastMonthStart && date <= lastMonthEnd;
-  });
-  
-  // 分别计算上月基地收货（SH）和基地买货（TH）的物料类型分布
-  const lastMonthBaseSelfData = lastMonthData.filter(item => {
-    const receiptNo = (item.receiptNo || '').toUpperCase();
-    return receiptNo.startsWith('SH');
-  });
-  
-  const lastMonthBasePurchaseData = lastMonthData.filter(item => {
-    const receiptNo = (item.receiptNo || '').toUpperCase();
-    return receiptNo.startsWith('TH');
-  });
-  
-  const lastMonthCategoryDistributionBaseSelf = calculateCategoryCost(lastMonthBaseSelfData);
-  const lastMonthCategoryDistributionBasePurchase = calculateCategoryCost(lastMonthBasePurchaseData);
-  
+
+  if (phase === 'full') {
+    const categoryData = validData.filter(item => {
+      const date = parseWarehouseDate(item.warehouseDate);
+      if (!date) return false;
+      return date >= currentMonthStartForCategory && date <= todayForCategory;
+    });
+
+    const baseSelfData = categoryData.filter(item => {
+      const receiptNo = (item.receiptNo || '').toUpperCase();
+      return receiptNo.startsWith('SH');
+    });
+
+    const basePurchaseData = categoryData.filter(item => {
+      const receiptNo = (item.receiptNo || '').toUpperCase();
+      return receiptNo.startsWith('TH');
+    });
+
+    categoryDistributionBaseSelf = calculateCategoryCost(baseSelfData);
+    categoryDistributionBasePurchase = calculateCategoryCost(basePurchaseData);
+
+    const lastMonthEnd = new Date(todayForCalc);
+    lastMonthEnd.setDate(0);
+    lastMonthEnd.setHours(23, 59, 59, 999);
+
+    const lastMonthData = validData.filter(item => {
+      const date = parseWarehouseDate(item.warehouseDate);
+      if (!date) return false;
+      return date >= lastMonthStart && date <= lastMonthEnd;
+    });
+
+    const lastMonthBaseSelfData = lastMonthData.filter(item => {
+      const receiptNo = (item.receiptNo || '').toUpperCase();
+      return receiptNo.startsWith('SH');
+    });
+
+    const lastMonthBasePurchaseData = lastMonthData.filter(item => {
+      const receiptNo = (item.receiptNo || '').toUpperCase();
+      return receiptNo.startsWith('TH');
+    });
+
+    lastMonthCategoryDistributionBaseSelf = calculateCategoryCost(lastMonthBaseSelfData);
+    lastMonthCategoryDistributionBasePurchase = calculateCategoryCost(lastMonthBasePurchaseData);
+  } else {
+    const empty = emptyCategoryFull();
+    categoryDistributionBaseSelf = empty;
+    categoryDistributionBasePurchase = empty;
+    lastMonthCategoryDistributionBaseSelf = emptyCategoryFull();
+    lastMonthCategoryDistributionBasePurchase = emptyCategoryFull();
+  }
+
   // 计算本周成本构成（按 receiptNo 分类）
-  const weekCostBreakdown = calculateWeekCostBreakdown(weekData);
+  const weekCostBreakdown = calculateWeekCostBreakdown(weekData, phase === 'full');
   
   // 确保所有数据都有默认值，避免前端报错
   return {
@@ -837,7 +901,8 @@ function calculateWeekCostBreakdown(
     material: string | null;
     unitPriceIncludingTax: any;
     netWeight: any;
-  }>
+  }>,
+  includeDailyCategory = true
 ): { 
   days: string[]; 
   baseSelf: number[]; 
@@ -900,16 +965,17 @@ function calculateWeekCostBreakdown(
     const receiptNo = (item.receiptNo || '').toUpperCase();
     if (receiptNo.startsWith('SH')) {
       dayData[dayIndex].baseSelf += cost;
-      // 收集基地收货的详细数据用于分类
-      if (!dailyCategoryMap.has(dateKey)) {
-        dailyCategoryMap.set(dateKey, []);
+      if (includeDailyCategory) {
+        if (!dailyCategoryMap.has(dateKey)) {
+          dailyCategoryMap.set(dateKey, []);
+        }
+        dailyCategoryMap.get(dateKey)!.push({
+          material: item.material,
+          totalPriceIncludingTax: item.totalPriceIncludingTax,
+          unitPriceIncludingTax: item.unitPriceIncludingTax,
+          netWeight: item.netWeight,
+        });
       }
-      dailyCategoryMap.get(dateKey)!.push({
-        material: item.material,
-        totalPriceIncludingTax: item.totalPriceIncludingTax,
-        unitPriceIncludingTax: item.unitPriceIncludingTax,
-        netWeight: item.netWeight,
-      });
     } else if (receiptNo.startsWith('TH')) {
       dayData[dayIndex].basePurchase += cost;
     } else {
@@ -917,27 +983,28 @@ function calculateWeekCostBreakdown(
     }
   }
   
-  // 计算每日的详细分类数据
-  const dailyCategoryData = days.map(dateKey => {
-    const dayItems = dailyCategoryMap.get(dateKey) || [];
-    const categoryData = calculateCategoryCost(dayItems.map(item => ({
-      material: item.material,
-      totalPriceIncludingTax: item.totalPriceIncludingTax,
-      warehouseDate: dateKey,
-      unitPriceIncludingTax: item.unitPriceIncludingTax,
-      netWeight: item.netWeight,
-    })));
-    
-    return {
-      date: dateKey,
-      baseSelfCategories: {
-        categories: categoryData.categories,
-        costs: categoryData.costs,
-        avgPrices: categoryData.avgPrices,
-        quantities: categoryData.quantities,
-      },
-    };
-  });
+  const dailyCategoryData = includeDailyCategory
+    ? days.map(dateKey => {
+        const dayItems = dailyCategoryMap.get(dateKey) || [];
+        const categoryData = calculateCategoryCost(dayItems.map(item => ({
+          material: item.material,
+          totalPriceIncludingTax: item.totalPriceIncludingTax,
+          warehouseDate: dateKey,
+          unitPriceIncludingTax: item.unitPriceIncludingTax,
+          netWeight: item.netWeight,
+        })));
+
+        return {
+          date: dateKey,
+          baseSelfCategories: {
+            categories: categoryData.categories,
+            costs: categoryData.costs,
+            avgPrices: categoryData.avgPrices,
+            quantities: categoryData.quantities,
+          },
+        };
+      })
+    : [];
   
   // 格式化日期显示（只显示月-日，最近一周不再用周一~周日避免歧义）
   const finalDays = days.map(date => {

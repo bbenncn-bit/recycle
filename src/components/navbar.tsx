@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronDownIcon} from '@heroicons/react/24/outline';
+import { Bars3Icon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import AcmeLogo from './acme-logo';
 import ThemeToggle from './theme-toggle';
 
@@ -48,11 +48,28 @@ const navigation = [
   },
 ];
 
+const mainNavActiveClass =
+  'bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white shadow-lg';
+const mainNavIdleClass =
+  'text-gray-600 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-gray-700/30 hover:text-gray-800 dark:hover:text-white hover:shadow-lg';
+/** 桌面端带下拉的父级链接悬停略强，与原先一致 */
+const desktopDropdownParentIdleClass =
+  'text-gray-600 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-700/30 hover:text-gray-800 dark:hover:text-white hover:shadow-lg';
+const subNavActiveClass =
+  'bg-blue-50/50 dark:bg-gray-700/50 text-blue-300 dark:text-blue-400';
+const subNavIdleClass =
+  'text-gray-700 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white';
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  /** 窄屏顶部「算账经营」下拉（成本/利润），与汉堡菜单的 accordion 状态分离 */
+  const [accountingQuickOpen, setAccountingQuickOpen] = useState(false);
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
+  const profitMgmtSectionActive =
+    pathname === '/profit-management/cost-analysis' ||
+    pathname === '/profit-management/profit-analysis';
 
   // 处理桌面端鼠标悬停事件
   const handleMouseEnter = (itemName: string) => {
@@ -77,17 +94,18 @@ export default function Navbar() {
     const handleClickOutside = (event: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
         closeDropdown();
+        setAccountingQuickOpen(false);
       }
     };
 
-    if (openDropdown) {
+    if (openDropdown || accountingQuickOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [openDropdown]);
+  }, [openDropdown, accountingQuickOpen]);
 
   return (
     <nav ref={navRef} className="bg-blue-200 dark:bg-gray-800 shadow-lg border-b border-blue-200 dark:border-gray-700">
@@ -117,9 +135,7 @@ export default function Navbar() {
                     <Link
                       href={item.href}
                       className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-normal transition-colors ${
-                        isActive
-                          ? 'bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white shadow-lg'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-700/30 hover:text-gray-800 dark:hover:text-white hover:shadow-lg'
+                        isActive ? mainNavActiveClass : desktopDropdownParentIdleClass
                       }`}
                     >
                       <span>{item.name}</span>
@@ -139,8 +155,8 @@ export default function Navbar() {
                                 href={subItem.href}
                                 className={`block px-4 py-2 text-sm transition-colors ${
                                   pathname === subItem.href
-                                    ? 'bg-blue-50/50 dark:bg-gray-700/50 text-blue-300 dark:text-blue-400'
-                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+                                    ? subNavActiveClass
+                                    : subNavIdleClass
                                 }`}
                               >
                                 {subItem.name}
@@ -159,9 +175,7 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-normal transition-colors ${
-                    isActive
-                      ? 'bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white shadow-lg'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/10 dark:hover:bg-gray-700/30 hover:text-gray-800 dark:hover:text-white hover:shadow-lg'
+                    isActive ? mainNavActiveClass : mainNavIdleClass
                   }`}
                 >
                   <span>{item.name}</span>
@@ -199,15 +213,75 @@ export default function Navbar() {
           <div className="md:hidden flex items-center space-x-2">
             <ThemeToggle />
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white p-2"
+              type="button"
+              aria-label={isOpen ? '关闭菜单' : '打开菜单'}
+              onClick={() => {
+                setIsOpen((o) => !o);
+                setAccountingQuickOpen(false);
+              }}
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:text-gray-900 dark:focus:text-white p-2 rounded-md hover:bg-white/30 dark:hover:bg-gray-700/50"
             >
-              {/* {isOpen ? (
-                // <XMarkIcon className="h-6 w-6" />
-              ) : (
-                // <Bars3Icon className="h-6 w-6" />
-              )} */}
+              <Bars3Icon className="h-6 w-6" />
             </button>
+          </div>
+        </div>
+
+        {/* 手机与窄屏：主导航底色选中；算账经营展开子项（成本/利润），子项选中为淡蓝字+浅底 */}
+        <div className="md:hidden flex gap-3 pb-3 -mt-2 justify-center sm:justify-start items-stretch">
+          <Link
+            href="/"
+            className={`flex flex-1 sm:flex-none items-center justify-center text-center px-3 py-2 rounded-md text-base font-normal transition-colors ${
+              pathname === '/' ? mainNavActiveClass : mainNavIdleClass
+            }`}
+          >
+            首页
+          </Link>
+          <div className="relative flex flex-1 sm:flex-none min-w-0">
+            <button
+              type="button"
+              aria-expanded={accountingQuickOpen}
+              aria-haspopup="true"
+              onClick={() => {
+                setAccountingQuickOpen((o) => !o);
+                setIsOpen(false);
+              }}
+              className={`flex w-full items-center justify-center gap-1 px-3 py-2 rounded-md text-base font-normal transition-colors ${
+                profitMgmtSectionActive ? mainNavActiveClass : mainNavIdleClass
+              }`}
+            >
+              <span>算账经营</span>
+              <ChevronDownIcon
+                className={`h-4 w-4 shrink-0 transition-transform ${accountingQuickOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {accountingQuickOpen && (
+              <div className="absolute left-0 right-0 top-full z-50 pt-1">
+                <div className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
+                  <Link
+                    href="/profit-management/cost-analysis"
+                    className={`block px-4 py-2 text-sm transition-colors ${
+                      pathname === '/profit-management/cost-analysis'
+                        ? subNavActiveClass
+                        : subNavIdleClass
+                    }`}
+                    onClick={() => setAccountingQuickOpen(false)}
+                  >
+                    成本分析
+                  </Link>
+                  <Link
+                    href="/profit-management/profit-analysis"
+                    className={`block px-4 py-2 text-sm transition-colors ${
+                      pathname === '/profit-management/profit-analysis'
+                        ? subNavActiveClass
+                        : subNavIdleClass
+                    }`}
+                    onClick={() => setAccountingQuickOpen(false)}
+                  >
+                    利润分析
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -224,17 +298,13 @@ export default function Navbar() {
                 return (
                   <div key={item.name}>
                     <button
+                      type="button"
                       onClick={() => handleDropdownToggle(item.name)}
-                      className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-base font-medium ${
-                        isActive
-                          ? 'bg-blue-50/60 dark:bg-gray-700/60 text-blue-600 dark:text-blue-400'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50/60 dark:hover:bg-gray-700/60 hover:text-gray-800 dark:hover:text-white'
+                      className={`flex w-full items-center justify-between px-3 py-2 rounded-md text-base font-normal transition-colors ${
+                        isActive ? mainNavActiveClass : mainNavIdleClass
                       }`}
                     >
-                      <div className="flex items-center space-x-3">
-                        {/* <Icon className="h-5 w-5" />
-                        <span>{item.name}</span> */}
-                      </div>
+                      <span>{item.name}</span>
                       <ChevronDownIcon className={`h-4 w-4 transition-transform ${
                         openDropdown === item.name ? 'rotate-180' : ''
                       }`} />
@@ -242,15 +312,15 @@ export default function Navbar() {
                     
                     {/* Mobile Dropdown */}
                     {openDropdown === item.name && (
-                      <div className="ml-8 mt-1 space-y-1">
+                      <div className="ml-2 mt-1 space-y-0.5 border-l border-gray-200 pl-3 dark:border-gray-600">
                         {item.dropdown.map((subItem) => (
                           <Link
                             key={subItem.name}
                             href={subItem.href}
-                            className={`block px-3 py-2 rounded-md text-sm ${
+                            className={`block rounded-md px-3 py-2 text-sm transition-colors ${
                               pathname === subItem.href
-                                ? 'bg-blue-50/60 dark:bg-gray-700/60 text-blue-600 dark:text-blue-400'
-                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50/60 dark:hover:bg-gray-700/60 hover:text-gray-800 dark:hover:text-white'
+                                ? subNavActiveClass
+                                : subNavIdleClass
                             }`}
                             onClick={() => {
                               setIsOpen(false);
@@ -270,14 +340,11 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
-                    isActive
-                      ? 'bg-blue-50/60 dark:bg-gray-700/60 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50/60 dark:hover:bg-gray-700/60 hover:text-gray-800 dark:hover:text-white'
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-normal transition-colors ${
+                    isActive ? mainNavActiveClass : mainNavIdleClass
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
-                  {/* <Icon className="h-5 w-5" /> */}
                   <span>{item.name}</span>
                 </Link>
               );

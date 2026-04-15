@@ -4,6 +4,8 @@ import { getCostAnalysisData } from "@/lib/services/profit-service";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
+    const phaseParam = searchParams.get('phase');
+    const phase = phaseParam === 'quick' ? 'quick' : 'full';
     const startDateStr = searchParams.get('startDate');
     const endDateStr = searchParams.get('endDate');
     
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
     }
     
     // 严格从数据库取数，不使用模拟数据
-    const data = await getCostAnalysisData(startDate, endDate);
+    const data = await getCostAnalysisData(startDate, endDate, phase);
     
     return NextResponse.json({
       success: true,

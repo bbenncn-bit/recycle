@@ -106,11 +106,14 @@ interface ProfitAnalysisData {
       processingCostPerTon: number[];
     };
   };
+  /** 与 API 一致：粗算首屏时为 true */
+  provisional?: boolean;
 }
 
 export default function ProfitAnalysis() {
   const [data, setData] = useState<ProfitAnalysisData | null>(null);
-  const [loading, setLoading] = useState(true);
+  /** idle：未就绪；shell：粗算首屏；core：精确数据已就绪；full：成品对比已合并 */
+  const [loadStage, setLoadStage] = useState<'idle' | 'shell' | 'core' | 'full'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [tooltipData, setTooltipData] = useState<{
     x: number;
@@ -174,86 +177,96 @@ export default function ProfitAnalysis() {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchData = async () => {
+      setLoadStage('idle');
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
-        
-        // 设置超时（5分钟，300秒）- 临时方案，等待缓存生效后可以改回60秒
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 300000);
-        
-        const response = await fetch('/api/profit-management/profit-analysis', {
+        const shellRes = await fetch('/api/profit-management/profit-analysis?phase=shell');
+        if (shellRes.ok) {
+          const shellJson = await shellRes.json();
+          if (shellJson.success && shellJson.data && !cancelled) {
+            setData(shellJson.data);
+            setLoadStage('shell');
+          }
+        }
+      } catch (e) {
+        console.warn('利润分析：粗算首屏未返回，将直接等待精确数据', e);
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000);
+
+      try {
+        const response = await fetch('/api/profit-management/profit-analysis?phase=core', {
           signal: controller.signal,
         });
-        
         clearTimeout(timeoutId);
-        
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        if (result.success) {
+        if (!result.success) throw new Error(result.error || '获取数据失败');
+        if (!cancelled) {
           setData(result.data);
-        } else {
-          throw new Error(result.error || '获取数据失败');
+          setLoadStage('core');
+          setError(null);
         }
       } catch (err) {
-        console.error('获取利润分析数据失败:', err);
-        const errorMessage = err instanceof Error 
-          ? (err.name === 'AbortError' ? '请求超时，请稍后重试' : err.message)
-          : '未知错误';
-        setError(errorMessage);
-        setData({
-          summary: {
-            todayProfit: 0,
-            weekProfit: 0,
-            monthProfit: 0,
-            todayRevenue: 0,
-            todayMaterialCost: 0,
-            todayProcessingCost: 0,
-          },
-          dailyTrend: {
-            dates: [],
-            revenue: [],
-            materialCost: [],
-            processingCost: [],
-            profit: [],
-          },
-          weekBreakdown: {
-            days: [],
-            revenue: [],
-            materialCost: [],
-            processingCost: [],
-            profit: [],
-          },
-          salesDetails: [],
-          productComparison: {
-            products: [],
-            currentMonth: {
-              materialUsagePerTon: [],
-              processingCostPerTon: [],
-            },
-            lastMonth: {
-              materialUsagePerTon: [],
-              processingCostPerTon: [],
-            },
-          },
-        });
-      } finally {
-        setLoading(false);
+        clearTimeout(timeoutId);
+        console.error('获取利润分析数据失败（精确计算）:', err);
+        const errorMessage =
+          err instanceof Error
+            ? err.name === 'AbortError'
+              ? '请求超时，请稍后重试'
+              : err.message
+            : '未知错误';
+        if (!cancelled) {
+          setError(errorMessage);
+          setData((prev) => (prev?.provisional ? prev : null));
+          setLoadStage((prev) => (prev === 'shell' ? 'shell' : 'idle'));
+        }
+        return;
+      }
+
+      try {
+        const pcRes = await fetch('/api/profit-management/profit-analysis?phase=productComparison');
+        if (!pcRes.ok) {
+          const errorData = await pcRes.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${pcRes.status}`);
+        }
+        const pcJson = await pcRes.json();
+        if (!pcJson.success || !pcJson.data?.productComparison) {
+          throw new Error(pcJson.error || '成品对比数据获取失败');
+        }
+        if (!cancelled) {
+          setData((prev) =>
+            prev
+              ? { ...prev, productComparison: pcJson.data.productComparison }
+              : null
+          );
+          setLoadStage('full');
+        }
+      } catch (e2) {
+        console.warn('利润分析：成品对比图加载失败，其余数据已显示', e2);
+        if (!cancelled) setLoadStage('full');
       }
     };
 
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (loading) {
+  if (!data && !error) {
     return <ProfitAnalysisSkeleton />;
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
         <div className="max-w-7xl mx-auto">
@@ -270,11 +283,7 @@ export default function ProfitAnalysis() {
   }
 
   if (!data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600 dark:text-gray-400">暂无数据</div>
-      </div>
-    );
+    return null;
   }
 
   // 日利润趋势：堆叠总高度 = 销售收入（材料+加工+其它净值+利润），利润用面积展示占比
@@ -651,16 +660,39 @@ export default function ProfitAnalysis() {
           </p>
         </div>
 
-        {/* 利润公式说明 */}
-        <div className="mb-8 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">利润计算公式</h3>
-          <p className="text-sm text-gray-700 dark:text-gray-300 font-mono break-all">
+        {/* 利润公式说明（与页面正文同一字体，不用等宽） */}
+        <div className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+            利润计算公式
+          </h3>
+          <p className="text-sm font-normal text-gray-700 dark:text-gray-300 leading-relaxed">
             利润 = 销售收入 − 总成本（废钢成本 + 加工成本）− 运输费 − 税费 + 即征即退 + 政府扶持资金 − 贴现费用 − 回款周期资金利息
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-sm font-normal text-gray-500 dark:text-gray-400 mt-3 leading-relaxed">
             销售明细表中按每张销售单分别计算：总成本含材料成本与加工成本；其它成本项 = 运输费 + 税费 + 贴现费用 + 回款周期资金利息；其它收入项 = 即征即退 + 政府扶持资金（待配置）。
           </p>
         </div>
+
+        {data.provisional && (
+          <div className="mb-4 rounded-md border border-sky-200/90 bg-sky-50/90 px-3 py-2 text-sm text-sky-950 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-100">
+            <strong>粗算首屏</strong>：已展示今日收入、按默认加工费（元/吨）估算的加工成本及趋势图；材料成本（LIFO）、利润与销售明细在后台精确计算中，完成后将自动刷新为正式数据。
+          </div>
+        )}
+
+        {error && data && (
+          <div
+            className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-800 dark:bg-red-950/40 dark:text-red-100"
+            role="alert"
+          >
+            精确数据加载失败，当前仍为粗算首屏。{error}
+          </div>
+        )}
+
+        {loadStage === 'core' && !data.provisional && (
+          <div className="mb-4 rounded-md border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+            成品对比分析图正在后台加载，其余数据已可查看…
+          </div>
+        )}
 
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -672,9 +704,11 @@ export default function ProfitAnalysis() {
                   今日利润
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {data.summary.todayProfit.toFixed(2)}
+                  {data.provisional ? '—' : data.summary.todayProfit.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  {data.provisional ? '精确利润计算中' : '万元'}
+                </p>
                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     收入: {data.summary.todayRevenue.toFixed(2)} 万元
@@ -700,9 +734,11 @@ export default function ProfitAnalysis() {
                   本周利润
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {data.summary.weekProfit.toFixed(2)}
+                  {data.provisional ? '—' : data.summary.weekProfit.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  {data.provisional ? '精确利润计算中' : '万元'}
+                </p>
               </div>
               <div className="bg-blue-100 dark:bg-blue-900 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -720,9 +756,11 @@ export default function ProfitAnalysis() {
                   本月利润
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {data.summary.monthProfit.toFixed(2)}
+                  {data.provisional ? '—' : data.summary.monthProfit.toFixed(2)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">万元</p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  {data.provisional ? '精确利润计算中' : '万元'}
+                </p>
               </div>
               <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3">
                 <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -738,6 +776,9 @@ export default function ProfitAnalysis() {
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 今日成本明细
               </p>
+              {data.provisional && (
+                <p className="text-xs text-amber-700 dark:text-amber-300/90 mt-1">材料成本待 LIFO 计算</p>
+              )}
               <div className="mt-3 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-xs text-gray-500">材料成本:</span>
@@ -813,6 +854,12 @@ export default function ProfitAnalysis() {
             </div>
           )}
 
+          {data.provisional && monthKeys.length === 0 && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              下方表格结构已就绪；行数据将在精确计算完成后自动出现。
+            </p>
+          )}
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
@@ -831,7 +878,19 @@ export default function ProfitAnalysis() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {paginatedDetails.map((sale, index) => (
+                {paginatedDetails.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={11}
+                      className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
+                    >
+                      {data.provisional
+                        ? '销售明细正在逐单精确计算（含材料 LIFO、税费等），请稍候…'
+                        : '暂无数据'}
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedDetails.map((sale, index) => (
                   <tr
                     key={`${sale.deliveryNumber}-${sale.deliveryDate}-${index}`}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
@@ -915,7 +974,8 @@ export default function ProfitAnalysis() {
                       {sale.profit.toFixed(2)}
                     </td>
                   </tr>
-                ))}
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -951,8 +1011,18 @@ export default function ProfitAnalysis() {
           )}
         </div>
 
+        {/* 成品对比：粗算阶段占位，避免大块空白 */}
+        {data.provisional && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 min-h-[280px] flex flex-col items-center justify-center border border-dashed border-gray-300 dark:border-gray-600 text-center gap-2">
+            <p className="text-sm font-medium text-gray-800 dark:text-gray-100">成品对比分析（当月 vs 上月）</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md px-4">
+              精确数据与成品列表就绪后，将在此加载柱状图与折线图。
+            </p>
+          </div>
+        )}
+
         {/* 成品对比分析图 */}
-        {data.productComparison.products.length > 0 && (
+        {!data.provisional && data.productComparison.products.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
             <LazyReactECharts
               option={productComparisonOption}

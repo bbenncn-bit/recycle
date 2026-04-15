@@ -58,7 +58,7 @@ export function CostAnalysisSkeleton() {
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          正在加载成本数据…
+          正在准备页面并加载成本数据（先显示汇总与趋势）…
         </p>
       </div>
     </div>
@@ -111,7 +111,7 @@ export function ProfitAnalysisSkeleton() {
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          正在计算利润明细，请稍候…
+          正在计算销售与利润明细（成品对比稍后补齐）…
         </p>
       </div>
     </div>

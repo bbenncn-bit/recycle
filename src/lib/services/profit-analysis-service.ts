@@ -88,6 +88,8 @@ export interface ProfitAnalysisData {
       processingCostPerTon: number[]; // 上月每吨成品加工成本（元/吨）
     };
   };
+  /** 首屏粗算：仅收入与默认加工费，材料/LIFO 未算，利润等置 0 */
+  provisional?: boolean;
 }
 
 /**
@@ -626,13 +628,246 @@ function getInterestPerTonFromSnapshot(salesUnitExclTax: number, customer: strin
   return salesUnitExclTax * 1.13 * (s.interestRateAnnual / 100 / 360) * days;
 }
 
+function getProfitSalesMinDeliveryDateStr(): string {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const lookbackYears = Math.min(
+    30,
+    Math.max(1, parseInt(process.env.PROFIT_SALES_LOOKBACK_YEARS || '10', 10) || 10)
+  );
+  const salesScanStart = new Date(today);
+  salesScanStart.setFullYear(salesScanStart.getFullYear() - lookbackYears);
+  salesScanStart.setHours(0, 0, 0, 0);
+  return formatDate(salesScanStart);
+}
+
+const EMPTY_PRODUCT_COMPARISON: ProfitAnalysisData['productComparison'] = {
+  products: [],
+  currentMonth: { materialUsagePerTon: [], processingCostPerTon: [] },
+  lastMonth: { materialUsagePerTon: [], processingCostPerTon: [] },
+};
+
+/** 成品对比（多库表查询，可延后加载） */
+async function buildProfitProductComparisonForProducts(
+  products: string[]
+): Promise<ProfitAnalysisData['productComparison']> {
+  const todayForCalc = new Date();
+  todayForCalc.setHours(0, 0, 0, 0);
+  const monthStart = new Date(todayForCalc);
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+  const currentMonthStr = formatDate(monthStart).substring(0, 7);
+  const lastMonth = new Date(monthStart);
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+  const lastMonthStr = formatDate(lastMonth).substring(0, 7);
+
+  const currentMonthMaterialUsage: number[] = [];
+  const currentMonthProcessingCost: number[] = [];
+  const lastMonthMaterialUsage: number[] = [];
+  const lastMonthProcessingCost: number[] = [];
+
+  for (const product of products) {
+    const currentMonthComposition = await getProductMaterialComposition(product, currentMonthStr);
+    const currentMonthTotalTons = currentMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
+    currentMonthMaterialUsage.push(currentMonthTotalTons);
+    const currentMonthUnitCost = await getProductUnitProcessingCost(product);
+    currentMonthProcessingCost.push(currentMonthUnitCost);
+
+    const lastMonthComposition = await getProductMaterialComposition(product, lastMonthStr);
+    const lastMonthTotalTons = lastMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
+    lastMonthMaterialUsage.push(lastMonthTotalTons);
+    lastMonthProcessingCost.push(currentMonthUnitCost);
+  }
+
+  return {
+    products,
+    currentMonth: {
+      materialUsagePerTon: currentMonthMaterialUsage,
+      processingCostPerTon: currentMonthProcessingCost,
+    },
+    lastMonth: {
+      materialUsagePerTon: lastMonthMaterialUsage,
+      processingCostPerTon: lastMonthProcessingCost,
+    },
+  };
+}
+
+/**
+ * 极速首屏（供 phase=shell）：一次发货表查询 + 内存按日汇总，不算材料成本与 LIFO。
+ * 成品对比见 getProfitAnalysisProductComparisonOnly。
+ */
+export async function getProfitAnalysisShellData(): Promise<ProfitAnalysisData> {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const todayForCalc = new Date();
+  todayForCalc.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(todayForCalc);
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const minDeliveryDateStr = getProfitSalesMinDeliveryDateStr();
+
+  const salesData = await prisma.deliverySettlement.findMany({
+    where: {
+      totalSettlementAmount: { not: null },
+      settlementQuantity: { not: null },
+      deliveryDate: { not: null, gte: minDeliveryDateStr },
+    },
+    select: {
+      deliveryDate: true,
+      totalSettlementAmount: true,
+      settlementQuantity: true,
+    },
+  });
+
+  type Row = { date: Date; revenue: number; qty: number };
+  const rows: Row[] = [];
+  for (const s of salesData) {
+    const d = parseDeliveryDate(s.deliveryDate);
+    if (!d) continue;
+    rows.push({
+      date: d,
+      revenue: processDecimal(s.totalSettlementAmount),
+      qty: processDecimal(s.settlementQuantity),
+    });
+  }
+
+  let maxDeliveryDate: Date | null = null;
+  for (const r of rows) {
+    if (!maxDeliveryDate || r.date > maxDeliveryDate) maxDeliveryDate = r.date;
+  }
+  const last7DaysEnd = maxDeliveryDate ? new Date(maxDeliveryDate) : new Date(todayForCalc);
+  last7DaysEnd.setHours(23, 59, 59, 999);
+  const last7DaysStart = new Date(last7DaysEnd);
+  last7DaysStart.setDate(last7DaysEnd.getDate() - 5);
+  last7DaysStart.setHours(0, 0, 0, 0);
+
+  const sumRevWan = (arr: Row[]) => arr.reduce((s, r) => s + r.revenue, 0) / 10000;
+  const sumProcWan = (arr: Row[]) =>
+    arr.reduce((s, r) => s + r.qty * DEFAULT_PROCESSING_COST_PER_TON, 0) / 10000;
+
+  const todayRows = rows.filter((r) => r.date >= todayForCalc && r.date <= todayEnd);
+
+  const todayRevenue = sumRevWan(todayRows);
+  const todayProcessingCost = sumProcWan(todayRows);
+
+  const trendStartDate = new Date(today);
+  trendStartDate.setDate(trendStartDate.getDate() - 30);
+  trendStartDate.setHours(0, 0, 0, 0);
+
+  const dailyTrendMap = new Map<
+    string,
+    { revenue: number; materialCost: number; processingCost: number; profit: number }
+  >();
+  for (const r of rows) {
+    if (r.date < trendStartDate || r.date > today) continue;
+    const key = formatDate(r.date);
+    const slot = dailyTrendMap.get(key) || {
+      revenue: 0,
+      materialCost: 0,
+      processingCost: 0,
+      profit: 0,
+    };
+    slot.revenue += r.revenue / 10000;
+    slot.processingCost += (r.qty * DEFAULT_PROCESSING_COST_PER_TON) / 10000;
+    dailyTrendMap.set(key, slot);
+  }
+  const cur = new Date(trendStartDate);
+  while (cur <= today) {
+    const key = formatDate(cur);
+    if (!dailyTrendMap.has(key)) {
+      dailyTrendMap.set(key, { revenue: 0, materialCost: 0, processingCost: 0, profit: 0 });
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  const dailyTrendDates = Array.from(dailyTrendMap.keys()).sort();
+  const dailyTrend = {
+    dates: dailyTrendDates,
+    revenue: dailyTrendDates.map((d) => dailyTrendMap.get(d)!.revenue),
+    materialCost: dailyTrendDates.map(() => 0),
+    processingCost: dailyTrendDates.map((d) => dailyTrendMap.get(d)!.processingCost),
+    profit: dailyTrendDates.map(() => 0),
+  };
+
+  const last7DaysLabels: string[] = [];
+  const last7DaysKeys: string[] = [];
+  const weekDataByDate = new Map<
+    string,
+    { revenue: number; materialCost: number; processingCost: number; profit: number }
+  >();
+  const weekStart = new Date(last7DaysStart);
+  weekStart.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    const key = formatDate(d);
+    last7DaysKeys.push(key);
+    const parts = key.split('-');
+    last7DaysLabels.push(`${parts[1]}-${parts[2]}`);
+    weekDataByDate.set(key, { revenue: 0, materialCost: 0, processingCost: 0, profit: 0 });
+  }
+  for (const r of rows) {
+    const key = formatDate(r.date);
+    const slot = weekDataByDate.get(key);
+    if (slot) {
+      slot.revenue += r.revenue / 10000;
+      slot.processingCost += (r.qty * DEFAULT_PROCESSING_COST_PER_TON) / 10000;
+    }
+  }
+  const weekBreakdown = {
+    days: last7DaysLabels,
+    revenue: last7DaysKeys.map((k) => weekDataByDate.get(k)!.revenue),
+    materialCost: last7DaysKeys.map(() => 0),
+    processingCost: last7DaysKeys.map((k) => weekDataByDate.get(k)!.processingCost),
+    profit: last7DaysKeys.map(() => 0),
+  };
+
+  return {
+    summary: {
+      todayProfit: 0,
+      weekProfit: 0,
+      monthProfit: 0,
+      todayRevenue,
+      todayMaterialCost: 0,
+      todayProcessingCost,
+    },
+    dailyTrend,
+    weekBreakdown,
+    salesDetails: [],
+    productComparison: { ...EMPTY_PRODUCT_COMPARISON },
+    provisional: true,
+  };
+}
+
+export async function getProfitAnalysisProductComparisonOnly(): Promise<
+  ProfitAnalysisData['productComparison']
+> {
+  const minDeliveryDateStr = getProfitSalesMinDeliveryDateStr();
+  const rows = await prisma.deliverySettlement.findMany({
+    where: {
+      productType: { not: null },
+      deliveryDate: { not: null, gte: minDeliveryDateStr },
+    },
+    select: { productType: true },
+  });
+  const productSet = new Set<string>();
+  for (const r of rows) {
+    if (r.productType) productSet.add(r.productType);
+  }
+  const products = Array.from(productSet).sort();
+  if (products.length === 0) return EMPTY_PRODUCT_COMPARISON;
+  return buildProfitProductComparisonForProducts(products);
+}
+
 /**
  * 获取利润分析数据
+ * @param options.includeProductComparison 为 false 时跳过成品对比（加快首屏，可后续单独请求）
  */
 export async function getProfitAnalysisData(
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
+  options?: { includeProductComparison?: boolean }
 ): Promise<ProfitAnalysisData> {
+  const includeProductComparison = options?.includeProductComparison !== false;
   const today = new Date();
   today.setHours(23, 59, 59, 999);
   const defaultStartDate = new Date(today);
@@ -642,15 +877,7 @@ export async function getProfitAnalysisData(
   const queryStartDate = startDate || defaultStartDate;
   const queryEndDate = endDate || today;
 
-  /** 发货日期字符串下界（YYYY-MM-DD），缩小全表扫描；可通过环境变量拉长窗口 */
-  const lookbackYears = Math.min(
-    30,
-    Math.max(1, parseInt(process.env.PROFIT_SALES_LOOKBACK_YEARS || '10', 10) || 10)
-  );
-  const salesScanStart = new Date(today);
-  salesScanStart.setFullYear(salesScanStart.getFullYear() - lookbackYears);
-  salesScanStart.setHours(0, 0, 0, 0);
-  const minDeliveryDateStr = formatDate(salesScanStart);
+  const minDeliveryDateStr = getProfitSalesMinDeliveryDateStr();
 
   // 查询销售数据
   let salesData;
@@ -680,7 +907,7 @@ export async function getProfitAnalysisData(
     });
     if (process.env.NODE_ENV === 'development') {
       console.log(
-        `✅ 销售数据 ${salesData.length} 条（delivery_date >= ${minDeliveryDateStr}，回溯 ${lookbackYears} 年）`
+        `✅ 销售数据 ${salesData.length} 条（delivery_date >= ${minDeliveryDateStr}）`
       );
     }
   } catch (error) {
@@ -1096,40 +1323,18 @@ export async function getProfitAnalysisData(
     profit: last7DaysKeys.map(k => weekDataByDate.get(k)!.profit),
   };
 
-  // 计算成品对比（当月与上月）
-  const currentMonthStr = formatDate(monthStart).substring(0, 7);
-  const lastMonth = new Date(monthStart);
-  lastMonth.setMonth(lastMonth.getMonth() - 1);
-  const lastMonthStr = formatDate(lastMonth).substring(0, 7);
-
-  // 获取所有成品名称
-  const productSet = new Set<string>();
-  for (const sale of salesDetails) {
-    if (sale.productType) {
-      productSet.add(sale.productType);
+  let productComparison: ProfitAnalysisData['productComparison'] = EMPTY_PRODUCT_COMPARISON;
+  if (includeProductComparison) {
+    const productSet = new Set<string>();
+    for (const sale of salesDetails) {
+      if (sale.productType) {
+        productSet.add(sale.productType);
+      }
     }
-  }
-
-  const products = Array.from(productSet);
-  const currentMonthMaterialUsage: number[] = [];
-  const currentMonthProcessingCost: number[] = [];
-  const lastMonthMaterialUsage: number[] = [];
-  const lastMonthProcessingCost: number[] = [];
-
-  for (const product of products) {
-    // 当月数据
-    const currentMonthComposition = await getProductMaterialComposition(product, currentMonthStr);
-    const currentMonthTotalTons = currentMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
-    currentMonthMaterialUsage.push(currentMonthTotalTons);
-    const currentMonthUnitCost = await getProductUnitProcessingCost(product);
-    currentMonthProcessingCost.push(currentMonthUnitCost);
-
-    // 上月数据
-    const lastMonthComposition = await getProductMaterialComposition(product, lastMonthStr);
-    const lastMonthTotalTons = lastMonthComposition.reduce((sum, c) => sum + c.ratio, 0);
-    lastMonthMaterialUsage.push(lastMonthTotalTons);
-    // 使用相同的单位加工成本（因为是上月配置）
-    lastMonthProcessingCost.push(currentMonthUnitCost);
+    const products = Array.from(productSet);
+    if (products.length > 0) {
+      productComparison = await buildProfitProductComparisonForProducts(products);
+    }
   }
 
   return {
@@ -1144,16 +1349,6 @@ export async function getProfitAnalysisData(
     dailyTrend,
     weekBreakdown,
     salesDetails,
-    productComparison: {
-      products,
-      currentMonth: {
-        materialUsagePerTon: currentMonthMaterialUsage,
-        processingCostPerTon: currentMonthProcessingCost,
-      },
-      lastMonth: {
-        materialUsagePerTon: lastMonthMaterialUsage,
-        processingCostPerTon: lastMonthProcessingCost,
-      },
-    },
+    productComparison,
   };
 }
