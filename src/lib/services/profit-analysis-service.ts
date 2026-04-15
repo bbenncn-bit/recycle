@@ -520,22 +520,35 @@ function buildParamSnapshot(
  */
 async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
   try {
-    const rows = await prisma.profitParamConfig.findMany({
-      select: {
-        paramKey: true,
-        steelMill: true,
-        effectiveDate: true,
-        value: true,
-        previousValue: true,
-      },
-    });
-    return rows.map((r) => ({
-      paramKey: r.paramKey,
-      steelMill: r.steelMill,
-      effectiveDate: new Date(r.effectiveDate),
-      value: processDecimal(r.value),
-      previousValue: r.previousValue != null ? processDecimal(r.previousValue) : null,
-    }));
+    // 使用原生 SQL，避免某些环境下 Prisma Client 未生成 profitParamConfig model 导致构建失败
+    const rows = await prisma.$queryRaw<
+      Array<{
+        paramKey: string;
+        steelMill: string | null;
+        effectiveDate: Date | string;
+        value: unknown;
+        previousValue: unknown;
+      }>
+    >`
+      SELECT
+        param_key AS paramKey,
+        steel_mill AS steelMill,
+        effective_date AS effectiveDate,
+        value AS value,
+        previous_value AS previousValue
+      FROM ProfitParamConfig
+    `;
+    return rows.map((r) => {
+      const effectiveDate = new Date(r.effectiveDate);
+      if (Number.isNaN(effectiveDate.getTime())) return null;
+      return {
+        paramKey: r.paramKey,
+        steelMill: r.steelMill,
+        effectiveDate,
+        value: processDecimal(r.value),
+        previousValue: r.previousValue != null ? processDecimal(r.previousValue) : null,
+      } as ParamConfigRow;
+    }).filter((r): r is ParamConfigRow => r !== null);
   } catch (e) {
     console.warn('加载 ProfitParamConfig 失败，将使用默认常量:', e);
     return [];
