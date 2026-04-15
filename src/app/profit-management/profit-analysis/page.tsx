@@ -288,33 +288,28 @@ export default function ProfitAnalysis() {
     return null;
   }
 
-  // 日利润趋势：堆叠总高度 = 销售收入（材料+加工+其它净值+利润），利润用面积展示占比
+  // 日利润趋势：左轴仅保留不含税销售收入与完整总成本；利润走右轴
   const revenueArr = data.dailyTrend.revenue || [];
-  const materialArr = data.dailyTrend.materialCost || [];
-  const processingArr = data.dailyTrend.processingCost || [];
   const profitArr = data.dailyTrend.profit || [];
-  const otherNetForStack: number[] = [];
-  const profitStackSlice: number[] = [];
+  const revenueExclTaxArr: number[] = [];
+  const totalCostArr: number[] = [];
   const trendLen = Math.max(
     revenueArr.length,
-    materialArr.length,
-    processingArr.length,
     profitArr.length
   );
   for (let i = 0; i < trendLen; i++) {
     const r = revenueArr[i] ?? 0;
-    const m = materialArr[i] ?? 0;
-    const p = processingArr[i] ?? 0;
     const pr = profitArr[i] ?? 0;
-    const otherNet = r - m - p - pr;
-    otherNetForStack.push(Math.max(0, otherNet));
-    profitStackSlice.push(pr + Math.min(0, otherNet));
+    const revenueExclTax = r / 1.13;
+    revenueExclTaxArr.push(revenueExclTax);
+    // 完整总成本口径：利润 = 不含税收入 - 总成本  => 总成本 = 不含税收入 - 利润
+    totalCostArr.push(revenueExclTax - pr);
   }
 
   const dailyTrendOption = {
     title: {
       text: '日利润趋势（最近30天）',
-      subtext: '堆叠高度为销售收入；绿色为利润区块（其它净收入为负时与利润合并为一层）',
+      subtext: '左轴：不含税收入/总成本（万元）；右轴：利润（万元，绿色面积）',
       left: 'center',
       textStyle: {
         color: '#333',
@@ -336,32 +331,25 @@ export default function ProfitAnalysis() {
       formatter: (params: any) => {
         if (!params?.length) return '';
         const idx = params[0].dataIndex ?? 0;
-        const r = revenueArr[idx] ?? 0;
-        const m = materialArr[idx] ?? 0;
-        const p = processingArr[idx] ?? 0;
+        const rExTax = revenueExclTaxArr[idx] ?? 0;
+        const totalCost = totalCostArr[idx] ?? 0;
         const pr = profitArr[idx] ?? 0;
-        const otherNet = r - m - p - pr;
         const name = params[0].name;
         let result = `${name}<br/>`;
-        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#5470c6;"></span>销售收入: ${r.toFixed(2)} 万元<br/>`;
-        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#ee6666;"></span>材料成本: ${m.toFixed(2)} 万元<br/>`;
-        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#fac858;"></span>加工成本: ${p.toFixed(2)} 万元<br/>`;
-        if (Math.abs(otherNet) >= 0.005) {
-          const label = otherNet >= 0 ? '其它收支净值（支出类净额）' : '其它收支净值（净收入等）';
-          result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#9ca3af;"></span>${label}: ${otherNet.toFixed(2)} 万元<br/>`;
-        }
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#5470c6;"></span>销售收入（不含税）: ${rExTax.toFixed(2)} 万元<br/>`;
+        result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#ee6666;"></span>总成本（完整口径）: ${totalCost.toFixed(2)} 万元<br/>`;
         result += `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background:#91cc75;"></span><b>利润: ${pr.toFixed(2)} 万元</b><br/>`;
-        result += `<span style="opacity:0.85">材料+加工+利润+其它净值 = ${(m + p + pr + otherNet).toFixed(2)} 万元</span>`;
+        result += `<span style="opacity:0.85">校验：不含税收入 - 总成本 = ${(rExTax - totalCost).toFixed(2)} 万元</span>`;
         return result;
       }
     },
     legend: {
-      data: ['材料成本', '加工成本', '其它收支净值', '利润'],
+      data: ['销售收入（不含税）', '总成本', '利润'],
       bottom: 0
     },
     grid: {
       left: '3%',
-      right: '4%',
+      right: '12%',
       bottom: '15%',
       top: '18%',
       containLabel: true
@@ -377,85 +365,91 @@ export default function ProfitAnalysis() {
         rotate: 45
       }
     },
-    yAxis: {
-      type: 'value',
-      name: '金额（万元）',
-      nameTextStyle: {
-        color: '#333'
-      }
-    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '金额（万元）',
+        position: 'left',
+        nameTextStyle: {
+          color: '#333'
+        },
+        axisLabel: {
+          color: '#333',
+        },
+      },
+      {
+        type: 'value',
+        name: '利润（万元）',
+        position: 'right',
+        axisLine: { show: true, lineStyle: { color: '#91cc75' } },
+        axisLabel: { color: '#91cc75' },
+        nameTextStyle: { color: '#91cc75' },
+        splitLine: { show: false },
+      },
+    ],
     series: [
       {
-        name: '材料成本',
+        name: '销售收入（不含税）',
         type: 'line',
-        stack: 'revenue',
+        yAxisIndex: 0,
         smooth: true,
-        areaStyle: {
-          opacity: 0.85
+        symbol: 'none',
+        itemStyle: {
+          color: '#5470c6'
         },
+        lineStyle: {
+          color: '#5470c6',
+          width: 2
+        },
+        emphasis: { focus: 'series' },
+        data: revenueExclTaxArr
+      },
+      {
+        name: '总成本',
+        type: 'line',
+        yAxisIndex: 0,
+        smooth: true,
+        symbol: 'none',
         itemStyle: {
           color: '#ee6666'
         },
         lineStyle: {
           color: '#ee6666',
-          width: 1
+          width: 1.8
         },
         emphasis: { focus: 'series' },
-        data: materialArr
-      },
-      {
-        name: '加工成本',
-        type: 'line',
-        stack: 'revenue',
-        smooth: true,
-        areaStyle: {
-          opacity: 0.85
-        },
-        itemStyle: {
-          color: '#fac858'
-        },
-        lineStyle: {
-          color: '#fac858',
-          width: 1
-        },
-        emphasis: { focus: 'series' },
-        data: processingArr
-      },
-      {
-        name: '其它收支净值',
-        type: 'line',
-        stack: 'revenue',
-        smooth: true,
-        areaStyle: {
-          opacity: 0.55
-        },
-        itemStyle: {
-          color: '#9ca3af'
-        },
-        lineStyle: {
-          color: '#9ca3af',
-          width: 1
-        },
-        emphasis: { focus: 'series' },
-        data: otherNetForStack
+        data: totalCostArr
       },
       {
         name: '利润',
         type: 'line',
-        stack: 'revenue',
+        yAxisIndex: 1,
         smooth: true,
+        smoothMonotone: 'x',
         areaStyle: {
-          opacity: 0.9
+          opacity: 0.22
         },
         itemStyle: {
           color: '#91cc75'
         },
         lineStyle: {
           color: '#91cc75',
-          width: 1
+          width: 2
         },
         emphasis: { focus: 'series' },
-        data: profitStackSlice
+        data: profitArr,
+        markLine: {
+          symbol: 'none',
+          lineStyle: {
+            color: 'rgba(220, 38, 38, 0.35)',
+            type: 'dashed',
+            width: 1,
+          },
+          label: {
+            show: false,
+          },
+          data: [{ yAxis: 0 }],
+        },
       }
     ]
   };

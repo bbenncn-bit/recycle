@@ -26,11 +26,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/profit-management/cost-analysis/page.js"
     ],
-    "/api/profit-management/cost-analysis/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/profit-management/cost-analysis/route.js"
-    ],
     "/profit-management/profit-analysis/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -40,46 +35,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/profit-management/profit-analysis/route.js"
-    ],
-    "/energy/consumption-calculation/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/energy/consumption-calculation/page.js"
-    ],
-    "/energy/consumption-query/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/energy/consumption-query/page.js"
-    ],
-    "/waste-management/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/waste-management/page.js"
-    ],
-    "/api/waste-management/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/waste-management/route.js"
-    ],
-    "/api/energy/consumption-query/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/energy/consumption-query/route.js"
-    ],
-    "/api/energy/consumption-calculation/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/energy/consumption-calculation/route.js"
-    ],
-    "/disposal/auction/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/disposal/auction/page.js"
-    ],
-    "/api/profit-management/cost-analysis/export/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/profit-management/cost-analysis/export/route.js"
     ]
   }
 }

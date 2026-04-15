@@ -1,7 +1,6 @@
 {
+  "/api/profit-management/profit-analysis/route": "app/api/profit-management/profit-analysis/route.js",
   "/page": "app/page.js",
-  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js",
-  "/energy/consumption-calculation/page": "app/energy/consumption-calculation/page.js",
   "/profit-management/profit-analysis/page": "app/profit-management/profit-analysis/page.js",
-  "/energy/consumption-query/page": "app/energy/consumption-query/page.js"
+  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js"
 }
