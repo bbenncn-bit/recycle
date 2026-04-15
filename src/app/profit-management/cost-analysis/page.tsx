@@ -376,8 +376,8 @@ export default function CostAnalysis() {
         const index = data.categoryDistributionBaseSelf.categories.indexOf(params.name);
         const avgPrice = index >= 0 ? data.categoryDistributionBaseSelf.avgPrices[index] : 0;
         const quantity = index >= 0 ? data.categoryDistributionBaseSelf.quantities[index] : 0;
-        const costYuan = (Number(params.value) || 0) * 10000;
-        return `${params.name}<br/>成本: ${costYuan.toFixed(2)} 元<br/>平均单价: ${avgPrice.toFixed(2)} 元/吨<br/>数量: ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
+        const costWan = Number(params.value) || 0;
+        return `${params.name}<br/>成本: ${costWan.toFixed(2)} 万元<br/>平均单价: ${avgPrice.toFixed(2)} 元/吨<br/>数量: ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
       }
     },
     legend: {
@@ -402,8 +402,8 @@ export default function CostAnalysis() {
             const index = data.categoryDistributionBaseSelf.categories.indexOf(params.name);
             const avgPrice = index >= 0 ? data.categoryDistributionBaseSelf.avgPrices[index] : 0;
             const quantity = index >= 0 ? data.categoryDistributionBaseSelf.quantities[index] : 0;
-            const costYuan = (Number(params.value) || 0) * 10000;
-            return `${params.name}\n成本:${costYuan.toFixed(2)}元\n平均单价:${avgPrice.toFixed(2)}元/吨\n数量:${quantity.toFixed(2)}吨\n(${params.percent.toFixed(2)}%)`;
+            const costWan = Number(params.value) || 0;
+            return `${params.name}\n成本:${costWan.toFixed(2)}万元\n平均单价:${avgPrice.toFixed(2)}元/吨\n数量:${quantity.toFixed(2)}吨\n(${params.percent.toFixed(2)}%)`;
           }
         },
         emphasis: {

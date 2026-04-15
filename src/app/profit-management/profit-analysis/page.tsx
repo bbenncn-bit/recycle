@@ -460,10 +460,11 @@ export default function ProfitAnalysis() {
     ]
   };
 
-  // 周利润分解图：左柱=销售收入、右柱=总成本（左Y轴）；利润用曲线图绑定右侧Y轴
-  const totalCostByDay = (data.weekBreakdown.materialCost || []).map((m: number, i: number) =>
-    (m || 0) + (data.weekBreakdown.processingCost?.[i] ?? 0)
-  );
+  // 周利润分解图：总成本采用完整口径（与利润公式一致）
+  // 完整总成本 = 销售收入 - 利润
+  const weekRevenueArr = data.weekBreakdown.revenue || [];
+  const weekProfitArr = data.weekBreakdown.profit || [];
+  const totalCostByDay = weekRevenueArr.map((r: number, i: number) => r - (weekProfitArr[i] ?? 0));
   const weekBreakdownOption = {
     title: {
       text: '最近一周利润分解',
@@ -483,11 +484,13 @@ export default function ProfitAnalysis() {
         const revenue = revParam?.value ?? 0;
         const totalCost = costParam?.value ?? 0;
         const profit = profitParam?.value ?? (revenue - totalCost);
-        const materialCost = data.weekBreakdown.materialCost?.[revParam?.dataIndex ?? 0] ?? 0;
-        const processingCost = data.weekBreakdown.processingCost?.[revParam?.dataIndex ?? 0] ?? 0;
+        const idx = revParam?.dataIndex ?? 0;
+        const materialCost = data.weekBreakdown.materialCost?.[idx] ?? 0;
+        const processingCost = data.weekBreakdown.processingCost?.[idx] ?? 0;
+        const otherNetCost = totalCostByDay[idx] - materialCost - processingCost;
         let result = `${params[0].name}<br/>`;
         result += `${revParam?.marker}销售收入: ${revenue.toFixed(2)} 万元<br/>`;
-        result += `${costParam?.marker}总成本: ${totalCost.toFixed(2)} 万元（材料 ${materialCost.toFixed(2)} + 加工 ${processingCost.toFixed(2)}）<br/>`;
+        result += `${costParam?.marker}总成本: ${totalCost.toFixed(2)} 万元（材料 ${materialCost.toFixed(2)} + 加工 ${processingCost.toFixed(2)} + 其它净成本 ${otherNetCost.toFixed(2)}）<br/>`;
         result += `${profitParam?.marker ?? ''}<b>利润: ${profit.toFixed(2)} 万元</b>`;
         return result;
       }
@@ -553,11 +556,27 @@ export default function ProfitAnalysis() {
         type: 'line',
         yAxisIndex: 1,
         data: data.weekBreakdown.profit || [],
+        smooth: true,
+        smoothMonotone: 'x',
         symbol: 'circle',
         symbolSize: 8,
         lineStyle: { color: '#91cc75', width: 2 },
         itemStyle: { color: '#91cc75' },
-        label: { show: false }
+        label: { show: false },
+        markLine: {
+          symbol: 'none',
+          label: {
+            show: true,
+            formatter: '利润零点',
+            color: 'rgba(220, 38, 38, 0.45)',
+          },
+          lineStyle: {
+            color: 'rgba(220, 38, 38, 0.35)',
+            type: 'dashed',
+            width: 1,
+          },
+          data: [{ yAxis: 0 }],
+        },
       }
     ]
   };
