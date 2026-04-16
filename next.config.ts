@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
-const path = require('path');
+/** 开发模式下允许从局域网 IP 等来源请求 /_next/*（逗号分隔完整 origin，如 http://10.54.28.215:3000） */
+const allowedDevOrigins = (process.env.NEXT_ALLOWED_DEV_ORIGINS ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
+  ...(allowedDevOrigins.length > 0 ? { allowedDevOrigins } : {}),
+
   // 注意：instrumentation.ts 在 Next.js 15+ 中默认启用，无需配置
   turbopack: {
       rules: {
@@ -76,5 +83,17 @@ const nextConfig: NextConfig = {
     trailingSlash: false,
     compress: true,
   }),
+
+  // Windows 下 Webpack 监听偶发丢事件，可能加剧 .next 分块与清单不一致；使用 `npm run dev:webpack` 时更稳
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        poll: process.env.NEXT_WEBPACK_POLL ? Number(process.env.NEXT_WEBPACK_POLL) : 1000,
+        aggregateTimeout: 500,
+      };
+    }
+    return config;
+  },
 };
 export default nextConfig;

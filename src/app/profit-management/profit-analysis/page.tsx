@@ -1247,7 +1247,7 @@ export default function ProfitAnalysis() {
                       <li>销售单价(不含税) ≈ {snapSalesExTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
                       <li>材料单价(不含税) ≈ {snapMaterialExTax.toFixed(2)} 元/吨 = 材料成本 / 材料核算量(优先出厂净重)</li>
                       <li>运输费: 客户对应的运价(含税/1.03) × 结算量</li>
-                      <li>税费: (销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%)×10% + (销售单价+材料单价)×0.05%</li>
+                      <li>税费: (销售单价×13% − 材料单价×入库单税率 − 运输费×3% − 加工费×9%)×10% + (销售单价+材料单价)×0.03%</li>
                       <li className="text-amber-700 dark:text-amber-300">
                         代入: ({snapSalesExTax.toFixed(2)}×13% − {snapMaterialExTax.toFixed(2)}×{(snapWarehouseTaxRate * 100).toFixed(4)}% − {snapTransportPerTon.toFixed(2)}×3% − {snapProcessFeePerTon.toFixed(2)}×9%)×{(snapTaxMain * 100).toFixed(2)}% + ({snapSalesExTax.toFixed(2)}+{snapMaterialExTax.toFixed(2)})×{(snapTaxExtra * 100).toFixed(4)}% = {snapTaxFormulaMainPerTon.toFixed(4)} + {snapTaxFormulaExtraPerTon.toFixed(4)} = {snapTaxPerTon.toFixed(4)} 元/吨（本单税费 {tax.toFixed(2)} 元）
                       </li>

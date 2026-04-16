@@ -94,6 +94,13 @@ interface CostAnalysisData {
   };
 }
 
+function formatYmd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export default function CostAnalysis() {
   const [data, setData] = useState<CostAnalysisData | null>(null);
   /** quick：首屏核心指标与趋势已就绪；full：料型分布等已合并 */
@@ -102,15 +109,32 @@ export default function CostAnalysis() {
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
   const [exporting, setExporting] = useState(false);
+  /** 当月内任选一日查看「当日成本」汇总（与 API costDay 一致） */
+  const [costViewDate, setCostViewDate] = useState(() => {
+    const n = new Date();
+    return formatYmd(new Date(n.getFullYear(), n.getMonth(), n.getDate()));
+  });
+  const [costDayMin, setCostDayMin] = useState('');
+  const [costDayMax, setCostDayMax] = useState('');
+
+  useEffect(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    setCostDayMin(formatYmd(monthStart));
+    setCostDayMax(formatYmd(today));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
+
+    const qs = new URLSearchParams({ phase: 'quick', costDay: costViewDate });
 
     const fetchData = async () => {
       try {
         setLoadStage('idle');
         setError(null);
-        const quickRes = await fetch('/api/profit-management/cost-analysis?phase=quick');
+        const quickRes = await fetch(`/api/profit-management/cost-analysis?${qs.toString()}`);
         if (!quickRes.ok) {
           const errorData = await quickRes.json().catch(() => ({}));
           throw new Error(errorData.error || `HTTP error! status: ${quickRes.status}`);
@@ -133,7 +157,8 @@ export default function CostAnalysis() {
       }
 
       try {
-        const fullRes = await fetch('/api/profit-management/cost-analysis');
+        const fullQs = new URLSearchParams({ costDay: costViewDate });
+        const fullRes = await fetch(`/api/profit-management/cost-analysis?${fullQs.toString()}`);
         if (!fullRes.ok) {
           const errorData = await fullRes.json().catch(() => ({}));
           throw new Error(errorData.error || `HTTP error! status: ${fullRes.status}`);
@@ -153,7 +178,7 @@ export default function CostAnalysis() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [costViewDate]);
 
   useEffect(() => {
     const now = new Date();
@@ -918,13 +943,28 @@ export default function CostAnalysis() {
 
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* 今日成本（包含平均日成本） */}
+          {/* 当日成本（含当月日期选择；平均日成本仍为当月至今） */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  今日成本
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    当日成本
+                  </p>
+                  {costViewDate && costDayMin && costDayMax && (
+                    <label className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                      <span className="whitespace-nowrap">查看日期</span>
+                      <input
+                        type="date"
+                        value={costViewDate}
+                        min={costDayMin}
+                        max={costDayMax}
+                        onChange={(e) => setCostViewDate(e.target.value)}
+                        className="rounded border border-gray-300 bg-white px-1.5 py-0.5 text-xs text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      />
+                    </label>
+                  )}
+                </div>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {data.summary.todayCost.toFixed(2)}
                 </p>

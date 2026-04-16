@@ -45,7 +45,7 @@ INSERT INTO `ProfitParamConfig` (`param_key`, `name_cn`, `category`, `sub_catego
 -- 其它成本项：税费公式中的比例
 INSERT INTO `ProfitParamConfig` (`param_key`, `name_cn`, `category`, `sub_category`, `steel_mill`, `effective_date`, `value`, `previous_value`, `unit`, `remark`) VALUES
 ('tax_rate_main', '税费-主税率', 'other_cost', 'tax', NULL, '2020-01-01', 10, NULL, '%', '附图税费公式中 10%'),
-('tax_rate_extra', '税费-附加税率', 'other_cost', 'tax', NULL, '2020-01-01', 0.05, NULL, '%', '附图税费公式中 (销售+材料)*0.05%');
+('tax_rate_extra', '税费-附加税率', 'other_cost', 'tax', NULL, '2020-01-01', 0.03, NULL, '%', '附图税费公式中 (销售+材料)*0.03%');
 
 -- 其它收入项：即征即退
 INSERT INTO `ProfitParamConfig` (`param_key`, `name_cn`, `category`, `sub_category`, `steel_mill`, `effective_date`, `value`, `previous_value`, `unit`, `remark`) VALUES

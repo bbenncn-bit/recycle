@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev",
-    "dev:turbo": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack",
+    "dev": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack",
+    "dev:webpack": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev",
+    "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && npm run dev",
     "build": "next build",
     "build:production": "NODE_ENV=production next build",
     "start": "next start",

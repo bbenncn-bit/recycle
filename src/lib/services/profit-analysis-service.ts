@@ -496,7 +496,7 @@ function buildParamSnapshot(
     transportFee,
     roadLossFactor: roadLoss,
     taxRateMain: v('tax_rate_main') || 10,
-    taxRateExtra: v('tax_rate_extra') || 0.05,
+    taxRateExtra: v('tax_rate_extra') || 0.03,
     processingFeeForRefund: v('processing_fee_for_refund') || DEFAULT_PROCESSING_COST_PER_TON,
     instantRefundRate: v('instant_refund_rate') || 30,
     // getEffectiveParamValue 未命中时返回 0，这里用 || 回退默认值，避免关键参数被 0 覆盖

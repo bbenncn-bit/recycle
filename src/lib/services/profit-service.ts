@@ -367,11 +367,13 @@ let costValidRowsCache: {
 /**
  * 获取成本分析数据
  * @param phase quick：先返回汇总/趋势/周柱（无料型饼图、无上月对比、无周维度料型钻取）；full：完整数据
+ * @param costSnapshotDay 可选；指定时 summary 中「当日成本」按该自然日汇总（否则为今天）
  */
 export async function getCostAnalysisData(
   startDate?: Date,
   endDate?: Date,
-  phase: 'quick' | 'full' = 'full'
+  phase: 'quick' | 'full' = 'full',
+  costSnapshotDay?: Date
 ): Promise<CostAnalysisData> {
   const devLog = process.env.NODE_ENV === 'development';
 
@@ -389,6 +391,24 @@ export async function getCostAnalysisData(
   todayForCalc.setHours(0, 0, 0, 0);
   const todayEnd = new Date(todayForCalc);
   todayEnd.setHours(23, 59, 59, 999);
+
+  /** 「当日成本」卡片用的自然日区间（默认同今天） */
+  let dayStart = new Date(todayForCalc);
+  let dayEnd = new Date(todayEnd);
+  if (costSnapshotDay && !Number.isNaN(costSnapshotDay.getTime())) {
+    dayStart = new Date(
+      costSnapshotDay.getFullYear(),
+      costSnapshotDay.getMonth(),
+      costSnapshotDay.getDate()
+    );
+    dayStart.setHours(0, 0, 0, 0);
+    dayEnd = new Date(
+      costSnapshotDay.getFullYear(),
+      costSnapshotDay.getMonth(),
+      costSnapshotDay.getDate()
+    );
+    dayEnd.setHours(23, 59, 59, 999);
+  }
 
   const lastMonthStart = new Date(todayForCalc);
   lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
@@ -611,7 +631,7 @@ export async function getCostAnalysisData(
   
   const todayData = validData.filter(item => {
     const date = parseWarehouseDate(item.warehouseDate);
-    return date && date >= todayForCalc && date <= todayEnd;
+    return date && date >= dayStart && date <= dayEnd;
   });
   
   const weekData = validData.filter(item => {
@@ -638,7 +658,7 @@ export async function getCostAnalysisData(
       todayData: todayData.length,
       weekData: weekData.length,
       monthData: monthData.length,
-      todayRange: `${formatDate(todayForCalc)} ~ ${formatDate(todayEnd)}`,
+      todayRange: `${formatDate(dayStart)} ~ ${formatDate(dayEnd)}`,
       weekRange: `${formatDate(last7DaysStart)} ~ ${formatDate(todayEnd)}`,
       monthRange: `${formatDate(monthStart)} ~ ${formatDate(todayEnd)}`,
       allDatesRange:

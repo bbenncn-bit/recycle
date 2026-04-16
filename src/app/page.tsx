@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getReceiptfgDataBatch } from './api/receiptfg/fetch-batch';
 import { getReceiptfcDataBatch } from './api/receiptfc/fetch-batch';
 import ProgressiveTableWithPagination from '../components/progressive-table-with-pagination';
@@ -23,8 +23,17 @@ interface TableData {
 }
 
 export default function Page() {
-  const monthDateOptions = useMemo(() => getLocalMonthToDateKeysDescending(), []);
-  const [selectedDate, setSelectedDate] = useState(() => monthDateOptions[0] ?? '');
+  /** 在浏览器挂载后再生成本月日期，避免 SSR 与客户端时区不一致导致水合异常或长期停在等待态 */
+  const [dateOptions, setDateOptions] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [datesReady, setDatesReady] = useState(false);
+
+  useEffect(() => {
+    const keys = getLocalMonthToDateKeysDescending();
+    setDateOptions(keys);
+    setSelectedDate(keys[0] ?? '');
+    setDatesReady(true);
+  }, []);
 
   const [fcTotalData, setFcTotalData] = useState<TableData[]>([]);
   const [fgTotalData, setFgTotalData] = useState<TableData[]>([]);
@@ -109,13 +118,14 @@ export default function Page() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">再生资源交易数据表</h1>
             <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <span className="whitespace-nowrap">交易日期</span>
+              <span className="whitespace-nowrap">交易日期（报废车与废钢铁同一天）</span>
               <select
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="min-w-[220px] rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                disabled={!datesReady || dateOptions.length === 0}
+                className="min-w-[220px] rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-blue-400 dark:focus:ring-blue-400"
               >
-                {monthDateOptions.map((d) => (
+                {dateOptions.map((d) => (
                   <option key={d} value={d}>
                     {d}
                   </option>
@@ -128,7 +138,15 @@ export default function Page() {
           </p>
         </div>
 
-        {selectedDate ? (
+        {!datesReady ? (
+          <div className="mb-8 rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-600 shadow dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+            正在准备本月可选日期…
+          </div>
+        ) : dateOptions.length === 0 || !selectedDate ? (
+          <div className="mb-8 rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+            无法解析当前月份日期，请刷新页面重试。
+          </div>
+        ) : (
           <>
             <ProgressiveTableWithPagination
               title="废钢铁 数据"
@@ -147,23 +165,9 @@ export default function Page() {
               itemsPerPage={10}
             />
           </>
-        ) : (
-          <div className="mb-8 rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-            无法解析当前月份日期，请刷新页面重试。
-          </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {fcStatsLoading ? (
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              ) : (
-                fcTotalData.length
-              )}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">报废车 交易记录</div>
-          </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {fgStatsLoading ? (
@@ -173,6 +177,16 @@ export default function Page() {
               )}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">废钢铁 交易记录</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              {fcStatsLoading ? (
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              ) : (
+                fcTotalData.length
+              )}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">报废车 交易记录</div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
