@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prismadb';
 import { normalizeMaterialCategoryLabel } from '@/lib/material-label';
+import { classifyCostReceipt } from '@/lib/cost-receipt-classification';
 
 export interface CostAnalysisData {
   summary: {
@@ -163,10 +164,17 @@ function processCostData(value: any): number {
 
 /**
  * 计算日成本（严格从数据库取数，不包含未来日期）
- * 按 receiptNo 分类：基地收货（SH）、基地买货（TH）、协同业务（其他）
+ * 金额口径：total_price_excluding_tax（元）；吨数口径：estimated_dry_basis（吨）
+ * 按 receiptNo + 仓库 分类：基地收货、基地买货、协同业务
  */
 function calculateDailyCost(
-  data: Array<{ warehouseDate: string | null; totalPriceIncludingTax: any; receiptNo: string | null; netWeight: any }>,
+  data: Array<{
+    warehouseDate: string | null;
+    totalPriceExcludingTax: any;
+    receiptNo: string | null;
+    warehouse: string | null;
+    estimatedDryBasis: any;
+  }>,
   startDate: Date,
   endDate: Date
 ): {
@@ -217,8 +225,8 @@ function calculateDailyCost(
     
     if (date >= startDate && date <= actualEndDate) {
       const dateKey = formatDate(date);
-      const cost = processCostData(item.totalPriceIncludingTax);
-      const qty = processCostData(item.netWeight);
+      const cost = processCostData(item.totalPriceExcludingTax);
+      const qty = processCostData(item.estimatedDryBasis);
       const dayData = dateMap.get(dateKey) || {
         baseSelf: 0,
         basePurchase: 0,
@@ -228,12 +236,11 @@ function calculateDailyCost(
         collaborationQty: 0,
       };
       
-      // 根据 receiptNo 前两个字母分类
-      const receiptNo = (item.receiptNo || '').toUpperCase();
-      if (receiptNo.startsWith('SH')) {
+      const bucket = classifyCostReceipt(item.receiptNo, item.warehouse);
+      if (bucket === 'baseSelf') {
         dayData.baseSelf += cost;
         dayData.baseSelfQty += qty;
-      } else if (receiptNo.startsWith('TH')) {
+      } else if (bucket === 'basePurchase') {
         dayData.basePurchase += cost;
         dayData.basePurchaseQty += qty;
       } else {
@@ -262,16 +269,15 @@ function calculateDailyCost(
 }
 
 /**
- * 按物料类型计算成本（从 PurchaseWarehouse 表的 material 字段分类汇总）
- * 包含平均单价和数量
+ * 按物料类型计算成本（从 PurchaseWarehouse.material 分类汇总）
+ * 成本为不含税总价（元→万元），吨数为预估干基；平均单价=不含税总额/干基吨
  */
 function calculateCategoryCost(
-  data: Array<{ 
-    material: string | null; 
-    totalPriceIncludingTax: any; 
+  data: Array<{
+    material: string | null;
+    totalPriceExcludingTax: any;
     warehouseDate: string | null;
-    unitPriceIncludingTax: any; // 单价（含税）
-    netWeight: any; // 净重
+    estimatedDryBasis: any;
   }>
 ): { 
   categories: string[]; 
@@ -299,9 +305,8 @@ function calculateCategoryCost(
     
     // 使用 material 字段进行分类（规范化后跨月份可对齐同一料型）
     const category = normalizeMaterialCategoryLabel(item.material);
-    const cost = processCostData(item.totalPriceIncludingTax);
-    const quantity = processCostData(item.netWeight); // 净重（吨）
-    const unitPrice = processCostData(item.unitPriceIncludingTax); // 单价（含税，元/吨）
+    const cost = processCostData(item.totalPriceExcludingTax);
+    const quantity = processCostData(item.estimatedDryBasis);
     
     const existing = categoryMap.get(category) || {
       totalCost: 0,
@@ -312,7 +317,7 @@ function calculateCategoryCost(
     
     existing.totalCost += cost;
     existing.totalQuantity += quantity;
-    existing.totalPrice += cost; // 总价用于计算加权平均
+    existing.totalPrice += cost;
     existing.count += 1;
     
     categoryMap.set(category, existing);
@@ -352,17 +357,21 @@ function calculateCategoryCost(
 const COST_VALID_ROWS_TTL_MS = 90_000;
 let costValidRowsCache: {
   minWarehouseDateStr: string;
+  schemaVersion: number;
   expiresAt: number;
   rows: Array<{
     warehouseDate: string | null;
+    warehouse: string | null;
     material: string | null;
-    totalPriceIncludingTax: unknown;
+    totalPriceExcludingTax: unknown;
     status: string | null;
     receiptNo: string | null;
-    unitPriceIncludingTax: unknown;
-    netWeight: unknown;
+    unitPriceExcludingTax: unknown;
+    estimatedDryBasis: unknown;
   }>;
 } | null = null;
+
+const COST_ROW_CACHE_SCHEMA = 3;
 
 /**
  * 获取成本分析数据
@@ -433,17 +442,19 @@ export async function getCostAnalysisData(
   const nowMs = Date.now();
   let validData: Array<{
     warehouseDate: string | null;
+    warehouse: string | null;
     material: string | null;
-    totalPriceIncludingTax: unknown;
+    totalPriceExcludingTax: unknown;
     status: string | null;
     receiptNo: string | null;
-    unitPriceIncludingTax: unknown;
-    netWeight: unknown;
+    unitPriceExcludingTax: unknown;
+    estimatedDryBasis: unknown;
   }>;
 
   if (
     costValidRowsCache &&
     costValidRowsCache.minWarehouseDateStr === minWarehouseDateStr &&
+    costValidRowsCache.schemaVersion === COST_ROW_CACHE_SCHEMA &&
     costValidRowsCache.expiresAt > nowMs
   ) {
     validData = costValidRowsCache.rows;
@@ -458,9 +469,6 @@ export async function getCostAnalysisData(
     try {
     allData = await prisma.purchaseWarehouse.findMany({
       where: {
-        totalPriceIncludingTax: {
-          not: null,
-        },
         warehouseDate: {
           not: null,
           gte: minWarehouseDateStr,
@@ -468,12 +476,13 @@ export async function getCostAnalysisData(
       },
       select: {
         warehouseDate: true,
+        warehouse: true,
         material: true,
-        totalPriceIncludingTax: true,
+        totalPriceExcludingTax: true,
         status: true,
-        receiptNo: true, // 添加 receiptNo 用于分类
-        unitPriceIncludingTax: true, // 单价（含税）
-        netWeight: true, // 净重
+        receiptNo: true,
+        unitPriceExcludingTax: true,
+        estimatedDryBasis: true,
       },
     });
     if (devLog) {
@@ -557,6 +566,7 @@ export async function getCostAnalysisData(
 
     costValidRowsCache = {
       minWarehouseDateStr,
+      schemaVersion: COST_ROW_CACHE_SCHEMA,
       expiresAt: nowMs + COST_VALID_ROWS_TTL_MS,
       rows: validData,
     };
@@ -602,8 +612,8 @@ export async function getCostAnalysisData(
   };
   
   validData.slice(0, 10).forEach(item => {
-    const price = processCostData(item.totalPriceIncludingTax);
-    if (item.totalPriceIncludingTax === null || item.totalPriceIncludingTax === undefined) {
+    const price = processCostData(item.totalPriceExcludingTax);
+    if (item.totalPriceExcludingTax === null || item.totalPriceExcludingTax === undefined) {
       priceStats.nullPrice++;
     } else if (price === 0) {
       priceStats.zeroPrice++;
@@ -611,7 +621,7 @@ export async function getCostAnalysisData(
       priceStats.hasPrice++;
       if (priceStats.samplePrices.length < 5) {
         priceStats.samplePrices.push({
-          original: item.totalPriceIncludingTax,
+          original: item.totalPriceExcludingTax,
           processed: price,
         });
       }
@@ -674,8 +684,8 @@ export async function getCostAnalysisData(
       '💰 今日数据示例:',
       todayData.slice(0, 3).map((item) => ({
         warehouseDate: item.warehouseDate,
-        totalPriceIncludingTax: item.totalPriceIncludingTax,
-        processed: processCostData(item.totalPriceIncludingTax),
+        totalPriceExcludingTax: item.totalPriceExcludingTax,
+        processed: processCostData(item.totalPriceExcludingTax),
       }))
     );
   }
@@ -685,8 +695,8 @@ export async function getCostAnalysisData(
       '💰 本周数据示例:',
       weekData.slice(0, 3).map((item) => ({
         warehouseDate: item.warehouseDate,
-        totalPriceIncludingTax: item.totalPriceIncludingTax,
-        processed: processCostData(item.totalPriceIncludingTax),
+        totalPriceExcludingTax: item.totalPriceExcludingTax,
+        processed: processCostData(item.totalPriceExcludingTax),
       }))
     );
   }
@@ -701,35 +711,40 @@ export async function getCostAnalysisData(
   });
   
   const todayCost = parseFloat((todayData.reduce(
-    (sum, item) => sum + processCostData(item.totalPriceIncludingTax),
+    (sum, item) => sum + processCostData(item.totalPriceExcludingTax),
     0
   ) / 10000).toFixed(2)); // 转换为万元，保留2位小数
   
   const weekCost = parseFloat((weekData.reduce(
-    (sum, item) => sum + processCostData(item.totalPriceIncludingTax),
+    (sum, item) => sum + processCostData(item.totalPriceExcludingTax),
     0
   ) / 10000).toFixed(2));
   
   const monthCost = parseFloat((monthData.reduce(
-    (sum, item) => sum + processCostData(item.totalPriceIncludingTax),
+    (sum, item) => sum + processCostData(item.totalPriceExcludingTax),
     0
   ) / 10000).toFixed(2));
 
   const summarizeBaseSelfAndPurchase = (
-    rows: Array<{ receiptNo: string | null; totalPriceIncludingTax: any; netWeight: any }>
+    rows: Array<{
+      receiptNo: string | null;
+      warehouse: string | null;
+      totalPriceExcludingTax: any;
+      estimatedDryBasis: any;
+    }>
   ) => {
     let baseSelfCost = 0;
     let baseSelfQty = 0;
     let basePurchaseCost = 0;
     let basePurchaseQty = 0;
     for (const row of rows) {
-      const receiptNo = (row.receiptNo || '').toUpperCase();
-      const cost = processCostData(row.totalPriceIncludingTax);
-      const qty = processCostData(row.netWeight);
-      if (receiptNo.startsWith('SH')) {
+      const cost = processCostData(row.totalPriceExcludingTax);
+      const qty = processCostData(row.estimatedDryBasis);
+      const bucket = classifyCostReceipt(row.receiptNo, row.warehouse);
+      if (bucket === 'baseSelf') {
         baseSelfCost += cost;
         baseSelfQty += qty;
-      } else if (receiptNo.startsWith('TH')) {
+      } else if (bucket === 'basePurchase') {
         basePurchaseCost += cost;
         basePurchaseQty += qty;
       }
@@ -758,7 +773,7 @@ export async function getCostAnalysisData(
   });
   
   const currentMonthTotal = parseFloat((currentMonthData.reduce(
-    (sum, item) => sum + processCostData(item.totalPriceIncludingTax),
+    (sum, item) => sum + processCostData(item.totalPriceExcludingTax),
     0
   ) / 10000).toFixed(2));
   
@@ -800,14 +815,12 @@ export async function getCostAnalysisData(
       return date >= currentMonthStartForCategory && date <= todayForCategory;
     });
 
-    const baseSelfData = categoryData.filter(item => {
-      const receiptNo = (item.receiptNo || '').toUpperCase();
-      return receiptNo.startsWith('SH');
+    const baseSelfData = categoryData.filter((item) => {
+      return classifyCostReceipt(item.receiptNo, item.warehouse) === 'baseSelf';
     });
 
-    const basePurchaseData = categoryData.filter(item => {
-      const receiptNo = (item.receiptNo || '').toUpperCase();
-      return receiptNo.startsWith('TH');
+    const basePurchaseData = categoryData.filter((item) => {
+      return classifyCostReceipt(item.receiptNo, item.warehouse) === 'basePurchase';
     });
 
     categoryDistributionBaseSelf = calculateCategoryCost(baseSelfData);
@@ -823,14 +836,12 @@ export async function getCostAnalysisData(
       return date >= lastMonthStart && date <= lastMonthEnd;
     });
 
-    const lastMonthBaseSelfData = lastMonthData.filter(item => {
-      const receiptNo = (item.receiptNo || '').toUpperCase();
-      return receiptNo.startsWith('SH');
+    const lastMonthBaseSelfData = lastMonthData.filter((item) => {
+      return classifyCostReceipt(item.receiptNo, item.warehouse) === 'baseSelf';
     });
 
-    const lastMonthBasePurchaseData = lastMonthData.filter(item => {
-      const receiptNo = (item.receiptNo || '').toUpperCase();
-      return receiptNo.startsWith('TH');
+    const lastMonthBasePurchaseData = lastMonthData.filter((item) => {
+      return classifyCostReceipt(item.receiptNo, item.warehouse) === 'basePurchase';
     });
 
     lastMonthCategoryDistributionBaseSelf = calculateCategoryCost(lastMonthBaseSelfData);
@@ -914,13 +925,14 @@ export async function getCostAnalysisData(
  * 其他 = 协同业务
  */
 function calculateWeekCostBreakdown(
-  weekData: Array<{ 
-    warehouseDate: string | null; 
-    totalPriceIncludingTax: any; 
+  weekData: Array<{
+    warehouseDate: string | null;
+    warehouse: string | null;
+    totalPriceExcludingTax: any;
     receiptNo: string | null;
     material: string | null;
-    unitPriceIncludingTax: any;
-    netWeight: any;
+    unitPriceExcludingTax: any;
+    estimatedDryBasis: any;
   }>,
   includeDailyCategory = true
 ): { 
@@ -961,9 +973,9 @@ function calculateWeekCostBreakdown(
   // 按日期和 receiptNo 分类汇总，同时收集每日的详细分类数据
   const dailyCategoryMap = new Map<string, Array<{
     material: string | null;
-    totalPriceIncludingTax: any;
-    unitPriceIncludingTax: any;
-    netWeight: any;
+    totalPriceExcludingTax: any;
+    unitPriceExcludingTax: any;
+    estimatedDryBasis: any;
   }>>();
   
   for (const item of weekData) {
@@ -979,11 +991,10 @@ function calculateWeekCostBreakdown(
     if (dayIndex === -1) continue;
     
     // 注意：这里不转换为万元，保持原始值（元），最后统一转换
-    const cost = processCostData(item.totalPriceIncludingTax);
+    const cost = processCostData(item.totalPriceExcludingTax);
     
-    // 根据 receiptNo 前两个字母分类
-    const receiptNo = (item.receiptNo || '').toUpperCase();
-    if (receiptNo.startsWith('SH')) {
+    const bucket = classifyCostReceipt(item.receiptNo, item.warehouse);
+    if (bucket === 'baseSelf') {
       dayData[dayIndex].baseSelf += cost;
       if (includeDailyCategory) {
         if (!dailyCategoryMap.has(dateKey)) {
@@ -991,12 +1002,12 @@ function calculateWeekCostBreakdown(
         }
         dailyCategoryMap.get(dateKey)!.push({
           material: item.material,
-          totalPriceIncludingTax: item.totalPriceIncludingTax,
-          unitPriceIncludingTax: item.unitPriceIncludingTax,
-          netWeight: item.netWeight,
+          totalPriceExcludingTax: item.totalPriceExcludingTax,
+          unitPriceExcludingTax: item.unitPriceExcludingTax,
+          estimatedDryBasis: item.estimatedDryBasis,
         });
       }
-    } else if (receiptNo.startsWith('TH')) {
+    } else if (bucket === 'basePurchase') {
       dayData[dayIndex].basePurchase += cost;
     } else {
       dayData[dayIndex].collaboration += cost;
@@ -1008,10 +1019,9 @@ function calculateWeekCostBreakdown(
         const dayItems = dailyCategoryMap.get(dateKey) || [];
         const categoryData = calculateCategoryCost(dayItems.map(item => ({
           material: item.material,
-          totalPriceIncludingTax: item.totalPriceIncludingTax,
+          totalPriceExcludingTax: item.totalPriceExcludingTax,
           warehouseDate: dateKey,
-          unitPriceIncludingTax: item.unitPriceIncludingTax,
-          netWeight: item.netWeight,
+          estimatedDryBasis: item.estimatedDryBasis,
         })));
 
         return {

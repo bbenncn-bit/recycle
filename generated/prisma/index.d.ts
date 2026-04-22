@@ -194,10 +194,26 @@ export type PurchaseWarehouse = $Result.DefaultSelection<Prisma.$PurchaseWarehou
  */
 export type DeliverySettlement = $Result.DefaultSelection<Prisma.$DeliverySettlementPayload>
 /**
+ * Model ProfitParamConfig
+ * 利润核算可调参数表（运输费/税费/即征即退/政府扶持/贴现/回款利息等，附图标红参数）
+ * 规则：按结算单发货日期查找，effective_date 起用 value，之前用 previous_value
+ */
+export type ProfitParamConfig = $Result.DefaultSelection<Prisma.$ProfitParamConfigPayload>
+/**
  * Model ProcessingCostInput
- * 生产情况录入表
+ * 生产情况录入表（与小程序/云函数写入一致：含 dailyProcess_qty、M*_qty 及 material_composition JSON）
  */
 export type ProcessingCostInput = $Result.DefaultSelection<Prisma.$ProcessingCostInputPayload>
+/**
+ * Model MaterialStorage
+ * 毛料库存与分类（2026-04 起：别名 = 库区拼音首字母 + 物料简写，如 MSLKM2）
+ */
+export type MaterialStorage = $Result.DefaultSelection<Prisma.$MaterialStoragePayload>
+/**
+ * Model ProductStock
+ * 成品库存（warehouse_code 为成品库代码，如 JGSL、PGSL）
+ */
+export type ProductStock = $Result.DefaultSelection<Prisma.$ProductStockPayload>
 /**
  * Model ProcessingCostConfig
  * 加工成本配置表（上月吨加工成本）
@@ -687,6 +703,16 @@ export class PrismaClient<
   get deliverySettlement(): Prisma.DeliverySettlementDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.profitParamConfig`: Exposes CRUD operations for the **ProfitParamConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProfitParamConfigs
+    * const profitParamConfigs = await prisma.profitParamConfig.findMany()
+    * ```
+    */
+  get profitParamConfig(): Prisma.ProfitParamConfigDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.processingCostInput`: Exposes CRUD operations for the **ProcessingCostInput** model.
     * Example usage:
     * ```ts
@@ -695,6 +721,26 @@ export class PrismaClient<
     * ```
     */
   get processingCostInput(): Prisma.ProcessingCostInputDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.materialStorage`: Exposes CRUD operations for the **MaterialStorage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MaterialStorages
+    * const materialStorages = await prisma.materialStorage.findMany()
+    * ```
+    */
+  get materialStorage(): Prisma.MaterialStorageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.productStock`: Exposes CRUD operations for the **ProductStock** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductStocks
+    * const productStocks = await prisma.productStock.findMany()
+    * ```
+    */
+  get productStock(): Prisma.ProductStockDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.processingCostConfig`: Exposes CRUD operations for the **ProcessingCostConfig** model.
@@ -1185,7 +1231,10 @@ export namespace Prisma {
     WasteManagement: 'WasteManagement',
     PurchaseWarehouse: 'PurchaseWarehouse',
     DeliverySettlement: 'DeliverySettlement',
+    ProfitParamConfig: 'ProfitParamConfig',
     ProcessingCostInput: 'ProcessingCostInput',
+    MaterialStorage: 'MaterialStorage',
+    ProductStock: 'ProductStock',
     ProcessingCostConfig: 'ProcessingCostConfig',
     MaterialCostCache: 'MaterialCostCache'
   };
@@ -1203,7 +1252,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "processingCostInput" | "processingCostConfig" | "materialCostCache"
+      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3583,6 +3632,72 @@ export namespace Prisma {
           }
         }
       }
+      ProfitParamConfig: {
+        payload: Prisma.$ProfitParamConfigPayload<ExtArgs>
+        fields: Prisma.ProfitParamConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProfitParamConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProfitParamConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.ProfitParamConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProfitParamConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          findMany: {
+            args: Prisma.ProfitParamConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>[]
+          }
+          create: {
+            args: Prisma.ProfitParamConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          createMany: {
+            args: Prisma.ProfitParamConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProfitParamConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          update: {
+            args: Prisma.ProfitParamConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProfitParamConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProfitParamConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProfitParamConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProfitParamConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.ProfitParamConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProfitParamConfig>
+          }
+          groupBy: {
+            args: Prisma.ProfitParamConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProfitParamConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProfitParamConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<ProfitParamConfigCountAggregateOutputType> | number
+          }
+        }
+      }
       ProcessingCostInput: {
         payload: Prisma.$ProcessingCostInputPayload<ExtArgs>
         fields: Prisma.ProcessingCostInputFieldRefs
@@ -3646,6 +3761,138 @@ export namespace Prisma {
           count: {
             args: Prisma.ProcessingCostInputCountArgs<ExtArgs>
             result: $Utils.Optional<ProcessingCostInputCountAggregateOutputType> | number
+          }
+        }
+      }
+      MaterialStorage: {
+        payload: Prisma.$MaterialStoragePayload<ExtArgs>
+        fields: Prisma.MaterialStorageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaterialStorageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaterialStorageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          findFirst: {
+            args: Prisma.MaterialStorageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaterialStorageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          findMany: {
+            args: Prisma.MaterialStorageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>[]
+          }
+          create: {
+            args: Prisma.MaterialStorageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          createMany: {
+            args: Prisma.MaterialStorageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MaterialStorageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          update: {
+            args: Prisma.MaterialStorageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          deleteMany: {
+            args: Prisma.MaterialStorageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaterialStorageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MaterialStorageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialStoragePayload>
+          }
+          aggregate: {
+            args: Prisma.MaterialStorageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaterialStorage>
+          }
+          groupBy: {
+            args: Prisma.MaterialStorageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaterialStorageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaterialStorageCountArgs<ExtArgs>
+            result: $Utils.Optional<MaterialStorageCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProductStock: {
+        payload: Prisma.$ProductStockPayload<ExtArgs>
+        fields: Prisma.ProductStockFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductStockFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductStockFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductStockFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductStockFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          findMany: {
+            args: Prisma.ProductStockFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>[]
+          }
+          create: {
+            args: Prisma.ProductStockCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          createMany: {
+            args: Prisma.ProductStockCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProductStockDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          update: {
+            args: Prisma.ProductStockUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductStockDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductStockUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductStockUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductStockAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductStock>
+          }
+          groupBy: {
+            args: Prisma.ProductStockGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductStockGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductStockCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductStockCountAggregateOutputType> | number
           }
         }
       }
@@ -3925,7 +4172,10 @@ export namespace Prisma {
     wasteManagement?: WasteManagementOmit
     purchaseWarehouse?: PurchaseWarehouseOmit
     deliverySettlement?: DeliverySettlementOmit
+    profitParamConfig?: ProfitParamConfigOmit
     processingCostInput?: ProcessingCostInputOmit
+    materialStorage?: MaterialStorageOmit
+    productStock?: ProductStockOmit
     processingCostConfig?: ProcessingCostConfigOmit
     materialCostCache?: MaterialCostCacheOmit
   }
@@ -38431,6 +38681,1018 @@ export namespace Prisma {
 
 
   /**
+   * Model ProfitParamConfig
+   */
+
+  export type AggregateProfitParamConfig = {
+    _count: ProfitParamConfigCountAggregateOutputType | null
+    _avg: ProfitParamConfigAvgAggregateOutputType | null
+    _sum: ProfitParamConfigSumAggregateOutputType | null
+    _min: ProfitParamConfigMinAggregateOutputType | null
+    _max: ProfitParamConfigMaxAggregateOutputType | null
+  }
+
+  export type ProfitParamConfigAvgAggregateOutputType = {
+    id: number | null
+    value: Decimal | null
+    previousValue: Decimal | null
+  }
+
+  export type ProfitParamConfigSumAggregateOutputType = {
+    id: number | null
+    value: Decimal | null
+    previousValue: Decimal | null
+  }
+
+  export type ProfitParamConfigMinAggregateOutputType = {
+    id: number | null
+    paramKey: string | null
+    nameCn: string | null
+    category: string | null
+    subCategory: string | null
+    steelMill: string | null
+    effectiveDate: Date | null
+    value: Decimal | null
+    previousValue: Decimal | null
+    unit: string | null
+    remark: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProfitParamConfigMaxAggregateOutputType = {
+    id: number | null
+    paramKey: string | null
+    nameCn: string | null
+    category: string | null
+    subCategory: string | null
+    steelMill: string | null
+    effectiveDate: Date | null
+    value: Decimal | null
+    previousValue: Decimal | null
+    unit: string | null
+    remark: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ProfitParamConfigCountAggregateOutputType = {
+    id: number
+    paramKey: number
+    nameCn: number
+    category: number
+    subCategory: number
+    steelMill: number
+    effectiveDate: number
+    value: number
+    previousValue: number
+    unit: number
+    remark: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ProfitParamConfigAvgAggregateInputType = {
+    id?: true
+    value?: true
+    previousValue?: true
+  }
+
+  export type ProfitParamConfigSumAggregateInputType = {
+    id?: true
+    value?: true
+    previousValue?: true
+  }
+
+  export type ProfitParamConfigMinAggregateInputType = {
+    id?: true
+    paramKey?: true
+    nameCn?: true
+    category?: true
+    subCategory?: true
+    steelMill?: true
+    effectiveDate?: true
+    value?: true
+    previousValue?: true
+    unit?: true
+    remark?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProfitParamConfigMaxAggregateInputType = {
+    id?: true
+    paramKey?: true
+    nameCn?: true
+    category?: true
+    subCategory?: true
+    steelMill?: true
+    effectiveDate?: true
+    value?: true
+    previousValue?: true
+    unit?: true
+    remark?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ProfitParamConfigCountAggregateInputType = {
+    id?: true
+    paramKey?: true
+    nameCn?: true
+    category?: true
+    subCategory?: true
+    steelMill?: true
+    effectiveDate?: true
+    value?: true
+    previousValue?: true
+    unit?: true
+    remark?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ProfitParamConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProfitParamConfig to aggregate.
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProfitParamConfigs to fetch.
+     */
+    orderBy?: ProfitParamConfigOrderByWithRelationInput | ProfitParamConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProfitParamConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProfitParamConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProfitParamConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProfitParamConfigs
+    **/
+    _count?: true | ProfitParamConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProfitParamConfigAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProfitParamConfigSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProfitParamConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProfitParamConfigMaxAggregateInputType
+  }
+
+  export type GetProfitParamConfigAggregateType<T extends ProfitParamConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateProfitParamConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProfitParamConfig[P]>
+      : GetScalarType<T[P], AggregateProfitParamConfig[P]>
+  }
+
+
+
+
+  export type ProfitParamConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProfitParamConfigWhereInput
+    orderBy?: ProfitParamConfigOrderByWithAggregationInput | ProfitParamConfigOrderByWithAggregationInput[]
+    by: ProfitParamConfigScalarFieldEnum[] | ProfitParamConfigScalarFieldEnum
+    having?: ProfitParamConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProfitParamConfigCountAggregateInputType | true
+    _avg?: ProfitParamConfigAvgAggregateInputType
+    _sum?: ProfitParamConfigSumAggregateInputType
+    _min?: ProfitParamConfigMinAggregateInputType
+    _max?: ProfitParamConfigMaxAggregateInputType
+  }
+
+  export type ProfitParamConfigGroupByOutputType = {
+    id: number
+    paramKey: string
+    nameCn: string
+    category: string
+    subCategory: string | null
+    steelMill: string | null
+    effectiveDate: Date
+    value: Decimal
+    previousValue: Decimal | null
+    unit: string | null
+    remark: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    _count: ProfitParamConfigCountAggregateOutputType | null
+    _avg: ProfitParamConfigAvgAggregateOutputType | null
+    _sum: ProfitParamConfigSumAggregateOutputType | null
+    _min: ProfitParamConfigMinAggregateOutputType | null
+    _max: ProfitParamConfigMaxAggregateOutputType | null
+  }
+
+  type GetProfitParamConfigGroupByPayload<T extends ProfitParamConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProfitParamConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProfitParamConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProfitParamConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], ProfitParamConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProfitParamConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    paramKey?: boolean
+    nameCn?: boolean
+    category?: boolean
+    subCategory?: boolean
+    steelMill?: boolean
+    effectiveDate?: boolean
+    value?: boolean
+    previousValue?: boolean
+    unit?: boolean
+    remark?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["profitParamConfig"]>
+
+
+
+  export type ProfitParamConfigSelectScalar = {
+    id?: boolean
+    paramKey?: boolean
+    nameCn?: boolean
+    category?: boolean
+    subCategory?: boolean
+    steelMill?: boolean
+    effectiveDate?: boolean
+    value?: boolean
+    previousValue?: boolean
+    unit?: boolean
+    remark?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ProfitParamConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "paramKey" | "nameCn" | "category" | "subCategory" | "steelMill" | "effectiveDate" | "value" | "previousValue" | "unit" | "remark" | "createdAt" | "updatedAt", ExtArgs["result"]["profitParamConfig"]>
+
+  export type $ProfitParamConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProfitParamConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      paramKey: string
+      nameCn: string
+      category: string
+      subCategory: string | null
+      steelMill: string | null
+      effectiveDate: Date
+      value: Prisma.Decimal
+      previousValue: Prisma.Decimal | null
+      unit: string | null
+      remark: string | null
+      createdAt: Date | null
+      updatedAt: Date | null
+    }, ExtArgs["result"]["profitParamConfig"]>
+    composites: {}
+  }
+
+  type ProfitParamConfigGetPayload<S extends boolean | null | undefined | ProfitParamConfigDefaultArgs> = $Result.GetResult<Prisma.$ProfitParamConfigPayload, S>
+
+  type ProfitParamConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProfitParamConfigFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProfitParamConfigCountAggregateInputType | true
+    }
+
+  export interface ProfitParamConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProfitParamConfig'], meta: { name: 'ProfitParamConfig' } }
+    /**
+     * Find zero or one ProfitParamConfig that matches the filter.
+     * @param {ProfitParamConfigFindUniqueArgs} args - Arguments to find a ProfitParamConfig
+     * @example
+     * // Get one ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProfitParamConfigFindUniqueArgs>(args: SelectSubset<T, ProfitParamConfigFindUniqueArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProfitParamConfig that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProfitParamConfigFindUniqueOrThrowArgs} args - Arguments to find a ProfitParamConfig
+     * @example
+     * // Get one ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProfitParamConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, ProfitParamConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProfitParamConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigFindFirstArgs} args - Arguments to find a ProfitParamConfig
+     * @example
+     * // Get one ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProfitParamConfigFindFirstArgs>(args?: SelectSubset<T, ProfitParamConfigFindFirstArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProfitParamConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigFindFirstOrThrowArgs} args - Arguments to find a ProfitParamConfig
+     * @example
+     * // Get one ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProfitParamConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, ProfitParamConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProfitParamConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProfitParamConfigs
+     * const profitParamConfigs = await prisma.profitParamConfig.findMany()
+     * 
+     * // Get first 10 ProfitParamConfigs
+     * const profitParamConfigs = await prisma.profitParamConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const profitParamConfigWithIdOnly = await prisma.profitParamConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProfitParamConfigFindManyArgs>(args?: SelectSubset<T, ProfitParamConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProfitParamConfig.
+     * @param {ProfitParamConfigCreateArgs} args - Arguments to create a ProfitParamConfig.
+     * @example
+     * // Create one ProfitParamConfig
+     * const ProfitParamConfig = await prisma.profitParamConfig.create({
+     *   data: {
+     *     // ... data to create a ProfitParamConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProfitParamConfigCreateArgs>(args: SelectSubset<T, ProfitParamConfigCreateArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProfitParamConfigs.
+     * @param {ProfitParamConfigCreateManyArgs} args - Arguments to create many ProfitParamConfigs.
+     * @example
+     * // Create many ProfitParamConfigs
+     * const profitParamConfig = await prisma.profitParamConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProfitParamConfigCreateManyArgs>(args?: SelectSubset<T, ProfitParamConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProfitParamConfig.
+     * @param {ProfitParamConfigDeleteArgs} args - Arguments to delete one ProfitParamConfig.
+     * @example
+     * // Delete one ProfitParamConfig
+     * const ProfitParamConfig = await prisma.profitParamConfig.delete({
+     *   where: {
+     *     // ... filter to delete one ProfitParamConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProfitParamConfigDeleteArgs>(args: SelectSubset<T, ProfitParamConfigDeleteArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProfitParamConfig.
+     * @param {ProfitParamConfigUpdateArgs} args - Arguments to update one ProfitParamConfig.
+     * @example
+     * // Update one ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProfitParamConfigUpdateArgs>(args: SelectSubset<T, ProfitParamConfigUpdateArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProfitParamConfigs.
+     * @param {ProfitParamConfigDeleteManyArgs} args - Arguments to filter ProfitParamConfigs to delete.
+     * @example
+     * // Delete a few ProfitParamConfigs
+     * const { count } = await prisma.profitParamConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProfitParamConfigDeleteManyArgs>(args?: SelectSubset<T, ProfitParamConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProfitParamConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProfitParamConfigs
+     * const profitParamConfig = await prisma.profitParamConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProfitParamConfigUpdateManyArgs>(args: SelectSubset<T, ProfitParamConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProfitParamConfig.
+     * @param {ProfitParamConfigUpsertArgs} args - Arguments to update or create a ProfitParamConfig.
+     * @example
+     * // Update or create a ProfitParamConfig
+     * const profitParamConfig = await prisma.profitParamConfig.upsert({
+     *   create: {
+     *     // ... data to create a ProfitParamConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProfitParamConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProfitParamConfigUpsertArgs>(args: SelectSubset<T, ProfitParamConfigUpsertArgs<ExtArgs>>): Prisma__ProfitParamConfigClient<$Result.GetResult<Prisma.$ProfitParamConfigPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProfitParamConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigCountArgs} args - Arguments to filter ProfitParamConfigs to count.
+     * @example
+     * // Count the number of ProfitParamConfigs
+     * const count = await prisma.profitParamConfig.count({
+     *   where: {
+     *     // ... the filter for the ProfitParamConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProfitParamConfigCountArgs>(
+      args?: Subset<T, ProfitParamConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProfitParamConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProfitParamConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProfitParamConfigAggregateArgs>(args: Subset<T, ProfitParamConfigAggregateArgs>): Prisma.PrismaPromise<GetProfitParamConfigAggregateType<T>>
+
+    /**
+     * Group by ProfitParamConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProfitParamConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProfitParamConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProfitParamConfigGroupByArgs['orderBy'] }
+        : { orderBy?: ProfitParamConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProfitParamConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProfitParamConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProfitParamConfig model
+   */
+  readonly fields: ProfitParamConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProfitParamConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProfitParamConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProfitParamConfig model
+   */
+  interface ProfitParamConfigFieldRefs {
+    readonly id: FieldRef<"ProfitParamConfig", 'Int'>
+    readonly paramKey: FieldRef<"ProfitParamConfig", 'String'>
+    readonly nameCn: FieldRef<"ProfitParamConfig", 'String'>
+    readonly category: FieldRef<"ProfitParamConfig", 'String'>
+    readonly subCategory: FieldRef<"ProfitParamConfig", 'String'>
+    readonly steelMill: FieldRef<"ProfitParamConfig", 'String'>
+    readonly effectiveDate: FieldRef<"ProfitParamConfig", 'DateTime'>
+    readonly value: FieldRef<"ProfitParamConfig", 'Decimal'>
+    readonly previousValue: FieldRef<"ProfitParamConfig", 'Decimal'>
+    readonly unit: FieldRef<"ProfitParamConfig", 'String'>
+    readonly remark: FieldRef<"ProfitParamConfig", 'String'>
+    readonly createdAt: FieldRef<"ProfitParamConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"ProfitParamConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProfitParamConfig findUnique
+   */
+  export type ProfitParamConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProfitParamConfig to fetch.
+     */
+    where: ProfitParamConfigWhereUniqueInput
+  }
+
+  /**
+   * ProfitParamConfig findUniqueOrThrow
+   */
+  export type ProfitParamConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProfitParamConfig to fetch.
+     */
+    where: ProfitParamConfigWhereUniqueInput
+  }
+
+  /**
+   * ProfitParamConfig findFirst
+   */
+  export type ProfitParamConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProfitParamConfig to fetch.
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProfitParamConfigs to fetch.
+     */
+    orderBy?: ProfitParamConfigOrderByWithRelationInput | ProfitParamConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProfitParamConfigs.
+     */
+    cursor?: ProfitParamConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProfitParamConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProfitParamConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProfitParamConfigs.
+     */
+    distinct?: ProfitParamConfigScalarFieldEnum | ProfitParamConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProfitParamConfig findFirstOrThrow
+   */
+  export type ProfitParamConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProfitParamConfig to fetch.
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProfitParamConfigs to fetch.
+     */
+    orderBy?: ProfitParamConfigOrderByWithRelationInput | ProfitParamConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProfitParamConfigs.
+     */
+    cursor?: ProfitParamConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProfitParamConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProfitParamConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProfitParamConfigs.
+     */
+    distinct?: ProfitParamConfigScalarFieldEnum | ProfitParamConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProfitParamConfig findMany
+   */
+  export type ProfitParamConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which ProfitParamConfigs to fetch.
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProfitParamConfigs to fetch.
+     */
+    orderBy?: ProfitParamConfigOrderByWithRelationInput | ProfitParamConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProfitParamConfigs.
+     */
+    cursor?: ProfitParamConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProfitParamConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProfitParamConfigs.
+     */
+    skip?: number
+    distinct?: ProfitParamConfigScalarFieldEnum | ProfitParamConfigScalarFieldEnum[]
+  }
+
+  /**
+   * ProfitParamConfig create
+   */
+  export type ProfitParamConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProfitParamConfig.
+     */
+    data: XOR<ProfitParamConfigCreateInput, ProfitParamConfigUncheckedCreateInput>
+  }
+
+  /**
+   * ProfitParamConfig createMany
+   */
+  export type ProfitParamConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProfitParamConfigs.
+     */
+    data: ProfitParamConfigCreateManyInput | ProfitParamConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProfitParamConfig update
+   */
+  export type ProfitParamConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProfitParamConfig.
+     */
+    data: XOR<ProfitParamConfigUpdateInput, ProfitParamConfigUncheckedUpdateInput>
+    /**
+     * Choose, which ProfitParamConfig to update.
+     */
+    where: ProfitParamConfigWhereUniqueInput
+  }
+
+  /**
+   * ProfitParamConfig updateMany
+   */
+  export type ProfitParamConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProfitParamConfigs.
+     */
+    data: XOR<ProfitParamConfigUpdateManyMutationInput, ProfitParamConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which ProfitParamConfigs to update
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * Limit how many ProfitParamConfigs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProfitParamConfig upsert
+   */
+  export type ProfitParamConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProfitParamConfig to update in case it exists.
+     */
+    where: ProfitParamConfigWhereUniqueInput
+    /**
+     * In case the ProfitParamConfig found by the `where` argument doesn't exist, create a new ProfitParamConfig with this data.
+     */
+    create: XOR<ProfitParamConfigCreateInput, ProfitParamConfigUncheckedCreateInput>
+    /**
+     * In case the ProfitParamConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProfitParamConfigUpdateInput, ProfitParamConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * ProfitParamConfig delete
+   */
+  export type ProfitParamConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+    /**
+     * Filter which ProfitParamConfig to delete.
+     */
+    where: ProfitParamConfigWhereUniqueInput
+  }
+
+  /**
+   * ProfitParamConfig deleteMany
+   */
+  export type ProfitParamConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProfitParamConfigs to delete
+     */
+    where?: ProfitParamConfigWhereInput
+    /**
+     * Limit how many ProfitParamConfigs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProfitParamConfig without action
+   */
+  export type ProfitParamConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProfitParamConfig
+     */
+    select?: ProfitParamConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProfitParamConfig
+     */
+    omit?: ProfitParamConfigOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model ProcessingCostInput
    */
 
@@ -38445,11 +39707,101 @@ export namespace Prisma {
   export type ProcessingCostInputAvgAggregateOutputType = {
     id: number | null
     productTons: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
+    M1Qty: Decimal | null
+    M1Price: Decimal | null
+    M2Qty: Decimal | null
+    M2Price: Decimal | null
+    M3Qty: Decimal | null
+    M3Price: Decimal | null
+    M4Qty: Decimal | null
+    M4Price: Decimal | null
+    M5Qty: Decimal | null
+    M5Price: Decimal | null
+    M6Qty: Decimal | null
+    M6Price: Decimal | null
+    M7Qty: Decimal | null
+    M7Price: Decimal | null
+    M8Qty: Decimal | null
+    M8Price: Decimal | null
+    M9Qty: Decimal | null
+    M9Price: Decimal | null
+    wireRopeQty: Decimal | null
+    wireRopePrice: Decimal | null
+    carShellQty: Decimal | null
+    carShellPrice: Decimal | null
+    pigIronQty: Decimal | null
+    pigIronPrice: Decimal | null
+    scrapQty: Decimal | null
+    scrapPrice: Decimal | null
+    carDismantleQty: Decimal | null
+    carDismantlePrice: Decimal | null
+    transferQty: Decimal | null
+    transferPrice: Decimal | null
+    auxiliaryQty: Decimal | null
+    auxiliaryPrice: Decimal | null
+    material1Qty: Decimal | null
+    material1Price: Decimal | null
+    material2Qty: Decimal | null
+    material2Price: Decimal | null
+    material3Qty: Decimal | null
+    material3Price: Decimal | null
+    material4Qty: Decimal | null
+    material4Price: Decimal | null
+    material5Qty: Decimal | null
+    material5Price: Decimal | null
   }
 
   export type ProcessingCostInputSumAggregateOutputType = {
     id: number | null
     productTons: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
+    M1Qty: Decimal | null
+    M1Price: Decimal | null
+    M2Qty: Decimal | null
+    M2Price: Decimal | null
+    M3Qty: Decimal | null
+    M3Price: Decimal | null
+    M4Qty: Decimal | null
+    M4Price: Decimal | null
+    M5Qty: Decimal | null
+    M5Price: Decimal | null
+    M6Qty: Decimal | null
+    M6Price: Decimal | null
+    M7Qty: Decimal | null
+    M7Price: Decimal | null
+    M8Qty: Decimal | null
+    M8Price: Decimal | null
+    M9Qty: Decimal | null
+    M9Price: Decimal | null
+    wireRopeQty: Decimal | null
+    wireRopePrice: Decimal | null
+    carShellQty: Decimal | null
+    carShellPrice: Decimal | null
+    pigIronQty: Decimal | null
+    pigIronPrice: Decimal | null
+    scrapQty: Decimal | null
+    scrapPrice: Decimal | null
+    carDismantleQty: Decimal | null
+    carDismantlePrice: Decimal | null
+    transferQty: Decimal | null
+    transferPrice: Decimal | null
+    auxiliaryQty: Decimal | null
+    auxiliaryPrice: Decimal | null
+    material1Qty: Decimal | null
+    material1Price: Decimal | null
+    material2Qty: Decimal | null
+    material2Price: Decimal | null
+    material3Qty: Decimal | null
+    material3Price: Decimal | null
+    material4Qty: Decimal | null
+    material4Price: Decimal | null
+    material5Qty: Decimal | null
+    material5Price: Decimal | null
   }
 
   export type ProcessingCostInputMinAggregateOutputType = {
@@ -38457,7 +39809,54 @@ export namespace Prisma {
     productName: string | null
     productWarehouse: string | null
     productTons: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
     productionDate: string | null
+    materialWarehouses: string | null
+    openid: string | null
+    M1Qty: Decimal | null
+    M1Price: Decimal | null
+    M2Qty: Decimal | null
+    M2Price: Decimal | null
+    M3Qty: Decimal | null
+    M3Price: Decimal | null
+    M4Qty: Decimal | null
+    M4Price: Decimal | null
+    M5Qty: Decimal | null
+    M5Price: Decimal | null
+    M6Qty: Decimal | null
+    M6Price: Decimal | null
+    M7Qty: Decimal | null
+    M7Price: Decimal | null
+    M8Qty: Decimal | null
+    M8Price: Decimal | null
+    M9Qty: Decimal | null
+    M9Price: Decimal | null
+    wireRopeQty: Decimal | null
+    wireRopePrice: Decimal | null
+    carShellQty: Decimal | null
+    carShellPrice: Decimal | null
+    pigIronQty: Decimal | null
+    pigIronPrice: Decimal | null
+    scrapQty: Decimal | null
+    scrapPrice: Decimal | null
+    carDismantleQty: Decimal | null
+    carDismantlePrice: Decimal | null
+    transferQty: Decimal | null
+    transferPrice: Decimal | null
+    auxiliaryQty: Decimal | null
+    auxiliaryPrice: Decimal | null
+    material1Qty: Decimal | null
+    material1Price: Decimal | null
+    material2Qty: Decimal | null
+    material2Price: Decimal | null
+    material3Qty: Decimal | null
+    material3Price: Decimal | null
+    material4Qty: Decimal | null
+    material4Price: Decimal | null
+    material5Qty: Decimal | null
+    material5Price: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -38467,7 +39866,54 @@ export namespace Prisma {
     productName: string | null
     productWarehouse: string | null
     productTons: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
     productionDate: string | null
+    materialWarehouses: string | null
+    openid: string | null
+    M1Qty: Decimal | null
+    M1Price: Decimal | null
+    M2Qty: Decimal | null
+    M2Price: Decimal | null
+    M3Qty: Decimal | null
+    M3Price: Decimal | null
+    M4Qty: Decimal | null
+    M4Price: Decimal | null
+    M5Qty: Decimal | null
+    M5Price: Decimal | null
+    M6Qty: Decimal | null
+    M6Price: Decimal | null
+    M7Qty: Decimal | null
+    M7Price: Decimal | null
+    M8Qty: Decimal | null
+    M8Price: Decimal | null
+    M9Qty: Decimal | null
+    M9Price: Decimal | null
+    wireRopeQty: Decimal | null
+    wireRopePrice: Decimal | null
+    carShellQty: Decimal | null
+    carShellPrice: Decimal | null
+    pigIronQty: Decimal | null
+    pigIronPrice: Decimal | null
+    scrapQty: Decimal | null
+    scrapPrice: Decimal | null
+    carDismantleQty: Decimal | null
+    carDismantlePrice: Decimal | null
+    transferQty: Decimal | null
+    transferPrice: Decimal | null
+    auxiliaryQty: Decimal | null
+    auxiliaryPrice: Decimal | null
+    material1Qty: Decimal | null
+    material1Price: Decimal | null
+    material2Qty: Decimal | null
+    material2Price: Decimal | null
+    material3Qty: Decimal | null
+    material3Price: Decimal | null
+    material4Qty: Decimal | null
+    material4Price: Decimal | null
+    material5Qty: Decimal | null
+    material5Price: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -38477,8 +39923,55 @@ export namespace Prisma {
     productName: number
     productWarehouse: number
     productTons: number
+    dailyProcessQty: number
+    dailyProcessAmount: number
+    dailyProcessPrice: number
     productionDate: number
     materialComposition: number
+    materialWarehouses: number
+    openid: number
+    M1Qty: number
+    M1Price: number
+    M2Qty: number
+    M2Price: number
+    M3Qty: number
+    M3Price: number
+    M4Qty: number
+    M4Price: number
+    M5Qty: number
+    M5Price: number
+    M6Qty: number
+    M6Price: number
+    M7Qty: number
+    M7Price: number
+    M8Qty: number
+    M8Price: number
+    M9Qty: number
+    M9Price: number
+    wireRopeQty: number
+    wireRopePrice: number
+    carShellQty: number
+    carShellPrice: number
+    pigIronQty: number
+    pigIronPrice: number
+    scrapQty: number
+    scrapPrice: number
+    carDismantleQty: number
+    carDismantlePrice: number
+    transferQty: number
+    transferPrice: number
+    auxiliaryQty: number
+    auxiliaryPrice: number
+    material1Qty: number
+    material1Price: number
+    material2Qty: number
+    material2Price: number
+    material3Qty: number
+    material3Price: number
+    material4Qty: number
+    material4Price: number
+    material5Qty: number
+    material5Price: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -38488,11 +39981,101 @@ export namespace Prisma {
   export type ProcessingCostInputAvgAggregateInputType = {
     id?: true
     productTons?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
+    M1Qty?: true
+    M1Price?: true
+    M2Qty?: true
+    M2Price?: true
+    M3Qty?: true
+    M3Price?: true
+    M4Qty?: true
+    M4Price?: true
+    M5Qty?: true
+    M5Price?: true
+    M6Qty?: true
+    M6Price?: true
+    M7Qty?: true
+    M7Price?: true
+    M8Qty?: true
+    M8Price?: true
+    M9Qty?: true
+    M9Price?: true
+    wireRopeQty?: true
+    wireRopePrice?: true
+    carShellQty?: true
+    carShellPrice?: true
+    pigIronQty?: true
+    pigIronPrice?: true
+    scrapQty?: true
+    scrapPrice?: true
+    carDismantleQty?: true
+    carDismantlePrice?: true
+    transferQty?: true
+    transferPrice?: true
+    auxiliaryQty?: true
+    auxiliaryPrice?: true
+    material1Qty?: true
+    material1Price?: true
+    material2Qty?: true
+    material2Price?: true
+    material3Qty?: true
+    material3Price?: true
+    material4Qty?: true
+    material4Price?: true
+    material5Qty?: true
+    material5Price?: true
   }
 
   export type ProcessingCostInputSumAggregateInputType = {
     id?: true
     productTons?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
+    M1Qty?: true
+    M1Price?: true
+    M2Qty?: true
+    M2Price?: true
+    M3Qty?: true
+    M3Price?: true
+    M4Qty?: true
+    M4Price?: true
+    M5Qty?: true
+    M5Price?: true
+    M6Qty?: true
+    M6Price?: true
+    M7Qty?: true
+    M7Price?: true
+    M8Qty?: true
+    M8Price?: true
+    M9Qty?: true
+    M9Price?: true
+    wireRopeQty?: true
+    wireRopePrice?: true
+    carShellQty?: true
+    carShellPrice?: true
+    pigIronQty?: true
+    pigIronPrice?: true
+    scrapQty?: true
+    scrapPrice?: true
+    carDismantleQty?: true
+    carDismantlePrice?: true
+    transferQty?: true
+    transferPrice?: true
+    auxiliaryQty?: true
+    auxiliaryPrice?: true
+    material1Qty?: true
+    material1Price?: true
+    material2Qty?: true
+    material2Price?: true
+    material3Qty?: true
+    material3Price?: true
+    material4Qty?: true
+    material4Price?: true
+    material5Qty?: true
+    material5Price?: true
   }
 
   export type ProcessingCostInputMinAggregateInputType = {
@@ -38500,7 +40083,54 @@ export namespace Prisma {
     productName?: true
     productWarehouse?: true
     productTons?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
     productionDate?: true
+    materialWarehouses?: true
+    openid?: true
+    M1Qty?: true
+    M1Price?: true
+    M2Qty?: true
+    M2Price?: true
+    M3Qty?: true
+    M3Price?: true
+    M4Qty?: true
+    M4Price?: true
+    M5Qty?: true
+    M5Price?: true
+    M6Qty?: true
+    M6Price?: true
+    M7Qty?: true
+    M7Price?: true
+    M8Qty?: true
+    M8Price?: true
+    M9Qty?: true
+    M9Price?: true
+    wireRopeQty?: true
+    wireRopePrice?: true
+    carShellQty?: true
+    carShellPrice?: true
+    pigIronQty?: true
+    pigIronPrice?: true
+    scrapQty?: true
+    scrapPrice?: true
+    carDismantleQty?: true
+    carDismantlePrice?: true
+    transferQty?: true
+    transferPrice?: true
+    auxiliaryQty?: true
+    auxiliaryPrice?: true
+    material1Qty?: true
+    material1Price?: true
+    material2Qty?: true
+    material2Price?: true
+    material3Qty?: true
+    material3Price?: true
+    material4Qty?: true
+    material4Price?: true
+    material5Qty?: true
+    material5Price?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38510,7 +40140,54 @@ export namespace Prisma {
     productName?: true
     productWarehouse?: true
     productTons?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
     productionDate?: true
+    materialWarehouses?: true
+    openid?: true
+    M1Qty?: true
+    M1Price?: true
+    M2Qty?: true
+    M2Price?: true
+    M3Qty?: true
+    M3Price?: true
+    M4Qty?: true
+    M4Price?: true
+    M5Qty?: true
+    M5Price?: true
+    M6Qty?: true
+    M6Price?: true
+    M7Qty?: true
+    M7Price?: true
+    M8Qty?: true
+    M8Price?: true
+    M9Qty?: true
+    M9Price?: true
+    wireRopeQty?: true
+    wireRopePrice?: true
+    carShellQty?: true
+    carShellPrice?: true
+    pigIronQty?: true
+    pigIronPrice?: true
+    scrapQty?: true
+    scrapPrice?: true
+    carDismantleQty?: true
+    carDismantlePrice?: true
+    transferQty?: true
+    transferPrice?: true
+    auxiliaryQty?: true
+    auxiliaryPrice?: true
+    material1Qty?: true
+    material1Price?: true
+    material2Qty?: true
+    material2Price?: true
+    material3Qty?: true
+    material3Price?: true
+    material4Qty?: true
+    material4Price?: true
+    material5Qty?: true
+    material5Price?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38520,8 +40197,55 @@ export namespace Prisma {
     productName?: true
     productWarehouse?: true
     productTons?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
     productionDate?: true
     materialComposition?: true
+    materialWarehouses?: true
+    openid?: true
+    M1Qty?: true
+    M1Price?: true
+    M2Qty?: true
+    M2Price?: true
+    M3Qty?: true
+    M3Price?: true
+    M4Qty?: true
+    M4Price?: true
+    M5Qty?: true
+    M5Price?: true
+    M6Qty?: true
+    M6Price?: true
+    M7Qty?: true
+    M7Price?: true
+    M8Qty?: true
+    M8Price?: true
+    M9Qty?: true
+    M9Price?: true
+    wireRopeQty?: true
+    wireRopePrice?: true
+    carShellQty?: true
+    carShellPrice?: true
+    pigIronQty?: true
+    pigIronPrice?: true
+    scrapQty?: true
+    scrapPrice?: true
+    carDismantleQty?: true
+    carDismantlePrice?: true
+    transferQty?: true
+    transferPrice?: true
+    auxiliaryQty?: true
+    auxiliaryPrice?: true
+    material1Qty?: true
+    material1Price?: true
+    material2Qty?: true
+    material2Price?: true
+    material3Qty?: true
+    material3Price?: true
+    material4Qty?: true
+    material4Price?: true
+    material5Qty?: true
+    material5Price?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -38618,8 +40342,55 @@ export namespace Prisma {
     productName: string | null
     productWarehouse: string | null
     productTons: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
     productionDate: string | null
     materialComposition: JsonValue | null
+    materialWarehouses: string | null
+    openid: string | null
+    M1Qty: Decimal | null
+    M1Price: Decimal | null
+    M2Qty: Decimal | null
+    M2Price: Decimal | null
+    M3Qty: Decimal | null
+    M3Price: Decimal | null
+    M4Qty: Decimal | null
+    M4Price: Decimal | null
+    M5Qty: Decimal | null
+    M5Price: Decimal | null
+    M6Qty: Decimal | null
+    M6Price: Decimal | null
+    M7Qty: Decimal | null
+    M7Price: Decimal | null
+    M8Qty: Decimal | null
+    M8Price: Decimal | null
+    M9Qty: Decimal | null
+    M9Price: Decimal | null
+    wireRopeQty: Decimal | null
+    wireRopePrice: Decimal | null
+    carShellQty: Decimal | null
+    carShellPrice: Decimal | null
+    pigIronQty: Decimal | null
+    pigIronPrice: Decimal | null
+    scrapQty: Decimal | null
+    scrapPrice: Decimal | null
+    carDismantleQty: Decimal | null
+    carDismantlePrice: Decimal | null
+    transferQty: Decimal | null
+    transferPrice: Decimal | null
+    auxiliaryQty: Decimal | null
+    auxiliaryPrice: Decimal | null
+    material1Qty: Decimal | null
+    material1Price: Decimal | null
+    material2Qty: Decimal | null
+    material2Price: Decimal | null
+    material3Qty: Decimal | null
+    material3Price: Decimal | null
+    material4Qty: Decimal | null
+    material4Price: Decimal | null
+    material5Qty: Decimal | null
+    material5Price: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
     _count: ProcessingCostInputCountAggregateOutputType | null
@@ -38648,8 +40419,55 @@ export namespace Prisma {
     productName?: boolean
     productWarehouse?: boolean
     productTons?: boolean
+    dailyProcessQty?: boolean
+    dailyProcessAmount?: boolean
+    dailyProcessPrice?: boolean
     productionDate?: boolean
     materialComposition?: boolean
+    materialWarehouses?: boolean
+    openid?: boolean
+    M1Qty?: boolean
+    M1Price?: boolean
+    M2Qty?: boolean
+    M2Price?: boolean
+    M3Qty?: boolean
+    M3Price?: boolean
+    M4Qty?: boolean
+    M4Price?: boolean
+    M5Qty?: boolean
+    M5Price?: boolean
+    M6Qty?: boolean
+    M6Price?: boolean
+    M7Qty?: boolean
+    M7Price?: boolean
+    M8Qty?: boolean
+    M8Price?: boolean
+    M9Qty?: boolean
+    M9Price?: boolean
+    wireRopeQty?: boolean
+    wireRopePrice?: boolean
+    carShellQty?: boolean
+    carShellPrice?: boolean
+    pigIronQty?: boolean
+    pigIronPrice?: boolean
+    scrapQty?: boolean
+    scrapPrice?: boolean
+    carDismantleQty?: boolean
+    carDismantlePrice?: boolean
+    transferQty?: boolean
+    transferPrice?: boolean
+    auxiliaryQty?: boolean
+    auxiliaryPrice?: boolean
+    material1Qty?: boolean
+    material1Price?: boolean
+    material2Qty?: boolean
+    material2Price?: boolean
+    material3Qty?: boolean
+    material3Price?: boolean
+    material4Qty?: boolean
+    material4Price?: boolean
+    material5Qty?: boolean
+    material5Price?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["processingCostInput"]>
@@ -38661,13 +40479,60 @@ export namespace Prisma {
     productName?: boolean
     productWarehouse?: boolean
     productTons?: boolean
+    dailyProcessQty?: boolean
+    dailyProcessAmount?: boolean
+    dailyProcessPrice?: boolean
     productionDate?: boolean
     materialComposition?: boolean
+    materialWarehouses?: boolean
+    openid?: boolean
+    M1Qty?: boolean
+    M1Price?: boolean
+    M2Qty?: boolean
+    M2Price?: boolean
+    M3Qty?: boolean
+    M3Price?: boolean
+    M4Qty?: boolean
+    M4Price?: boolean
+    M5Qty?: boolean
+    M5Price?: boolean
+    M6Qty?: boolean
+    M6Price?: boolean
+    M7Qty?: boolean
+    M7Price?: boolean
+    M8Qty?: boolean
+    M8Price?: boolean
+    M9Qty?: boolean
+    M9Price?: boolean
+    wireRopeQty?: boolean
+    wireRopePrice?: boolean
+    carShellQty?: boolean
+    carShellPrice?: boolean
+    pigIronQty?: boolean
+    pigIronPrice?: boolean
+    scrapQty?: boolean
+    scrapPrice?: boolean
+    carDismantleQty?: boolean
+    carDismantlePrice?: boolean
+    transferQty?: boolean
+    transferPrice?: boolean
+    auxiliaryQty?: boolean
+    auxiliaryPrice?: boolean
+    material1Qty?: boolean
+    material1Price?: boolean
+    material2Qty?: boolean
+    material2Price?: boolean
+    material3Qty?: boolean
+    material3Price?: boolean
+    material4Qty?: boolean
+    material4Price?: boolean
+    material5Qty?: boolean
+    material5Price?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProcessingCostInputOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "productWarehouse" | "productTons" | "productionDate" | "materialComposition" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostInput"]>
+  export type ProcessingCostInputOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "productWarehouse" | "productTons" | "dailyProcessQty" | "dailyProcessAmount" | "dailyProcessPrice" | "productionDate" | "materialComposition" | "materialWarehouses" | "openid" | "M1Qty" | "M1Price" | "M2Qty" | "M2Price" | "M3Qty" | "M3Price" | "M4Qty" | "M4Price" | "M5Qty" | "M5Price" | "M6Qty" | "M6Price" | "M7Qty" | "M7Price" | "M8Qty" | "M8Price" | "M9Qty" | "M9Price" | "wireRopeQty" | "wireRopePrice" | "carShellQty" | "carShellPrice" | "pigIronQty" | "pigIronPrice" | "scrapQty" | "scrapPrice" | "carDismantleQty" | "carDismantlePrice" | "transferQty" | "transferPrice" | "auxiliaryQty" | "auxiliaryPrice" | "material1Qty" | "material1Price" | "material2Qty" | "material2Price" | "material3Qty" | "material3Price" | "material4Qty" | "material4Price" | "material5Qty" | "material5Price" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostInput"]>
 
   export type $ProcessingCostInputPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ProcessingCostInput"
@@ -38677,8 +40542,55 @@ export namespace Prisma {
       productName: string | null
       productWarehouse: string | null
       productTons: Prisma.Decimal | null
+      dailyProcessQty: Prisma.Decimal | null
+      dailyProcessAmount: Prisma.Decimal | null
+      dailyProcessPrice: Prisma.Decimal | null
       productionDate: string | null
       materialComposition: Prisma.JsonValue | null
+      materialWarehouses: string | null
+      openid: string | null
+      M1Qty: Prisma.Decimal | null
+      M1Price: Prisma.Decimal | null
+      M2Qty: Prisma.Decimal | null
+      M2Price: Prisma.Decimal | null
+      M3Qty: Prisma.Decimal | null
+      M3Price: Prisma.Decimal | null
+      M4Qty: Prisma.Decimal | null
+      M4Price: Prisma.Decimal | null
+      M5Qty: Prisma.Decimal | null
+      M5Price: Prisma.Decimal | null
+      M6Qty: Prisma.Decimal | null
+      M6Price: Prisma.Decimal | null
+      M7Qty: Prisma.Decimal | null
+      M7Price: Prisma.Decimal | null
+      M8Qty: Prisma.Decimal | null
+      M8Price: Prisma.Decimal | null
+      M9Qty: Prisma.Decimal | null
+      M9Price: Prisma.Decimal | null
+      wireRopeQty: Prisma.Decimal | null
+      wireRopePrice: Prisma.Decimal | null
+      carShellQty: Prisma.Decimal | null
+      carShellPrice: Prisma.Decimal | null
+      pigIronQty: Prisma.Decimal | null
+      pigIronPrice: Prisma.Decimal | null
+      scrapQty: Prisma.Decimal | null
+      scrapPrice: Prisma.Decimal | null
+      carDismantleQty: Prisma.Decimal | null
+      carDismantlePrice: Prisma.Decimal | null
+      transferQty: Prisma.Decimal | null
+      transferPrice: Prisma.Decimal | null
+      auxiliaryQty: Prisma.Decimal | null
+      auxiliaryPrice: Prisma.Decimal | null
+      material1Qty: Prisma.Decimal | null
+      material1Price: Prisma.Decimal | null
+      material2Qty: Prisma.Decimal | null
+      material2Price: Prisma.Decimal | null
+      material3Qty: Prisma.Decimal | null
+      material3Price: Prisma.Decimal | null
+      material4Qty: Prisma.Decimal | null
+      material4Price: Prisma.Decimal | null
+      material5Qty: Prisma.Decimal | null
+      material5Price: Prisma.Decimal | null
       createdAt: Date | null
       updatedAt: Date | null
     }, ExtArgs["result"]["processingCostInput"]>
@@ -39054,8 +40966,55 @@ export namespace Prisma {
     readonly productName: FieldRef<"ProcessingCostInput", 'String'>
     readonly productWarehouse: FieldRef<"ProcessingCostInput", 'String'>
     readonly productTons: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessAmount: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
     readonly productionDate: FieldRef<"ProcessingCostInput", 'String'>
     readonly materialComposition: FieldRef<"ProcessingCostInput", 'Json'>
+    readonly materialWarehouses: FieldRef<"ProcessingCostInput", 'String'>
+    readonly openid: FieldRef<"ProcessingCostInput", 'String'>
+    readonly M1Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M1Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M3Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M3Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M5Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M5Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M6Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M6Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M7Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M7Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M8Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M8Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M9Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly M9Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly wireRopeQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly wireRopePrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly carShellQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly carShellPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly pigIronQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly pigIronPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly scrapQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly scrapPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly carDismantleQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly carDismantlePrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly transferQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly transferPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly auxiliaryQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly auxiliaryPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material1Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material1Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material3Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material3Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material5Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly material5Price: FieldRef<"ProcessingCostInput", 'Decimal'>
     readonly createdAt: FieldRef<"ProcessingCostInput", 'DateTime'>
     readonly updatedAt: FieldRef<"ProcessingCostInput", 'DateTime'>
   }
@@ -39376,6 +41335,1994 @@ export namespace Prisma {
      * Omit specific fields from the ProcessingCostInput
      */
     omit?: ProcessingCostInputOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MaterialStorage
+   */
+
+  export type AggregateMaterialStorage = {
+    _count: MaterialStorageCountAggregateOutputType | null
+    _avg: MaterialStorageAvgAggregateOutputType | null
+    _sum: MaterialStorageSumAggregateOutputType | null
+    _min: MaterialStorageMinAggregateOutputType | null
+    _max: MaterialStorageMaxAggregateOutputType | null
+  }
+
+  export type MaterialStorageAvgAggregateOutputType = {
+    id: number | null
+    currentQty: Decimal | null
+    currentPrice: Decimal | null
+    qty20260331: Decimal | null
+    price20260331: Decimal | null
+  }
+
+  export type MaterialStorageSumAggregateOutputType = {
+    id: number | null
+    currentQty: Decimal | null
+    currentPrice: Decimal | null
+    qty20260331: Decimal | null
+    price20260331: Decimal | null
+  }
+
+  export type MaterialStorageMinAggregateOutputType = {
+    id: number | null
+    storageArea: string | null
+    materialType: string | null
+    aliasName: string | null
+    currentQty: Decimal | null
+    currentPrice: Decimal | null
+    openidField: string | null
+    createBy: string | null
+    createdAt: string | null
+    updateBy: string | null
+    updatedAt: string | null
+    qty20260331: Decimal | null
+    price20260331: Decimal | null
+  }
+
+  export type MaterialStorageMaxAggregateOutputType = {
+    id: number | null
+    storageArea: string | null
+    materialType: string | null
+    aliasName: string | null
+    currentQty: Decimal | null
+    currentPrice: Decimal | null
+    openidField: string | null
+    createBy: string | null
+    createdAt: string | null
+    updateBy: string | null
+    updatedAt: string | null
+    qty20260331: Decimal | null
+    price20260331: Decimal | null
+  }
+
+  export type MaterialStorageCountAggregateOutputType = {
+    id: number
+    storageArea: number
+    materialType: number
+    aliasName: number
+    currentQty: number
+    currentPrice: number
+    openidField: number
+    createBy: number
+    createdAt: number
+    updateBy: number
+    updatedAt: number
+    qty20260331: number
+    price20260331: number
+    _all: number
+  }
+
+
+  export type MaterialStorageAvgAggregateInputType = {
+    id?: true
+    currentQty?: true
+    currentPrice?: true
+    qty20260331?: true
+    price20260331?: true
+  }
+
+  export type MaterialStorageSumAggregateInputType = {
+    id?: true
+    currentQty?: true
+    currentPrice?: true
+    qty20260331?: true
+    price20260331?: true
+  }
+
+  export type MaterialStorageMinAggregateInputType = {
+    id?: true
+    storageArea?: true
+    materialType?: true
+    aliasName?: true
+    currentQty?: true
+    currentPrice?: true
+    openidField?: true
+    createBy?: true
+    createdAt?: true
+    updateBy?: true
+    updatedAt?: true
+    qty20260331?: true
+    price20260331?: true
+  }
+
+  export type MaterialStorageMaxAggregateInputType = {
+    id?: true
+    storageArea?: true
+    materialType?: true
+    aliasName?: true
+    currentQty?: true
+    currentPrice?: true
+    openidField?: true
+    createBy?: true
+    createdAt?: true
+    updateBy?: true
+    updatedAt?: true
+    qty20260331?: true
+    price20260331?: true
+  }
+
+  export type MaterialStorageCountAggregateInputType = {
+    id?: true
+    storageArea?: true
+    materialType?: true
+    aliasName?: true
+    currentQty?: true
+    currentPrice?: true
+    openidField?: true
+    createBy?: true
+    createdAt?: true
+    updateBy?: true
+    updatedAt?: true
+    qty20260331?: true
+    price20260331?: true
+    _all?: true
+  }
+
+  export type MaterialStorageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialStorage to aggregate.
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialStorages to fetch.
+     */
+    orderBy?: MaterialStorageOrderByWithRelationInput | MaterialStorageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaterialStorageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialStorages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialStorages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MaterialStorages
+    **/
+    _count?: true | MaterialStorageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaterialStorageAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaterialStorageSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaterialStorageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaterialStorageMaxAggregateInputType
+  }
+
+  export type GetMaterialStorageAggregateType<T extends MaterialStorageAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaterialStorage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaterialStorage[P]>
+      : GetScalarType<T[P], AggregateMaterialStorage[P]>
+  }
+
+
+
+
+  export type MaterialStorageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialStorageWhereInput
+    orderBy?: MaterialStorageOrderByWithAggregationInput | MaterialStorageOrderByWithAggregationInput[]
+    by: MaterialStorageScalarFieldEnum[] | MaterialStorageScalarFieldEnum
+    having?: MaterialStorageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaterialStorageCountAggregateInputType | true
+    _avg?: MaterialStorageAvgAggregateInputType
+    _sum?: MaterialStorageSumAggregateInputType
+    _min?: MaterialStorageMinAggregateInputType
+    _max?: MaterialStorageMaxAggregateInputType
+  }
+
+  export type MaterialStorageGroupByOutputType = {
+    id: number
+    storageArea: string | null
+    materialType: string | null
+    aliasName: string | null
+    currentQty: Decimal | null
+    currentPrice: Decimal | null
+    openidField: string | null
+    createBy: string | null
+    createdAt: string | null
+    updateBy: string | null
+    updatedAt: string | null
+    qty20260331: Decimal | null
+    price20260331: Decimal | null
+    _count: MaterialStorageCountAggregateOutputType | null
+    _avg: MaterialStorageAvgAggregateOutputType | null
+    _sum: MaterialStorageSumAggregateOutputType | null
+    _min: MaterialStorageMinAggregateOutputType | null
+    _max: MaterialStorageMaxAggregateOutputType | null
+  }
+
+  type GetMaterialStorageGroupByPayload<T extends MaterialStorageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaterialStorageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaterialStorageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaterialStorageGroupByOutputType[P]>
+            : GetScalarType<T[P], MaterialStorageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaterialStorageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    storageArea?: boolean
+    materialType?: boolean
+    aliasName?: boolean
+    currentQty?: boolean
+    currentPrice?: boolean
+    openidField?: boolean
+    createBy?: boolean
+    createdAt?: boolean
+    updateBy?: boolean
+    updatedAt?: boolean
+    qty20260331?: boolean
+    price20260331?: boolean
+  }, ExtArgs["result"]["materialStorage"]>
+
+
+
+  export type MaterialStorageSelectScalar = {
+    id?: boolean
+    storageArea?: boolean
+    materialType?: boolean
+    aliasName?: boolean
+    currentQty?: boolean
+    currentPrice?: boolean
+    openidField?: boolean
+    createBy?: boolean
+    createdAt?: boolean
+    updateBy?: boolean
+    updatedAt?: boolean
+    qty20260331?: boolean
+    price20260331?: boolean
+  }
+
+  export type MaterialStorageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "storageArea" | "materialType" | "aliasName" | "currentQty" | "currentPrice" | "openidField" | "createBy" | "createdAt" | "updateBy" | "updatedAt" | "qty20260331" | "price20260331", ExtArgs["result"]["materialStorage"]>
+
+  export type $MaterialStoragePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MaterialStorage"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      storageArea: string | null
+      materialType: string | null
+      aliasName: string | null
+      currentQty: Prisma.Decimal | null
+      currentPrice: Prisma.Decimal | null
+      openidField: string | null
+      createBy: string | null
+      createdAt: string | null
+      updateBy: string | null
+      updatedAt: string | null
+      qty20260331: Prisma.Decimal | null
+      price20260331: Prisma.Decimal | null
+    }, ExtArgs["result"]["materialStorage"]>
+    composites: {}
+  }
+
+  type MaterialStorageGetPayload<S extends boolean | null | undefined | MaterialStorageDefaultArgs> = $Result.GetResult<Prisma.$MaterialStoragePayload, S>
+
+  type MaterialStorageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaterialStorageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaterialStorageCountAggregateInputType | true
+    }
+
+  export interface MaterialStorageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MaterialStorage'], meta: { name: 'MaterialStorage' } }
+    /**
+     * Find zero or one MaterialStorage that matches the filter.
+     * @param {MaterialStorageFindUniqueArgs} args - Arguments to find a MaterialStorage
+     * @example
+     * // Get one MaterialStorage
+     * const materialStorage = await prisma.materialStorage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaterialStorageFindUniqueArgs>(args: SelectSubset<T, MaterialStorageFindUniqueArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MaterialStorage that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaterialStorageFindUniqueOrThrowArgs} args - Arguments to find a MaterialStorage
+     * @example
+     * // Get one MaterialStorage
+     * const materialStorage = await prisma.materialStorage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaterialStorageFindUniqueOrThrowArgs>(args: SelectSubset<T, MaterialStorageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialStorage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageFindFirstArgs} args - Arguments to find a MaterialStorage
+     * @example
+     * // Get one MaterialStorage
+     * const materialStorage = await prisma.materialStorage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaterialStorageFindFirstArgs>(args?: SelectSubset<T, MaterialStorageFindFirstArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialStorage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageFindFirstOrThrowArgs} args - Arguments to find a MaterialStorage
+     * @example
+     * // Get one MaterialStorage
+     * const materialStorage = await prisma.materialStorage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaterialStorageFindFirstOrThrowArgs>(args?: SelectSubset<T, MaterialStorageFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MaterialStorages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MaterialStorages
+     * const materialStorages = await prisma.materialStorage.findMany()
+     * 
+     * // Get first 10 MaterialStorages
+     * const materialStorages = await prisma.materialStorage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const materialStorageWithIdOnly = await prisma.materialStorage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaterialStorageFindManyArgs>(args?: SelectSubset<T, MaterialStorageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MaterialStorage.
+     * @param {MaterialStorageCreateArgs} args - Arguments to create a MaterialStorage.
+     * @example
+     * // Create one MaterialStorage
+     * const MaterialStorage = await prisma.materialStorage.create({
+     *   data: {
+     *     // ... data to create a MaterialStorage
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaterialStorageCreateArgs>(args: SelectSubset<T, MaterialStorageCreateArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MaterialStorages.
+     * @param {MaterialStorageCreateManyArgs} args - Arguments to create many MaterialStorages.
+     * @example
+     * // Create many MaterialStorages
+     * const materialStorage = await prisma.materialStorage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaterialStorageCreateManyArgs>(args?: SelectSubset<T, MaterialStorageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a MaterialStorage.
+     * @param {MaterialStorageDeleteArgs} args - Arguments to delete one MaterialStorage.
+     * @example
+     * // Delete one MaterialStorage
+     * const MaterialStorage = await prisma.materialStorage.delete({
+     *   where: {
+     *     // ... filter to delete one MaterialStorage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaterialStorageDeleteArgs>(args: SelectSubset<T, MaterialStorageDeleteArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MaterialStorage.
+     * @param {MaterialStorageUpdateArgs} args - Arguments to update one MaterialStorage.
+     * @example
+     * // Update one MaterialStorage
+     * const materialStorage = await prisma.materialStorage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaterialStorageUpdateArgs>(args: SelectSubset<T, MaterialStorageUpdateArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MaterialStorages.
+     * @param {MaterialStorageDeleteManyArgs} args - Arguments to filter MaterialStorages to delete.
+     * @example
+     * // Delete a few MaterialStorages
+     * const { count } = await prisma.materialStorage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaterialStorageDeleteManyArgs>(args?: SelectSubset<T, MaterialStorageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialStorages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MaterialStorages
+     * const materialStorage = await prisma.materialStorage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaterialStorageUpdateManyArgs>(args: SelectSubset<T, MaterialStorageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MaterialStorage.
+     * @param {MaterialStorageUpsertArgs} args - Arguments to update or create a MaterialStorage.
+     * @example
+     * // Update or create a MaterialStorage
+     * const materialStorage = await prisma.materialStorage.upsert({
+     *   create: {
+     *     // ... data to create a MaterialStorage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MaterialStorage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaterialStorageUpsertArgs>(args: SelectSubset<T, MaterialStorageUpsertArgs<ExtArgs>>): Prisma__MaterialStorageClient<$Result.GetResult<Prisma.$MaterialStoragePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MaterialStorages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageCountArgs} args - Arguments to filter MaterialStorages to count.
+     * @example
+     * // Count the number of MaterialStorages
+     * const count = await prisma.materialStorage.count({
+     *   where: {
+     *     // ... the filter for the MaterialStorages we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaterialStorageCountArgs>(
+      args?: Subset<T, MaterialStorageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaterialStorageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MaterialStorage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaterialStorageAggregateArgs>(args: Subset<T, MaterialStorageAggregateArgs>): Prisma.PrismaPromise<GetMaterialStorageAggregateType<T>>
+
+    /**
+     * Group by MaterialStorage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialStorageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaterialStorageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaterialStorageGroupByArgs['orderBy'] }
+        : { orderBy?: MaterialStorageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaterialStorageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaterialStorageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MaterialStorage model
+   */
+  readonly fields: MaterialStorageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MaterialStorage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaterialStorageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MaterialStorage model
+   */
+  interface MaterialStorageFieldRefs {
+    readonly id: FieldRef<"MaterialStorage", 'Int'>
+    readonly storageArea: FieldRef<"MaterialStorage", 'String'>
+    readonly materialType: FieldRef<"MaterialStorage", 'String'>
+    readonly aliasName: FieldRef<"MaterialStorage", 'String'>
+    readonly currentQty: FieldRef<"MaterialStorage", 'Decimal'>
+    readonly currentPrice: FieldRef<"MaterialStorage", 'Decimal'>
+    readonly openidField: FieldRef<"MaterialStorage", 'String'>
+    readonly createBy: FieldRef<"MaterialStorage", 'String'>
+    readonly createdAt: FieldRef<"MaterialStorage", 'String'>
+    readonly updateBy: FieldRef<"MaterialStorage", 'String'>
+    readonly updatedAt: FieldRef<"MaterialStorage", 'String'>
+    readonly qty20260331: FieldRef<"MaterialStorage", 'Decimal'>
+    readonly price20260331: FieldRef<"MaterialStorage", 'Decimal'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MaterialStorage findUnique
+   */
+  export type MaterialStorageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialStorage to fetch.
+     */
+    where: MaterialStorageWhereUniqueInput
+  }
+
+  /**
+   * MaterialStorage findUniqueOrThrow
+   */
+  export type MaterialStorageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialStorage to fetch.
+     */
+    where: MaterialStorageWhereUniqueInput
+  }
+
+  /**
+   * MaterialStorage findFirst
+   */
+  export type MaterialStorageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialStorage to fetch.
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialStorages to fetch.
+     */
+    orderBy?: MaterialStorageOrderByWithRelationInput | MaterialStorageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialStorages.
+     */
+    cursor?: MaterialStorageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialStorages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialStorages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialStorages.
+     */
+    distinct?: MaterialStorageScalarFieldEnum | MaterialStorageScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialStorage findFirstOrThrow
+   */
+  export type MaterialStorageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialStorage to fetch.
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialStorages to fetch.
+     */
+    orderBy?: MaterialStorageOrderByWithRelationInput | MaterialStorageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialStorages.
+     */
+    cursor?: MaterialStorageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialStorages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialStorages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialStorages.
+     */
+    distinct?: MaterialStorageScalarFieldEnum | MaterialStorageScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialStorage findMany
+   */
+  export type MaterialStorageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialStorages to fetch.
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialStorages to fetch.
+     */
+    orderBy?: MaterialStorageOrderByWithRelationInput | MaterialStorageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MaterialStorages.
+     */
+    cursor?: MaterialStorageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialStorages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialStorages.
+     */
+    skip?: number
+    distinct?: MaterialStorageScalarFieldEnum | MaterialStorageScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialStorage create
+   */
+  export type MaterialStorageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MaterialStorage.
+     */
+    data?: XOR<MaterialStorageCreateInput, MaterialStorageUncheckedCreateInput>
+  }
+
+  /**
+   * MaterialStorage createMany
+   */
+  export type MaterialStorageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MaterialStorages.
+     */
+    data: MaterialStorageCreateManyInput | MaterialStorageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MaterialStorage update
+   */
+  export type MaterialStorageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MaterialStorage.
+     */
+    data: XOR<MaterialStorageUpdateInput, MaterialStorageUncheckedUpdateInput>
+    /**
+     * Choose, which MaterialStorage to update.
+     */
+    where: MaterialStorageWhereUniqueInput
+  }
+
+  /**
+   * MaterialStorage updateMany
+   */
+  export type MaterialStorageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MaterialStorages.
+     */
+    data: XOR<MaterialStorageUpdateManyMutationInput, MaterialStorageUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialStorages to update
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * Limit how many MaterialStorages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialStorage upsert
+   */
+  export type MaterialStorageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MaterialStorage to update in case it exists.
+     */
+    where: MaterialStorageWhereUniqueInput
+    /**
+     * In case the MaterialStorage found by the `where` argument doesn't exist, create a new MaterialStorage with this data.
+     */
+    create: XOR<MaterialStorageCreateInput, MaterialStorageUncheckedCreateInput>
+    /**
+     * In case the MaterialStorage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaterialStorageUpdateInput, MaterialStorageUncheckedUpdateInput>
+  }
+
+  /**
+   * MaterialStorage delete
+   */
+  export type MaterialStorageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+    /**
+     * Filter which MaterialStorage to delete.
+     */
+    where: MaterialStorageWhereUniqueInput
+  }
+
+  /**
+   * MaterialStorage deleteMany
+   */
+  export type MaterialStorageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialStorages to delete
+     */
+    where?: MaterialStorageWhereInput
+    /**
+     * Limit how many MaterialStorages to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialStorage without action
+   */
+  export type MaterialStorageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialStorage
+     */
+    select?: MaterialStorageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialStorage
+     */
+    omit?: MaterialStorageOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProductStock
+   */
+
+  export type AggregateProductStock = {
+    _count: ProductStockCountAggregateOutputType | null
+    _avg: ProductStockAvgAggregateOutputType | null
+    _sum: ProductStockSumAggregateOutputType | null
+    _min: ProductStockMinAggregateOutputType | null
+    _max: ProductStockMaxAggregateOutputType | null
+  }
+
+  export type ProductStockAvgAggregateOutputType = {
+    id: number | null
+    stockQty: Decimal | null
+    currentPrice: Decimal | null
+  }
+
+  export type ProductStockSumAggregateOutputType = {
+    id: number | null
+    stockQty: Decimal | null
+    currentPrice: Decimal | null
+  }
+
+  export type ProductStockMinAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    warehouseCode: string | null
+    stockQty: Decimal | null
+    currentPrice: Decimal | null
+    lastInbound: Date | null
+    lastOutbound: Date | null
+    createTime: Date | null
+    updateTime: Date | null
+  }
+
+  export type ProductStockMaxAggregateOutputType = {
+    id: number | null
+    productName: string | null
+    warehouseCode: string | null
+    stockQty: Decimal | null
+    currentPrice: Decimal | null
+    lastInbound: Date | null
+    lastOutbound: Date | null
+    createTime: Date | null
+    updateTime: Date | null
+  }
+
+  export type ProductStockCountAggregateOutputType = {
+    id: number
+    productName: number
+    warehouseCode: number
+    stockQty: number
+    currentPrice: number
+    lastInbound: number
+    lastOutbound: number
+    createTime: number
+    updateTime: number
+    _all: number
+  }
+
+
+  export type ProductStockAvgAggregateInputType = {
+    id?: true
+    stockQty?: true
+    currentPrice?: true
+  }
+
+  export type ProductStockSumAggregateInputType = {
+    id?: true
+    stockQty?: true
+    currentPrice?: true
+  }
+
+  export type ProductStockMinAggregateInputType = {
+    id?: true
+    productName?: true
+    warehouseCode?: true
+    stockQty?: true
+    currentPrice?: true
+    lastInbound?: true
+    lastOutbound?: true
+    createTime?: true
+    updateTime?: true
+  }
+
+  export type ProductStockMaxAggregateInputType = {
+    id?: true
+    productName?: true
+    warehouseCode?: true
+    stockQty?: true
+    currentPrice?: true
+    lastInbound?: true
+    lastOutbound?: true
+    createTime?: true
+    updateTime?: true
+  }
+
+  export type ProductStockCountAggregateInputType = {
+    id?: true
+    productName?: true
+    warehouseCode?: true
+    stockQty?: true
+    currentPrice?: true
+    lastInbound?: true
+    lastOutbound?: true
+    createTime?: true
+    updateTime?: true
+    _all?: true
+  }
+
+  export type ProductStockAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductStock to aggregate.
+     */
+    where?: ProductStockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStocks to fetch.
+     */
+    orderBy?: ProductStockOrderByWithRelationInput | ProductStockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductStockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductStocks
+    **/
+    _count?: true | ProductStockCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProductStockAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProductStockSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductStockMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductStockMaxAggregateInputType
+  }
+
+  export type GetProductStockAggregateType<T extends ProductStockAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductStock]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductStock[P]>
+      : GetScalarType<T[P], AggregateProductStock[P]>
+  }
+
+
+
+
+  export type ProductStockGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductStockWhereInput
+    orderBy?: ProductStockOrderByWithAggregationInput | ProductStockOrderByWithAggregationInput[]
+    by: ProductStockScalarFieldEnum[] | ProductStockScalarFieldEnum
+    having?: ProductStockScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductStockCountAggregateInputType | true
+    _avg?: ProductStockAvgAggregateInputType
+    _sum?: ProductStockSumAggregateInputType
+    _min?: ProductStockMinAggregateInputType
+    _max?: ProductStockMaxAggregateInputType
+  }
+
+  export type ProductStockGroupByOutputType = {
+    id: number
+    productName: string | null
+    warehouseCode: string | null
+    stockQty: Decimal | null
+    currentPrice: Decimal | null
+    lastInbound: Date | null
+    lastOutbound: Date | null
+    createTime: Date | null
+    updateTime: Date | null
+    _count: ProductStockCountAggregateOutputType | null
+    _avg: ProductStockAvgAggregateOutputType | null
+    _sum: ProductStockSumAggregateOutputType | null
+    _min: ProductStockMinAggregateOutputType | null
+    _max: ProductStockMaxAggregateOutputType | null
+  }
+
+  type GetProductStockGroupByPayload<T extends ProductStockGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductStockGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductStockGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductStockGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductStockGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductStockSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productName?: boolean
+    warehouseCode?: boolean
+    stockQty?: boolean
+    currentPrice?: boolean
+    lastInbound?: boolean
+    lastOutbound?: boolean
+    createTime?: boolean
+    updateTime?: boolean
+  }, ExtArgs["result"]["productStock"]>
+
+
+
+  export type ProductStockSelectScalar = {
+    id?: boolean
+    productName?: boolean
+    warehouseCode?: boolean
+    stockQty?: boolean
+    currentPrice?: boolean
+    lastInbound?: boolean
+    lastOutbound?: boolean
+    createTime?: boolean
+    updateTime?: boolean
+  }
+
+  export type ProductStockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "warehouseCode" | "stockQty" | "currentPrice" | "lastInbound" | "lastOutbound" | "createTime" | "updateTime", ExtArgs["result"]["productStock"]>
+
+  export type $ProductStockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductStock"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      productName: string | null
+      warehouseCode: string | null
+      stockQty: Prisma.Decimal | null
+      currentPrice: Prisma.Decimal | null
+      lastInbound: Date | null
+      lastOutbound: Date | null
+      createTime: Date | null
+      updateTime: Date | null
+    }, ExtArgs["result"]["productStock"]>
+    composites: {}
+  }
+
+  type ProductStockGetPayload<S extends boolean | null | undefined | ProductStockDefaultArgs> = $Result.GetResult<Prisma.$ProductStockPayload, S>
+
+  type ProductStockCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProductStockFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProductStockCountAggregateInputType | true
+    }
+
+  export interface ProductStockDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductStock'], meta: { name: 'ProductStock' } }
+    /**
+     * Find zero or one ProductStock that matches the filter.
+     * @param {ProductStockFindUniqueArgs} args - Arguments to find a ProductStock
+     * @example
+     * // Get one ProductStock
+     * const productStock = await prisma.productStock.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductStockFindUniqueArgs>(args: SelectSubset<T, ProductStockFindUniqueArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProductStock that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProductStockFindUniqueOrThrowArgs} args - Arguments to find a ProductStock
+     * @example
+     * // Get one ProductStock
+     * const productStock = await prisma.productStock.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductStockFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductStockFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductStock that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockFindFirstArgs} args - Arguments to find a ProductStock
+     * @example
+     * // Get one ProductStock
+     * const productStock = await prisma.productStock.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductStockFindFirstArgs>(args?: SelectSubset<T, ProductStockFindFirstArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductStock that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockFindFirstOrThrowArgs} args - Arguments to find a ProductStock
+     * @example
+     * // Get one ProductStock
+     * const productStock = await prisma.productStock.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductStockFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductStockFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProductStocks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductStocks
+     * const productStocks = await prisma.productStock.findMany()
+     * 
+     * // Get first 10 ProductStocks
+     * const productStocks = await prisma.productStock.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productStockWithIdOnly = await prisma.productStock.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductStockFindManyArgs>(args?: SelectSubset<T, ProductStockFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProductStock.
+     * @param {ProductStockCreateArgs} args - Arguments to create a ProductStock.
+     * @example
+     * // Create one ProductStock
+     * const ProductStock = await prisma.productStock.create({
+     *   data: {
+     *     // ... data to create a ProductStock
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductStockCreateArgs>(args: SelectSubset<T, ProductStockCreateArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProductStocks.
+     * @param {ProductStockCreateManyArgs} args - Arguments to create many ProductStocks.
+     * @example
+     * // Create many ProductStocks
+     * const productStock = await prisma.productStock.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductStockCreateManyArgs>(args?: SelectSubset<T, ProductStockCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProductStock.
+     * @param {ProductStockDeleteArgs} args - Arguments to delete one ProductStock.
+     * @example
+     * // Delete one ProductStock
+     * const ProductStock = await prisma.productStock.delete({
+     *   where: {
+     *     // ... filter to delete one ProductStock
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductStockDeleteArgs>(args: SelectSubset<T, ProductStockDeleteArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProductStock.
+     * @param {ProductStockUpdateArgs} args - Arguments to update one ProductStock.
+     * @example
+     * // Update one ProductStock
+     * const productStock = await prisma.productStock.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductStockUpdateArgs>(args: SelectSubset<T, ProductStockUpdateArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProductStocks.
+     * @param {ProductStockDeleteManyArgs} args - Arguments to filter ProductStocks to delete.
+     * @example
+     * // Delete a few ProductStocks
+     * const { count } = await prisma.productStock.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductStockDeleteManyArgs>(args?: SelectSubset<T, ProductStockDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductStocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductStocks
+     * const productStock = await prisma.productStock.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductStockUpdateManyArgs>(args: SelectSubset<T, ProductStockUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductStock.
+     * @param {ProductStockUpsertArgs} args - Arguments to update or create a ProductStock.
+     * @example
+     * // Update or create a ProductStock
+     * const productStock = await prisma.productStock.upsert({
+     *   create: {
+     *     // ... data to create a ProductStock
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductStock we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductStockUpsertArgs>(args: SelectSubset<T, ProductStockUpsertArgs<ExtArgs>>): Prisma__ProductStockClient<$Result.GetResult<Prisma.$ProductStockPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProductStocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockCountArgs} args - Arguments to filter ProductStocks to count.
+     * @example
+     * // Count the number of ProductStocks
+     * const count = await prisma.productStock.count({
+     *   where: {
+     *     // ... the filter for the ProductStocks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductStockCountArgs>(
+      args?: Subset<T, ProductStockCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductStockCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductStock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductStockAggregateArgs>(args: Subset<T, ProductStockAggregateArgs>): Prisma.PrismaPromise<GetProductStockAggregateType<T>>
+
+    /**
+     * Group by ProductStock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductStockGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductStockGroupByArgs['orderBy'] }
+        : { orderBy?: ProductStockGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductStockGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductStockGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductStock model
+   */
+  readonly fields: ProductStockFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductStock.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductStockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductStock model
+   */
+  interface ProductStockFieldRefs {
+    readonly id: FieldRef<"ProductStock", 'Int'>
+    readonly productName: FieldRef<"ProductStock", 'String'>
+    readonly warehouseCode: FieldRef<"ProductStock", 'String'>
+    readonly stockQty: FieldRef<"ProductStock", 'Decimal'>
+    readonly currentPrice: FieldRef<"ProductStock", 'Decimal'>
+    readonly lastInbound: FieldRef<"ProductStock", 'DateTime'>
+    readonly lastOutbound: FieldRef<"ProductStock", 'DateTime'>
+    readonly createTime: FieldRef<"ProductStock", 'DateTime'>
+    readonly updateTime: FieldRef<"ProductStock", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductStock findUnique
+   */
+  export type ProductStockFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStock to fetch.
+     */
+    where: ProductStockWhereUniqueInput
+  }
+
+  /**
+   * ProductStock findUniqueOrThrow
+   */
+  export type ProductStockFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStock to fetch.
+     */
+    where: ProductStockWhereUniqueInput
+  }
+
+  /**
+   * ProductStock findFirst
+   */
+  export type ProductStockFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStock to fetch.
+     */
+    where?: ProductStockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStocks to fetch.
+     */
+    orderBy?: ProductStockOrderByWithRelationInput | ProductStockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductStocks.
+     */
+    cursor?: ProductStockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductStocks.
+     */
+    distinct?: ProductStockScalarFieldEnum | ProductStockScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStock findFirstOrThrow
+   */
+  export type ProductStockFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStock to fetch.
+     */
+    where?: ProductStockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStocks to fetch.
+     */
+    orderBy?: ProductStockOrderByWithRelationInput | ProductStockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductStocks.
+     */
+    cursor?: ProductStockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductStocks.
+     */
+    distinct?: ProductStockScalarFieldEnum | ProductStockScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStock findMany
+   */
+  export type ProductStockFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStocks to fetch.
+     */
+    where?: ProductStockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStocks to fetch.
+     */
+    orderBy?: ProductStockOrderByWithRelationInput | ProductStockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductStocks.
+     */
+    cursor?: ProductStockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStocks.
+     */
+    skip?: number
+    distinct?: ProductStockScalarFieldEnum | ProductStockScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStock create
+   */
+  export type ProductStockCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProductStock.
+     */
+    data?: XOR<ProductStockCreateInput, ProductStockUncheckedCreateInput>
+  }
+
+  /**
+   * ProductStock createMany
+   */
+  export type ProductStockCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductStocks.
+     */
+    data: ProductStockCreateManyInput | ProductStockCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductStock update
+   */
+  export type ProductStockUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProductStock.
+     */
+    data: XOR<ProductStockUpdateInput, ProductStockUncheckedUpdateInput>
+    /**
+     * Choose, which ProductStock to update.
+     */
+    where: ProductStockWhereUniqueInput
+  }
+
+  /**
+   * ProductStock updateMany
+   */
+  export type ProductStockUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductStocks.
+     */
+    data: XOR<ProductStockUpdateManyMutationInput, ProductStockUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductStocks to update
+     */
+    where?: ProductStockWhereInput
+    /**
+     * Limit how many ProductStocks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductStock upsert
+   */
+  export type ProductStockUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProductStock to update in case it exists.
+     */
+    where: ProductStockWhereUniqueInput
+    /**
+     * In case the ProductStock found by the `where` argument doesn't exist, create a new ProductStock with this data.
+     */
+    create: XOR<ProductStockCreateInput, ProductStockUncheckedCreateInput>
+    /**
+     * In case the ProductStock was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductStockUpdateInput, ProductStockUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductStock delete
+   */
+  export type ProductStockDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
+    /**
+     * Filter which ProductStock to delete.
+     */
+    where: ProductStockWhereUniqueInput
+  }
+
+  /**
+   * ProductStock deleteMany
+   */
+  export type ProductStockDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductStocks to delete
+     */
+    where?: ProductStockWhereInput
+    /**
+     * Limit how many ProductStocks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductStock without action
+   */
+  export type ProductStockDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStock
+     */
+    select?: ProductStockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStock
+     */
+    omit?: ProductStockOmit<ExtArgs> | null
   }
 
 
@@ -41816,18 +45763,118 @@ export namespace Prisma {
   export type DeliverySettlementScalarFieldEnum = (typeof DeliverySettlementScalarFieldEnum)[keyof typeof DeliverySettlementScalarFieldEnum]
 
 
+  export const ProfitParamConfigScalarFieldEnum: {
+    id: 'id',
+    paramKey: 'paramKey',
+    nameCn: 'nameCn',
+    category: 'category',
+    subCategory: 'subCategory',
+    steelMill: 'steelMill',
+    effectiveDate: 'effectiveDate',
+    value: 'value',
+    previousValue: 'previousValue',
+    unit: 'unit',
+    remark: 'remark',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ProfitParamConfigScalarFieldEnum = (typeof ProfitParamConfigScalarFieldEnum)[keyof typeof ProfitParamConfigScalarFieldEnum]
+
+
   export const ProcessingCostInputScalarFieldEnum: {
     id: 'id',
     productName: 'productName',
     productWarehouse: 'productWarehouse',
     productTons: 'productTons',
+    dailyProcessQty: 'dailyProcessQty',
+    dailyProcessAmount: 'dailyProcessAmount',
+    dailyProcessPrice: 'dailyProcessPrice',
     productionDate: 'productionDate',
     materialComposition: 'materialComposition',
+    materialWarehouses: 'materialWarehouses',
+    openid: 'openid',
+    M1Qty: 'M1Qty',
+    M1Price: 'M1Price',
+    M2Qty: 'M2Qty',
+    M2Price: 'M2Price',
+    M3Qty: 'M3Qty',
+    M3Price: 'M3Price',
+    M4Qty: 'M4Qty',
+    M4Price: 'M4Price',
+    M5Qty: 'M5Qty',
+    M5Price: 'M5Price',
+    M6Qty: 'M6Qty',
+    M6Price: 'M6Price',
+    M7Qty: 'M7Qty',
+    M7Price: 'M7Price',
+    M8Qty: 'M8Qty',
+    M8Price: 'M8Price',
+    M9Qty: 'M9Qty',
+    M9Price: 'M9Price',
+    wireRopeQty: 'wireRopeQty',
+    wireRopePrice: 'wireRopePrice',
+    carShellQty: 'carShellQty',
+    carShellPrice: 'carShellPrice',
+    pigIronQty: 'pigIronQty',
+    pigIronPrice: 'pigIronPrice',
+    scrapQty: 'scrapQty',
+    scrapPrice: 'scrapPrice',
+    carDismantleQty: 'carDismantleQty',
+    carDismantlePrice: 'carDismantlePrice',
+    transferQty: 'transferQty',
+    transferPrice: 'transferPrice',
+    auxiliaryQty: 'auxiliaryQty',
+    auxiliaryPrice: 'auxiliaryPrice',
+    material1Qty: 'material1Qty',
+    material1Price: 'material1Price',
+    material2Qty: 'material2Qty',
+    material2Price: 'material2Price',
+    material3Qty: 'material3Qty',
+    material3Price: 'material3Price',
+    material4Qty: 'material4Qty',
+    material4Price: 'material4Price',
+    material5Qty: 'material5Qty',
+    material5Price: 'material5Price',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type ProcessingCostInputScalarFieldEnum = (typeof ProcessingCostInputScalarFieldEnum)[keyof typeof ProcessingCostInputScalarFieldEnum]
+
+
+  export const MaterialStorageScalarFieldEnum: {
+    id: 'id',
+    storageArea: 'storageArea',
+    materialType: 'materialType',
+    aliasName: 'aliasName',
+    currentQty: 'currentQty',
+    currentPrice: 'currentPrice',
+    openidField: 'openidField',
+    createBy: 'createBy',
+    createdAt: 'createdAt',
+    updateBy: 'updateBy',
+    updatedAt: 'updatedAt',
+    qty20260331: 'qty20260331',
+    price20260331: 'price20260331'
+  };
+
+  export type MaterialStorageScalarFieldEnum = (typeof MaterialStorageScalarFieldEnum)[keyof typeof MaterialStorageScalarFieldEnum]
+
+
+  export const ProductStockScalarFieldEnum: {
+    id: 'id',
+    productName: 'productName',
+    warehouseCode: 'warehouseCode',
+    stockQty: 'stockQty',
+    currentPrice: 'currentPrice',
+    lastInbound: 'lastInbound',
+    lastOutbound: 'lastOutbound',
+    createTime: 'createTime',
+    updateTime: 'updateTime'
+  };
+
+  export type ProductStockScalarFieldEnum = (typeof ProductStockScalarFieldEnum)[keyof typeof ProductStockScalarFieldEnum]
 
 
   export const ProcessingCostConfigScalarFieldEnum: {
@@ -42306,13 +46353,50 @@ export namespace Prisma {
   export type DeliverySettlementOrderByRelevanceFieldEnum = (typeof DeliverySettlementOrderByRelevanceFieldEnum)[keyof typeof DeliverySettlementOrderByRelevanceFieldEnum]
 
 
+  export const ProfitParamConfigOrderByRelevanceFieldEnum: {
+    paramKey: 'paramKey',
+    nameCn: 'nameCn',
+    category: 'category',
+    subCategory: 'subCategory',
+    steelMill: 'steelMill',
+    unit: 'unit',
+    remark: 'remark'
+  };
+
+  export type ProfitParamConfigOrderByRelevanceFieldEnum = (typeof ProfitParamConfigOrderByRelevanceFieldEnum)[keyof typeof ProfitParamConfigOrderByRelevanceFieldEnum]
+
+
   export const ProcessingCostInputOrderByRelevanceFieldEnum: {
     productName: 'productName',
     productWarehouse: 'productWarehouse',
-    productionDate: 'productionDate'
+    productionDate: 'productionDate',
+    materialWarehouses: 'materialWarehouses',
+    openid: 'openid'
   };
 
   export type ProcessingCostInputOrderByRelevanceFieldEnum = (typeof ProcessingCostInputOrderByRelevanceFieldEnum)[keyof typeof ProcessingCostInputOrderByRelevanceFieldEnum]
+
+
+  export const MaterialStorageOrderByRelevanceFieldEnum: {
+    storageArea: 'storageArea',
+    materialType: 'materialType',
+    aliasName: 'aliasName',
+    openidField: 'openidField',
+    createBy: 'createBy',
+    createdAt: 'createdAt',
+    updateBy: 'updateBy',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MaterialStorageOrderByRelevanceFieldEnum = (typeof MaterialStorageOrderByRelevanceFieldEnum)[keyof typeof MaterialStorageOrderByRelevanceFieldEnum]
+
+
+  export const ProductStockOrderByRelevanceFieldEnum: {
+    productName: 'productName',
+    warehouseCode: 'warehouseCode'
+  };
+
+  export type ProductStockOrderByRelevanceFieldEnum = (typeof ProductStockOrderByRelevanceFieldEnum)[keyof typeof ProductStockOrderByRelevanceFieldEnum]
 
 
   export const ProcessingCostConfigOrderByRelevanceFieldEnum: {
@@ -44940,6 +49024,102 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableWithAggregatesFilter<"DeliverySettlement"> | Date | string | null
   }
 
+  export type ProfitParamConfigWhereInput = {
+    AND?: ProfitParamConfigWhereInput | ProfitParamConfigWhereInput[]
+    OR?: ProfitParamConfigWhereInput[]
+    NOT?: ProfitParamConfigWhereInput | ProfitParamConfigWhereInput[]
+    id?: IntFilter<"ProfitParamConfig"> | number
+    paramKey?: StringFilter<"ProfitParamConfig"> | string
+    nameCn?: StringFilter<"ProfitParamConfig"> | string
+    category?: StringFilter<"ProfitParamConfig"> | string
+    subCategory?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    steelMill?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    effectiveDate?: DateTimeFilter<"ProfitParamConfig"> | Date | string
+    value?: DecimalFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
+    previousValue?: DecimalNullableFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    remark?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    createdAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
+  }
+
+  export type ProfitParamConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    paramKey?: SortOrder
+    nameCn?: SortOrder
+    category?: SortOrder
+    subCategory?: SortOrderInput | SortOrder
+    steelMill?: SortOrderInput | SortOrder
+    effectiveDate?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrderInput | SortOrder
+    unit?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _relevance?: ProfitParamConfigOrderByRelevanceInput
+  }
+
+  export type ProfitParamConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    paramKey_steelMill_effectiveDate?: ProfitParamConfigParamKeySteelMillEffectiveDateCompoundUniqueInput
+    AND?: ProfitParamConfigWhereInput | ProfitParamConfigWhereInput[]
+    OR?: ProfitParamConfigWhereInput[]
+    NOT?: ProfitParamConfigWhereInput | ProfitParamConfigWhereInput[]
+    paramKey?: StringFilter<"ProfitParamConfig"> | string
+    nameCn?: StringFilter<"ProfitParamConfig"> | string
+    category?: StringFilter<"ProfitParamConfig"> | string
+    subCategory?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    steelMill?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    effectiveDate?: DateTimeFilter<"ProfitParamConfig"> | Date | string
+    value?: DecimalFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
+    previousValue?: DecimalNullableFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    remark?: StringNullableFilter<"ProfitParamConfig"> | string | null
+    createdAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
+  }, "id" | "paramKey_steelMill_effectiveDate">
+
+  export type ProfitParamConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    paramKey?: SortOrder
+    nameCn?: SortOrder
+    category?: SortOrder
+    subCategory?: SortOrderInput | SortOrder
+    steelMill?: SortOrderInput | SortOrder
+    effectiveDate?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrderInput | SortOrder
+    unit?: SortOrderInput | SortOrder
+    remark?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    _count?: ProfitParamConfigCountOrderByAggregateInput
+    _avg?: ProfitParamConfigAvgOrderByAggregateInput
+    _max?: ProfitParamConfigMaxOrderByAggregateInput
+    _min?: ProfitParamConfigMinOrderByAggregateInput
+    _sum?: ProfitParamConfigSumOrderByAggregateInput
+  }
+
+  export type ProfitParamConfigScalarWhereWithAggregatesInput = {
+    AND?: ProfitParamConfigScalarWhereWithAggregatesInput | ProfitParamConfigScalarWhereWithAggregatesInput[]
+    OR?: ProfitParamConfigScalarWhereWithAggregatesInput[]
+    NOT?: ProfitParamConfigScalarWhereWithAggregatesInput | ProfitParamConfigScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ProfitParamConfig"> | number
+    paramKey?: StringWithAggregatesFilter<"ProfitParamConfig"> | string
+    nameCn?: StringWithAggregatesFilter<"ProfitParamConfig"> | string
+    category?: StringWithAggregatesFilter<"ProfitParamConfig"> | string
+    subCategory?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
+    steelMill?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
+    effectiveDate?: DateTimeWithAggregatesFilter<"ProfitParamConfig"> | Date | string
+    value?: DecimalWithAggregatesFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
+    previousValue?: DecimalNullableWithAggregatesFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    unit?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
+    remark?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"ProfitParamConfig"> | Date | string | null
+    updatedAt?: DateTimeNullableWithAggregatesFilter<"ProfitParamConfig"> | Date | string | null
+  }
+
   export type ProcessingCostInputWhereInput = {
     AND?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
     OR?: ProcessingCostInputWhereInput[]
@@ -44948,8 +49128,55 @@ export namespace Prisma {
     productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableFilter<"ProcessingCostInput">
+    materialWarehouses?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    openid?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    M1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
   }
@@ -44959,8 +49186,55 @@ export namespace Prisma {
     productName?: SortOrderInput | SortOrder
     productWarehouse?: SortOrderInput | SortOrder
     productTons?: SortOrderInput | SortOrder
+    dailyProcessQty?: SortOrderInput | SortOrder
+    dailyProcessAmount?: SortOrderInput | SortOrder
+    dailyProcessPrice?: SortOrderInput | SortOrder
     productionDate?: SortOrderInput | SortOrder
     materialComposition?: SortOrderInput | SortOrder
+    materialWarehouses?: SortOrderInput | SortOrder
+    openid?: SortOrderInput | SortOrder
+    M1Qty?: SortOrderInput | SortOrder
+    M1Price?: SortOrderInput | SortOrder
+    M2Qty?: SortOrderInput | SortOrder
+    M2Price?: SortOrderInput | SortOrder
+    M3Qty?: SortOrderInput | SortOrder
+    M3Price?: SortOrderInput | SortOrder
+    M4Qty?: SortOrderInput | SortOrder
+    M4Price?: SortOrderInput | SortOrder
+    M5Qty?: SortOrderInput | SortOrder
+    M5Price?: SortOrderInput | SortOrder
+    M6Qty?: SortOrderInput | SortOrder
+    M6Price?: SortOrderInput | SortOrder
+    M7Qty?: SortOrderInput | SortOrder
+    M7Price?: SortOrderInput | SortOrder
+    M8Qty?: SortOrderInput | SortOrder
+    M8Price?: SortOrderInput | SortOrder
+    M9Qty?: SortOrderInput | SortOrder
+    M9Price?: SortOrderInput | SortOrder
+    wireRopeQty?: SortOrderInput | SortOrder
+    wireRopePrice?: SortOrderInput | SortOrder
+    carShellQty?: SortOrderInput | SortOrder
+    carShellPrice?: SortOrderInput | SortOrder
+    pigIronQty?: SortOrderInput | SortOrder
+    pigIronPrice?: SortOrderInput | SortOrder
+    scrapQty?: SortOrderInput | SortOrder
+    scrapPrice?: SortOrderInput | SortOrder
+    carDismantleQty?: SortOrderInput | SortOrder
+    carDismantlePrice?: SortOrderInput | SortOrder
+    transferQty?: SortOrderInput | SortOrder
+    transferPrice?: SortOrderInput | SortOrder
+    auxiliaryQty?: SortOrderInput | SortOrder
+    auxiliaryPrice?: SortOrderInput | SortOrder
+    material1Qty?: SortOrderInput | SortOrder
+    material1Price?: SortOrderInput | SortOrder
+    material2Qty?: SortOrderInput | SortOrder
+    material2Price?: SortOrderInput | SortOrder
+    material3Qty?: SortOrderInput | SortOrder
+    material3Price?: SortOrderInput | SortOrder
+    material4Qty?: SortOrderInput | SortOrder
+    material4Price?: SortOrderInput | SortOrder
+    material5Qty?: SortOrderInput | SortOrder
+    material5Price?: SortOrderInput | SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
     _relevance?: ProcessingCostInputOrderByRelevanceInput
@@ -44974,8 +49248,55 @@ export namespace Prisma {
     productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableFilter<"ProcessingCostInput">
+    materialWarehouses?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    openid?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    M1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
   }, "id">
@@ -44985,8 +49306,55 @@ export namespace Prisma {
     productName?: SortOrderInput | SortOrder
     productWarehouse?: SortOrderInput | SortOrder
     productTons?: SortOrderInput | SortOrder
+    dailyProcessQty?: SortOrderInput | SortOrder
+    dailyProcessAmount?: SortOrderInput | SortOrder
+    dailyProcessPrice?: SortOrderInput | SortOrder
     productionDate?: SortOrderInput | SortOrder
     materialComposition?: SortOrderInput | SortOrder
+    materialWarehouses?: SortOrderInput | SortOrder
+    openid?: SortOrderInput | SortOrder
+    M1Qty?: SortOrderInput | SortOrder
+    M1Price?: SortOrderInput | SortOrder
+    M2Qty?: SortOrderInput | SortOrder
+    M2Price?: SortOrderInput | SortOrder
+    M3Qty?: SortOrderInput | SortOrder
+    M3Price?: SortOrderInput | SortOrder
+    M4Qty?: SortOrderInput | SortOrder
+    M4Price?: SortOrderInput | SortOrder
+    M5Qty?: SortOrderInput | SortOrder
+    M5Price?: SortOrderInput | SortOrder
+    M6Qty?: SortOrderInput | SortOrder
+    M6Price?: SortOrderInput | SortOrder
+    M7Qty?: SortOrderInput | SortOrder
+    M7Price?: SortOrderInput | SortOrder
+    M8Qty?: SortOrderInput | SortOrder
+    M8Price?: SortOrderInput | SortOrder
+    M9Qty?: SortOrderInput | SortOrder
+    M9Price?: SortOrderInput | SortOrder
+    wireRopeQty?: SortOrderInput | SortOrder
+    wireRopePrice?: SortOrderInput | SortOrder
+    carShellQty?: SortOrderInput | SortOrder
+    carShellPrice?: SortOrderInput | SortOrder
+    pigIronQty?: SortOrderInput | SortOrder
+    pigIronPrice?: SortOrderInput | SortOrder
+    scrapQty?: SortOrderInput | SortOrder
+    scrapPrice?: SortOrderInput | SortOrder
+    carDismantleQty?: SortOrderInput | SortOrder
+    carDismantlePrice?: SortOrderInput | SortOrder
+    transferQty?: SortOrderInput | SortOrder
+    transferPrice?: SortOrderInput | SortOrder
+    auxiliaryQty?: SortOrderInput | SortOrder
+    auxiliaryPrice?: SortOrderInput | SortOrder
+    material1Qty?: SortOrderInput | SortOrder
+    material1Price?: SortOrderInput | SortOrder
+    material2Qty?: SortOrderInput | SortOrder
+    material2Price?: SortOrderInput | SortOrder
+    material3Qty?: SortOrderInput | SortOrder
+    material3Price?: SortOrderInput | SortOrder
+    material4Qty?: SortOrderInput | SortOrder
+    material4Price?: SortOrderInput | SortOrder
+    material5Qty?: SortOrderInput | SortOrder
+    material5Price?: SortOrderInput | SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
     _count?: ProcessingCostInputCountOrderByAggregateInput
@@ -45004,10 +49372,227 @@ export namespace Prisma {
     productName?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     productTons?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableWithAggregatesFilter<"ProcessingCostInput">
+    materialWarehouses?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    openid?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    M1Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M1Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M3Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M5Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M6Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M7Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M8Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    M9Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material1Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material3Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    material5Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
+  }
+
+  export type MaterialStorageWhereInput = {
+    AND?: MaterialStorageWhereInput | MaterialStorageWhereInput[]
+    OR?: MaterialStorageWhereInput[]
+    NOT?: MaterialStorageWhereInput | MaterialStorageWhereInput[]
+    id?: IntFilter<"MaterialStorage"> | number
+    storageArea?: StringNullableFilter<"MaterialStorage"> | string | null
+    materialType?: StringNullableFilter<"MaterialStorage"> | string | null
+    aliasName?: StringNullableFilter<"MaterialStorage"> | string | null
+    currentQty?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    openidField?: StringNullableFilter<"MaterialStorage"> | string | null
+    createBy?: StringNullableFilter<"MaterialStorage"> | string | null
+    createdAt?: StringNullableFilter<"MaterialStorage"> | string | null
+    updateBy?: StringNullableFilter<"MaterialStorage"> | string | null
+    updatedAt?: StringNullableFilter<"MaterialStorage"> | string | null
+    qty20260331?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    price20260331?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageOrderByWithRelationInput = {
+    id?: SortOrder
+    storageArea?: SortOrderInput | SortOrder
+    materialType?: SortOrderInput | SortOrder
+    aliasName?: SortOrderInput | SortOrder
+    currentQty?: SortOrderInput | SortOrder
+    currentPrice?: SortOrderInput | SortOrder
+    openidField?: SortOrderInput | SortOrder
+    createBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updateBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    qty20260331?: SortOrderInput | SortOrder
+    price20260331?: SortOrderInput | SortOrder
+    _relevance?: MaterialStorageOrderByRelevanceInput
+  }
+
+  export type MaterialStorageWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: MaterialStorageWhereInput | MaterialStorageWhereInput[]
+    OR?: MaterialStorageWhereInput[]
+    NOT?: MaterialStorageWhereInput | MaterialStorageWhereInput[]
+    storageArea?: StringNullableFilter<"MaterialStorage"> | string | null
+    materialType?: StringNullableFilter<"MaterialStorage"> | string | null
+    aliasName?: StringNullableFilter<"MaterialStorage"> | string | null
+    currentQty?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    openidField?: StringNullableFilter<"MaterialStorage"> | string | null
+    createBy?: StringNullableFilter<"MaterialStorage"> | string | null
+    createdAt?: StringNullableFilter<"MaterialStorage"> | string | null
+    updateBy?: StringNullableFilter<"MaterialStorage"> | string | null
+    updatedAt?: StringNullableFilter<"MaterialStorage"> | string | null
+    qty20260331?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    price20260331?: DecimalNullableFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+  }, "id">
+
+  export type MaterialStorageOrderByWithAggregationInput = {
+    id?: SortOrder
+    storageArea?: SortOrderInput | SortOrder
+    materialType?: SortOrderInput | SortOrder
+    aliasName?: SortOrderInput | SortOrder
+    currentQty?: SortOrderInput | SortOrder
+    currentPrice?: SortOrderInput | SortOrder
+    openidField?: SortOrderInput | SortOrder
+    createBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    updateBy?: SortOrderInput | SortOrder
+    updatedAt?: SortOrderInput | SortOrder
+    qty20260331?: SortOrderInput | SortOrder
+    price20260331?: SortOrderInput | SortOrder
+    _count?: MaterialStorageCountOrderByAggregateInput
+    _avg?: MaterialStorageAvgOrderByAggregateInput
+    _max?: MaterialStorageMaxOrderByAggregateInput
+    _min?: MaterialStorageMinOrderByAggregateInput
+    _sum?: MaterialStorageSumOrderByAggregateInput
+  }
+
+  export type MaterialStorageScalarWhereWithAggregatesInput = {
+    AND?: MaterialStorageScalarWhereWithAggregatesInput | MaterialStorageScalarWhereWithAggregatesInput[]
+    OR?: MaterialStorageScalarWhereWithAggregatesInput[]
+    NOT?: MaterialStorageScalarWhereWithAggregatesInput | MaterialStorageScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MaterialStorage"> | number
+    storageArea?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    materialType?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    aliasName?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    currentQty?: DecimalNullableWithAggregatesFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableWithAggregatesFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    openidField?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    createBy?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    createdAt?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    updateBy?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    updatedAt?: StringNullableWithAggregatesFilter<"MaterialStorage"> | string | null
+    qty20260331?: DecimalNullableWithAggregatesFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+    price20260331?: DecimalNullableWithAggregatesFilter<"MaterialStorage"> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type ProductStockWhereInput = {
+    AND?: ProductStockWhereInput | ProductStockWhereInput[]
+    OR?: ProductStockWhereInput[]
+    NOT?: ProductStockWhereInput | ProductStockWhereInput[]
+    id?: IntFilter<"ProductStock"> | number
+    productName?: StringNullableFilter<"ProductStock"> | string | null
+    warehouseCode?: StringNullableFilter<"ProductStock"> | string | null
+    stockQty?: DecimalNullableFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    lastOutbound?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    createTime?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    updateTime?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+  }
+
+  export type ProductStockOrderByWithRelationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    warehouseCode?: SortOrderInput | SortOrder
+    stockQty?: SortOrderInput | SortOrder
+    currentPrice?: SortOrderInput | SortOrder
+    lastInbound?: SortOrderInput | SortOrder
+    lastOutbound?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    updateTime?: SortOrderInput | SortOrder
+    _relevance?: ProductStockOrderByRelevanceInput
+  }
+
+  export type ProductStockWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ProductStockWhereInput | ProductStockWhereInput[]
+    OR?: ProductStockWhereInput[]
+    NOT?: ProductStockWhereInput | ProductStockWhereInput[]
+    productName?: StringNullableFilter<"ProductStock"> | string | null
+    warehouseCode?: StringNullableFilter<"ProductStock"> | string | null
+    stockQty?: DecimalNullableFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    lastOutbound?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    createTime?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+    updateTime?: DateTimeNullableFilter<"ProductStock"> | Date | string | null
+  }, "id">
+
+  export type ProductStockOrderByWithAggregationInput = {
+    id?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    warehouseCode?: SortOrderInput | SortOrder
+    stockQty?: SortOrderInput | SortOrder
+    currentPrice?: SortOrderInput | SortOrder
+    lastInbound?: SortOrderInput | SortOrder
+    lastOutbound?: SortOrderInput | SortOrder
+    createTime?: SortOrderInput | SortOrder
+    updateTime?: SortOrderInput | SortOrder
+    _count?: ProductStockCountOrderByAggregateInput
+    _avg?: ProductStockAvgOrderByAggregateInput
+    _max?: ProductStockMaxOrderByAggregateInput
+    _min?: ProductStockMinOrderByAggregateInput
+    _sum?: ProductStockSumOrderByAggregateInput
+  }
+
+  export type ProductStockScalarWhereWithAggregatesInput = {
+    AND?: ProductStockScalarWhereWithAggregatesInput | ProductStockScalarWhereWithAggregatesInput[]
+    OR?: ProductStockScalarWhereWithAggregatesInput[]
+    NOT?: ProductStockScalarWhereWithAggregatesInput | ProductStockScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ProductStock"> | number
+    productName?: StringNullableWithAggregatesFilter<"ProductStock"> | string | null
+    warehouseCode?: StringNullableWithAggregatesFilter<"ProductStock"> | string | null
+    stockQty?: DecimalNullableWithAggregatesFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: DecimalNullableWithAggregatesFilter<"ProductStock"> | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: DateTimeNullableWithAggregatesFilter<"ProductStock"> | Date | string | null
+    lastOutbound?: DateTimeNullableWithAggregatesFilter<"ProductStock"> | Date | string | null
+    createTime?: DateTimeNullableWithAggregatesFilter<"ProductStock"> | Date | string | null
+    updateTime?: DateTimeNullableWithAggregatesFilter<"ProductStock"> | Date | string | null
   }
 
   export type ProcessingCostConfigWhereInput = {
@@ -47861,12 +52446,168 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type ProfitParamConfigCreateInput = {
+    paramKey: string
+    nameCn: string
+    category: string
+    subCategory?: string | null
+    steelMill?: string | null
+    effectiveDate: Date | string
+    value: Decimal | DecimalJsLike | number | string
+    previousValue?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    remark?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProfitParamConfigUncheckedCreateInput = {
+    id?: number
+    paramKey: string
+    nameCn: string
+    category: string
+    subCategory?: string | null
+    steelMill?: string | null
+    effectiveDate: Date | string
+    value: Decimal | DecimalJsLike | number | string
+    previousValue?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    remark?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProfitParamConfigUpdateInput = {
+    paramKey?: StringFieldUpdateOperationsInput | string
+    nameCn?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    steelMill?: NullableStringFieldUpdateOperationsInput | string | null
+    effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProfitParamConfigUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    paramKey?: StringFieldUpdateOperationsInput | string
+    nameCn?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    steelMill?: NullableStringFieldUpdateOperationsInput | string | null
+    effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProfitParamConfigCreateManyInput = {
+    id?: number
+    paramKey: string
+    nameCn: string
+    category: string
+    subCategory?: string | null
+    steelMill?: string | null
+    effectiveDate: Date | string
+    value: Decimal | DecimalJsLike | number | string
+    previousValue?: Decimal | DecimalJsLike | number | string | null
+    unit?: string | null
+    remark?: string | null
+    createdAt?: Date | string | null
+    updatedAt?: Date | string | null
+  }
+
+  export type ProfitParamConfigUpdateManyMutationInput = {
+    paramKey?: StringFieldUpdateOperationsInput | string
+    nameCn?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    steelMill?: NullableStringFieldUpdateOperationsInput | string | null
+    effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProfitParamConfigUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    paramKey?: StringFieldUpdateOperationsInput | string
+    nameCn?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    subCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    steelMill?: NullableStringFieldUpdateOperationsInput | string | null
+    effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    unit?: NullableStringFieldUpdateOperationsInput | string | null
+    remark?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type ProcessingCostInputCreateInput = {
     productName?: string | null
     productWarehouse?: string | null
     productTons?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: string | null
+    openid?: string | null
+    M1Qty?: Decimal | DecimalJsLike | number | string | null
+    M1Price?: Decimal | DecimalJsLike | number | string | null
+    M2Qty?: Decimal | DecimalJsLike | number | string | null
+    M2Price?: Decimal | DecimalJsLike | number | string | null
+    M3Qty?: Decimal | DecimalJsLike | number | string | null
+    M3Price?: Decimal | DecimalJsLike | number | string | null
+    M4Qty?: Decimal | DecimalJsLike | number | string | null
+    M4Price?: Decimal | DecimalJsLike | number | string | null
+    M5Qty?: Decimal | DecimalJsLike | number | string | null
+    M5Price?: Decimal | DecimalJsLike | number | string | null
+    M6Qty?: Decimal | DecimalJsLike | number | string | null
+    M6Price?: Decimal | DecimalJsLike | number | string | null
+    M7Qty?: Decimal | DecimalJsLike | number | string | null
+    M7Price?: Decimal | DecimalJsLike | number | string | null
+    M8Qty?: Decimal | DecimalJsLike | number | string | null
+    M8Price?: Decimal | DecimalJsLike | number | string | null
+    M9Qty?: Decimal | DecimalJsLike | number | string | null
+    M9Price?: Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
+    carShellQty?: Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
+    scrapQty?: Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
+    transferQty?: Decimal | DecimalJsLike | number | string | null
+    transferPrice?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
+    material1Qty?: Decimal | DecimalJsLike | number | string | null
+    material1Price?: Decimal | DecimalJsLike | number | string | null
+    material2Qty?: Decimal | DecimalJsLike | number | string | null
+    material2Price?: Decimal | DecimalJsLike | number | string | null
+    material3Qty?: Decimal | DecimalJsLike | number | string | null
+    material3Price?: Decimal | DecimalJsLike | number | string | null
+    material4Qty?: Decimal | DecimalJsLike | number | string | null
+    material4Price?: Decimal | DecimalJsLike | number | string | null
+    material5Qty?: Decimal | DecimalJsLike | number | string | null
+    material5Price?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -47876,8 +52617,55 @@ export namespace Prisma {
     productName?: string | null
     productWarehouse?: string | null
     productTons?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: string | null
+    openid?: string | null
+    M1Qty?: Decimal | DecimalJsLike | number | string | null
+    M1Price?: Decimal | DecimalJsLike | number | string | null
+    M2Qty?: Decimal | DecimalJsLike | number | string | null
+    M2Price?: Decimal | DecimalJsLike | number | string | null
+    M3Qty?: Decimal | DecimalJsLike | number | string | null
+    M3Price?: Decimal | DecimalJsLike | number | string | null
+    M4Qty?: Decimal | DecimalJsLike | number | string | null
+    M4Price?: Decimal | DecimalJsLike | number | string | null
+    M5Qty?: Decimal | DecimalJsLike | number | string | null
+    M5Price?: Decimal | DecimalJsLike | number | string | null
+    M6Qty?: Decimal | DecimalJsLike | number | string | null
+    M6Price?: Decimal | DecimalJsLike | number | string | null
+    M7Qty?: Decimal | DecimalJsLike | number | string | null
+    M7Price?: Decimal | DecimalJsLike | number | string | null
+    M8Qty?: Decimal | DecimalJsLike | number | string | null
+    M8Price?: Decimal | DecimalJsLike | number | string | null
+    M9Qty?: Decimal | DecimalJsLike | number | string | null
+    M9Price?: Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
+    carShellQty?: Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
+    scrapQty?: Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
+    transferQty?: Decimal | DecimalJsLike | number | string | null
+    transferPrice?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
+    material1Qty?: Decimal | DecimalJsLike | number | string | null
+    material1Price?: Decimal | DecimalJsLike | number | string | null
+    material2Qty?: Decimal | DecimalJsLike | number | string | null
+    material2Price?: Decimal | DecimalJsLike | number | string | null
+    material3Qty?: Decimal | DecimalJsLike | number | string | null
+    material3Price?: Decimal | DecimalJsLike | number | string | null
+    material4Qty?: Decimal | DecimalJsLike | number | string | null
+    material4Price?: Decimal | DecimalJsLike | number | string | null
+    material5Qty?: Decimal | DecimalJsLike | number | string | null
+    material5Price?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -47886,8 +52674,55 @@ export namespace Prisma {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
     productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    openid?: NullableStringFieldUpdateOperationsInput | string | null
+    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -47897,8 +52732,55 @@ export namespace Prisma {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
     productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    openid?: NullableStringFieldUpdateOperationsInput | string | null
+    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -47908,8 +52790,55 @@ export namespace Prisma {
     productName?: string | null
     productWarehouse?: string | null
     productTons?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: string | null
+    openid?: string | null
+    M1Qty?: Decimal | DecimalJsLike | number | string | null
+    M1Price?: Decimal | DecimalJsLike | number | string | null
+    M2Qty?: Decimal | DecimalJsLike | number | string | null
+    M2Price?: Decimal | DecimalJsLike | number | string | null
+    M3Qty?: Decimal | DecimalJsLike | number | string | null
+    M3Price?: Decimal | DecimalJsLike | number | string | null
+    M4Qty?: Decimal | DecimalJsLike | number | string | null
+    M4Price?: Decimal | DecimalJsLike | number | string | null
+    M5Qty?: Decimal | DecimalJsLike | number | string | null
+    M5Price?: Decimal | DecimalJsLike | number | string | null
+    M6Qty?: Decimal | DecimalJsLike | number | string | null
+    M6Price?: Decimal | DecimalJsLike | number | string | null
+    M7Qty?: Decimal | DecimalJsLike | number | string | null
+    M7Price?: Decimal | DecimalJsLike | number | string | null
+    M8Qty?: Decimal | DecimalJsLike | number | string | null
+    M8Price?: Decimal | DecimalJsLike | number | string | null
+    M9Qty?: Decimal | DecimalJsLike | number | string | null
+    M9Price?: Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
+    carShellQty?: Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
+    scrapQty?: Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
+    transferQty?: Decimal | DecimalJsLike | number | string | null
+    transferPrice?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
+    material1Qty?: Decimal | DecimalJsLike | number | string | null
+    material1Price?: Decimal | DecimalJsLike | number | string | null
+    material2Qty?: Decimal | DecimalJsLike | number | string | null
+    material2Price?: Decimal | DecimalJsLike | number | string | null
+    material3Qty?: Decimal | DecimalJsLike | number | string | null
+    material3Price?: Decimal | DecimalJsLike | number | string | null
+    material4Qty?: Decimal | DecimalJsLike | number | string | null
+    material4Price?: Decimal | DecimalJsLike | number | string | null
+    material5Qty?: Decimal | DecimalJsLike | number | string | null
+    material5Price?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -47918,8 +52847,55 @@ export namespace Prisma {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
     productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    openid?: NullableStringFieldUpdateOperationsInput | string | null
+    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -47929,10 +52905,247 @@ export namespace Prisma {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
     productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
+    materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    openid?: NullableStringFieldUpdateOperationsInput | string | null
+    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MaterialStorageCreateInput = {
+    storageArea?: string | null
+    materialType?: string | null
+    aliasName?: string | null
+    currentQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    openidField?: string | null
+    createBy?: string | null
+    createdAt?: string | null
+    updateBy?: string | null
+    updatedAt?: string | null
+    qty20260331?: Decimal | DecimalJsLike | number | string | null
+    price20260331?: Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageUncheckedCreateInput = {
+    id?: number
+    storageArea?: string | null
+    materialType?: string | null
+    aliasName?: string | null
+    currentQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    openidField?: string | null
+    createBy?: string | null
+    createdAt?: string | null
+    updateBy?: string | null
+    updatedAt?: string | null
+    qty20260331?: Decimal | DecimalJsLike | number | string | null
+    price20260331?: Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageUpdateInput = {
+    storageArea?: NullableStringFieldUpdateOperationsInput | string | null
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    aliasName?: NullableStringFieldUpdateOperationsInput | string | null
+    currentQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    openidField?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableStringFieldUpdateOperationsInput | string | null
+    qty20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    storageArea?: NullableStringFieldUpdateOperationsInput | string | null
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    aliasName?: NullableStringFieldUpdateOperationsInput | string | null
+    currentQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    openidField?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableStringFieldUpdateOperationsInput | string | null
+    qty20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageCreateManyInput = {
+    id?: number
+    storageArea?: string | null
+    materialType?: string | null
+    aliasName?: string | null
+    currentQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    openidField?: string | null
+    createBy?: string | null
+    createdAt?: string | null
+    updateBy?: string | null
+    updatedAt?: string | null
+    qty20260331?: Decimal | DecimalJsLike | number | string | null
+    price20260331?: Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageUpdateManyMutationInput = {
+    storageArea?: NullableStringFieldUpdateOperationsInput | string | null
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    aliasName?: NullableStringFieldUpdateOperationsInput | string | null
+    currentQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    openidField?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableStringFieldUpdateOperationsInput | string | null
+    qty20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type MaterialStorageUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    storageArea?: NullableStringFieldUpdateOperationsInput | string | null
+    materialType?: NullableStringFieldUpdateOperationsInput | string | null
+    aliasName?: NullableStringFieldUpdateOperationsInput | string | null
+    currentQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    openidField?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: NullableStringFieldUpdateOperationsInput | string | null
+    qty20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    price20260331?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type ProductStockCreateInput = {
+    productName?: string | null
+    warehouseCode?: string | null
+    stockQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    lastInbound?: Date | string | null
+    lastOutbound?: Date | string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type ProductStockUncheckedCreateInput = {
+    id?: number
+    productName?: string | null
+    warehouseCode?: string | null
+    stockQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    lastInbound?: Date | string | null
+    lastOutbound?: Date | string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type ProductStockUpdateInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseCode?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastOutbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseCode?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastOutbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockCreateManyInput = {
+    id?: number
+    productName?: string | null
+    warehouseCode?: string | null
+    stockQty?: Decimal | DecimalJsLike | number | string | null
+    currentPrice?: Decimal | DecimalJsLike | number | string | null
+    lastInbound?: Date | string | null
+    lastOutbound?: Date | string | null
+    createTime?: Date | string | null
+    updateTime?: Date | string | null
+  }
+
+  export type ProductStockUpdateManyMutationInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseCode?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastOutbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    warehouseCode?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currentPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    lastInbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastOutbound?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type ProcessingCostConfigCreateInput = {
@@ -50089,6 +55302,163 @@ export namespace Prisma {
     totalSettlementAmount?: SortOrder
   }
 
+  export type StringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type ProfitParamConfigOrderByRelevanceInput = {
+    fields: ProfitParamConfigOrderByRelevanceFieldEnum | ProfitParamConfigOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProfitParamConfigParamKeySteelMillEffectiveDateCompoundUniqueInput = {
+    paramKey: string
+    steelMill: string
+    effectiveDate: Date | string
+  }
+
+  export type ProfitParamConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    paramKey?: SortOrder
+    nameCn?: SortOrder
+    category?: SortOrder
+    subCategory?: SortOrder
+    steelMill?: SortOrder
+    effectiveDate?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrder
+    unit?: SortOrder
+    remark?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProfitParamConfigAvgOrderByAggregateInput = {
+    id?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrder
+  }
+
+  export type ProfitParamConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    paramKey?: SortOrder
+    nameCn?: SortOrder
+    category?: SortOrder
+    subCategory?: SortOrder
+    steelMill?: SortOrder
+    effectiveDate?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrder
+    unit?: SortOrder
+    remark?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProfitParamConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    paramKey?: SortOrder
+    nameCn?: SortOrder
+    category?: SortOrder
+    subCategory?: SortOrder
+    steelMill?: SortOrder
+    effectiveDate?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrder
+    unit?: SortOrder
+    remark?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ProfitParamConfigSumOrderByAggregateInput = {
+    id?: SortOrder
+    value?: SortOrder
+    previousValue?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
   export type ProcessingCostInputOrderByRelevanceInput = {
     fields: ProcessingCostInputOrderByRelevanceFieldEnum | ProcessingCostInputOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -50100,8 +55470,55 @@ export namespace Prisma {
     productName?: SortOrder
     productWarehouse?: SortOrder
     productTons?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
     productionDate?: SortOrder
     materialComposition?: SortOrder
+    materialWarehouses?: SortOrder
+    openid?: SortOrder
+    M1Qty?: SortOrder
+    M1Price?: SortOrder
+    M2Qty?: SortOrder
+    M2Price?: SortOrder
+    M3Qty?: SortOrder
+    M3Price?: SortOrder
+    M4Qty?: SortOrder
+    M4Price?: SortOrder
+    M5Qty?: SortOrder
+    M5Price?: SortOrder
+    M6Qty?: SortOrder
+    M6Price?: SortOrder
+    M7Qty?: SortOrder
+    M7Price?: SortOrder
+    M8Qty?: SortOrder
+    M8Price?: SortOrder
+    M9Qty?: SortOrder
+    M9Price?: SortOrder
+    wireRopeQty?: SortOrder
+    wireRopePrice?: SortOrder
+    carShellQty?: SortOrder
+    carShellPrice?: SortOrder
+    pigIronQty?: SortOrder
+    pigIronPrice?: SortOrder
+    scrapQty?: SortOrder
+    scrapPrice?: SortOrder
+    carDismantleQty?: SortOrder
+    carDismantlePrice?: SortOrder
+    transferQty?: SortOrder
+    transferPrice?: SortOrder
+    auxiliaryQty?: SortOrder
+    auxiliaryPrice?: SortOrder
+    material1Qty?: SortOrder
+    material1Price?: SortOrder
+    material2Qty?: SortOrder
+    material2Price?: SortOrder
+    material3Qty?: SortOrder
+    material3Price?: SortOrder
+    material4Qty?: SortOrder
+    material4Price?: SortOrder
+    material5Qty?: SortOrder
+    material5Price?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -50109,6 +55526,51 @@ export namespace Prisma {
   export type ProcessingCostInputAvgOrderByAggregateInput = {
     id?: SortOrder
     productTons?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
+    M1Qty?: SortOrder
+    M1Price?: SortOrder
+    M2Qty?: SortOrder
+    M2Price?: SortOrder
+    M3Qty?: SortOrder
+    M3Price?: SortOrder
+    M4Qty?: SortOrder
+    M4Price?: SortOrder
+    M5Qty?: SortOrder
+    M5Price?: SortOrder
+    M6Qty?: SortOrder
+    M6Price?: SortOrder
+    M7Qty?: SortOrder
+    M7Price?: SortOrder
+    M8Qty?: SortOrder
+    M8Price?: SortOrder
+    M9Qty?: SortOrder
+    M9Price?: SortOrder
+    wireRopeQty?: SortOrder
+    wireRopePrice?: SortOrder
+    carShellQty?: SortOrder
+    carShellPrice?: SortOrder
+    pigIronQty?: SortOrder
+    pigIronPrice?: SortOrder
+    scrapQty?: SortOrder
+    scrapPrice?: SortOrder
+    carDismantleQty?: SortOrder
+    carDismantlePrice?: SortOrder
+    transferQty?: SortOrder
+    transferPrice?: SortOrder
+    auxiliaryQty?: SortOrder
+    auxiliaryPrice?: SortOrder
+    material1Qty?: SortOrder
+    material1Price?: SortOrder
+    material2Qty?: SortOrder
+    material2Price?: SortOrder
+    material3Qty?: SortOrder
+    material3Price?: SortOrder
+    material4Qty?: SortOrder
+    material4Price?: SortOrder
+    material5Qty?: SortOrder
+    material5Price?: SortOrder
   }
 
   export type ProcessingCostInputMaxOrderByAggregateInput = {
@@ -50116,7 +55578,54 @@ export namespace Prisma {
     productName?: SortOrder
     productWarehouse?: SortOrder
     productTons?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
     productionDate?: SortOrder
+    materialWarehouses?: SortOrder
+    openid?: SortOrder
+    M1Qty?: SortOrder
+    M1Price?: SortOrder
+    M2Qty?: SortOrder
+    M2Price?: SortOrder
+    M3Qty?: SortOrder
+    M3Price?: SortOrder
+    M4Qty?: SortOrder
+    M4Price?: SortOrder
+    M5Qty?: SortOrder
+    M5Price?: SortOrder
+    M6Qty?: SortOrder
+    M6Price?: SortOrder
+    M7Qty?: SortOrder
+    M7Price?: SortOrder
+    M8Qty?: SortOrder
+    M8Price?: SortOrder
+    M9Qty?: SortOrder
+    M9Price?: SortOrder
+    wireRopeQty?: SortOrder
+    wireRopePrice?: SortOrder
+    carShellQty?: SortOrder
+    carShellPrice?: SortOrder
+    pigIronQty?: SortOrder
+    pigIronPrice?: SortOrder
+    scrapQty?: SortOrder
+    scrapPrice?: SortOrder
+    carDismantleQty?: SortOrder
+    carDismantlePrice?: SortOrder
+    transferQty?: SortOrder
+    transferPrice?: SortOrder
+    auxiliaryQty?: SortOrder
+    auxiliaryPrice?: SortOrder
+    material1Qty?: SortOrder
+    material1Price?: SortOrder
+    material2Qty?: SortOrder
+    material2Price?: SortOrder
+    material3Qty?: SortOrder
+    material3Price?: SortOrder
+    material4Qty?: SortOrder
+    material4Price?: SortOrder
+    material5Qty?: SortOrder
+    material5Price?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -50126,7 +55635,54 @@ export namespace Prisma {
     productName?: SortOrder
     productWarehouse?: SortOrder
     productTons?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
     productionDate?: SortOrder
+    materialWarehouses?: SortOrder
+    openid?: SortOrder
+    M1Qty?: SortOrder
+    M1Price?: SortOrder
+    M2Qty?: SortOrder
+    M2Price?: SortOrder
+    M3Qty?: SortOrder
+    M3Price?: SortOrder
+    M4Qty?: SortOrder
+    M4Price?: SortOrder
+    M5Qty?: SortOrder
+    M5Price?: SortOrder
+    M6Qty?: SortOrder
+    M6Price?: SortOrder
+    M7Qty?: SortOrder
+    M7Price?: SortOrder
+    M8Qty?: SortOrder
+    M8Price?: SortOrder
+    M9Qty?: SortOrder
+    M9Price?: SortOrder
+    wireRopeQty?: SortOrder
+    wireRopePrice?: SortOrder
+    carShellQty?: SortOrder
+    carShellPrice?: SortOrder
+    pigIronQty?: SortOrder
+    pigIronPrice?: SortOrder
+    scrapQty?: SortOrder
+    scrapPrice?: SortOrder
+    carDismantleQty?: SortOrder
+    carDismantlePrice?: SortOrder
+    transferQty?: SortOrder
+    transferPrice?: SortOrder
+    auxiliaryQty?: SortOrder
+    auxiliaryPrice?: SortOrder
+    material1Qty?: SortOrder
+    material1Price?: SortOrder
+    material2Qty?: SortOrder
+    material2Price?: SortOrder
+    material3Qty?: SortOrder
+    material3Price?: SortOrder
+    material4Qty?: SortOrder
+    material4Price?: SortOrder
+    material5Qty?: SortOrder
+    material5Price?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -50134,6 +55690,175 @@ export namespace Prisma {
   export type ProcessingCostInputSumOrderByAggregateInput = {
     id?: SortOrder
     productTons?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
+    M1Qty?: SortOrder
+    M1Price?: SortOrder
+    M2Qty?: SortOrder
+    M2Price?: SortOrder
+    M3Qty?: SortOrder
+    M3Price?: SortOrder
+    M4Qty?: SortOrder
+    M4Price?: SortOrder
+    M5Qty?: SortOrder
+    M5Price?: SortOrder
+    M6Qty?: SortOrder
+    M6Price?: SortOrder
+    M7Qty?: SortOrder
+    M7Price?: SortOrder
+    M8Qty?: SortOrder
+    M8Price?: SortOrder
+    M9Qty?: SortOrder
+    M9Price?: SortOrder
+    wireRopeQty?: SortOrder
+    wireRopePrice?: SortOrder
+    carShellQty?: SortOrder
+    carShellPrice?: SortOrder
+    pigIronQty?: SortOrder
+    pigIronPrice?: SortOrder
+    scrapQty?: SortOrder
+    scrapPrice?: SortOrder
+    carDismantleQty?: SortOrder
+    carDismantlePrice?: SortOrder
+    transferQty?: SortOrder
+    transferPrice?: SortOrder
+    auxiliaryQty?: SortOrder
+    auxiliaryPrice?: SortOrder
+    material1Qty?: SortOrder
+    material1Price?: SortOrder
+    material2Qty?: SortOrder
+    material2Price?: SortOrder
+    material3Qty?: SortOrder
+    material3Price?: SortOrder
+    material4Qty?: SortOrder
+    material4Price?: SortOrder
+    material5Qty?: SortOrder
+    material5Price?: SortOrder
+  }
+
+  export type MaterialStorageOrderByRelevanceInput = {
+    fields: MaterialStorageOrderByRelevanceFieldEnum | MaterialStorageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MaterialStorageCountOrderByAggregateInput = {
+    id?: SortOrder
+    storageArea?: SortOrder
+    materialType?: SortOrder
+    aliasName?: SortOrder
+    currentQty?: SortOrder
+    currentPrice?: SortOrder
+    openidField?: SortOrder
+    createBy?: SortOrder
+    createdAt?: SortOrder
+    updateBy?: SortOrder
+    updatedAt?: SortOrder
+    qty20260331?: SortOrder
+    price20260331?: SortOrder
+  }
+
+  export type MaterialStorageAvgOrderByAggregateInput = {
+    id?: SortOrder
+    currentQty?: SortOrder
+    currentPrice?: SortOrder
+    qty20260331?: SortOrder
+    price20260331?: SortOrder
+  }
+
+  export type MaterialStorageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    storageArea?: SortOrder
+    materialType?: SortOrder
+    aliasName?: SortOrder
+    currentQty?: SortOrder
+    currentPrice?: SortOrder
+    openidField?: SortOrder
+    createBy?: SortOrder
+    createdAt?: SortOrder
+    updateBy?: SortOrder
+    updatedAt?: SortOrder
+    qty20260331?: SortOrder
+    price20260331?: SortOrder
+  }
+
+  export type MaterialStorageMinOrderByAggregateInput = {
+    id?: SortOrder
+    storageArea?: SortOrder
+    materialType?: SortOrder
+    aliasName?: SortOrder
+    currentQty?: SortOrder
+    currentPrice?: SortOrder
+    openidField?: SortOrder
+    createBy?: SortOrder
+    createdAt?: SortOrder
+    updateBy?: SortOrder
+    updatedAt?: SortOrder
+    qty20260331?: SortOrder
+    price20260331?: SortOrder
+  }
+
+  export type MaterialStorageSumOrderByAggregateInput = {
+    id?: SortOrder
+    currentQty?: SortOrder
+    currentPrice?: SortOrder
+    qty20260331?: SortOrder
+    price20260331?: SortOrder
+  }
+
+  export type ProductStockOrderByRelevanceInput = {
+    fields: ProductStockOrderByRelevanceFieldEnum | ProductStockOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProductStockCountOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    warehouseCode?: SortOrder
+    stockQty?: SortOrder
+    currentPrice?: SortOrder
+    lastInbound?: SortOrder
+    lastOutbound?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type ProductStockAvgOrderByAggregateInput = {
+    id?: SortOrder
+    stockQty?: SortOrder
+    currentPrice?: SortOrder
+  }
+
+  export type ProductStockMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    warehouseCode?: SortOrder
+    stockQty?: SortOrder
+    currentPrice?: SortOrder
+    lastInbound?: SortOrder
+    lastOutbound?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type ProductStockMinOrderByAggregateInput = {
+    id?: SortOrder
+    productName?: SortOrder
+    warehouseCode?: SortOrder
+    stockQty?: SortOrder
+    currentPrice?: SortOrder
+    lastInbound?: SortOrder
+    lastOutbound?: SortOrder
+    createTime?: SortOrder
+    updateTime?: SortOrder
+  }
+
+  export type ProductStockSumOrderByAggregateInput = {
+    id?: SortOrder
+    stockQty?: SortOrder
+    currentPrice?: SortOrder
   }
 
   export type ProcessingCostConfigOrderByRelevanceInput = {
@@ -50265,6 +55990,22 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -50449,6 +56190,91 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedStringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
   }
 
 

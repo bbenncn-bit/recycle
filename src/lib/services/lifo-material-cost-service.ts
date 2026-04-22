@@ -18,7 +18,7 @@ function processDecimal(value: any): number {
  * 解析生产日期字符串为 Date 对象
  * 支持格式：MM/DD/YYYY, YYYY-MM-DD, DD/MM/YYYY 等
  */
-function parseProductionDate(dateStr: string | null): Date | null {
+export function parseProductionDate(dateStr: string | null): Date | null {
   if (!dateStr) return null;
   const trimmed = dateStr.trim();
   if (!trimmed) return null;
@@ -57,7 +57,7 @@ function parseProductionDate(dateStr: string | null): Date | null {
 }
 
 /**
- * 原材料字段映射：从 ProcessingCostInput 表的字段名到材料名称
+ * 原材料字段映射：从 ProcessingCostInput 表的字段名到材料名称（历史 M 列口径）
  */
 const MATERIAL_FIELD_MAP: Record<string, string> = {
   M1_qty: '优质毛料M1',
@@ -84,6 +84,61 @@ const MATERIAL_FIELD_MAP: Record<string, string> = {
 };
 
 /**
+ * 解析 material_composition（小程序写入的 JSON），优先于 M*_qty 列（2026-04 起多库区同类毛料并存）
+ */
+function extractMaterialCostsFromComposition(record: any): Array<{
+  material: string;
+  qty: number;
+  price: number;
+  cost: number;
+}> | null {
+  const raw =
+    (record as any).material_composition ??
+    (record as any).materialComposition ??
+    null;
+  if (raw == null) return null;
+  let arr: unknown[];
+  if (typeof Buffer !== 'undefined' && Buffer.isBuffer(raw)) {
+    try {
+      arr = JSON.parse(raw.toString('utf8')) as unknown[];
+    } catch {
+      return null;
+    }
+  } else if (typeof raw === 'string') {
+    try {
+      arr = JSON.parse(raw) as unknown[];
+    } catch {
+      return null;
+    }
+  } else if (Array.isArray(raw)) {
+    arr = raw;
+  } else {
+    return null;
+  }
+  if (!Array.isArray(arr) || arr.length === 0) return null;
+  const materials: Array<{ material: string; qty: number; price: number; cost: number }> = [];
+  for (const item of arr) {
+    if (!item || typeof item !== 'object') continue;
+    const o = item as Record<string, unknown>;
+    const label =
+      (o.material != null ? String(o.material) : '').trim() ||
+      (o.shortName != null ? String(o.shortName) : '').trim();
+    const qty = processDecimal(o.tons);
+    const price = processDecimal(
+      o.currentPrice ?? o.current_price ?? o.price
+    );
+    if (!label || qty <= 0) continue;
+    materials.push({
+      material: label,
+      qty,
+      price,
+      cost: qty * price,
+    });
+  }
+  return materials.length > 0 ? materials : null;
+}
+
+/**
  * 从 ProcessingCostInput 记录中提取原材料用量和单价
  */
 function extractMaterialCosts(record: any): Array<{
@@ -92,6 +147,9 @@ function extractMaterialCosts(record: any): Array<{
   price: number;
   cost: number;
 }> {
+  const fromJson = extractMaterialCostsFromComposition(record);
+  if (fromJson) return fromJson;
+
   const materials: Array<{ material: string; qty: number; price: number; cost: number }> = [];
 
   for (const [qtyField, materialName] of Object.entries(MATERIAL_FIELD_MAP)) {
@@ -124,7 +182,12 @@ function calculateProductionMaterialCost(record: any): {
   const materials = extractMaterialCosts(record);
   const totalCost = materials.reduce((sum, m) => sum + m.cost, 0);
   // 优先使用 dailyProcess_qty，如果没有则使用 product_tons
-  const totalQty = processDecimal(record.dailyProcess_qty) || processDecimal(record.product_tons) || processDecimal(record.productTons) || 0;
+  const totalQty =
+    processDecimal(record.dailyProcess_qty) ||
+    processDecimal(record.dailyProcessQty) ||
+    processDecimal(record.product_tons) ||
+    processDecimal(record.productTons) ||
+    0;
   const unitCost = totalQty > 0 ? totalCost / totalQty : 0;
 
   if (materials.length === 0 && totalQty > 0) {
@@ -189,6 +252,7 @@ export async function calculateLIFOMaterialCost(
           production_date,
           dailyProcess_qty,
           product_tons,
+          material_composition,
           M1_qty, M1_price,
           M2_qty, M2_price,
           M3_qty, M3_price,

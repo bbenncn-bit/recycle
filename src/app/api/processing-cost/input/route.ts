@@ -75,6 +75,7 @@ export async function POST(request: Request) {
         productName: body.productName,
         productWarehouse: body.productWarehouse,
         productTons: body.productTons,
+        dailyProcessQty: body.productTons,
         productionDate: body.productionDate,
         materialComposition: body.materialComposition as any,
       },

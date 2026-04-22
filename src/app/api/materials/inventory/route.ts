@@ -33,16 +33,16 @@ export async function GET(request: Request) {
     const purchases = await prisma.purchaseWarehouse.findMany({
       where: {
         material: material,
-        netWeight: {
+        estimatedDryBasis: {
           not: null,
         },
       },
       select: {
-        netWeight: true,
+        estimatedDryBasis: true,
       },
     });
 
-    const totalPurchased = purchases.reduce((sum, p) => sum + processDecimal(p.netWeight), 0);
+    const totalPurchased = purchases.reduce((sum, p) => sum + processDecimal(p.estimatedDryBasis), 0);
 
     // 查询已使用总量（从生产情况录入表中汇总）
     // 注意：Prisma 的 JSON 字段不能直接使用 not: null，需要查询所有记录后过滤

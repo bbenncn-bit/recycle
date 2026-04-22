@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
+import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
 
 function normalizeDateBoundary(dateStr: string, endOfDay: boolean): Date | null {
   const d = new Date(dateStr);
@@ -32,10 +33,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: '日期范围不合法' }, { status: 400 });
     }
 
-    // 仅汇总基地收货：收货单号 receipt_no 以 SH 开头（如 SH2601150013），排除 TH 等基地买货单
+    // 仅汇总基地收货：SH 开头且仓库不为「优质毛料库」「M钢渣粒子」「MP废钢库」
     const rows = await prisma.purchaseWarehouse.findMany({
       select: {
         receiptNo: true,
+        warehouse: true,
         warehouseDate: true,
         inboundTime: true,
         warehouseArea: true,
@@ -58,8 +60,7 @@ export async function GET(request: Request) {
     });
 
     const filtered = rows.filter((row) => {
-      const rn = (row.receiptNo || '').trim();
-      if (!rn.toUpperCase().startsWith('SH')) return false;
+      if (!isBaseSelfReceipt(row.receiptNo, row.warehouse)) return false;
       const dateByWarehouse = parseWarehouseDate(row.warehouseDate);
       const dateByInbound = parseInboundTime(row.inboundTime);
       const date = dateByWarehouse || dateByInbound;

@@ -139,21 +139,18 @@ async function getMaterialAvgPrice(material: string, beforeDate: Date): Promise<
         warehouseDate: {
           not: null,
         },
-        unitPriceIncludingTax: {
+        estimatedDryBasis: {
           not: null,
         },
-        netWeight: {
-          not: null,
-        },
-        totalPriceIncludingTax: {
+        totalPriceExcludingTax: {
           not: null,
         },
       },
       select: {
         warehouseDate: true,
-        unitPriceIncludingTax: true,
-        netWeight: true,
-        totalPriceIncludingTax: true,
+        unitPriceExcludingTax: true,
+        estimatedDryBasis: true,
+        totalPriceExcludingTax: true,
       },
     });
 
@@ -166,8 +163,8 @@ async function getMaterialAvgPrice(material: string, beforeDate: Date): Promise<
       if (!purchaseDate) continue;
       if (purchaseDate < startDate || purchaseDate >= beforeDate) continue;
 
-      const weight = processDecimal(purchase.netWeight);
-      const cost = processDecimal(purchase.totalPriceIncludingTax);
+      const weight = processDecimal(purchase.estimatedDryBasis);
+      const cost = processDecimal(purchase.totalPriceExcludingTax);
       
       if (weight > 0) {
         totalWeight += weight;

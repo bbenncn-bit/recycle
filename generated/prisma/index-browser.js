@@ -522,15 +522,106 @@ exports.Prisma.DeliverySettlementScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ProfitParamConfigScalarFieldEnum = {
+  id: 'id',
+  paramKey: 'paramKey',
+  nameCn: 'nameCn',
+  category: 'category',
+  subCategory: 'subCategory',
+  steelMill: 'steelMill',
+  effectiveDate: 'effectiveDate',
+  value: 'value',
+  previousValue: 'previousValue',
+  unit: 'unit',
+  remark: 'remark',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProcessingCostInputScalarFieldEnum = {
   id: 'id',
   productName: 'productName',
   productWarehouse: 'productWarehouse',
   productTons: 'productTons',
+  dailyProcessQty: 'dailyProcessQty',
+  dailyProcessAmount: 'dailyProcessAmount',
+  dailyProcessPrice: 'dailyProcessPrice',
   productionDate: 'productionDate',
   materialComposition: 'materialComposition',
+  materialWarehouses: 'materialWarehouses',
+  openid: 'openid',
+  M1Qty: 'M1Qty',
+  M1Price: 'M1Price',
+  M2Qty: 'M2Qty',
+  M2Price: 'M2Price',
+  M3Qty: 'M3Qty',
+  M3Price: 'M3Price',
+  M4Qty: 'M4Qty',
+  M4Price: 'M4Price',
+  M5Qty: 'M5Qty',
+  M5Price: 'M5Price',
+  M6Qty: 'M6Qty',
+  M6Price: 'M6Price',
+  M7Qty: 'M7Qty',
+  M7Price: 'M7Price',
+  M8Qty: 'M8Qty',
+  M8Price: 'M8Price',
+  M9Qty: 'M9Qty',
+  M9Price: 'M9Price',
+  wireRopeQty: 'wireRopeQty',
+  wireRopePrice: 'wireRopePrice',
+  carShellQty: 'carShellQty',
+  carShellPrice: 'carShellPrice',
+  pigIronQty: 'pigIronQty',
+  pigIronPrice: 'pigIronPrice',
+  scrapQty: 'scrapQty',
+  scrapPrice: 'scrapPrice',
+  carDismantleQty: 'carDismantleQty',
+  carDismantlePrice: 'carDismantlePrice',
+  transferQty: 'transferQty',
+  transferPrice: 'transferPrice',
+  auxiliaryQty: 'auxiliaryQty',
+  auxiliaryPrice: 'auxiliaryPrice',
+  material1Qty: 'material1Qty',
+  material1Price: 'material1Price',
+  material2Qty: 'material2Qty',
+  material2Price: 'material2Price',
+  material3Qty: 'material3Qty',
+  material3Price: 'material3Price',
+  material4Qty: 'material4Qty',
+  material4Price: 'material4Price',
+  material5Qty: 'material5Qty',
+  material5Price: 'material5Price',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MaterialStorageScalarFieldEnum = {
+  id: 'id',
+  storageArea: 'storageArea',
+  materialType: 'materialType',
+  aliasName: 'aliasName',
+  currentQty: 'currentQty',
+  currentPrice: 'currentPrice',
+  openidField: 'openidField',
+  createBy: 'createBy',
+  createdAt: 'createdAt',
+  updateBy: 'updateBy',
+  updatedAt: 'updatedAt',
+  qty20260331: 'qty20260331',
+  price20260331: 'price20260331'
+};
+
+exports.Prisma.ProductStockScalarFieldEnum = {
+  id: 'id',
+  productName: 'productName',
+  warehouseCode: 'warehouseCode',
+  stockQty: 'stockQty',
+  currentPrice: 'currentPrice',
+  lastInbound: 'lastInbound',
+  lastOutbound: 'lastOutbound',
+  createTime: 'createTime',
+  updateTime: 'updateTime'
 };
 
 exports.Prisma.ProcessingCostConfigScalarFieldEnum = {
@@ -880,10 +971,38 @@ exports.Prisma.DeliverySettlementOrderByRelevanceFieldEnum = {
   vehicleNumber: 'vehicleNumber'
 };
 
+exports.Prisma.ProfitParamConfigOrderByRelevanceFieldEnum = {
+  paramKey: 'paramKey',
+  nameCn: 'nameCn',
+  category: 'category',
+  subCategory: 'subCategory',
+  steelMill: 'steelMill',
+  unit: 'unit',
+  remark: 'remark'
+};
+
 exports.Prisma.ProcessingCostInputOrderByRelevanceFieldEnum = {
   productName: 'productName',
   productWarehouse: 'productWarehouse',
-  productionDate: 'productionDate'
+  productionDate: 'productionDate',
+  materialWarehouses: 'materialWarehouses',
+  openid: 'openid'
+};
+
+exports.Prisma.MaterialStorageOrderByRelevanceFieldEnum = {
+  storageArea: 'storageArea',
+  materialType: 'materialType',
+  aliasName: 'aliasName',
+  openidField: 'openidField',
+  createBy: 'createBy',
+  createdAt: 'createdAt',
+  updateBy: 'updateBy',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductStockOrderByRelevanceFieldEnum = {
+  productName: 'productName',
+  warehouseCode: 'warehouseCode'
 };
 
 exports.Prisma.ProcessingCostConfigOrderByRelevanceFieldEnum = {
@@ -936,7 +1055,10 @@ exports.Prisma.ModelName = {
   WasteManagement: 'WasteManagement',
   PurchaseWarehouse: 'PurchaseWarehouse',
   DeliverySettlement: 'DeliverySettlement',
+  ProfitParamConfig: 'ProfitParamConfig',
   ProcessingCostInput: 'ProcessingCostInput',
+  MaterialStorage: 'MaterialStorage',
+  ProductStock: 'ProductStock',
   ProcessingCostConfig: 'ProcessingCostConfig',
   MaterialCostCache: 'MaterialCostCache'
 };

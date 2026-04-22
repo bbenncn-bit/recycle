@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import LazyReactECharts from '@/components/lazy-react-echarts';
 import { CostAnalysisSkeleton } from '@/components/profit-dashboard-skeletons';
 import { normalizeMaterialCategoryLabel } from '@/lib/material-label';
@@ -101,6 +101,16 @@ function formatYmd(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+const MATERIAL_INVENTORY_MIN_CLOSING = '2026-04-01';
+
+interface InventoryRow {
+  storageArea: string;
+  materialType: string;
+  qty: number;
+  price: number;
+  amount: number;
+}
+
 export default function CostAnalysis() {
   const [data, setData] = useState<CostAnalysisData | null>(null);
   /** quick：首屏核心指标与趋势已就绪；full：料型分布等已合并 */
@@ -116,6 +126,77 @@ export default function CostAnalysis() {
   });
   const [costDayMin, setCostDayMin] = useState('');
   const [costDayMax, setCostDayMax] = useState('');
+
+  const invMonthChoices = useMemo(() => {
+    const now = new Date();
+    return [0, 1, 2].map((i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      return {
+        year: d.getFullYear(),
+        month: d.getMonth() + 1,
+        label: `${d.getFullYear()}年${d.getMonth() + 1}月`,
+      };
+    });
+  }, []);
+
+  const [invPickIdx, setInvPickIdx] = useState(0);
+  const invYear = invMonthChoices[invPickIdx]?.year ?? new Date().getFullYear();
+  const invMonth = invMonthChoices[invPickIdx]?.month ?? new Date().getMonth() + 1;
+
+  const [invClosingDate, setInvClosingDate] = useState(() => {
+    const n = new Date();
+    return formatYmd(n);
+  });
+  const [invOpeningRows, setInvOpeningRows] = useState<InventoryRow[]>([]);
+  const [invClosingRows, setInvClosingRows] = useState<InventoryRow[]>([]);
+  const [invLoading, setInvLoading] = useState(false);
+  const [invErr, setInvErr] = useState<string | null>(null);
+
+  const invClosingMin = MATERIAL_INVENTORY_MIN_CLOSING;
+  const invClosingMax = useMemo(() => formatYmd(new Date()), []);
+
+  useEffect(() => {
+    if (invClosingDate < invClosingMin) setInvClosingDate(invClosingMin);
+    else if (invClosingDate > invClosingMax) setInvClosingDate(invClosingMax);
+  }, [invClosingDate, invClosingMin, invClosingMax]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setInvLoading(true);
+      setInvErr(null);
+      try {
+        const qs = new URLSearchParams({
+          year: String(invYear),
+          month: String(invMonth),
+          closingDate: invClosingDate,
+        });
+        const res = await fetch(
+          `/api/profit-management/cost-analysis/material-inventory?${qs.toString()}`
+        );
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || `HTTP ${res.status}`);
+        }
+        if (!cancelled) {
+          setInvOpeningRows(json.data?.opening || []);
+          setInvClosingRows(json.data?.closing || []);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setInvErr(e instanceof Error ? e.message : '加载失败');
+          setInvOpeningRows([]);
+          setInvClosingRows([]);
+        }
+      } finally {
+        if (!cancelled) setInvLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [invYear, invMonth, invClosingDate]);
 
   useEffect(() => {
     const now = new Date();
@@ -907,7 +988,7 @@ export default function CostAnalysis() {
           </div>
           <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-              导出数据（基地收货汇总：收货单号以 SH 开头；总结算金额为万元）
+              导出数据（基地收货汇总：SH 开头且仓库不为「优质毛料库」「M钢渣粒子」「MP废钢库」；总结算金额为万元）
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
@@ -941,10 +1022,10 @@ export default function CostAnalysis() {
           </div>
         )}
 
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* 统计卡片：本月成本与毛料期初/期末表并排 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           {/* 当日成本（含当月日期选择；平均日成本仍为当月至今） */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 lg:col-span-1">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -1206,27 +1287,117 @@ export default function CostAnalysis() {
             />
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  本月成本
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {data.summary.monthCost.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  万元，吨数 {monthTotalQty.toFixed(2)} 吨
-                </p>
-                <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  <div>基地收货 {data.summary.monthBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.monthBaseSelfQty.toFixed(2)} 吨</div>
-                  <div>基地买货 {data.summary.monthBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.monthBasePurchaseQty.toFixed(2)} 吨</div>
+          <div className="lg:col-span-3 flex flex-col xl:flex-row gap-4 min-w-0">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 shrink-0 xl:w-[220px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    本月成本
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                    {data.summary.monthCost.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    万元，吨数 {monthTotalQty.toFixed(2)} 吨
+                  </p>
+                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                    <div>基地收货 {data.summary.monthBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.monthBaseSelfQty.toFixed(2)} 吨</div>
+                    <div>基地买货 {data.summary.monthBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.monthBasePurchaseQty.toFixed(2)} 吨</div>
+                  </div>
+                </div>
+                <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3 hidden sm:block">
+                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
               </div>
-              <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3">
-                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex-1 min-w-0 border border-gray-100 dark:border-gray-700">
+              <div className="flex flex-wrap items-end gap-3 mb-3">
+                <label className="text-xs text-gray-600 dark:text-gray-400 flex flex-col gap-1">
+                  <span>期初月份（当月 1 日 0 点）</span>
+                  <select
+                    value={invPickIdx}
+                    onChange={(e) => setInvPickIdx(Number(e.target.value))}
+                    className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  >
+                    {invMonthChoices.map((c, idx) => (
+                      <option key={`${c.year}-${c.month}`} value={idx}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 flex flex-col gap-1">
+                  <span>期末截止日（当天 24 点）</span>
+                  <input
+                    type="date"
+                    min={invClosingMin}
+                    max={invClosingMax}
+                    value={invClosingDate}
+                    onChange={(e) => setInvClosingDate(e.target.value)}
+                    className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  />
+                </label>
+                {invLoading && (
+                  <span className="text-xs text-gray-500">加载中…</span>
+                )}
+              </div>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">
+                期初：MaterialStorage 的 20260331_qty / 20260331_price；4 月为表列示值，5、6 月起为自 2026-04-01 起按基地收货（SH 剔除三库）以预估干基吨数、总价（不含税）入库加权，加工 material_composition 耗用滚存（若库表无该列则暂不扣加工）。
+                期末：同口径滚存至所选日。
+              </p>
+              {invErr && (
+                <p className="text-xs text-red-600 dark:text-red-400 mb-2">{invErr}</p>
+              )}
+              <div className="overflow-x-auto max-h-[320px] overflow-y-auto text-xs">
+                <p className="font-medium text-gray-700 dark:text-gray-300 mb-1">期初（吨 / 元每吨）</p>
+                <table className="w-full border-collapse text-left mb-4">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400">
+                      <th className="py-1 pr-2 font-medium">库区</th>
+                      <th className="py-1 pr-2 font-medium">毛料</th>
+                      <th className="py-1 pr-2 font-medium text-right">数量</th>
+                      <th className="py-1 pr-2 font-medium text-right">单价</th>
+                      <th className="py-1 font-medium text-right">金额</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invOpeningRows.map((r, i) => (
+                      <tr key={`o-${i}`} className="border-b border-gray-100 dark:border-gray-700/80">
+                        <td className="py-1 pr-2 whitespace-nowrap">{r.storageArea}</td>
+                        <td className="py-1 pr-2">{r.materialType}</td>
+                        <td className="py-1 pr-2 text-right tabular-nums">{r.qty.toFixed(4)}</td>
+                        <td className="py-1 pr-2 text-right tabular-nums">{r.price.toFixed(4)}</td>
+                        <td className="py-1 text-right tabular-nums">{r.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="font-medium text-gray-700 dark:text-gray-300 mb-1">期末（吨 / 元每吨）</p>
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400">
+                      <th className="py-1 pr-2 font-medium">库区</th>
+                      <th className="py-1 pr-2 font-medium">毛料</th>
+                      <th className="py-1 pr-2 font-medium text-right">数量</th>
+                      <th className="py-1 pr-2 font-medium text-right">单价</th>
+                      <th className="py-1 font-medium text-right">金额</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invClosingRows.map((r, i) => (
+                      <tr key={`c-${i}`} className="border-b border-gray-100 dark:border-gray-700/80">
+                        <td className="py-1 pr-2 whitespace-nowrap">{r.storageArea}</td>
+                        <td className="py-1 pr-2">{r.materialType}</td>
+                        <td className="py-1 pr-2 text-right tabular-nums">{r.qty.toFixed(4)}</td>
+                        <td className="py-1 pr-2 text-right tabular-nums">{r.price.toFixed(4)}</td>
+                        <td className="py-1 text-right tabular-nums">{r.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

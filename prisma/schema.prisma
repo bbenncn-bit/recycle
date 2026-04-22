@@ -478,14 +478,61 @@ model ProfitParamConfig {
   @@map("ProfitParamConfig")
 }
 
-/// 生产情况录入表
+/// 生产情况录入表（与小程序/云函数写入一致：含 dailyProcess_qty、M*_qty 及 material_composition JSON）
 model ProcessingCostInput {
   id                    Int       @id @default(autoincrement()) @map("id")
-  productName           String?   @db.VarChar(100) @map("product_name")           // 成品名称（如：钢筋压块）
-  productWarehouse      String?   @db.VarChar(100) @map("product_warehouse")      // 成品仓库（如：C1）
-  productTons           Decimal?  @db.Decimal(18, 2) @map("product_tons")          // 成品重量（吨）
-  productionDate        String?   @db.VarChar(50) @map("production_date")         // 生产日期时间（VARCHAR 50格式）
-  materialComposition   Json?     @map("material_composition")                    // 原材料构成（JSON格式：[{material: "优质毛料M1", tons: 12}, ...]）
+  productName           String?   @db.VarChar(100) @map("product_name")
+  productWarehouse      String?   @db.VarChar(100) @map("product_warehouse")
+  productTons           Decimal?  @db.Decimal(18, 2) @map("product_tons")
+  dailyProcessQty       Decimal?  @db.Decimal(18, 4) @map("dailyProcess_qty")
+  dailyProcessAmount    Decimal?  @db.Decimal(18, 2) @map("dailyProcess_amount")
+  dailyProcessPrice     Decimal?  @db.Decimal(18, 8) @map("dailyProcess_price")
+  productionDate        String?   @db.VarChar(50) @map("production_date")
+  materialComposition   Json?     @map("material_composition")
+  materialWarehouses    String?   @db.Text @map("material_warehouses")
+  openid                String?   @db.VarChar(100) @map("openid")
+  M1Qty                 Decimal?  @db.Decimal(18, 4) @map("M1_qty")
+  M1Price               Decimal?  @db.Decimal(18, 8) @map("M1_price")
+  M2Qty                 Decimal?  @db.Decimal(18, 4) @map("M2_qty")
+  M2Price               Decimal?  @db.Decimal(18, 8) @map("M2_price")
+  M3Qty                 Decimal?  @db.Decimal(18, 4) @map("M3_qty")
+  M3Price               Decimal?  @db.Decimal(18, 8) @map("M3_price")
+  M4Qty                 Decimal?  @db.Decimal(18, 4) @map("M4_qty")
+  M4Price               Decimal?  @db.Decimal(18, 8) @map("M4_price")
+  M5Qty                 Decimal?  @db.Decimal(18, 4) @map("M5_qty")
+  M5Price               Decimal?  @db.Decimal(18, 8) @map("M5_price")
+  M6Qty                 Decimal?  @db.Decimal(18, 4) @map("M6_qty")
+  M6Price               Decimal?  @db.Decimal(18, 8) @map("M6_price")
+  M7Qty                 Decimal?  @db.Decimal(18, 4) @map("M7_qty")
+  M7Price               Decimal?  @db.Decimal(18, 8) @map("M7_price")
+  M8Qty                 Decimal?  @db.Decimal(18, 4) @map("M8_qty")
+  M8Price               Decimal?  @db.Decimal(18, 8) @map("M8_price")
+  M9Qty                 Decimal?  @db.Decimal(18, 4) @map("M9_qty")
+  M9Price               Decimal?  @db.Decimal(18, 8) @map("M9_price")
+  wireRopeQty           Decimal?  @db.Decimal(18, 4) @map("wireRope_qty")
+  wireRopePrice         Decimal?  @db.Decimal(18, 8) @map("wireRope_price")
+  carShellQty           Decimal?  @db.Decimal(18, 4) @map("carShell_qty")
+  carShellPrice         Decimal?  @db.Decimal(18, 8) @map("carShell_price")
+  pigIronQty            Decimal?  @db.Decimal(18, 4) @map("pigIron_qty")
+  pigIronPrice          Decimal?  @db.Decimal(18, 8) @map("pigIron_price")
+  scrapQty              Decimal?  @db.Decimal(18, 4) @map("scrap_qty")
+  scrapPrice            Decimal?  @db.Decimal(18, 8) @map("scrap_price")
+  carDismantleQty       Decimal?  @db.Decimal(18, 4) @map("carDismantle_qty")
+  carDismantlePrice     Decimal?  @db.Decimal(18, 8) @map("carDismantle_price")
+  transferQty           Decimal?  @db.Decimal(18, 4) @map("transfer_qty")
+  transferPrice         Decimal?  @db.Decimal(18, 8) @map("transfer_price")
+  auxiliaryQty          Decimal?  @db.Decimal(18, 4) @map("auxiliary_qty")
+  auxiliaryPrice        Decimal?  @db.Decimal(18, 8) @map("auxiliary_price")
+  material1Qty          Decimal?  @db.Decimal(18, 4) @map("material1_qty")
+  material1Price        Decimal?  @db.Decimal(18, 8) @map("material1_price")
+  material2Qty          Decimal?  @db.Decimal(18, 4) @map("material2_qty")
+  material2Price        Decimal?  @db.Decimal(18, 8) @map("material2_price")
+  material3Qty          Decimal?  @db.Decimal(18, 4) @map("material3_qty")
+  material3Price        Decimal?  @db.Decimal(18, 8) @map("material3_price")
+  material4Qty          Decimal?  @db.Decimal(18, 4) @map("material4_qty")
+  material4Price        Decimal?  @db.Decimal(18, 8) @map("material4_price")
+  material5Qty          Decimal?  @db.Decimal(18, 4) @map("material5_qty")
+  material5Price        Decimal?  @db.Decimal(18, 8) @map("material5_price")
   createdAt             DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
 
@@ -493,6 +540,44 @@ model ProcessingCostInput {
   @@index([productWarehouse])
   @@index([productionDate])
   @@map("ProcessingCostInput")
+}
+
+/// 毛料库存与分类（2026-04 起：别名 = 库区拼音首字母 + 物料简写，如 MSLKM2）
+model MaterialStorage {
+  id             Int       @id @default(autoincrement()) @map("id")
+  storageArea    String?   @db.VarChar(100) @map("storage_area")
+  materialType   String?   @db.VarChar(100) @map("material_type")
+  aliasName      String?   @db.VarChar(80) @map("alias_name")
+  currentQty     Decimal?  @db.Decimal(18, 4) @map("current_qty")
+  currentPrice   Decimal?  @db.Decimal(18, 4) @map("current_price")
+  openidField    String?   @db.VarChar(64) @map("_openid")
+  createBy       String?   @db.VarChar(100) @map("createBy")
+  createdAt      String?   @db.VarChar(50) @map("createdAt")
+  updateBy       String?   @db.VarChar(100) @map("updateBy")
+  updatedAt      String?   @db.VarChar(50) @map("updatedAt")
+  qty20260331    Decimal?  @db.Decimal(18, 4) @map("20260331_qty")
+  price20260331  Decimal?  @db.Decimal(18, 4) @map("20260331_price")
+
+  @@index([storageArea])
+  @@index([aliasName])
+  @@map("MaterialStorage")
+}
+
+/// 成品库存（warehouse_code 为成品库代码，如 JGSL、PGSL）
+model ProductStock {
+  id             Int       @id @default(autoincrement()) @map("id")
+  productName    String?   @db.VarChar(100) @map("product_name")
+  warehouseCode  String?   @db.VarChar(50) @map("warehouse_code")
+  stockQty       Decimal?  @db.Decimal(18, 3) @map("stock_qty")
+  currentPrice   Decimal?  @db.Decimal(18, 2) @map("current_price")
+  lastInbound    DateTime? @db.DateTime(0) @map("last_inbound")
+  lastOutbound   DateTime? @db.DateTime(0) @map("last_outbound")
+  createTime     DateTime? @db.DateTime(0) @map("create_time")
+  updateTime     DateTime? @db.DateTime(0) @map("update_time")
+
+  @@index([productName])
+  @@index([warehouseCode])
+  @@map("ProductStock")
 }
 
 /// 加工成本配置表（上月吨加工成本）
