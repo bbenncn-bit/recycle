@@ -1,9 +1,16 @@
-import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prismadb';
 import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
 
 /** 默认 prisma 或 $transaction 内的 tx，用于加工单删除等与库存写同一原子事务 */
-export type PrismaDb = typeof prisma | Prisma.TransactionClient;
+export type PrismaDb = Pick<
+  typeof prisma,
+  | '$queryRaw'
+  | '$queryRawUnsafe'
+  | '$executeRaw'
+  | '$executeRawUnsafe'
+  | 'materialStorage'
+  | 'productStock'
+>;
 
 export const PURCHASE_SYNC_KEY = 'purchase_warehouse_last_id';
 
