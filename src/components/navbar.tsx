@@ -15,6 +15,7 @@ const navigation = [
     dropdown: [
       { name: '成本分析', href: '/profit-management/cost-analysis' },
       { name: '利润分析', href: '/profit-management/profit-analysis' },
+      { name: '运维', href: '/profit-management/operations' },
     ]
   },
   { 
@@ -69,7 +70,8 @@ export default function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const profitMgmtSectionActive =
     pathname === '/profit-management/cost-analysis' ||
-    pathname === '/profit-management/profit-analysis';
+    pathname === '/profit-management/profit-analysis' ||
+    pathname === '/profit-management/operations';
 
   // 处理桌面端鼠标悬停事件
   const handleMouseEnter = (itemName: string) => {
@@ -278,6 +280,17 @@ export default function Navbar() {
                     onClick={() => setAccountingQuickOpen(false)}
                   >
                     利润分析
+                  </Link>
+                  <Link
+                    href="/profit-management/operations"
+                    className={`block px-4 py-2 text-sm transition-colors ${
+                      pathname === '/profit-management/operations'
+                        ? subNavActiveClass
+                        : subNavIdleClass
+                    }`}
+                    onClick={() => setAccountingQuickOpen(false)}
+                  >
+                    运维
                   </Link>
                 </div>
               </div>

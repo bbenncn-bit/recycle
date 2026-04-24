@@ -504,8 +504,8 @@ function buildParamSnapshot(
     govSubsidyRate100: v('gov_subsidy_rate_100') || 100,
     govSubsidyRate70: v('gov_subsidy_rate_70') || 70,
     govSubsidyRate38: v('gov_subsidy_rate_38') || 38,
-    discountRatePinggang: vMill('discount_rate_pinggang') || 2.175,
-    collectionDaysPinggang: vMill('collection_days_pinggang') || 18,
+    discountRatePinggang: vMill('discount_rate_pinggang') || 1.8,
+    collectionDaysPinggang: vMill('collection_days_pinggang') || 60,
     collectionDaysJigang: vMill('collection_days_jigang') || 12,
     collectionDaysXingang: vMill('collection_days_xingang') || 37,
     interestRateAnnual: v('interest_rate_annual') || 3,
@@ -636,7 +636,9 @@ function getTransportPerTonFromSnapshot(s: ProfitParamSnapshot, _customer: strin
  */
 function getDiscountPerTonFromSnapshot(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
   if ((customer || '').trim() !== '萍钢') return 0;
-  return salesUnitExclTax * 1.13 * (s.discountRatePinggang / 100);
+  // 业务口径固定：萍钢贴现费用=销售单价(不含税)*1.13*1.8%
+  const pinggangDiscountRate = 1.8;
+  return salesUnitExclTax * 1.13 * (pinggangDiscountRate / 100);
 }
 
 /**
@@ -645,7 +647,8 @@ function getDiscountPerTonFromSnapshot(salesUnitExclTax: number, customer: strin
 function getInterestPerTonFromSnapshot(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
   const c = (customer || '').trim();
   let days = 0;
-  if (c === '萍钢') days = s.collectionDaysPinggang;
+  // 业务口径固定：萍钢回款天数=60天
+  if (c === '萍钢') days = 60;
   else if (c === '吉钢') days = s.collectionDaysJigang;
   else if (c === '新钢') days = s.collectionDaysXingang;
   if (days === 0) return 0;
@@ -1150,14 +1153,20 @@ export async function getProfitAnalysisData(
             warehouseTaxRate = 0.13;
           }
 
-          const transportPerTon = getTransportPerTonFromSnapshot(paramSnapshot, customer);
+          // 运输费口径：客户运价(含税) * 出厂重量；出厂重量=净重/1.03
+          const transportWeightForCalc = netWeightQuantity > 0 ? netWeightQuantity : quantity;
+          const transportCost =
+            transportWeightForCalc > 0 && paramSnapshot.roadLossFactor > 0
+              ? paramSnapshot.transportFee * (transportWeightForCalc / paramSnapshot.roadLossFactor)
+              : 0;
+          const transportPerSettlementTonForTax = quantity > 0 ? transportCost / quantity : 0;
           const taxMain = paramSnapshot.taxRateMain / 100;
           const taxExtra = paramSnapshot.taxRateExtra / 100;
           const taxBasePerTon =
             quantity > 0
               ? salesUnitExclTax * 0.13 -
                 materialUnitExclTax * warehouseTaxRate -
-                transportPerTon * 0.03 -
+                transportPerSettlementTonForTax * 0.03 -
                 paramSnapshot.processingFeeForRefund * 0.09
               : 0;
           const taxPerTon =
@@ -1168,7 +1177,6 @@ export async function getProfitAnalysisData(
           const discountPerTon = getDiscountPerTonFromSnapshot(salesUnitExclTax, customer, paramSnapshot);
           const interestPerTon = getInterestPerTonFromSnapshot(salesUnitExclTax, customer, paramSnapshot);
 
-          const transportCost = transportPerTon * quantity;
           const taxCost = taxPerTon * quantity;
           const discountCost = discountPerTon * quantity;
           const interestCost = interestPerTon * quantity;
@@ -1179,7 +1187,7 @@ export async function getProfitAnalysisData(
           let immediateRefundPerTon = 0;
           let governmentSupportPerTon = 0;
           if (customer === '萍钢' || customer === '新钢' || customer === '吉钢') {
-            const baseTransport = getTransportPerTonFromSnapshot(paramSnapshot, customer);
+            const baseTransport = transportPerSettlementTonForTax;
             const taxBasePerTon =
               salesUnitExclTax * 0.13 -
               materialUnitExclTax * warehouseTaxRate -
@@ -1241,7 +1249,7 @@ export async function getProfitAnalysisData(
               materialUnitExclTax,
               materialCalcQuantity,
               warehouseTaxRate,
-              transportPerTon,
+              transportPerTon: transportPerSettlementTonForTax,
               processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,
               taxMainRate: taxMain,
               taxExtraRate: taxExtra,
