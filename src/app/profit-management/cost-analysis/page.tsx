@@ -118,7 +118,7 @@ export default function CostAnalysis() {
   const [error, setError] = useState<string | null>(null);
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
-  const [exporting, setExporting] = useState(false);
+  const [exportingType, setExportingType] = useState<'' | 'summary' | 'inventory'>('');
   /** 当月内任选一日查看「当日成本」汇总（与 API costDay 一致） */
   const [costViewDate, setCostViewDate] = useState(() => {
     const n = new Date();
@@ -270,7 +270,7 @@ export default function CostAnalysis() {
     setExportEndDate(`${yyyy}-${mm}-${dd}`);
   }, []);
 
-  const handleExportData = async () => {
+  const handleExportData = async (mode: 'summary' | 'inventory' = 'summary') => {
     if (!exportStartDate || !exportEndDate) {
       alert('请选择导出日期范围');
       return;
@@ -280,10 +280,11 @@ export default function CostAnalysis() {
       return;
     }
     try {
-      setExporting(true);
+      setExportingType(mode);
       const params = new URLSearchParams({
         startDate: exportStartDate,
         endDate: exportEndDate,
+        mode,
       });
       const response = await fetch(`/api/profit-management/cost-analysis/export?${params.toString()}`);
       if (!response.ok) {
@@ -294,7 +295,10 @@ export default function CostAnalysis() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `成本分析明细_${exportStartDate}_至_${exportEndDate}.xlsx`;
+      a.download =
+        mode === 'inventory'
+          ? `基地收货与成品统计_${exportStartDate}_至_${exportEndDate}.xlsx`
+          : `毛料采购汇总_${exportStartDate}_至_${exportEndDate}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -303,7 +307,7 @@ export default function CostAnalysis() {
       const msg = e instanceof Error ? e.message : '导出失败';
       alert(msg);
     } finally {
-      setExporting(false);
+      setExportingType('');
     }
   };
 
@@ -988,7 +992,7 @@ export default function CostAnalysis() {
           </div>
           <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-              导出数据（基地收货汇总：SH 开头且仓库不为「优质毛料库」「M钢渣粒子」「MP废钢库」；总结算金额为万元）
+              导出数据（支持日期范围：毛料采购汇总、基地收货+成品统计台账）
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
@@ -1006,11 +1010,19 @@ export default function CostAnalysis() {
               />
               <button
                 type="button"
-                onClick={handleExportData}
-                disabled={exporting}
+                onClick={() => handleExportData('summary')}
+                disabled={!!exportingType}
                 className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {exporting ? '导出中...' : '导出数据'}
+                {exportingType === 'summary' ? '导出中...' : '导出毛料汇总'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExportData('inventory')}
+                disabled={!!exportingType}
+                className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {exportingType === 'inventory' ? '导出中...' : '导出台账表'}
               </button>
             </div>
           </div>
