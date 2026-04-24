@@ -6,6 +6,7 @@ import {
   rebuildMaterialStorageFromPurchase,
   refreshMaterialCostCache,
 } from '@/lib/services/inventory-ops-service';
+import { deleteProcessingOrderWithRollback } from '@/lib/services/processing-order-delete-service';
 
 function verifyOpsSecret(request: Request): NextResponse | null {
   const secret = process.env.INVENTORY_OPS_SECRET?.trim();
@@ -15,6 +16,13 @@ function verifyOpsSecret(request: Request): NextResponse | null {
     return NextResponse.json({ success: false, error: '未授权（请配置请求头 x-inventory-ops-secret）' }, { status: 401 });
   }
   return null;
+}
+
+/** 加工单管理员删除：须已配置并匹配 INVENTORY_OPS_SECRET */
+function canProcessingDeleteAdmin(request: Request): boolean {
+  const secret = process.env.INVENTORY_OPS_SECRET?.trim();
+  if (!secret) return false;
+  return request.headers.get('x-inventory-ops-secret')?.trim() === secret;
 }
 
 export async function GET(request: Request) {
@@ -49,7 +57,8 @@ export async function GET(request: Request) {
 type PostBody =
   | { action: 'syncPurchase'; maxRows?: number; trigger?: string }
   | { action: 'rebuildPurchase'; touchOnlyMatched?: boolean }
-  | { action: 'refreshMaterialCostCache'; startDate: string; endDate: string };
+  | { action: 'refreshMaterialCostCache'; startDate: string; endDate: string }
+  | { action: 'deleteProcessingOrder'; id: number; openid?: string | null };
 
 export async function POST(request: Request) {
   const denied = verifyOpsSecret(request);
@@ -82,8 +91,30 @@ export async function POST(request: Request) {
       });
     }
 
+    if (action === 'deleteProcessingOrder') {
+      const id = Number((body as { id?: unknown }).id);
+      const openid = (body as { openid?: string | null }).openid ?? null;
+      const adminBypass = canProcessingDeleteAdmin(request);
+      const result = await deleteProcessingOrderWithRollback({
+        id,
+        openid: typeof openid === 'string' ? openid : null,
+        adminBypass,
+      });
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, error: result.error, data: result },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({ success: true, data: result });
+    }
+
     return NextResponse.json(
-      { success: false, error: '未知 action（syncPurchase | rebuildPurchase | refreshMaterialCostCache）' },
+      {
+        success: false,
+        error:
+          '未知 action（syncPurchase | rebuildPurchase | refreshMaterialCostCache | deleteProcessingOrder）',
+      },
       { status: 400 }
     );
   } catch (error) {

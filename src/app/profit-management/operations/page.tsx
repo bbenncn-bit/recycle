@@ -54,6 +54,8 @@ export default function ProfitOperationsPage() {
   const [lastResult, setLastResult] = useState<unknown>(null);
   const [cacheRange, setCacheRange] = useState(defaultCacheRange);
   const [maxRows, setMaxRows] = useState(2000);
+  const [deleteOrderId, setDeleteOrderId] = useState('');
+  const [deleteOrderOpenid, setDeleteOrderOpenid] = useState('');
 
   const headers = useMemo((): HeadersInit => {
     const h: HeadersInit = { 'Content-Type': 'application/json' };
@@ -124,7 +126,7 @@ export default function ProfitOperationsPage() {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">算账经营 · 运维</h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            采购同步至毛料库存、全量重算、材料成本缓存刷新。与小程序/云函数共用同一 MySQL。
+            采购同步、加工单删除回滚、材料成本缓存等。与小程序/云函数共用同一 MySQL。
           </p>
         </div>
 
@@ -133,6 +135,10 @@ export default function ProfitOperationsPage() {
           <p className="mt-1 opacity-95">
             若在生产环境设置了环境变量 <code className="rounded bg-black/10 px-1 dark:bg-white/10">INVENTORY_OPS_SECRET</code>
             ，则须在下方填写相同密钥并在请求头携带（本页已自动附加）。未设置时本地开发可直接调用。
+          </p>
+          <p className="mt-2 opacity-95">
+            <strong>加工单删除</strong>：配置了密钥并填写后，删除加工单可不校验录入人；未配置密钥时须在请求体传{' '}
+            <code className="rounded bg-black/10 px-1 dark:bg-white/10">openid</code> 与单据一致。
           </p>
         </div>
 
@@ -283,6 +289,69 @@ export default function ProfitOperationsPage() {
             </button>
           </section>
         </div>
+
+        <section className="rounded-lg border border-red-200 bg-white p-4 dark:border-red-900/50 dark:bg-gray-800">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">加工单删除（回滚库存）</h2>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            先按单据把<strong>毛料加回</strong> <code className="rounded bg-black/5 px-1 dark:bg-white/10">MaterialStorage</code>
+            ，再把<strong>成品扣减</strong> <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProductStock</code>
+            ，最后删除 <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProcessingCostInput</code> 行。若已在库里手工
+            DELETE 了加工单，本功能无法自动推断用量，需按流水或备份手工补调。
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="text-xs text-gray-600 dark:text-gray-400">加工单 id（ProcessingCostInput.id）</label>
+              <input
+                type="number"
+                min={1}
+                value={deleteOrderId}
+                onChange={(e) => setDeleteOrderId(e.target.value)}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                placeholder="例如 1514"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-600 dark:text-gray-400">
+                录入人 openid（未配置运维密钥时必填）
+              </label>
+              <input
+                type="text"
+                value={deleteOrderOpenid}
+                onChange={(e) => setDeleteOrderOpenid(e.target.value)}
+                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                placeholder="与行内 openid / _openid 一致"
+              />
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={!!busy}
+            onClick={() => {
+              const id = parseInt(deleteOrderId, 10);
+              if (!id || id < 1) {
+                alert('请输入有效的加工单 id');
+                return;
+              }
+              if (
+                !confirm(
+                  `确认删除加工单 id=${id} 并回滚毛料与成品？此操作在同一事务内执行，不可撤销。`
+                )
+              ) {
+                return;
+              }
+              const payload: Record<string, unknown> = {
+                action: 'deleteProcessingOrder',
+                id,
+              };
+              const o = deleteOrderOpenid.trim();
+              if (o) payload.openid = o;
+              postAction(payload);
+            }}
+            className="mt-4 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {busy === 'deleteProcessingOrder' ? '执行中…' : '删除加工单并回滚'}
+          </button>
+        </section>
 
         {lastResult != null && (
           <section className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-950/40">

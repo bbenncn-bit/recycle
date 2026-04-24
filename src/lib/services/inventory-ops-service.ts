@@ -1,5 +1,9 @@
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prismadb';
 import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+
+/** 默认 prisma 或 $transaction 内的 tx，用于加工单删除等与库存写同一原子事务 */
+export type PrismaDb = typeof prisma | Prisma.TransactionClient;
 
 export const PURCHASE_SYNC_KEY = 'purchase_warehouse_last_id';
 
@@ -71,27 +75,30 @@ async function upsertSyncState(keyName: string, valueNum: number): Promise<boole
   }
 }
 
-async function appendMaterialStorageLog(row: {
-  business_date: string | null;
-  change_type: string;
-  source_type: string | null;
-  source_ref: string | null;
-  storage_area: string;
-  material_type: string;
-  qty_before: number;
-  qty_delta: number;
-  qty_after: number;
-  price_before: number | null;
-  price_after: number | null;
-  amount_delta_yuan: number | null;
-  operator_openid: string | null;
-  photo_urls: string | null;
-  note: string | null;
-}): Promise<void> {
+async function appendMaterialStorageLog(
+  row: {
+    business_date: string | null;
+    change_type: string;
+    source_type: string | null;
+    source_ref: string | null;
+    storage_area: string;
+    material_type: string;
+    qty_before: number;
+    qty_delta: number;
+    qty_after: number;
+    price_before: number | null;
+    price_after: number | null;
+    amount_delta_yuan: number | null;
+    operator_openid: string | null;
+    photo_urls: string | null;
+    note: string | null;
+  },
+  db: PrismaDb = prisma
+): Promise<void> {
   const ready = await hasChangeLogTable();
   if (!ready) return;
   try {
-    await prisma.$executeRaw`
+    await db.$executeRaw`
       INSERT INTO MaterialStorageChangeLog (
         business_date, change_type, source_type, source_ref,
         storage_area, material_type,
@@ -109,24 +116,27 @@ async function appendMaterialStorageLog(row: {
   }
 }
 
-async function adjustMaterialStorage(opts: {
-  warehouse: string;
-  materialType: string;
-  deltaQty: number;
-  deltaAmountYuan?: number | null;
-  changeType: string;
-  sourceType?: string | null;
-  sourceRef?: string | null;
-  businessDate?: string | null;
-  note?: string | null;
-}): Promise<{ touched: boolean; frozen?: boolean }> {
+async function adjustMaterialStorage(
+  opts: {
+    warehouse: string;
+    materialType: string;
+    deltaQty: number;
+    deltaAmountYuan?: number | null;
+    changeType: string;
+    sourceType?: string | null;
+    sourceRef?: string | null;
+    businessDate?: string | null;
+    note?: string | null;
+  },
+  db: PrismaDb = prisma
+): Promise<{ touched: boolean; frozen?: boolean }> {
   const warehouse = norm(opts.warehouse);
   const materialType = norm(opts.materialType);
   const deltaQtyRaw = toNum(opts.deltaQty);
   const deltaQty = deltaQtyRaw != null ? deltaQtyRaw : 0;
   if (!warehouse || !materialType || deltaQty === 0) return { touched: false };
 
-  const row = await prisma.materialStorage.findFirst({
+  const row = await db.materialStorage.findFirst({
     where: { storageArea: warehouse, materialType },
   });
   if (!row) return { touched: false };
@@ -150,7 +160,7 @@ async function adjustMaterialStorage(opts: {
     }
   }
 
-  await prisma.materialStorage.update({
+  await db.materialStorage.update({
     where: { id: row.id },
     data: {
       currentQty: afterQty,
@@ -174,9 +184,60 @@ async function adjustMaterialStorage(opts: {
     operator_openid: null,
     photo_urls: null,
     note: opts.note ?? null,
-  });
+  }, db);
 
   return { touched: true };
+}
+
+/** 删除加工单：将当时扣减的毛料加回（与云函数 incrementMaterialStorage 一致） */
+export async function incrementMaterialStorageForProcessingDelete(
+  warehouse: string,
+  materialType: string,
+  tons: number,
+  meta: { recordId: number; productionDate?: string | null },
+  db: PrismaDb = prisma
+): Promise<{ touched: boolean; frozen?: boolean }> {
+  const q = toNum(tons);
+  if (!norm(warehouse) || !norm(materialType) || q == null || q <= 0) {
+    return { touched: false };
+  }
+  return adjustMaterialStorage(
+    {
+      warehouse,
+      materialType,
+      deltaQty: q,
+      changeType: 'PRODUCTION_DELETE_ROLLBACK',
+      sourceType: 'ProcessingCostInput',
+      sourceRef: String(meta.recordId),
+      businessDate: meta.productionDate ?? null,
+      note: 'deleteProcessingOrder 毛料回滚',
+    },
+    db
+  );
+}
+
+/** 删除加工单：扣减当时增加的成品库存 */
+export async function decrementProductStockForProcessingDelete(
+  productName: string,
+  warehouseCode: string | null | undefined,
+  tons: number,
+  db: PrismaDb = prisma
+): Promise<boolean> {
+  const t = toNum(tons);
+  const pn = norm(productName);
+  if (!pn || t == null || t <= 0) return false;
+  const wh = norm(warehouseCode);
+  const row = await db.productStock.findFirst({
+    where: wh ? { productName: pn, warehouseCode: wh } : { productName: pn },
+  });
+  if (!row) return false;
+  const cur = toNum(row.stockQty) ?? 0;
+  const newQty = Math.max(0, cur - t);
+  await db.productStock.update({
+    where: { id: row.id },
+    data: { stockQty: newQty },
+  });
+  return true;
 }
 
 export async function syncMaterialStorageFromPurchase(options?: {
