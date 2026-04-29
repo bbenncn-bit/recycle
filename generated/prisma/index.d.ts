@@ -224,6 +224,11 @@ export type ProcessingCostConfig = $Result.DefaultSelection<Prisma.$ProcessingCo
  * 材料成本缓存表（LIFO 预计算结果）
  */
 export type MaterialCostCache = $Result.DefaultSelection<Prisma.$MaterialCostCachePayload>
+/**
+ * Model OpsConsoleUser
+ * 运维控制台账号（Web 登录，与业务用户分离）
+ */
+export type OpsConsoleUser = $Result.DefaultSelection<Prisma.$OpsConsoleUserPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -761,6 +766,16 @@ export class PrismaClient<
     * ```
     */
   get materialCostCache(): Prisma.MaterialCostCacheDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.opsConsoleUser`: Exposes CRUD operations for the **OpsConsoleUser** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OpsConsoleUsers
+    * const opsConsoleUsers = await prisma.opsConsoleUser.findMany()
+    * ```
+    */
+  get opsConsoleUser(): Prisma.OpsConsoleUserDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1236,7 +1251,8 @@ export namespace Prisma {
     MaterialStorage: 'MaterialStorage',
     ProductStock: 'ProductStock',
     ProcessingCostConfig: 'ProcessingCostConfig',
-    MaterialCostCache: 'MaterialCostCache'
+    MaterialCostCache: 'MaterialCostCache',
+    OpsConsoleUser: 'OpsConsoleUser'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1252,7 +1268,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache"
+      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache" | "opsConsoleUser"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4028,6 +4044,72 @@ export namespace Prisma {
           }
         }
       }
+      OpsConsoleUser: {
+        payload: Prisma.$OpsConsoleUserPayload<ExtArgs>
+        fields: Prisma.OpsConsoleUserFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OpsConsoleUserFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OpsConsoleUserFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          findFirst: {
+            args: Prisma.OpsConsoleUserFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OpsConsoleUserFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          findMany: {
+            args: Prisma.OpsConsoleUserFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>[]
+          }
+          create: {
+            args: Prisma.OpsConsoleUserCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          createMany: {
+            args: Prisma.OpsConsoleUserCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.OpsConsoleUserDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          update: {
+            args: Prisma.OpsConsoleUserUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          deleteMany: {
+            args: Prisma.OpsConsoleUserDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OpsConsoleUserUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.OpsConsoleUserUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpsConsoleUserPayload>
+          }
+          aggregate: {
+            args: Prisma.OpsConsoleUserAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOpsConsoleUser>
+          }
+          groupBy: {
+            args: Prisma.OpsConsoleUserGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OpsConsoleUserGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OpsConsoleUserCountArgs<ExtArgs>
+            result: $Utils.Optional<OpsConsoleUserCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4178,6 +4260,7 @@ export namespace Prisma {
     productStock?: ProductStockOmit
     processingCostConfig?: ProcessingCostConfigOmit
     materialCostCache?: MaterialCostCacheOmit
+    opsConsoleUser?: OpsConsoleUserOmit
   }
 
   /* Types for Logging */
@@ -45240,6 +45323,944 @@ export namespace Prisma {
 
 
   /**
+   * Model OpsConsoleUser
+   */
+
+  export type AggregateOpsConsoleUser = {
+    _count: OpsConsoleUserCountAggregateOutputType | null
+    _avg: OpsConsoleUserAvgAggregateOutputType | null
+    _sum: OpsConsoleUserSumAggregateOutputType | null
+    _min: OpsConsoleUserMinAggregateOutputType | null
+    _max: OpsConsoleUserMaxAggregateOutputType | null
+  }
+
+  export type OpsConsoleUserAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type OpsConsoleUserSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type OpsConsoleUserMinAggregateOutputType = {
+    id: number | null
+    username: string | null
+    passwordHash: string | null
+    lastLoginAt: Date | null
+    lastLoginIp: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OpsConsoleUserMaxAggregateOutputType = {
+    id: number | null
+    username: string | null
+    passwordHash: string | null
+    lastLoginAt: Date | null
+    lastLoginIp: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OpsConsoleUserCountAggregateOutputType = {
+    id: number
+    username: number
+    passwordHash: number
+    lastLoginAt: number
+    lastLoginIp: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type OpsConsoleUserAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type OpsConsoleUserSumAggregateInputType = {
+    id?: true
+  }
+
+  export type OpsConsoleUserMinAggregateInputType = {
+    id?: true
+    username?: true
+    passwordHash?: true
+    lastLoginAt?: true
+    lastLoginIp?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OpsConsoleUserMaxAggregateInputType = {
+    id?: true
+    username?: true
+    passwordHash?: true
+    lastLoginAt?: true
+    lastLoginIp?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OpsConsoleUserCountAggregateInputType = {
+    id?: true
+    username?: true
+    passwordHash?: true
+    lastLoginAt?: true
+    lastLoginIp?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type OpsConsoleUserAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OpsConsoleUser to aggregate.
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpsConsoleUsers to fetch.
+     */
+    orderBy?: OpsConsoleUserOrderByWithRelationInput | OpsConsoleUserOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OpsConsoleUserWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpsConsoleUsers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpsConsoleUsers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OpsConsoleUsers
+    **/
+    _count?: true | OpsConsoleUserCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OpsConsoleUserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OpsConsoleUserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OpsConsoleUserMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OpsConsoleUserMaxAggregateInputType
+  }
+
+  export type GetOpsConsoleUserAggregateType<T extends OpsConsoleUserAggregateArgs> = {
+        [P in keyof T & keyof AggregateOpsConsoleUser]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOpsConsoleUser[P]>
+      : GetScalarType<T[P], AggregateOpsConsoleUser[P]>
+  }
+
+
+
+
+  export type OpsConsoleUserGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpsConsoleUserWhereInput
+    orderBy?: OpsConsoleUserOrderByWithAggregationInput | OpsConsoleUserOrderByWithAggregationInput[]
+    by: OpsConsoleUserScalarFieldEnum[] | OpsConsoleUserScalarFieldEnum
+    having?: OpsConsoleUserScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OpsConsoleUserCountAggregateInputType | true
+    _avg?: OpsConsoleUserAvgAggregateInputType
+    _sum?: OpsConsoleUserSumAggregateInputType
+    _min?: OpsConsoleUserMinAggregateInputType
+    _max?: OpsConsoleUserMaxAggregateInputType
+  }
+
+  export type OpsConsoleUserGroupByOutputType = {
+    id: number
+    username: string
+    passwordHash: string
+    lastLoginAt: Date | null
+    lastLoginIp: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: OpsConsoleUserCountAggregateOutputType | null
+    _avg: OpsConsoleUserAvgAggregateOutputType | null
+    _sum: OpsConsoleUserSumAggregateOutputType | null
+    _min: OpsConsoleUserMinAggregateOutputType | null
+    _max: OpsConsoleUserMaxAggregateOutputType | null
+  }
+
+  type GetOpsConsoleUserGroupByPayload<T extends OpsConsoleUserGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OpsConsoleUserGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OpsConsoleUserGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OpsConsoleUserGroupByOutputType[P]>
+            : GetScalarType<T[P], OpsConsoleUserGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OpsConsoleUserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    username?: boolean
+    passwordHash?: boolean
+    lastLoginAt?: boolean
+    lastLoginIp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["opsConsoleUser"]>
+
+
+
+  export type OpsConsoleUserSelectScalar = {
+    id?: boolean
+    username?: boolean
+    passwordHash?: boolean
+    lastLoginAt?: boolean
+    lastLoginIp?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type OpsConsoleUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "lastLoginAt" | "lastLoginIp" | "createdAt" | "updatedAt", ExtArgs["result"]["opsConsoleUser"]>
+
+  export type $OpsConsoleUserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OpsConsoleUser"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      username: string
+      passwordHash: string
+      lastLoginAt: Date | null
+      lastLoginIp: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["opsConsoleUser"]>
+    composites: {}
+  }
+
+  type OpsConsoleUserGetPayload<S extends boolean | null | undefined | OpsConsoleUserDefaultArgs> = $Result.GetResult<Prisma.$OpsConsoleUserPayload, S>
+
+  type OpsConsoleUserCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OpsConsoleUserFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OpsConsoleUserCountAggregateInputType | true
+    }
+
+  export interface OpsConsoleUserDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OpsConsoleUser'], meta: { name: 'OpsConsoleUser' } }
+    /**
+     * Find zero or one OpsConsoleUser that matches the filter.
+     * @param {OpsConsoleUserFindUniqueArgs} args - Arguments to find a OpsConsoleUser
+     * @example
+     * // Get one OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OpsConsoleUserFindUniqueArgs>(args: SelectSubset<T, OpsConsoleUserFindUniqueArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OpsConsoleUser that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OpsConsoleUserFindUniqueOrThrowArgs} args - Arguments to find a OpsConsoleUser
+     * @example
+     * // Get one OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OpsConsoleUserFindUniqueOrThrowArgs>(args: SelectSubset<T, OpsConsoleUserFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OpsConsoleUser that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserFindFirstArgs} args - Arguments to find a OpsConsoleUser
+     * @example
+     * // Get one OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OpsConsoleUserFindFirstArgs>(args?: SelectSubset<T, OpsConsoleUserFindFirstArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OpsConsoleUser that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserFindFirstOrThrowArgs} args - Arguments to find a OpsConsoleUser
+     * @example
+     * // Get one OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OpsConsoleUserFindFirstOrThrowArgs>(args?: SelectSubset<T, OpsConsoleUserFindFirstOrThrowArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OpsConsoleUsers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OpsConsoleUsers
+     * const opsConsoleUsers = await prisma.opsConsoleUser.findMany()
+     * 
+     * // Get first 10 OpsConsoleUsers
+     * const opsConsoleUsers = await prisma.opsConsoleUser.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const opsConsoleUserWithIdOnly = await prisma.opsConsoleUser.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OpsConsoleUserFindManyArgs>(args?: SelectSubset<T, OpsConsoleUserFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OpsConsoleUser.
+     * @param {OpsConsoleUserCreateArgs} args - Arguments to create a OpsConsoleUser.
+     * @example
+     * // Create one OpsConsoleUser
+     * const OpsConsoleUser = await prisma.opsConsoleUser.create({
+     *   data: {
+     *     // ... data to create a OpsConsoleUser
+     *   }
+     * })
+     * 
+     */
+    create<T extends OpsConsoleUserCreateArgs>(args: SelectSubset<T, OpsConsoleUserCreateArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OpsConsoleUsers.
+     * @param {OpsConsoleUserCreateManyArgs} args - Arguments to create many OpsConsoleUsers.
+     * @example
+     * // Create many OpsConsoleUsers
+     * const opsConsoleUser = await prisma.opsConsoleUser.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OpsConsoleUserCreateManyArgs>(args?: SelectSubset<T, OpsConsoleUserCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a OpsConsoleUser.
+     * @param {OpsConsoleUserDeleteArgs} args - Arguments to delete one OpsConsoleUser.
+     * @example
+     * // Delete one OpsConsoleUser
+     * const OpsConsoleUser = await prisma.opsConsoleUser.delete({
+     *   where: {
+     *     // ... filter to delete one OpsConsoleUser
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OpsConsoleUserDeleteArgs>(args: SelectSubset<T, OpsConsoleUserDeleteArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OpsConsoleUser.
+     * @param {OpsConsoleUserUpdateArgs} args - Arguments to update one OpsConsoleUser.
+     * @example
+     * // Update one OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OpsConsoleUserUpdateArgs>(args: SelectSubset<T, OpsConsoleUserUpdateArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OpsConsoleUsers.
+     * @param {OpsConsoleUserDeleteManyArgs} args - Arguments to filter OpsConsoleUsers to delete.
+     * @example
+     * // Delete a few OpsConsoleUsers
+     * const { count } = await prisma.opsConsoleUser.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OpsConsoleUserDeleteManyArgs>(args?: SelectSubset<T, OpsConsoleUserDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OpsConsoleUsers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OpsConsoleUsers
+     * const opsConsoleUser = await prisma.opsConsoleUser.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OpsConsoleUserUpdateManyArgs>(args: SelectSubset<T, OpsConsoleUserUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one OpsConsoleUser.
+     * @param {OpsConsoleUserUpsertArgs} args - Arguments to update or create a OpsConsoleUser.
+     * @example
+     * // Update or create a OpsConsoleUser
+     * const opsConsoleUser = await prisma.opsConsoleUser.upsert({
+     *   create: {
+     *     // ... data to create a OpsConsoleUser
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OpsConsoleUser we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OpsConsoleUserUpsertArgs>(args: SelectSubset<T, OpsConsoleUserUpsertArgs<ExtArgs>>): Prisma__OpsConsoleUserClient<$Result.GetResult<Prisma.$OpsConsoleUserPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OpsConsoleUsers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserCountArgs} args - Arguments to filter OpsConsoleUsers to count.
+     * @example
+     * // Count the number of OpsConsoleUsers
+     * const count = await prisma.opsConsoleUser.count({
+     *   where: {
+     *     // ... the filter for the OpsConsoleUsers we want to count
+     *   }
+     * })
+    **/
+    count<T extends OpsConsoleUserCountArgs>(
+      args?: Subset<T, OpsConsoleUserCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OpsConsoleUserCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OpsConsoleUser.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OpsConsoleUserAggregateArgs>(args: Subset<T, OpsConsoleUserAggregateArgs>): Prisma.PrismaPromise<GetOpsConsoleUserAggregateType<T>>
+
+    /**
+     * Group by OpsConsoleUser.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpsConsoleUserGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OpsConsoleUserGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OpsConsoleUserGroupByArgs['orderBy'] }
+        : { orderBy?: OpsConsoleUserGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OpsConsoleUserGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOpsConsoleUserGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OpsConsoleUser model
+   */
+  readonly fields: OpsConsoleUserFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OpsConsoleUser.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OpsConsoleUserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OpsConsoleUser model
+   */
+  interface OpsConsoleUserFieldRefs {
+    readonly id: FieldRef<"OpsConsoleUser", 'Int'>
+    readonly username: FieldRef<"OpsConsoleUser", 'String'>
+    readonly passwordHash: FieldRef<"OpsConsoleUser", 'String'>
+    readonly lastLoginAt: FieldRef<"OpsConsoleUser", 'DateTime'>
+    readonly lastLoginIp: FieldRef<"OpsConsoleUser", 'String'>
+    readonly createdAt: FieldRef<"OpsConsoleUser", 'DateTime'>
+    readonly updatedAt: FieldRef<"OpsConsoleUser", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OpsConsoleUser findUnique
+   */
+  export type OpsConsoleUserFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter, which OpsConsoleUser to fetch.
+     */
+    where: OpsConsoleUserWhereUniqueInput
+  }
+
+  /**
+   * OpsConsoleUser findUniqueOrThrow
+   */
+  export type OpsConsoleUserFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter, which OpsConsoleUser to fetch.
+     */
+    where: OpsConsoleUserWhereUniqueInput
+  }
+
+  /**
+   * OpsConsoleUser findFirst
+   */
+  export type OpsConsoleUserFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter, which OpsConsoleUser to fetch.
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpsConsoleUsers to fetch.
+     */
+    orderBy?: OpsConsoleUserOrderByWithRelationInput | OpsConsoleUserOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OpsConsoleUsers.
+     */
+    cursor?: OpsConsoleUserWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpsConsoleUsers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpsConsoleUsers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OpsConsoleUsers.
+     */
+    distinct?: OpsConsoleUserScalarFieldEnum | OpsConsoleUserScalarFieldEnum[]
+  }
+
+  /**
+   * OpsConsoleUser findFirstOrThrow
+   */
+  export type OpsConsoleUserFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter, which OpsConsoleUser to fetch.
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpsConsoleUsers to fetch.
+     */
+    orderBy?: OpsConsoleUserOrderByWithRelationInput | OpsConsoleUserOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OpsConsoleUsers.
+     */
+    cursor?: OpsConsoleUserWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpsConsoleUsers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpsConsoleUsers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OpsConsoleUsers.
+     */
+    distinct?: OpsConsoleUserScalarFieldEnum | OpsConsoleUserScalarFieldEnum[]
+  }
+
+  /**
+   * OpsConsoleUser findMany
+   */
+  export type OpsConsoleUserFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter, which OpsConsoleUsers to fetch.
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpsConsoleUsers to fetch.
+     */
+    orderBy?: OpsConsoleUserOrderByWithRelationInput | OpsConsoleUserOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OpsConsoleUsers.
+     */
+    cursor?: OpsConsoleUserWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpsConsoleUsers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpsConsoleUsers.
+     */
+    skip?: number
+    distinct?: OpsConsoleUserScalarFieldEnum | OpsConsoleUserScalarFieldEnum[]
+  }
+
+  /**
+   * OpsConsoleUser create
+   */
+  export type OpsConsoleUserCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * The data needed to create a OpsConsoleUser.
+     */
+    data: XOR<OpsConsoleUserCreateInput, OpsConsoleUserUncheckedCreateInput>
+  }
+
+  /**
+   * OpsConsoleUser createMany
+   */
+  export type OpsConsoleUserCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OpsConsoleUsers.
+     */
+    data: OpsConsoleUserCreateManyInput | OpsConsoleUserCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OpsConsoleUser update
+   */
+  export type OpsConsoleUserUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * The data needed to update a OpsConsoleUser.
+     */
+    data: XOR<OpsConsoleUserUpdateInput, OpsConsoleUserUncheckedUpdateInput>
+    /**
+     * Choose, which OpsConsoleUser to update.
+     */
+    where: OpsConsoleUserWhereUniqueInput
+  }
+
+  /**
+   * OpsConsoleUser updateMany
+   */
+  export type OpsConsoleUserUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OpsConsoleUsers.
+     */
+    data: XOR<OpsConsoleUserUpdateManyMutationInput, OpsConsoleUserUncheckedUpdateManyInput>
+    /**
+     * Filter which OpsConsoleUsers to update
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * Limit how many OpsConsoleUsers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OpsConsoleUser upsert
+   */
+  export type OpsConsoleUserUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * The filter to search for the OpsConsoleUser to update in case it exists.
+     */
+    where: OpsConsoleUserWhereUniqueInput
+    /**
+     * In case the OpsConsoleUser found by the `where` argument doesn't exist, create a new OpsConsoleUser with this data.
+     */
+    create: XOR<OpsConsoleUserCreateInput, OpsConsoleUserUncheckedCreateInput>
+    /**
+     * In case the OpsConsoleUser was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OpsConsoleUserUpdateInput, OpsConsoleUserUncheckedUpdateInput>
+  }
+
+  /**
+   * OpsConsoleUser delete
+   */
+  export type OpsConsoleUserDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+    /**
+     * Filter which OpsConsoleUser to delete.
+     */
+    where: OpsConsoleUserWhereUniqueInput
+  }
+
+  /**
+   * OpsConsoleUser deleteMany
+   */
+  export type OpsConsoleUserDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OpsConsoleUsers to delete
+     */
+    where?: OpsConsoleUserWhereInput
+    /**
+     * Limit how many OpsConsoleUsers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OpsConsoleUser without action
+   */
+  export type OpsConsoleUserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpsConsoleUser
+     */
+    select?: OpsConsoleUserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpsConsoleUser
+     */
+    omit?: OpsConsoleUserOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -45906,6 +46927,19 @@ export namespace Prisma {
   export type MaterialCostCacheScalarFieldEnum = (typeof MaterialCostCacheScalarFieldEnum)[keyof typeof MaterialCostCacheScalarFieldEnum]
 
 
+  export const OpsConsoleUserScalarFieldEnum: {
+    id: 'id',
+    username: 'username',
+    passwordHash: 'passwordHash',
+    lastLoginAt: 'lastLoginAt',
+    lastLoginIp: 'lastLoginIp',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type OpsConsoleUserScalarFieldEnum = (typeof OpsConsoleUserScalarFieldEnum)[keyof typeof OpsConsoleUserScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -46415,6 +47449,15 @@ export namespace Prisma {
   };
 
   export type MaterialCostCacheOrderByRelevanceFieldEnum = (typeof MaterialCostCacheOrderByRelevanceFieldEnum)[keyof typeof MaterialCostCacheOrderByRelevanceFieldEnum]
+
+
+  export const OpsConsoleUserOrderByRelevanceFieldEnum: {
+    username: 'username',
+    passwordHash: 'passwordHash',
+    lastLoginIp: 'lastLoginIp'
+  };
+
+  export type OpsConsoleUserOrderByRelevanceFieldEnum = (typeof OpsConsoleUserOrderByRelevanceFieldEnum)[keyof typeof OpsConsoleUserOrderByRelevanceFieldEnum]
 
 
   /**
@@ -49738,6 +50781,71 @@ export namespace Prisma {
     productionRecords?: JsonNullableWithAggregatesFilter<"MaterialCostCache">
     calculatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
+  }
+
+  export type OpsConsoleUserWhereInput = {
+    AND?: OpsConsoleUserWhereInput | OpsConsoleUserWhereInput[]
+    OR?: OpsConsoleUserWhereInput[]
+    NOT?: OpsConsoleUserWhereInput | OpsConsoleUserWhereInput[]
+    id?: IntFilter<"OpsConsoleUser"> | number
+    username?: StringFilter<"OpsConsoleUser"> | string
+    passwordHash?: StringFilter<"OpsConsoleUser"> | string
+    lastLoginAt?: DateTimeNullableFilter<"OpsConsoleUser"> | Date | string | null
+    lastLoginIp?: StringNullableFilter<"OpsConsoleUser"> | string | null
+    createdAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
+    updatedAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
+  }
+
+  export type OpsConsoleUserOrderByWithRelationInput = {
+    id?: SortOrder
+    username?: SortOrder
+    passwordHash?: SortOrder
+    lastLoginAt?: SortOrderInput | SortOrder
+    lastLoginIp?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: OpsConsoleUserOrderByRelevanceInput
+  }
+
+  export type OpsConsoleUserWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    username?: string
+    AND?: OpsConsoleUserWhereInput | OpsConsoleUserWhereInput[]
+    OR?: OpsConsoleUserWhereInput[]
+    NOT?: OpsConsoleUserWhereInput | OpsConsoleUserWhereInput[]
+    passwordHash?: StringFilter<"OpsConsoleUser"> | string
+    lastLoginAt?: DateTimeNullableFilter<"OpsConsoleUser"> | Date | string | null
+    lastLoginIp?: StringNullableFilter<"OpsConsoleUser"> | string | null
+    createdAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
+    updatedAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
+  }, "id" | "username">
+
+  export type OpsConsoleUserOrderByWithAggregationInput = {
+    id?: SortOrder
+    username?: SortOrder
+    passwordHash?: SortOrder
+    lastLoginAt?: SortOrderInput | SortOrder
+    lastLoginIp?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: OpsConsoleUserCountOrderByAggregateInput
+    _avg?: OpsConsoleUserAvgOrderByAggregateInput
+    _max?: OpsConsoleUserMaxOrderByAggregateInput
+    _min?: OpsConsoleUserMinOrderByAggregateInput
+    _sum?: OpsConsoleUserSumOrderByAggregateInput
+  }
+
+  export type OpsConsoleUserScalarWhereWithAggregatesInput = {
+    AND?: OpsConsoleUserScalarWhereWithAggregatesInput | OpsConsoleUserScalarWhereWithAggregatesInput[]
+    OR?: OpsConsoleUserScalarWhereWithAggregatesInput[]
+    NOT?: OpsConsoleUserScalarWhereWithAggregatesInput | OpsConsoleUserScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"OpsConsoleUser"> | number
+    username?: StringWithAggregatesFilter<"OpsConsoleUser"> | string
+    passwordHash?: StringWithAggregatesFilter<"OpsConsoleUser"> | string
+    lastLoginAt?: DateTimeNullableWithAggregatesFilter<"OpsConsoleUser"> | Date | string | null
+    lastLoginIp?: StringNullableWithAggregatesFilter<"OpsConsoleUser"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"OpsConsoleUser"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"OpsConsoleUser"> | Date | string
   }
 
   export type CAHoldingsCreateInput = {
@@ -53303,6 +54411,73 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type OpsConsoleUserCreateInput = {
+    username: string
+    passwordHash: string
+    lastLoginAt?: Date | string | null
+    lastLoginIp?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpsConsoleUserUncheckedCreateInput = {
+    id?: number
+    username: string
+    passwordHash: string
+    lastLoginAt?: Date | string | null
+    lastLoginIp?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpsConsoleUserUpdateInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpsConsoleUserUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpsConsoleUserCreateManyInput = {
+    id?: number
+    username: string
+    passwordHash: string
+    lastLoginAt?: Date | string | null
+    lastLoginIp?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpsConsoleUserUpdateManyMutationInput = {
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpsConsoleUserUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -55958,6 +57133,50 @@ export namespace Prisma {
     id?: SortOrder
     settlementQuantity?: SortOrder
     materialCost?: SortOrder
+  }
+
+  export type OpsConsoleUserOrderByRelevanceInput = {
+    fields: OpsConsoleUserOrderByRelevanceFieldEnum | OpsConsoleUserOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type OpsConsoleUserCountOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    passwordHash?: SortOrder
+    lastLoginAt?: SortOrder
+    lastLoginIp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpsConsoleUserAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type OpsConsoleUserMaxOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    passwordHash?: SortOrder
+    lastLoginAt?: SortOrder
+    lastLoginIp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpsConsoleUserMinOrderByAggregateInput = {
+    id?: SortOrder
+    username?: SortOrder
+    passwordHash?: SortOrder
+    lastLoginAt?: SortOrder
+    lastLoginIp?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpsConsoleUserSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {

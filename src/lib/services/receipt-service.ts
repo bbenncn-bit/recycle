@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prismadb';
+import { HOME_DEFAULT_DATE_KEY } from '@/lib/receipt-home-dates';
 
 const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -13,6 +14,20 @@ function localDayRangeFromDateKey(dateKey: string): { start: Date; end: Date } |
   const start = new Date(y, mo - 1, d, 0, 0, 0, 0);
   const end = new Date(y, mo - 1, d + 1, 0, 0, 0, 0);
   return { start, end };
+}
+
+function getHomeDefaultWindow(): {
+  yesterdayStart: Date;
+  todayStart: Date;
+  todayTwoAM: Date;
+} {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const yesterdayStart = new Date(todayStart);
+  yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+  const todayTwoAM = new Date(todayStart);
+  todayTwoAM.setHours(2, 0, 0, 0);
+  return { yesterdayStart, todayStart, todayTwoAM };
 }
 
 export interface ReceiptData {
@@ -50,7 +65,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   offset?: number;
-  /** YYYY-MM-DD（本地日历日 0:00～次日 0:00）；传入则查询该日，不传则仍用库中最新有数据的日期 */
+  /** YYYY-MM-DD（本地日）或 HOME_DEFAULT（今日00:00-02:00 + 昨日全天） */
   date?: string;
 }
 
@@ -70,12 +85,21 @@ export interface PaginatedResult<T> {
  * 报废车数据服务
  */
 export class ReceiptfcService {
-  private static async resolveOrderDayRange(
+  private static async resolveOrderTimeWhere(
     params: PaginationParams
-  ): Promise<{ start: Date; end: Date } | null> {
+  ): Promise<Record<string, unknown> | null> {
     if (params.date) {
+      if (params.date === HOME_DEFAULT_DATE_KEY) {
+        const { yesterdayStart, todayStart, todayTwoAM } = getHomeDefaultWindow();
+        return {
+          OR: [
+            { orderTime: { gte: yesterdayStart, lt: todayStart } },
+            { orderTime: { gte: todayStart, lt: todayTwoAM } },
+          ],
+        };
+      }
       const r = localDayRangeFromDateKey(params.date);
-      if (r) return r;
+      if (r) return { orderTime: { gte: r.start, lt: r.end } };
     }
     const latestDate = await this.getLatestOrderDate();
     if (!latestDate) return null;
@@ -83,7 +107,7 @@ export class ReceiptfcService {
     dateStart.setUTCHours(0, 0, 0, 0);
     const dateEnd = new Date(dateStart);
     dateEnd.setUTCDate(dateEnd.getUTCDate() + 1);
-    return { start: dateStart, end: dateEnd };
+    return { orderTime: { gte: dateStart, lt: dateEnd } };
   }
 
   /**
@@ -138,8 +162,8 @@ export class ReceiptfcService {
 
       console.log(`🔄 获取报废车数据 - 页码: ${page}, 限制: ${limit}, 偏移: ${actualOffset}`);
 
-      const range = await this.resolveOrderDayRange(params);
-      if (!range) {
+      const where = await this.resolveOrderTimeWhere(params);
+      if (!where) {
         return {
           data: [],
           pagination: {
@@ -152,19 +176,12 @@ export class ReceiptfcService {
         };
       }
 
-      const { start: dateStart, end: dateEnd } = range;
-
-      console.log(`🔍 分页查询报废车数据 - 日期范围: ${dateStart.toISOString()} 到 ${dateEnd.toISOString()}`);
+      console.log(`🔍 分页查询报废车数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
       // 获取分页数据
       const [data, total] = await Promise.all([
         prisma.receiptfc.findMany({
-          where: {
-            orderTime: {
-              gte: dateStart,
-              lt: dateEnd
-            }
-          },
+          where,
           orderBy: {
             orderTime: 'desc'
           },
@@ -172,12 +189,7 @@ export class ReceiptfcService {
           take: limit
         }),
         prisma.receiptfc.count({
-          where: {
-            orderTime: {
-              gte: dateStart,
-              lt: dateEnd
-            }
-          }
+          where
         })
       ]);
 
@@ -308,12 +320,21 @@ export class ReceiptfcService {
  * 废钢数据服务
  */
 export class ReceiptfgService {
-  private static async resolveOrderDayRange(
+  private static async resolveOrderTimeWhere(
     params: PaginationParams
-  ): Promise<{ start: Date; end: Date } | null> {
+  ): Promise<Record<string, unknown> | null> {
     if (params.date) {
+      if (params.date === HOME_DEFAULT_DATE_KEY) {
+        const { yesterdayStart, todayStart, todayTwoAM } = getHomeDefaultWindow();
+        return {
+          OR: [
+            { orderTime: { gte: yesterdayStart, lt: todayStart } },
+            { orderTime: { gte: todayStart, lt: todayTwoAM } },
+          ],
+        };
+      }
       const r = localDayRangeFromDateKey(params.date);
-      if (r) return r;
+      if (r) return { orderTime: { gte: r.start, lt: r.end } };
     }
     const latestDate = await this.getLatestOrderDate();
     if (!latestDate) return null;
@@ -321,7 +342,7 @@ export class ReceiptfgService {
     dateStart.setUTCHours(0, 0, 0, 0);
     const dateEnd = new Date(dateStart);
     dateEnd.setUTCDate(dateEnd.getUTCDate() + 1);
-    return { start: dateStart, end: dateEnd };
+    return { orderTime: { gte: dateStart, lt: dateEnd } };
   }
 
   /**
@@ -375,8 +396,8 @@ export class ReceiptfgService {
 
       console.log(`🔄 获取废钢数据 - 页码: ${page}, 限制: ${limit}, 偏移: ${actualOffset}`);
 
-      const range = await this.resolveOrderDayRange(params);
-      if (!range) {
+      const where = await this.resolveOrderTimeWhere(params);
+      if (!where) {
         return {
           data: [],
           pagination: {
@@ -389,19 +410,12 @@ export class ReceiptfgService {
         };
       }
 
-      const { start: dateStart, end: dateEnd } = range;
-
-      console.log(`🔍 分页查询废钢数据 - 日期范围: ${dateStart.toISOString()} 到 ${dateEnd.toISOString()}`);
+      console.log(`🔍 分页查询废钢数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
       // 获取分页数据
       const [data, total] = await Promise.all([
         prisma.receiptfg.findMany({
-          where: {
-            orderTime: {
-              gte: dateStart,
-              lt: dateEnd
-            }
-          },
+          where,
           orderBy: {
             orderTime: 'desc'
           },
@@ -409,12 +423,7 @@ export class ReceiptfgService {
           take: limit
         }),
         prisma.receiptfg.count({
-          where: {
-            orderTime: {
-              gte: dateStart,
-              lt: dateEnd
-            }
-          }
+          where
         })
       ]);
 

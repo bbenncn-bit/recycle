@@ -15,7 +15,7 @@ const navigation = [
     dropdown: [
       { name: '成本分析', href: '/profit-management/cost-analysis' },
       { name: '利润分析', href: '/profit-management/profit-analysis' },
-      { name: '运维', href: '/profit-management/operations' },
+      { name: '运维', href: '/profit-management/operations/login' },
     ]
   },
   { 
@@ -49,6 +49,14 @@ const navigation = [
   },
 ];
 
+/** 运维子路由（登录/注册/控制台）均视为「运维」选中 */
+function isSubNavItemActive(subItem: { name: string; href: string }, pathname: string): boolean {
+  if (subItem.name === '运维') {
+    return pathname.startsWith('/profit-management/operations');
+  }
+  return pathname === subItem.href;
+}
+
 const mainNavActiveClass =
   'bg-white/50 dark:bg-gray-700/50 text-gray-800 dark:text-white shadow-lg';
 const mainNavIdleClass =
@@ -71,7 +79,7 @@ export default function Navbar() {
   const profitMgmtSectionActive =
     pathname === '/profit-management/cost-analysis' ||
     pathname === '/profit-management/profit-analysis' ||
-    pathname === '/profit-management/operations';
+    pathname.startsWith('/profit-management/operations');
 
   // 处理桌面端鼠标悬停事件
   const handleMouseEnter = (itemName: string) => {
@@ -123,8 +131,10 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-12">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || (item.dropdown && item.dropdown.some(subItem => pathname === subItem.href));
-              // const Icon = item.icon;
+              const isActive =
+                (!item.dropdown && pathname === item.href) ||
+                (item.dropdown &&
+                  item.dropdown.some((subItem) => isSubNavItemActive(subItem, pathname)));
               
               if (item.dropdown) {
                 return (
@@ -156,7 +166,7 @@ export default function Navbar() {
                                 key={subItem.name}
                                 href={subItem.href}
                                 className={`block px-4 py-2 text-sm transition-colors ${
-                                  pathname === subItem.href
+                                  isSubNavItemActive(subItem, pathname)
                                     ? subNavActiveClass
                                     : subNavIdleClass
                                 }`}
@@ -282,9 +292,9 @@ export default function Navbar() {
                     利润分析
                   </Link>
                   <Link
-                    href="/profit-management/operations"
+                    href="/profit-management/operations/login"
                     className={`block px-4 py-2 text-sm transition-colors ${
-                      pathname === '/profit-management/operations'
+                      pathname.startsWith('/profit-management/operations')
                         ? subNavActiveClass
                         : subNavIdleClass
                     }`}
@@ -304,8 +314,10 @@ export default function Navbar() {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             {navigation.map((item) => {
-              const isActive = pathname === item.href || (item.dropdown && item.dropdown.some(subItem => pathname === subItem.href));
-              // const Icon = item.icon;
+              const isActive =
+                (!item.dropdown && pathname === item.href) ||
+                (item.dropdown &&
+                  item.dropdown.some((subItem) => isSubNavItemActive(subItem, pathname)));
               
               if (item.dropdown) {
                 return (
@@ -331,7 +343,7 @@ export default function Navbar() {
                             key={subItem.name}
                             href={subItem.href}
                             className={`block rounded-md px-3 py-2 text-sm transition-colors ${
-                              pathname === subItem.href
+                              isSubNavItemActive(subItem, pathname)
                                 ? subNavActiveClass
                                 : subNavIdleClass
                             }`}

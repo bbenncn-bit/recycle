@@ -1,10 +1,10 @@
 const CHUNK_PUBLIC_PATH = "server/app/api/receiptfg/route.js";
 const runtime = require("../../../chunks/[turbopack]_runtime.js");
-runtime.loadChunk("server/chunks/[externals]_node:crypto_e33f3241._.js");
+runtime.loadChunk("server/chunks/[externals]_node:crypto_1cf7a3f1._.js");
 runtime.loadChunk("server/chunks/generated_prisma_runtime_client_3dbab0e0.js");
 runtime.loadChunk("server/chunks/generated_prisma_query_compiler_bg_wasm-base64_d352fe87.js");
 runtime.loadChunk("server/chunks/generated_prisma_75dc4794._.js");
-runtime.loadChunk("server/chunks/_586ac676._.js");
+runtime.loadChunk("server/chunks/_71ca72df._.js");
 runtime.loadChunk("server/chunks/[root-of-the-server]__8dda64af._.js");
 runtime.loadChunk("server/chunks/node_modules_next_9889243d._.js");
 runtime.loadChunk("server/chunks/node_modules_mariadb_10c4c329._.js");

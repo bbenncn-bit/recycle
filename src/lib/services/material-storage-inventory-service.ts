@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
 import { parseProductionDate } from '@/lib/services/lifo-material-cost-service';
 import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+import { purchaseInboundStorageArea } from '@/lib/purchase-warehouse-location';
 
 function dec(value: unknown): number {
   if (value === null || value === undefined) return 0;
@@ -147,6 +148,7 @@ async function applyRollRange(
     select: {
       receiptNo: true,
       warehouse: true,
+      warehouseArea: true,
       material: true,
       warehouseDate: true,
       estimatedDryBasis: true,
@@ -161,11 +163,12 @@ async function applyRollRange(
     if (!isBaseSelfReceipt(p.receiptNo, p.warehouse)) continue;
     const d = parseWarehouseDate(p.warehouseDate);
     if (!d || d < rs || d > re) continue;
-    const idx = matchPurchaseRowIndex(state, p.warehouse || '', p.material || '');
+    const idx = matchPurchaseRowIndex(state, purchaseInboundStorageArea(p), p.material || '');
     if (idx < 0) continue;
     const qty = dec(p.estimatedDryBasis);
     const costYuan = dec(p.totalPriceExcludingTax);
-    if (qty <= 0) continue;
+    // 允许负值入库行参与滚存（冲减行），仅忽略 0
+    if (qty === 0) continue;
     const row = state[idx];
     const q0 = row.qty;
     const p0 = row.price;
@@ -272,4 +275,48 @@ export async function getClosingStateThroughDate(endYmd: string): Promise<Materi
 
   await applyRollRange(state, MATERIAL_INVENTORY_ROLL_START, end);
   return state;
+}
+
+/** 与增量同步冻结别名一致：不向这些别名行写回（避免覆盖专用口径） */
+const ROLL_FORWARD_FROZEN_ALIASES = new Set([
+  'MLKM2',
+  'MLKM',
+  'MLKQ1M2',
+  'MLKQ1M0',
+  'MLKQ1M6',
+]);
+
+/**
+ * 按「20260331 期初 + 基地收货入库（库区优先、否则仓库）− 加工耗用」滚存结果，写回 MaterialStorage.current_qty/current_price，
+ * 使小程序毛料库存与 PurchaseWarehouse 汇总及加工扣减口径一致。
+ */
+export async function persistRollforwardClosingToMaterialStorage(endYmd: string): Promise<{
+  success: boolean;
+  updated: number;
+  skippedFrozen: number;
+  endYmd: string;
+}> {
+  const snapshot = await getClosingStateThroughDate(endYmd);
+  let updated = 0;
+  let skippedFrozen = 0;
+
+  await prisma.$transaction(async (tx) => {
+    for (const row of snapshot) {
+      const alias = norm(row.aliasName);
+      if (alias && ROLL_FORWARD_FROZEN_ALIASES.has(alias)) {
+        skippedFrozen++;
+        continue;
+      }
+      await tx.materialStorage.update({
+        where: { id: row.id },
+        data: {
+          currentQty: row.qty,
+          currentPrice: row.price,
+        },
+      });
+      updated++;
+    }
+  });
+
+  return { success: true, updated, skippedFrozen, endYmd };
 }

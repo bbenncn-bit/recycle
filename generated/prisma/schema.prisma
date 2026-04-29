@@ -613,3 +613,16 @@ model MaterialCostCache {
   @@index([deliveryDate])
   @@map("MaterialCostCache")
 }
+
+/// 运维控制台账号（Web 登录，与业务用户分离）
+model OpsConsoleUser {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(64)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  lastLoginAt  DateTime? @map("last_login_at") @db.DateTime(0)
+  lastLoginIp  String?   @map("last_login_ip") @db.VarChar(45)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.DateTime(0)
+
+  @@map("OpsConsoleUser")
+}

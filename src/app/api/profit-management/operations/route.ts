@@ -5,28 +5,19 @@ import {
   syncMaterialStorageFromPurchase,
   rebuildMaterialStorageFromPurchase,
   refreshMaterialCostCache,
+  reconcileProductStockWithProcessing,
 } from '@/lib/services/inventory-ops-service';
 import { deleteProcessingOrderWithRollback } from '@/lib/services/processing-order-delete-service';
+import { assertInventoryOpsAuthorized } from '@/lib/inventory-ops-request-auth';
+import { verifyOpsSessionFromRequest } from '@/lib/ops-auth';
 
-function verifyOpsSecret(request: Request): NextResponse | null {
-  const secret = process.env.INVENTORY_OPS_SECRET?.trim();
-  if (!secret) return null;
-  const h = request.headers.get('x-inventory-ops-secret')?.trim();
-  if (h !== secret) {
-    return NextResponse.json({ success: false, error: '未授权（请配置请求头 x-inventory-ops-secret）' }, { status: 401 });
-  }
-  return null;
-}
-
-/** 加工单管理员删除：须已配置并匹配 INVENTORY_OPS_SECRET */
-function canProcessingDeleteAdmin(request: Request): boolean {
-  const secret = process.env.INVENTORY_OPS_SECRET?.trim();
-  if (!secret) return false;
-  return request.headers.get('x-inventory-ops-secret')?.trim() === secret;
+/** 加工单管理员删除：已登录运维账号即可（不需 openid） */
+function canProcessingDeleteAdmin(hasOpsSession: boolean): boolean {
+  return hasOpsSession;
 }
 
 export async function GET(request: Request) {
-  const denied = verifyOpsSecret(request);
+  const denied = await assertInventoryOpsAuthorized(request);
   if (denied) return denied;
 
   try {
@@ -58,11 +49,14 @@ type PostBody =
   | { action: 'syncPurchase'; maxRows?: number; trigger?: string }
   | { action: 'rebuildPurchase'; touchOnlyMatched?: boolean }
   | { action: 'refreshMaterialCostCache'; startDate: string; endDate: string }
-  | { action: 'deleteProcessingOrder'; id: number; openid?: string | null };
+  | { action: 'deleteProcessingOrder'; id: number; openid?: string | null }
+  | { action: 'reconcileProductStock'; apply?: boolean; tolerance?: number };
 
 export async function POST(request: Request) {
-  const denied = verifyOpsSecret(request);
+  const denied = await assertInventoryOpsAuthorized(request);
   if (denied) return denied;
+
+  const opsSession = await verifyOpsSessionFromRequest(request);
 
   try {
     const body = (await request.json()) as PostBody;
@@ -94,7 +88,7 @@ export async function POST(request: Request) {
     if (action === 'deleteProcessingOrder') {
       const id = Number((body as { id?: unknown }).id);
       const openid = (body as { openid?: string | null }).openid ?? null;
-      const adminBypass = canProcessingDeleteAdmin(request);
+      const adminBypass = canProcessingDeleteAdmin(!!opsSession);
       const result = await deleteProcessingOrderWithRollback({
         id,
         openid: typeof openid === 'string' ? openid : null,
@@ -109,11 +103,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, data: result });
     }
 
+    if (action === 'reconcileProductStock') {
+      const payload = body as { apply?: boolean; tolerance?: number };
+      const result = await reconcileProductStockWithProcessing({
+        apply: payload.apply === true,
+        tolerance: payload.tolerance,
+      });
+      return NextResponse.json({ success: true, data: result });
+    }
+
     return NextResponse.json(
       {
         success: false,
         error:
-          '未知 action（syncPurchase | rebuildPurchase | refreshMaterialCostCache | deleteProcessingOrder）',
+          '未知 action（syncPurchase | rebuildPurchase | refreshMaterialCostCache | deleteProcessingOrder | reconcileProductStock）',
       },
       { status: 400 }
     );

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getReceiptfgDataBatch } from './api/receiptfg/fetch-batch';
 import { getReceiptfcDataBatch } from './api/receiptfc/fetch-batch';
 import ProgressiveTableWithPagination from '../components/progressive-table-with-pagination';
-import { getLocalMonthToDateKeysDescending } from '@/lib/receipt-home-dates';
+import { getHomeDateOptions, HOME_DEFAULT_DATE_KEY } from '@/lib/receipt-home-dates';
 
 interface TableData {
   id: number;
@@ -29,9 +29,9 @@ export default function Page() {
   const [datesReady, setDatesReady] = useState(false);
 
   useEffect(() => {
-    const keys = getLocalMonthToDateKeysDescending();
+    const keys = getHomeDateOptions();
     setDateOptions(keys);
-    setSelectedDate(keys[0] ?? '');
+    setSelectedDate(HOME_DEFAULT_DATE_KEY);
     setDatesReady(true);
   }, []);
 
@@ -109,7 +109,10 @@ export default function Page() {
     return fcAmount + fgAmount;
   };
 
-  const tableSubtitle = `${selectedDate} 全天交易记录`;
+  const tableSubtitle =
+    selectedDate === HOME_DEFAULT_DATE_KEY
+      ? '默认窗口：今日00:00-02:00 + 昨日全天（按时间倒序）'
+      : `${selectedDate} 全天交易记录（按时间倒序）`;
 
   return (
     <main className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -127,7 +130,7 @@ export default function Page() {
               >
                 {dateOptions.map((d) => (
                   <option key={d} value={d}>
-                    {d}
+                    {d === HOME_DEFAULT_DATE_KEY ? '默认（今日00:00-02:00 + 昨日）' : d}
                   </option>
                 ))}
               </select>

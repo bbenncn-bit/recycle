@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-const SECRET_STORAGE_KEY = 'inventory-ops-secret';
+const JSON_HEADERS: HeadersInit = { 'Content-Type': 'application/json' };
 
 type StatusPayload = {
   syncStateTable: boolean;
@@ -24,6 +24,8 @@ type StatusPayload = {
   }>;
 };
 
+type Me = { username: string };
+
 function formatYmd(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -39,14 +41,7 @@ function defaultCacheRange(): { start: string; end: string } {
 }
 
 export default function ProfitOperationsPage() {
-  const [secret, setSecret] = useState(() => {
-    if (typeof window === 'undefined') return '';
-    try {
-      return localStorage.getItem(SECRET_STORAGE_KEY) || '';
-    } catch {
-      return '';
-    }
-  });
+  const [me, setMe] = useState<Me | null>(null);
   const [status, setStatus] = useState<StatusPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,19 +52,32 @@ export default function ProfitOperationsPage() {
   const [deleteOrderId, setDeleteOrderId] = useState('');
   const [deleteOrderOpenid, setDeleteOrderOpenid] = useState('');
 
-  const headers = useMemo((): HeadersInit => {
-    const h: HeadersInit = { 'Content-Type': 'application/json' };
-    if (secret.trim()) {
-      (h as Record<string, string>)['x-inventory-ops-secret'] = secret.trim();
-    }
-    return h;
-  }, [secret]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/ops-auth/me', { credentials: 'same-origin' });
+        const json = await res.json();
+        if (!cancelled && res.ok && json.success && json.data?.username) {
+          setMe({ username: json.data.username as string });
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const loadStatus = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await fetch('/api/profit-management/operations?logLimit=80', { headers });
+      const res = await fetch('/api/profit-management/operations?logLimit=80', {
+        headers: JSON_HEADERS,
+        credentials: 'same-origin',
+      });
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.error || `HTTP ${res.status}`);
@@ -81,21 +89,11 @@ export default function ProfitOperationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [headers]);
+  }, []);
 
   useEffect(() => {
     loadStatus();
   }, [loadStatus]);
-
-  const persistSecret = () => {
-    try {
-      if (secret.trim()) localStorage.setItem(SECRET_STORAGE_KEY, secret.trim());
-      else localStorage.removeItem(SECRET_STORAGE_KEY);
-    } catch {
-      /* ignore */
-    }
-    loadStatus();
-  };
 
   const postAction = async (body: Record<string, unknown>) => {
     const label = String(body.action || 'request');
@@ -104,7 +102,8 @@ export default function ProfitOperationsPage() {
     try {
       const res = await fetch('/api/profit-management/operations', {
         method: 'POST',
-        headers,
+        headers: JSON_HEADERS,
+        credentials: 'same-origin',
         body: JSON.stringify(body),
       });
       const json = await res.json();
@@ -120,49 +119,97 @@ export default function ProfitOperationsPage() {
     }
   };
 
+  const logout = async () => {
+    await fetch('/api/ops-auth/logout', { method: 'POST', credentials: 'same-origin' });
+    window.location.href = '/profit-management/operations/login';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">算账经营 · 运维</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            采购同步、加工单删除回滚、材料成本缓存等。与小程序/云函数共用同一 MySQL。
-          </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">算账经营 · 运维</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              高权限操作。与小程序/云函数共用同一 MySQL。按分类使用，避免在业务未要求时全量重算。
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            {me && (
+              <span className="text-gray-600 dark:text-gray-300">
+                已登录 <span className="font-medium text-gray-900 dark:text-white">{me.username}</span>
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={logout}
+              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-gray-800 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+              退出
+            </button>
+          </div>
         </div>
+
+        <section className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-950/40 dark:text-slate-200">
+          <h2 className="font-medium text-slate-900 dark:text-slate-100">何时用哪一块</h2>
+          <ul className="mt-2 list-inside list-disc space-y-1.5 opacity-95">
+            <li>
+              <strong>基地采购 → 毛料库存</strong>：向 <code className="rounded bg-black/10 px-1">PurchaseWarehouse</code>{' '}
+              新增行后，可用本页「增量同步」；或使用{' '}
+              <strong className="text-slate-900 dark:text-slate-100">
+                pm2 长驻进程自动同步
+              </strong>
+              （见仓库 <code className="rounded bg-black/10 px-1">ecosystem.config.cjs</code>
+              ）。推荐在 MySQL 执行 <code className="rounded bg-black/10 px-1">prisma/sql/purchase_warehouse_sync_signal.sql</code>
+              ：入库表有 INSERT/UPDATE 时才置「待同步」标志；无变更时每轮只做单行查询，不做大表 COUNT。轮询间隔由{' '}
+              <code className="rounded bg-black/10 px-1">PURCHASE_AUTO_SYNC_INTERVAL_MS</code> 决定（如 15000 ={' '}
+              <strong>15 秒</strong>，不是 1.5 秒）。无长驻 Node 时用{' '}
+              <code className="rounded bg-black/10 px-1">CRON_SYNC_SECRET</code> +{' '}
+              <code className="rounded bg-black/10 px-1">POST /api/cron/sync-purchase-material</code>。
+            </li>
+            <li>
+              <strong>材料成本缓存</strong>：利润分析页数据异常、或期间内采购/生产有大批变更后，按日期范围刷新。
+            </li>
+            <li>
+              <strong>加工单删除</strong>：需撤销某条已保存的加工单并回滚毛料/成品库存时；危险操作，需确认单号。
+            </li>
+            <li>
+              <strong>成品库存一致性</strong>：发现 <code className="rounded bg-black/10 px-1">ProductStock</code> 与加工汇总
+              对不上时，先「巡检」再视情况「修复」。
+            </li>
+            <li>
+              <strong>最近库存流水</strong>：审计最近毛料变动，不修改数据。
+            </li>
+          </ul>
+        </section>
+
+        <section className="rounded-lg border border-blue-200 bg-blue-50/90 p-4 text-sm text-blue-950 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-100">
+          <h2 className="font-medium text-blue-950 dark:text-blue-50">增量同步会不会打乱加工单对毛料的扣减？</h2>
+          <p className="mt-2 opacity-95">
+            <strong>不会。</strong>增量同步只扫描{' '}
+            <code className="rounded bg-black/10 px-1 dark:bg-white/15">PurchaseWarehouse.id</code> 大于游标{' '}
+            <code className="rounded bg-black/10 px-1 dark:bg-white/15">purchase_warehouse_last_id</code> 的<strong>新行</strong>
+            ，对每条基地收货行向 <code className="rounded bg-black/10 px-1 dark:bg-white/15">MaterialStorage</code>{' '}
+            做<strong>入库累加</strong>（流水类型如 PURCHASE_IN），并推进游标。加工单扣减是另一条业务流水，不会在增量同步里被撤销或覆盖。
+          </p>
+          <p className="mt-2 opacity-95">
+            界面上的 <strong>maxRows（如 2000）</strong>表示<strong>本轮最多处理多少条「尚未同步」的新入库行</strong>（分批），
+            不是按日期回溯、也不是把库存拉回某个历史切片，因此<strong>不会选到「加工单之前」再来覆盖加工影响</strong>。
+          </p>
+          <p className="mt-2 text-xs opacity-90">
+            注意：若<strong>修改</strong>了<strong>游标之前已处理过</strong>的旧入库单行，增量同步<strong>不会</strong>自动重放该行；这种情况需全量重算或手工调账。
+          </p>
+        </section>
 
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-100">
           <p className="font-medium">安全说明</p>
           <p className="mt-1 opacity-95">
-            若在生产环境设置了环境变量 <code className="rounded bg-black/10 px-1 dark:bg-white/10">INVENTORY_OPS_SECRET</code>
-            ，则须在下方填写相同密钥并在请求头携带（本页已自动附加）。未设置时本地开发可直接调用。
+            运维 API 仅接受已登录会话（HTTP-only Cookie）。请在登录后再操作；定时入库同步请使用{' '}
+            <code className="rounded bg-black/10 px-1 dark:bg-white/10">POST /api/cron/sync-purchase-material</code>。
           </p>
           <p className="mt-2 opacity-95">
-            <strong>加工单删除</strong>：配置了密钥并填写后，删除加工单可不校验录入人；未配置密钥时须在请求体传{' '}
-            <code className="rounded bg-black/10 px-1 dark:bg-white/10">openid</code> 与单据一致。
+            <strong>加工单删除</strong>：已登录运维账号时可不填 openid。
           </p>
-        </div>
-
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
-              运维密钥（可选，存浏览器本地）
-            </label>
-            <input
-              type="password"
-              autoComplete="off"
-              value={secret}
-              onChange={(e) => setSecret(e.target.value)}
-              className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
-              placeholder="与服务器 INVENTORY_OPS_SECRET 一致"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={persistSecret}
-            className="rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-          >
-            保存并刷新
-          </button>
         </div>
 
         {loadError && (
@@ -197,11 +244,15 @@ export default function ProfitOperationsPage() {
           </div>
         )}
 
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">一、基地采购与毛料库存</h2>
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">毛料库存（采购）</h2>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">采购入库 → 毛料库存</h3>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              口径与小程序一致：基地收货 SH（剔除三库），干基吨数、不含税金额。
+              口径与小程序一致：基地收货、干基吨与不含税金额；入库单行库区为「库区优先，空则仓库」。
+            </p>
+            <p className="mt-2 text-xs text-amber-800 dark:text-amber-200/90">
+              若未开启服务端自动轮询（见上文环境变量），仅写入库表不会更新 MaterialStorage，须手动增量同步或 Cron 接口。
             </p>
             <div className="mt-4 space-y-3">
               <div>
@@ -248,7 +299,7 @@ export default function ProfitOperationsPage() {
           </section>
 
           <section className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">材料成本缓存</h2>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">材料成本缓存</h3>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               执行 <code className="rounded bg-black/5 px-1 dark:bg-white/10">CALL sp_update_material_cost_cache</code>{' '}
               写入 MaterialCostCache，供利润分析页使用。
@@ -290,13 +341,14 @@ export default function ProfitOperationsPage() {
           </section>
         </div>
 
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">二、加工与成品库存</h2>
+
         <section className="rounded-lg border border-red-200 bg-white p-4 dark:border-red-900/50 dark:bg-gray-800">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">加工单删除（回滚库存）</h2>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">加工单删除（回滚库存）</h3>
           <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-            先按单据把<strong>毛料加回</strong> <code className="rounded bg-black/5 px-1 dark:bg-white/10">MaterialStorage</code>
-            ，再把<strong>成品扣减</strong> <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProductStock</code>
-            ，最后删除 <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProcessingCostInput</code> 行。若已在库里手工
-            DELETE 了加工单，本功能无法自动推断用量，需按流水或备份手工补调。
+            按单据把毛料加回 <code className="rounded bg-black/5 px-1 dark:bg-white/10">MaterialStorage</code>
+            ，成品扣减 <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProductStock</code>
+            ，再删除 <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProcessingCostInput</code>。若库内已手工删单，本功能无法推断用量。
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
@@ -312,14 +364,14 @@ export default function ProfitOperationsPage() {
             </div>
             <div>
               <label className="text-xs text-gray-600 dark:text-gray-400">
-                录入人 openid（未配置运维密钥时必填）
+                录入人 openid（不填本页已登录运维时一般可不填，与行内一致可加强校验）
               </label>
               <input
                 type="text"
                 value={deleteOrderOpenid}
                 onChange={(e) => setDeleteOrderOpenid(e.target.value)}
                 className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
-                placeholder="与行内 openid / _openid 一致"
+                placeholder="与行内 openid 一致"
               />
             </div>
           </div>
@@ -353,6 +405,43 @@ export default function ProfitOperationsPage() {
           </button>
         </section>
 
+        <section className="rounded-lg border border-indigo-200 bg-white p-4 dark:border-indigo-900/50 dark:bg-gray-800">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">库存一致性巡检 / 修复（成品）</h3>
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+            对比 <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProcessingCostInput</code> 汇总加工量与{' '}
+            <code className="rounded bg-black/5 px-1 dark:bg-white/10">ProductStock.stock_qty</code>。先巡检再修复。
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={!!busy}
+              onClick={() => postAction({ action: 'reconcileProductStock', apply: false })}
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {busy === 'reconcileProductStock' ? '执行中…' : '巡检差异（不落库）'}
+            </button>
+            <button
+              type="button"
+              disabled={!!busy}
+              onClick={() => {
+                if (
+                  !confirm(
+                    '将按 ProcessingCostInput 汇总值覆盖 ProductStock.stock_qty（仅修复差异行）。是否继续？'
+                  )
+                ) {
+                  return;
+                }
+                postAction({ action: 'reconcileProductStock', apply: true });
+              }}
+              className="rounded-md border border-indigo-600 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-100 disabled:opacity-50 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-100 dark:hover:bg-indigo-950/60"
+            >
+              {busy === 'reconcileProductStock' ? '执行中…' : '一键修复差异'}
+            </button>
+          </div>
+        </section>
+
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">三、审计</h2>
+
         {lastResult != null && (
           <section className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-950/40">
             <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">上次接口返回</h3>
@@ -365,7 +454,8 @@ export default function ProfitOperationsPage() {
         {status && status.recentLogs.length > 0 && (
           <section className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
             <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">最近库存流水</h2>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">最近库存流水</h3>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">仅展示，不修改数据。</p>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-xs">
@@ -383,9 +473,7 @@ export default function ProfitOperationsPage() {
                   {status.recentLogs.map((r) => (
                     <tr key={String(r.id)} className="text-gray-800 dark:text-gray-200">
                       <td className="whitespace-nowrap px-3 py-2 tabular-nums">
-                        {r.created_at
-                          ? new Date(r.created_at).toLocaleString('zh-CN')
-                          : '—'}
+                        {r.created_at ? new Date(r.created_at).toLocaleString('zh-CN') : '—'}
                       </td>
                       <td className="px-3 py-2">{r.change_type}</td>
                       <td className="max-w-[120px] truncate px-3 py-2" title={r.storage_area}>
@@ -395,7 +483,10 @@ export default function ProfitOperationsPage() {
                         {r.material_type}
                       </td>
                       <td className="px-3 py-2 tabular-nums">{String(r.qty_delta)}</td>
-                      <td className="max-w-[140px] truncate px-3 py-2 text-gray-600 dark:text-gray-400" title={`${r.source_type || ''} ${r.source_ref || ''}`}>
+                      <td
+                        className="max-w-[140px] truncate px-3 py-2 text-gray-600 dark:text-gray-400"
+                        title={`${r.source_type || ''} ${r.source_ref || ''}`}
+                      >
                         {r.source_type} {r.source_ref}
                       </td>
                     </tr>
@@ -414,7 +505,9 @@ function StatCard({ title, ok }: { title: string; ok: boolean }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
       <p className="text-xs text-gray-500 dark:text-gray-400">{title}</p>
-      <p className={`mt-1 text-lg font-semibold ${ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>
+      <p
+        className={`mt-1 text-lg font-semibold ${ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}
+      >
         {ok ? '已就绪' : '缺失'}
       </p>
     </div>

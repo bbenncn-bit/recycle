@@ -6,6 +6,9 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
 
+  const { startPurchaseIncrementalAutoSyncIfEnabled } = await import('@/lib/purchase-auto-sync');
+  startPurchaseIncrementalAutoSyncIfEnabled();
+
   const g = globalThis as typeof globalThis & { localStorage?: unknown };
   if (g.localStorage != null && typeof (g.localStorage as { getItem?: unknown }).getItem !== 'function') {
     const noop = () => {};

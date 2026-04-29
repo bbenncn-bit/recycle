@@ -155,13 +155,20 @@ export async function deleteProcessingOrderWithRollback(opts: {
       const productTons =
         toNum(row.daily_process_qty ?? row.dailyProcess_qty ?? row.product_tons ?? row.productTons) ?? 0;
 
+      const materialRollback: Array<{ touched: boolean; frozen?: boolean }> = [];
       for (const item of composition) {
-        await incrementMaterialStorageForProcessingDelete(
+        const r = await incrementMaterialStorageForProcessingDelete(
           item.warehouse,
           item.material,
           item.tons,
           { recordId: id, productionDate: productionDate || null },
           tx
+        );
+        materialRollback.push(r);
+      }
+      if (composition.length > 0 && materialRollback.some((r) => !r.touched)) {
+        throw new Error(
+          '毛料回滚未全部生效：MaterialStorage 未匹配到对应行（加工单存的是别名编码如 MGJKM0，需与库存表 alias_name / material_type 一致）。请检查数据后重试。'
         );
       }
 
@@ -170,7 +177,12 @@ export async function deleteProcessingOrderWithRollback(opts: {
           productName,
           productWarehouse || null,
           productTons,
-          tx
+          tx,
+          {
+            recordId: id,
+            businessDate: productionDate || null,
+            note: 'deleteProcessingOrder 成品回滚扣减',
+          }
         );
       }
 

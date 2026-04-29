@@ -1058,15 +1058,19 @@ export default function CostAnalysis() {
                     </label>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                  {data.summary.todayCost.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  万元，吨数 {todayTotalQty.toFixed(2)} 吨
+                <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tabular-nums leading-snug">
+                  {data.summary.todayCost.toFixed(2)}万元{' '}
+                  <span className="font-semibold">{todayTotalQty.toFixed(2)} 吨</span>
                 </p>
                 <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  <div>基地收货 {data.summary.todayBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.todayBaseSelfQty.toFixed(2)} 吨</div>
-                  <div>基地买货 {data.summary.todayBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.todayBasePurchaseQty.toFixed(2)} 吨</div>
+                  <div>
+                    基地收货 {data.summary.todayBaseSelfQty.toFixed(2)} 吨{' '}
+                    {data.summary.todayBaseSelfCost.toFixed(2)}万元
+                  </div>
+                  <div>
+                    基地买货 {data.summary.todayBasePurchaseQty.toFixed(2)} 吨{' '}
+                    {data.summary.todayBasePurchaseCost.toFixed(2)}万元
+                  </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -1091,15 +1095,19 @@ export default function CostAnalysis() {
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 最近一周成本
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                {data.summary.weekCost.toFixed(2)} 万元
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                吨数 {weekTotalQty.toFixed(2)} 吨
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2 tabular-nums leading-snug">
+                {data.summary.weekCost.toFixed(2)}万元{' '}
+                <span className="font-semibold">{weekTotalQty.toFixed(2)} 吨</span>
               </p>
               <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                <div>基地收货 {data.summary.weekBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.weekBaseSelfQty.toFixed(2)} 吨</div>
-                <div>基地买货 {data.summary.weekBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.weekBasePurchaseQty.toFixed(2)} 吨</div>
+                <div>
+                  基地收货 {data.summary.weekBaseSelfQty.toFixed(2)} 吨{' '}
+                  {data.summary.weekBaseSelfCost.toFixed(2)}万元
+                </div>
+                <div>
+                  基地买货 {data.summary.weekBasePurchaseQty.toFixed(2)} 吨{' '}
+                  {data.summary.weekBasePurchaseCost.toFixed(2)}万元
+                </div>
               </div>
             </div>
             <LazyReactECharts
@@ -1157,7 +1165,7 @@ export default function CostAnalysis() {
                                     const idx = categoryData.categories.indexOf(params.name);
                                     const avgPrice = idx >= 0 ? categoryData.avgPrices[idx] : 0;
                                     const quantity = idx >= 0 ? categoryData.quantities[idx] : 0;
-                                    return `${params.name}<br/>平均单价: ${avgPrice.toFixed(2)} 元/吨<br/>采购吨数: ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
+                                    return `${params.name}<br/>平均单价: ${avgPrice.toFixed(2)} 元/吨<br/>采购 ${quantity.toFixed(2)} 吨<br/>占比: ${params.percent.toFixed(2)}%`;
                                   }
                                 },
                                 series: [{
@@ -1306,15 +1314,19 @@ export default function CostAnalysis() {
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     本月成本
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-                    {data.summary.monthCost.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    万元，吨数 {monthTotalQty.toFixed(2)} 吨
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2 tabular-nums leading-snug">
+                    {data.summary.monthCost.toFixed(2)}万元{' '}
+                    <span className="font-semibold">{monthTotalQty.toFixed(2)} 吨</span>
                   </p>
                   <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                    <div>基地收货 {data.summary.monthBaseSelfCost.toFixed(2)} 万元，吨数 {data.summary.monthBaseSelfQty.toFixed(2)} 吨</div>
-                    <div>基地买货 {data.summary.monthBasePurchaseCost.toFixed(2)} 万元，吨数 {data.summary.monthBasePurchaseQty.toFixed(2)} 吨</div>
+                    <div>
+                      基地收货 {data.summary.monthBaseSelfQty.toFixed(2)} 吨{' '}
+                      {data.summary.monthBaseSelfCost.toFixed(2)}万元
+                    </div>
+                    <div>
+                      基地买货 {data.summary.monthBasePurchaseQty.toFixed(2)} 吨{' '}
+                      {data.summary.monthBasePurchaseCost.toFixed(2)}万元
+                    </div>
                   </div>
                 </div>
                 <div className="bg-purple-100 dark:bg-purple-900 rounded-full p-3 hidden sm:block">
