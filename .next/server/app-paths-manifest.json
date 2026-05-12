@@ -1,8 +1,0 @@
-{
-  "/api/profit-management/cost-analysis/material-inventory/route": "app/api/profit-management/cost-analysis/material-inventory/route.js",
-  "/api/profit-management/cost-analysis/inventory-value/route": "app/api/profit-management/cost-analysis/inventory-value/route.js",
-  "/api/profit-management/cost-analysis/route": "app/api/profit-management/cost-analysis/route.js",
-  "/page": "app/page.js",
-  "/profit-management/profit-analysis/page": "app/profit-management/profit-analysis/page.js",
-  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js"
-}
