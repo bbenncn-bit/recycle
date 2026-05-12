@@ -1,80 +1,55 @@
 {
   "pages": {
-    "/_not-found/page": [
-      "static/chunks/[root-of-the-server]__9f3cc993._.css",
-      "static/chunks/node_modules_987eaa26._.js",
-      "static/chunks/src_components_f2455c27._.js",
-      "static/chunks/src_app_layout_tsx_007ca514._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_17e42fcf._.js",
-      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
-      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
-      "static/chunks/node_modules_next_dist_0eb1e458._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
-      "static/chunks/_e69f0d32._.js",
-      "static/chunks/_a894171a._.js"
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
     "/page": [
-      "static/chunks/[root-of-the-server]__9f3cc993._.css",
-      "static/chunks/node_modules_987eaa26._.js",
-      "static/chunks/src_components_f2455c27._.js",
-      "static/chunks/src_app_layout_tsx_007ca514._.js",
-      "static/chunks/src_e388a9c7._.js",
-      "static/chunks/node_modules_981d6cf7._.js",
-      "static/chunks/src_app_page_tsx_1616dd05._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_17e42fcf._.js",
-      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
-      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
-      "static/chunks/node_modules_next_dist_0eb1e458._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
-      "static/chunks/_e69f0d32._.js",
-      "static/chunks/_a894171a._.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/api/receiptfc/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/receiptfc/route.js"
+    ],
+    "/api/receiptfg/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/receiptfg/route.js"
+    ],
+    "/profit-management/profit-analysis/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profit-management/profit-analysis/page.js"
+    ],
+    "/api/profit-management/profit-analysis/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/profit-analysis/route.js"
     ],
     "/profit-management/cost-analysis/page": [
-      "static/chunks/[root-of-the-server]__9f3cc993._.css",
-      "static/chunks/node_modules_987eaa26._.js",
-      "static/chunks/src_components_f2455c27._.js",
-      "static/chunks/src_app_layout_tsx_007ca514._.js",
-      "static/chunks/node_modules_ccc48948._.js",
-      "static/chunks/src_643824ef._.js",
-      "static/chunks/node_modules_next_dist_shared_lib_0f9809d8._.js",
-      "static/chunks/src_app_profit-management_cost-analysis_page_tsx_1616dd05._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_17e42fcf._.js",
-      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
-      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
-      "static/chunks/node_modules_next_dist_0eb1e458._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
-      "static/chunks/_e69f0d32._.js",
-      "static/chunks/_a894171a._.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profit-management/cost-analysis/page.js"
     ],
-    "/profit-management/operations/login/page": [
-      "static/chunks/[root-of-the-server]__9f3cc993._.css",
-      "static/chunks/node_modules_987eaa26._.js",
-      "static/chunks/src_components_f2455c27._.js",
-      "static/chunks/src_app_layout_tsx_007ca514._.js",
-      "static/chunks/src_app_profit-management_operations_login_page_tsx_70d65b6a._.js",
-      "static/chunks/src_app_profit-management_operations_login_page_tsx_1616dd05._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_17e42fcf._.js",
-      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
-      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
-      "static/chunks/node_modules_next_dist_0eb1e458._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
-      "static/chunks/_e69f0d32._.js",
-      "static/chunks/_a894171a._.js"
+    "/api/profit-management/cost-analysis/material-inventory/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/cost-analysis/material-inventory/route.js"
     ],
-    "/profit-management/operations/page": [
-      "static/chunks/[root-of-the-server]__9f3cc993._.css",
-      "static/chunks/node_modules_987eaa26._.js",
-      "static/chunks/src_components_f2455c27._.js",
-      "static/chunks/src_app_layout_tsx_007ca514._.js",
-      "static/chunks/src_app_profit-management_operations_page_tsx_b9129b49._.js",
-      "static/chunks/src_app_profit-management_operations_page_tsx_1616dd05._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_17e42fcf._.js",
-      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
-      "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
-      "static/chunks/node_modules_next_dist_0eb1e458._.js",
-      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
-      "static/chunks/_e69f0d32._.js",
-      "static/chunks/_a894171a._.js"
+    "/api/profit-management/cost-analysis/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/cost-analysis/route.js"
+    ],
+    "/api/profit-management/cost-analysis/inventory-value/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/profit-management/cost-analysis/inventory-value/route.js"
     ]
   }
 }

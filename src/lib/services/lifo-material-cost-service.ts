@@ -1,5 +1,90 @@
 import { prisma } from '@/lib/prismadb';
+import { getProcessingCostMaterialQtyFieldLabels } from '@/lib/processing-cost-input-material-columns';
 import { parseWarehouseDate } from './profit-service';
+
+function getRecordField(record: Record<string, unknown>, canonical: string): unknown {
+  if (canonical in record) return (record as any)[canonical];
+  const lower = canonical.toLowerCase();
+  for (const k of Object.keys(record)) {
+    if (k.toLowerCase() === lower) return (record as any)[k];
+  }
+  return undefined;
+}
+
+/** ProcessingCostInput 实际列名（小写 -> information_schema 中的名字）；一次缓存 */
+let pciColumnLowerToActual: Map<string, string> | null = null;
+/** 已按当前表结构拼好的 SELECT 列清单（仅含存在的列） */
+let pciSelectListSql: string | null = null;
+
+function quoteMysqlIdent(name: string): string {
+  return '`' + name.replace(/`/g, '``') + '`';
+}
+
+/**
+ * 部分库仅有 material_composition，或列名已切换为 MSLKM4_qty 等 alias 列；动态探测列，
+ * 避免 SELECT 引用不存在的列触发 1054 导致整页利润明细失败。
+ */
+async function getProcessingCostInputSelectShape(): Promise<{
+  selectListSql: string;
+  hasProductionDate: boolean;
+  lowerToActual: Map<string, string>;
+}> {
+  if (pciSelectListSql !== null && pciColumnLowerToActual !== null) {
+    return {
+      selectListSql: pciSelectListSql,
+      hasProductionDate: pciColumnLowerToActual.has('production_date'),
+      lowerToActual: pciColumnLowerToActual,
+    };
+  }
+
+  let lowerToActual = new Map<string, string>();
+  try {
+    const rows = await prisma.$queryRaw<Array<{ COLUMN_NAME: string }>>`
+      SELECT COLUMN_NAME
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND LOWER(TABLE_NAME) = LOWER('ProcessingCostInput')
+    `;
+    for (const r of rows) {
+      if (r.COLUMN_NAME) lowerToActual.set(r.COLUMN_NAME.toLowerCase(), r.COLUMN_NAME);
+    }
+  } catch {
+    lowerToActual = new Map();
+  }
+
+  pciColumnLowerToActual = lowerToActual;
+
+  const parts: string[] = [];
+  const addCanonical = (canonical: string) => {
+    const actual = lowerToActual.get(canonical.toLowerCase());
+    if (!actual) return;
+    if (actual === canonical) {
+      parts.push(quoteMysqlIdent(actual));
+    } else {
+      parts.push(`${quoteMysqlIdent(actual)} AS ${quoteMysqlIdent(canonical)}`);
+    }
+  };
+
+  addCanonical('id');
+  addCanonical('production_date');
+  addCanonical('dailyProcess_qty');
+  addCanonical('product_tons');
+  addCanonical('material_composition');
+
+  for (const qtyKey of Object.keys(getProcessingCostMaterialQtyFieldLabels())) {
+    const priceKey = qtyKey.replace(/_qty$/i, '_price');
+    addCanonical(qtyKey);
+    addCanonical(priceKey);
+  }
+
+  pciSelectListSql = parts.length > 0 ? parts.join(',\n          ') : '`id`';
+
+  return {
+    selectListSql: pciSelectListSql,
+    hasProductionDate: lowerToActual.has('production_date'),
+    lowerToActual,
+  };
+}
 
 /**
  * 处理数值：将 Decimal 转换为 number，处理 null 值
@@ -55,33 +140,6 @@ export function parseProductionDate(dateStr: string | null): Date | null {
 
   return null;
 }
-
-/**
- * 原材料字段映射：从 ProcessingCostInput 表的字段名到材料名称（历史 M 列口径）
- */
-const MATERIAL_FIELD_MAP: Record<string, string> = {
-  M1_qty: '优质毛料M1',
-  M2_qty: '重型折旧毛料M2',
-  M3_qty: '重型加工毛料M3',
-  M4_qty: '中型折旧毛料M4',
-  M5_qty: 'M5',
-  M6_qty: '小型折旧毛料M6',
-  M7_qty: '小型加工毛料M7',
-  M8_qty: '轻薄折旧毛料M8',
-  M9_qty: '轻薄加工毛料M9',
-  wireRope_qty: '钢丝绳',
-  carShell_qty: '汽车小轿壳',
-  pigIron_qty: '生铁毛料',
-  scrap_qty: '渣钢',
-  carDismantle_qty: '汽拆',
-  transfer_qty: '移库',
-  auxiliary_qty: '辅料',
-  material1_qty: 'material1',
-  material2_qty: 'material2',
-  material3_qty: 'material3',
-  material4_qty: 'material4',
-  material5_qty: 'material5',
-};
 
 /**
  * 解析 material_composition（小程序写入的 JSON），优先于 M*_qty 列（2026-04 起多库区同类毛料并存）
@@ -152,10 +210,11 @@ function extractMaterialCosts(record: any): Array<{
 
   const materials: Array<{ material: string; qty: number; price: number; cost: number }> = [];
 
-  for (const [qtyField, materialName] of Object.entries(MATERIAL_FIELD_MAP)) {
-    const priceField = qtyField.replace('_qty', '_price');
-    const qty = processDecimal((record as any)[qtyField]);
-    const price = processDecimal((record as any)[priceField]);
+  const fieldLabels = getProcessingCostMaterialQtyFieldLabels();
+  for (const [qtyField, materialName] of Object.entries(fieldLabels)) {
+    const priceField = qtyField.replace(/_qty$/i, '_price');
+    const qty = processDecimal(getRecordField(record as Record<string, unknown>, qtyField));
+    const price = processDecimal(getRecordField(record as Record<string, unknown>, priceField));
 
     if (qty > 0 && price > 0) {
       materials.push({
@@ -233,59 +292,42 @@ export async function calculateLIFOMaterialCost(
 
   try {
     // 查询该成品的所有生产记录（按生产日期倒序，LIFO：后进先出）
-    const whereClause: any = {
-      productName: productName,
-    };
-    if (productWarehouse) {
-      whereClause.productWarehouse = productWarehouse;
-    }
-
-    // 直接使用 raw query 查询所有字段（因为 Prisma schema 没有包含所有详细字段如 M1_qty, M1_price, dailyProcess_qty 等）
+    // 直接使用 raw query；列清单按 information_schema 动态生成，避免库未建 M1_qty 等列时 1054 导致整页失败
     let detailedRecords: any[] = [];
     try {
-      // 尝试使用 Prisma 查询所有字段
-      // 使用 $queryRawUnsafe 进行查询（需要转义参数以防止 SQL 注入）
       const escapedProductName = (productName || '').replace(/'/g, "''");
+      const shape = await getProcessingCostInputSelectShape();
+      if (!shape.hasProductionDate) {
+        console.warn(
+          'ProcessingCostInput 表缺少 production_date 列，无法执行 LIFO 材料成本查询',
+        );
+        return { cost: 0, composition: [], productionRecords: [] };
+      }
+      const colProductName = shape.lowerToActual.get('product_name');
+      if (!colProductName) {
+        console.warn('ProcessingCostInput 表缺少 product_name 列，无法执行 LIFO');
+        return { cost: 0, composition: [], productionRecords: [] };
+      }
+      const colProductionDate = shape.lowerToActual.get('production_date')!;
+
       let rawQuery = `
         SELECT 
-          id,
-          production_date,
-          dailyProcess_qty,
-          product_tons,
-          material_composition,
-          M1_qty, M1_price,
-          M2_qty, M2_price,
-          M3_qty, M3_price,
-          M4_qty, M4_price,
-          M5_qty, M5_price,
-          M6_qty, M6_price,
-          M7_qty, M7_price,
-          M8_qty, M8_price,
-          M9_qty, M9_price,
-          wireRope_qty, wireRope_price,
-          carShell_qty, carShell_price,
-          pigIron_qty, pigIron_price,
-          scrap_qty, scrap_price,
-          carDismantle_qty, carDismantle_price,
-          transfer_qty, transfer_price,
-          auxiliary_qty, auxiliary_price,
-          material1_qty, material1_price,
-          material2_qty, material2_price,
-          material3_qty, material3_price,
-          material4_qty, material4_price,
-          material5_qty, material5_price
+          ${shape.selectListSql}
         FROM ProcessingCostInput
-        WHERE product_name = '${escapedProductName}'
+        WHERE ${quoteMysqlIdent(colProductName)} = '${escapedProductName}'
       `;
 
       if (productWarehouse) {
-        const escapedWarehouse = (productWarehouse || '').replace(/'/g, "''");
-        rawQuery += ` AND product_warehouse = '${escapedWarehouse}'`;
+        const whCol = shape.lowerToActual.get('product_warehouse');
+        if (whCol) {
+          const escapedWarehouse = (productWarehouse || '').replace(/'/g, "''");
+          rawQuery += ` AND ${quoteMysqlIdent(whCol)} = '${escapedWarehouse}'`;
+        }
       }
 
-      rawQuery += ` AND production_date IS NOT NULL ORDER BY production_date DESC`;
+      rawQuery += ` AND ${quoteMysqlIdent(colProductionDate)} IS NOT NULL ORDER BY ${quoteMysqlIdent(colProductionDate)} DESC`;
 
-      detailedRecords = await prisma.$queryRawUnsafe(rawQuery) as any[];
+      detailedRecords = (await prisma.$queryRawUnsafe(rawQuery)) as any[];
       
       if (!detailedRecords || detailedRecords.length === 0) {
         console.warn(`未找到 ${productName}${productWarehouse ? ` (${productWarehouse})` : ''} 的生产记录`);

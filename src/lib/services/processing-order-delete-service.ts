@@ -3,27 +3,7 @@ import {
   decrementProductStockForProcessingDelete,
   incrementMaterialStorageForProcessingDelete,
 } from '@/lib/services/inventory-ops-service';
-
-/** 与云函数 mysql/index.js MATERIAL_ALIAS_COLUMN_PREFIXES 一致 */
-const MATERIAL_ALIAS_PREFIXES = [
-  'MSLKM4',
-  'MSLKM2',
-  'MSLKM',
-  'MSLKM0',
-  'MSLKM6',
-  'MJSJM4',
-  'MJSJM2',
-  'MCKKM',
-  'MCKKM0',
-  'MGJKM0',
-  'MGJKM10',
-  'MLKM2',
-  'MLKM',
-  'MLKQ1M2',
-  'MLKQ1M0',
-  'MLKQ1M6',
-  'FL1',
-] as const;
+import { MATERIAL_ALIAS_PREFIXES } from '@/lib/processing-cost-input-material-columns';
 
 function norm(s: unknown): string {
   return (s != null ? String(s) : '').trim();

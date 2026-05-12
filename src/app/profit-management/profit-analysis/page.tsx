@@ -48,6 +48,8 @@ interface ProfitAnalysisData {
     deliveryNumber: string;
     deliveryDate: string;
     productType: string;
+    /** 表格成品名称：warehouse 优先 */
+    productDisplayName: string;
     warehouse: string;
     customer: string;
     settlementQuantity: number;
@@ -914,7 +916,9 @@ export default function ProfitAnalysis() {
                   >
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryNumber}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryDate}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.productType}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {sale.productDisplayName || sale.warehouse || sale.productType}
+                    </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.customer}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.settlementQuantity.toFixed(2)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.revenue.toFixed(2)}</td>
@@ -1068,7 +1072,13 @@ export default function ProfitAnalysis() {
               </h3>
               <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                 <div>发货单号: {tooltipData.sale.deliveryNumber}</div>
-                <div>成品: {tooltipData.sale.productType} ({tooltipData.sale.warehouse})</div>
+                <div>
+                  成品:{' '}
+                  {tooltipData.sale.productDisplayName ||
+                    tooltipData.sale.warehouse ||
+                    tooltipData.sale.productType}{' '}
+                  ({tooltipData.sale.productType})
+                </div>
                 <div>销售数量: {tooltipData.sale.settlementQuantity.toFixed(2)} 吨</div>
                 <div>总材料成本: {tooltipData.sale.materialCost.toFixed(2)} 元</div>
               </div>
@@ -1216,7 +1226,10 @@ export default function ProfitAnalysis() {
                   </h3>
                   <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
                     <div>发货单号: {s.deliveryNumber}</div>
-                    <div>客户: {s.customer} | 成品: {s.productType}</div>
+                    <div>
+                      客户: {s.customer} | 成品:{' '}
+                      {s.productDisplayName || s.warehouse || s.productType}
+                    </div>
                     <div>结算量: {qty.toFixed(2)} 吨</div>
                   </div>
                   <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">
@@ -1322,7 +1335,10 @@ export default function ProfitAnalysis() {
                   </h3>
                   <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
                     <div>发货单号: {s.deliveryNumber}</div>
-                    <div>客户: {s.customer} | 成品: {s.productType}</div>
+                    <div>
+                      客户: {s.customer} | 成品:{' '}
+                      {s.productDisplayName || s.warehouse || s.productType}
+                    </div>
                     <div>结算量: {qty.toFixed(2)} 吨</div>
                   </div>
                   <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">

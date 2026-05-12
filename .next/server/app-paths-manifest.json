@@ -1,15 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/ops-auth/login/route": "app/api/ops-auth/login/route.js",
-  "/api/ops-auth/logout/route": "app/api/ops-auth/logout/route.js",
-  "/api/ops-auth/me/route": "app/api/ops-auth/me/route.js",
   "/api/profit-management/cost-analysis/material-inventory/route": "app/api/profit-management/cost-analysis/material-inventory/route.js",
+  "/api/profit-management/cost-analysis/inventory-value/route": "app/api/profit-management/cost-analysis/inventory-value/route.js",
   "/api/profit-management/cost-analysis/route": "app/api/profit-management/cost-analysis/route.js",
-  "/api/profit-management/operations/route": "app/api/profit-management/operations/route.js",
-  "/api/receiptfc/route": "app/api/receiptfc/route.js",
-  "/api/receiptfg/route": "app/api/receiptfg/route.js",
   "/page": "app/page.js",
-  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js",
-  "/profit-management/operations/login/page": "app/profit-management/operations/login/page.js",
-  "/profit-management/operations/page": "app/profit-management/operations/page.js"
+  "/profit-management/profit-analysis/page": "app/profit-management/profit-analysis/page.js",
+  "/profit-management/cost-analysis/page": "app/profit-management/cost-analysis/page.js"
 }

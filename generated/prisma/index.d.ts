@@ -201,7 +201,7 @@ export type DeliverySettlement = $Result.DefaultSelection<Prisma.$DeliverySettle
 export type ProfitParamConfig = $Result.DefaultSelection<Prisma.$ProfitParamConfigPayload>
 /**
  * Model ProcessingCostInput
- * 生产情况录入表（与小程序/云函数写入一致：含 dailyProcess_qty、M*_qty 及 material_composition JSON）
+ * 生产情况录入表：毛料列 = MaterialStorage.alias_name + _qty/_price（2026-04 起）；含 material_composition JSON
  */
 export type ProcessingCostInput = $Result.DefaultSelection<Prisma.$ProcessingCostInputPayload>
 /**
@@ -39789,157 +39789,142 @@ export namespace Prisma {
 
   export type ProcessingCostInputAvgAggregateOutputType = {
     id: number | null
-    productTons: Decimal | null
+    mslkm4Qty: Decimal | null
+    mslkm4Price: Decimal | null
+    mslkm2Qty: Decimal | null
+    mslkm2Price: Decimal | null
+    mslkmQty: Decimal | null
+    mslkmPrice: Decimal | null
+    mslkm0Qty: Decimal | null
+    mslkm0Price: Decimal | null
+    mslkm6Qty: Decimal | null
+    mslkm6Price: Decimal | null
+    mjsjm4Qty: Decimal | null
+    mjsjm4Price: Decimal | null
+    mjsjm2Qty: Decimal | null
+    mjsjm2Price: Decimal | null
+    mckkmQty: Decimal | null
+    mckkmPrice: Decimal | null
+    mckkm0Qty: Decimal | null
+    mckkm0Price: Decimal | null
+    mgjkm0Qty: Decimal | null
+    mgjkm0Price: Decimal | null
+    mgjkm10Qty: Decimal | null
+    mgjkm10Price: Decimal | null
+    mlkm2Qty: Decimal | null
+    mlkm2Price: Decimal | null
+    mlkmQty: Decimal | null
+    mlkmPrice: Decimal | null
+    mlkq1m2Qty: Decimal | null
+    mlkq1m2Price: Decimal | null
+    mlkq1m0Qty: Decimal | null
+    mlkq1m0Price: Decimal | null
+    mlkq1m6Qty: Decimal | null
+    mlkq1m6Price: Decimal | null
+    fl1Qty: Decimal | null
+    fl1Price: Decimal | null
     dailyProcessQty: Decimal | null
     dailyProcessAmount: Decimal | null
     dailyProcessPrice: Decimal | null
-    M1Qty: Decimal | null
-    M1Price: Decimal | null
-    M2Qty: Decimal | null
-    M2Price: Decimal | null
-    M3Qty: Decimal | null
-    M3Price: Decimal | null
-    M4Qty: Decimal | null
-    M4Price: Decimal | null
-    M5Qty: Decimal | null
-    M5Price: Decimal | null
-    M6Qty: Decimal | null
-    M6Price: Decimal | null
-    M7Qty: Decimal | null
-    M7Price: Decimal | null
-    M8Qty: Decimal | null
-    M8Price: Decimal | null
-    M9Qty: Decimal | null
-    M9Price: Decimal | null
-    wireRopeQty: Decimal | null
-    wireRopePrice: Decimal | null
-    carShellQty: Decimal | null
-    carShellPrice: Decimal | null
-    pigIronQty: Decimal | null
-    pigIronPrice: Decimal | null
-    scrapQty: Decimal | null
-    scrapPrice: Decimal | null
-    carDismantleQty: Decimal | null
-    carDismantlePrice: Decimal | null
-    transferQty: Decimal | null
-    transferPrice: Decimal | null
-    auxiliaryQty: Decimal | null
-    auxiliaryPrice: Decimal | null
-    material1Qty: Decimal | null
-    material1Price: Decimal | null
-    material2Qty: Decimal | null
-    material2Price: Decimal | null
-    material3Qty: Decimal | null
-    material3Price: Decimal | null
-    material4Qty: Decimal | null
-    material4Price: Decimal | null
-    material5Qty: Decimal | null
-    material5Price: Decimal | null
+    productTons: Decimal | null
   }
 
   export type ProcessingCostInputSumAggregateOutputType = {
     id: number | null
-    productTons: Decimal | null
+    mslkm4Qty: Decimal | null
+    mslkm4Price: Decimal | null
+    mslkm2Qty: Decimal | null
+    mslkm2Price: Decimal | null
+    mslkmQty: Decimal | null
+    mslkmPrice: Decimal | null
+    mslkm0Qty: Decimal | null
+    mslkm0Price: Decimal | null
+    mslkm6Qty: Decimal | null
+    mslkm6Price: Decimal | null
+    mjsjm4Qty: Decimal | null
+    mjsjm4Price: Decimal | null
+    mjsjm2Qty: Decimal | null
+    mjsjm2Price: Decimal | null
+    mckkmQty: Decimal | null
+    mckkmPrice: Decimal | null
+    mckkm0Qty: Decimal | null
+    mckkm0Price: Decimal | null
+    mgjkm0Qty: Decimal | null
+    mgjkm0Price: Decimal | null
+    mgjkm10Qty: Decimal | null
+    mgjkm10Price: Decimal | null
+    mlkm2Qty: Decimal | null
+    mlkm2Price: Decimal | null
+    mlkmQty: Decimal | null
+    mlkmPrice: Decimal | null
+    mlkq1m2Qty: Decimal | null
+    mlkq1m2Price: Decimal | null
+    mlkq1m0Qty: Decimal | null
+    mlkq1m0Price: Decimal | null
+    mlkq1m6Qty: Decimal | null
+    mlkq1m6Price: Decimal | null
+    fl1Qty: Decimal | null
+    fl1Price: Decimal | null
     dailyProcessQty: Decimal | null
     dailyProcessAmount: Decimal | null
     dailyProcessPrice: Decimal | null
-    M1Qty: Decimal | null
-    M1Price: Decimal | null
-    M2Qty: Decimal | null
-    M2Price: Decimal | null
-    M3Qty: Decimal | null
-    M3Price: Decimal | null
-    M4Qty: Decimal | null
-    M4Price: Decimal | null
-    M5Qty: Decimal | null
-    M5Price: Decimal | null
-    M6Qty: Decimal | null
-    M6Price: Decimal | null
-    M7Qty: Decimal | null
-    M7Price: Decimal | null
-    M8Qty: Decimal | null
-    M8Price: Decimal | null
-    M9Qty: Decimal | null
-    M9Price: Decimal | null
-    wireRopeQty: Decimal | null
-    wireRopePrice: Decimal | null
-    carShellQty: Decimal | null
-    carShellPrice: Decimal | null
-    pigIronQty: Decimal | null
-    pigIronPrice: Decimal | null
-    scrapQty: Decimal | null
-    scrapPrice: Decimal | null
-    carDismantleQty: Decimal | null
-    carDismantlePrice: Decimal | null
-    transferQty: Decimal | null
-    transferPrice: Decimal | null
-    auxiliaryQty: Decimal | null
-    auxiliaryPrice: Decimal | null
-    material1Qty: Decimal | null
-    material1Price: Decimal | null
-    material2Qty: Decimal | null
-    material2Price: Decimal | null
-    material3Qty: Decimal | null
-    material3Price: Decimal | null
-    material4Qty: Decimal | null
-    material4Price: Decimal | null
-    material5Qty: Decimal | null
-    material5Price: Decimal | null
+    productTons: Decimal | null
   }
 
   export type ProcessingCostInputMinAggregateOutputType = {
     id: number | null
     productName: string | null
     productWarehouse: string | null
-    productTons: Decimal | null
+    productionDate: string | null
+    materialWarehouses: string | null
+    mslkm4Qty: Decimal | null
+    mslkm4Price: Decimal | null
+    mslkm2Qty: Decimal | null
+    mslkm2Price: Decimal | null
+    mslkmQty: Decimal | null
+    mslkmPrice: Decimal | null
+    mslkm0Qty: Decimal | null
+    mslkm0Price: Decimal | null
+    mslkm6Qty: Decimal | null
+    mslkm6Price: Decimal | null
+    mjsjm4Qty: Decimal | null
+    mjsjm4Price: Decimal | null
+    mjsjm2Qty: Decimal | null
+    mjsjm2Price: Decimal | null
+    mckkmQty: Decimal | null
+    mckkmPrice: Decimal | null
+    mckkm0Qty: Decimal | null
+    mckkm0Price: Decimal | null
+    mgjkm0Qty: Decimal | null
+    mgjkm0Price: Decimal | null
+    mgjkm10Qty: Decimal | null
+    mgjkm10Price: Decimal | null
+    mlkm2Qty: Decimal | null
+    mlkm2Price: Decimal | null
+    mlkmQty: Decimal | null
+    mlkmPrice: Decimal | null
+    mlkq1m2Qty: Decimal | null
+    mlkq1m2Price: Decimal | null
+    mlkq1m0Qty: Decimal | null
+    mlkq1m0Price: Decimal | null
+    mlkq1m6Qty: Decimal | null
+    mlkq1m6Price: Decimal | null
+    fl1Qty: Decimal | null
+    fl1Price: Decimal | null
     dailyProcessQty: Decimal | null
     dailyProcessAmount: Decimal | null
     dailyProcessPrice: Decimal | null
-    productionDate: string | null
-    materialWarehouses: string | null
+    dep: string | null
     openid: string | null
-    M1Qty: Decimal | null
-    M1Price: Decimal | null
-    M2Qty: Decimal | null
-    M2Price: Decimal | null
-    M3Qty: Decimal | null
-    M3Price: Decimal | null
-    M4Qty: Decimal | null
-    M4Price: Decimal | null
-    M5Qty: Decimal | null
-    M5Price: Decimal | null
-    M6Qty: Decimal | null
-    M6Price: Decimal | null
-    M7Qty: Decimal | null
-    M7Price: Decimal | null
-    M8Qty: Decimal | null
-    M8Price: Decimal | null
-    M9Qty: Decimal | null
-    M9Price: Decimal | null
-    wireRopeQty: Decimal | null
-    wireRopePrice: Decimal | null
-    carShellQty: Decimal | null
-    carShellPrice: Decimal | null
-    pigIronQty: Decimal | null
-    pigIronPrice: Decimal | null
-    scrapQty: Decimal | null
-    scrapPrice: Decimal | null
-    carDismantleQty: Decimal | null
-    carDismantlePrice: Decimal | null
-    transferQty: Decimal | null
-    transferPrice: Decimal | null
-    auxiliaryQty: Decimal | null
-    auxiliaryPrice: Decimal | null
-    material1Qty: Decimal | null
-    material1Price: Decimal | null
-    material2Qty: Decimal | null
-    material2Price: Decimal | null
-    material3Qty: Decimal | null
-    material3Price: Decimal | null
-    material4Qty: Decimal | null
-    material4Price: Decimal | null
-    material5Qty: Decimal | null
-    material5Price: Decimal | null
+    phone: string | null
+    name: string | null
+    updateBy: string | null
+    createBy: string | null
+    owner: string | null
+    cloudId: string | null
+    mainDep: string | null
+    cloudOpenid: string | null
+    productTons: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -39948,55 +39933,56 @@ export namespace Prisma {
     id: number | null
     productName: string | null
     productWarehouse: string | null
-    productTons: Decimal | null
+    productionDate: string | null
+    materialWarehouses: string | null
+    mslkm4Qty: Decimal | null
+    mslkm4Price: Decimal | null
+    mslkm2Qty: Decimal | null
+    mslkm2Price: Decimal | null
+    mslkmQty: Decimal | null
+    mslkmPrice: Decimal | null
+    mslkm0Qty: Decimal | null
+    mslkm0Price: Decimal | null
+    mslkm6Qty: Decimal | null
+    mslkm6Price: Decimal | null
+    mjsjm4Qty: Decimal | null
+    mjsjm4Price: Decimal | null
+    mjsjm2Qty: Decimal | null
+    mjsjm2Price: Decimal | null
+    mckkmQty: Decimal | null
+    mckkmPrice: Decimal | null
+    mckkm0Qty: Decimal | null
+    mckkm0Price: Decimal | null
+    mgjkm0Qty: Decimal | null
+    mgjkm0Price: Decimal | null
+    mgjkm10Qty: Decimal | null
+    mgjkm10Price: Decimal | null
+    mlkm2Qty: Decimal | null
+    mlkm2Price: Decimal | null
+    mlkmQty: Decimal | null
+    mlkmPrice: Decimal | null
+    mlkq1m2Qty: Decimal | null
+    mlkq1m2Price: Decimal | null
+    mlkq1m0Qty: Decimal | null
+    mlkq1m0Price: Decimal | null
+    mlkq1m6Qty: Decimal | null
+    mlkq1m6Price: Decimal | null
+    fl1Qty: Decimal | null
+    fl1Price: Decimal | null
     dailyProcessQty: Decimal | null
     dailyProcessAmount: Decimal | null
     dailyProcessPrice: Decimal | null
-    productionDate: string | null
-    materialWarehouses: string | null
+    dep: string | null
     openid: string | null
-    M1Qty: Decimal | null
-    M1Price: Decimal | null
-    M2Qty: Decimal | null
-    M2Price: Decimal | null
-    M3Qty: Decimal | null
-    M3Price: Decimal | null
-    M4Qty: Decimal | null
-    M4Price: Decimal | null
-    M5Qty: Decimal | null
-    M5Price: Decimal | null
-    M6Qty: Decimal | null
-    M6Price: Decimal | null
-    M7Qty: Decimal | null
-    M7Price: Decimal | null
-    M8Qty: Decimal | null
-    M8Price: Decimal | null
-    M9Qty: Decimal | null
-    M9Price: Decimal | null
-    wireRopeQty: Decimal | null
-    wireRopePrice: Decimal | null
-    carShellQty: Decimal | null
-    carShellPrice: Decimal | null
-    pigIronQty: Decimal | null
-    pigIronPrice: Decimal | null
-    scrapQty: Decimal | null
-    scrapPrice: Decimal | null
-    carDismantleQty: Decimal | null
-    carDismantlePrice: Decimal | null
-    transferQty: Decimal | null
-    transferPrice: Decimal | null
-    auxiliaryQty: Decimal | null
-    auxiliaryPrice: Decimal | null
-    material1Qty: Decimal | null
-    material1Price: Decimal | null
-    material2Qty: Decimal | null
-    material2Price: Decimal | null
-    material3Qty: Decimal | null
-    material3Price: Decimal | null
-    material4Qty: Decimal | null
-    material4Price: Decimal | null
-    material5Qty: Decimal | null
-    material5Price: Decimal | null
+    phone: string | null
+    name: string | null
+    updateBy: string | null
+    createBy: string | null
+    owner: string | null
+    cloudId: string | null
+    mainDep: string | null
+    cloudOpenid: string | null
+    productTons: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -40005,56 +39991,57 @@ export namespace Prisma {
     id: number
     productName: number
     productWarehouse: number
-    productTons: number
-    dailyProcessQty: number
-    dailyProcessAmount: number
-    dailyProcessPrice: number
     productionDate: number
     materialComposition: number
     materialWarehouses: number
+    mslkm4Qty: number
+    mslkm4Price: number
+    mslkm2Qty: number
+    mslkm2Price: number
+    mslkmQty: number
+    mslkmPrice: number
+    mslkm0Qty: number
+    mslkm0Price: number
+    mslkm6Qty: number
+    mslkm6Price: number
+    mjsjm4Qty: number
+    mjsjm4Price: number
+    mjsjm2Qty: number
+    mjsjm2Price: number
+    mckkmQty: number
+    mckkmPrice: number
+    mckkm0Qty: number
+    mckkm0Price: number
+    mgjkm0Qty: number
+    mgjkm0Price: number
+    mgjkm10Qty: number
+    mgjkm10Price: number
+    mlkm2Qty: number
+    mlkm2Price: number
+    mlkmQty: number
+    mlkmPrice: number
+    mlkq1m2Qty: number
+    mlkq1m2Price: number
+    mlkq1m0Qty: number
+    mlkq1m0Price: number
+    mlkq1m6Qty: number
+    mlkq1m6Price: number
+    fl1Qty: number
+    fl1Price: number
+    dailyProcessQty: number
+    dailyProcessAmount: number
+    dailyProcessPrice: number
+    dep: number
     openid: number
-    M1Qty: number
-    M1Price: number
-    M2Qty: number
-    M2Price: number
-    M3Qty: number
-    M3Price: number
-    M4Qty: number
-    M4Price: number
-    M5Qty: number
-    M5Price: number
-    M6Qty: number
-    M6Price: number
-    M7Qty: number
-    M7Price: number
-    M8Qty: number
-    M8Price: number
-    M9Qty: number
-    M9Price: number
-    wireRopeQty: number
-    wireRopePrice: number
-    carShellQty: number
-    carShellPrice: number
-    pigIronQty: number
-    pigIronPrice: number
-    scrapQty: number
-    scrapPrice: number
-    carDismantleQty: number
-    carDismantlePrice: number
-    transferQty: number
-    transferPrice: number
-    auxiliaryQty: number
-    auxiliaryPrice: number
-    material1Qty: number
-    material1Price: number
-    material2Qty: number
-    material2Price: number
-    material3Qty: number
-    material3Price: number
-    material4Qty: number
-    material4Price: number
-    material5Qty: number
-    material5Price: number
+    phone: number
+    name: number
+    updateBy: number
+    createBy: number
+    owner: number
+    cloudId: number
+    mainDep: number
+    cloudOpenid: number
+    productTons: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -40063,157 +40050,142 @@ export namespace Prisma {
 
   export type ProcessingCostInputAvgAggregateInputType = {
     id?: true
-    productTons?: true
+    mslkm4Qty?: true
+    mslkm4Price?: true
+    mslkm2Qty?: true
+    mslkm2Price?: true
+    mslkmQty?: true
+    mslkmPrice?: true
+    mslkm0Qty?: true
+    mslkm0Price?: true
+    mslkm6Qty?: true
+    mslkm6Price?: true
+    mjsjm4Qty?: true
+    mjsjm4Price?: true
+    mjsjm2Qty?: true
+    mjsjm2Price?: true
+    mckkmQty?: true
+    mckkmPrice?: true
+    mckkm0Qty?: true
+    mckkm0Price?: true
+    mgjkm0Qty?: true
+    mgjkm0Price?: true
+    mgjkm10Qty?: true
+    mgjkm10Price?: true
+    mlkm2Qty?: true
+    mlkm2Price?: true
+    mlkmQty?: true
+    mlkmPrice?: true
+    mlkq1m2Qty?: true
+    mlkq1m2Price?: true
+    mlkq1m0Qty?: true
+    mlkq1m0Price?: true
+    mlkq1m6Qty?: true
+    mlkq1m6Price?: true
+    fl1Qty?: true
+    fl1Price?: true
     dailyProcessQty?: true
     dailyProcessAmount?: true
     dailyProcessPrice?: true
-    M1Qty?: true
-    M1Price?: true
-    M2Qty?: true
-    M2Price?: true
-    M3Qty?: true
-    M3Price?: true
-    M4Qty?: true
-    M4Price?: true
-    M5Qty?: true
-    M5Price?: true
-    M6Qty?: true
-    M6Price?: true
-    M7Qty?: true
-    M7Price?: true
-    M8Qty?: true
-    M8Price?: true
-    M9Qty?: true
-    M9Price?: true
-    wireRopeQty?: true
-    wireRopePrice?: true
-    carShellQty?: true
-    carShellPrice?: true
-    pigIronQty?: true
-    pigIronPrice?: true
-    scrapQty?: true
-    scrapPrice?: true
-    carDismantleQty?: true
-    carDismantlePrice?: true
-    transferQty?: true
-    transferPrice?: true
-    auxiliaryQty?: true
-    auxiliaryPrice?: true
-    material1Qty?: true
-    material1Price?: true
-    material2Qty?: true
-    material2Price?: true
-    material3Qty?: true
-    material3Price?: true
-    material4Qty?: true
-    material4Price?: true
-    material5Qty?: true
-    material5Price?: true
+    productTons?: true
   }
 
   export type ProcessingCostInputSumAggregateInputType = {
     id?: true
-    productTons?: true
+    mslkm4Qty?: true
+    mslkm4Price?: true
+    mslkm2Qty?: true
+    mslkm2Price?: true
+    mslkmQty?: true
+    mslkmPrice?: true
+    mslkm0Qty?: true
+    mslkm0Price?: true
+    mslkm6Qty?: true
+    mslkm6Price?: true
+    mjsjm4Qty?: true
+    mjsjm4Price?: true
+    mjsjm2Qty?: true
+    mjsjm2Price?: true
+    mckkmQty?: true
+    mckkmPrice?: true
+    mckkm0Qty?: true
+    mckkm0Price?: true
+    mgjkm0Qty?: true
+    mgjkm0Price?: true
+    mgjkm10Qty?: true
+    mgjkm10Price?: true
+    mlkm2Qty?: true
+    mlkm2Price?: true
+    mlkmQty?: true
+    mlkmPrice?: true
+    mlkq1m2Qty?: true
+    mlkq1m2Price?: true
+    mlkq1m0Qty?: true
+    mlkq1m0Price?: true
+    mlkq1m6Qty?: true
+    mlkq1m6Price?: true
+    fl1Qty?: true
+    fl1Price?: true
     dailyProcessQty?: true
     dailyProcessAmount?: true
     dailyProcessPrice?: true
-    M1Qty?: true
-    M1Price?: true
-    M2Qty?: true
-    M2Price?: true
-    M3Qty?: true
-    M3Price?: true
-    M4Qty?: true
-    M4Price?: true
-    M5Qty?: true
-    M5Price?: true
-    M6Qty?: true
-    M6Price?: true
-    M7Qty?: true
-    M7Price?: true
-    M8Qty?: true
-    M8Price?: true
-    M9Qty?: true
-    M9Price?: true
-    wireRopeQty?: true
-    wireRopePrice?: true
-    carShellQty?: true
-    carShellPrice?: true
-    pigIronQty?: true
-    pigIronPrice?: true
-    scrapQty?: true
-    scrapPrice?: true
-    carDismantleQty?: true
-    carDismantlePrice?: true
-    transferQty?: true
-    transferPrice?: true
-    auxiliaryQty?: true
-    auxiliaryPrice?: true
-    material1Qty?: true
-    material1Price?: true
-    material2Qty?: true
-    material2Price?: true
-    material3Qty?: true
-    material3Price?: true
-    material4Qty?: true
-    material4Price?: true
-    material5Qty?: true
-    material5Price?: true
+    productTons?: true
   }
 
   export type ProcessingCostInputMinAggregateInputType = {
     id?: true
     productName?: true
     productWarehouse?: true
-    productTons?: true
+    productionDate?: true
+    materialWarehouses?: true
+    mslkm4Qty?: true
+    mslkm4Price?: true
+    mslkm2Qty?: true
+    mslkm2Price?: true
+    mslkmQty?: true
+    mslkmPrice?: true
+    mslkm0Qty?: true
+    mslkm0Price?: true
+    mslkm6Qty?: true
+    mslkm6Price?: true
+    mjsjm4Qty?: true
+    mjsjm4Price?: true
+    mjsjm2Qty?: true
+    mjsjm2Price?: true
+    mckkmQty?: true
+    mckkmPrice?: true
+    mckkm0Qty?: true
+    mckkm0Price?: true
+    mgjkm0Qty?: true
+    mgjkm0Price?: true
+    mgjkm10Qty?: true
+    mgjkm10Price?: true
+    mlkm2Qty?: true
+    mlkm2Price?: true
+    mlkmQty?: true
+    mlkmPrice?: true
+    mlkq1m2Qty?: true
+    mlkq1m2Price?: true
+    mlkq1m0Qty?: true
+    mlkq1m0Price?: true
+    mlkq1m6Qty?: true
+    mlkq1m6Price?: true
+    fl1Qty?: true
+    fl1Price?: true
     dailyProcessQty?: true
     dailyProcessAmount?: true
     dailyProcessPrice?: true
-    productionDate?: true
-    materialWarehouses?: true
+    dep?: true
     openid?: true
-    M1Qty?: true
-    M1Price?: true
-    M2Qty?: true
-    M2Price?: true
-    M3Qty?: true
-    M3Price?: true
-    M4Qty?: true
-    M4Price?: true
-    M5Qty?: true
-    M5Price?: true
-    M6Qty?: true
-    M6Price?: true
-    M7Qty?: true
-    M7Price?: true
-    M8Qty?: true
-    M8Price?: true
-    M9Qty?: true
-    M9Price?: true
-    wireRopeQty?: true
-    wireRopePrice?: true
-    carShellQty?: true
-    carShellPrice?: true
-    pigIronQty?: true
-    pigIronPrice?: true
-    scrapQty?: true
-    scrapPrice?: true
-    carDismantleQty?: true
-    carDismantlePrice?: true
-    transferQty?: true
-    transferPrice?: true
-    auxiliaryQty?: true
-    auxiliaryPrice?: true
-    material1Qty?: true
-    material1Price?: true
-    material2Qty?: true
-    material2Price?: true
-    material3Qty?: true
-    material3Price?: true
-    material4Qty?: true
-    material4Price?: true
-    material5Qty?: true
-    material5Price?: true
+    phone?: true
+    name?: true
+    updateBy?: true
+    createBy?: true
+    owner?: true
+    cloudId?: true
+    mainDep?: true
+    cloudOpenid?: true
+    productTons?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -40222,55 +40194,56 @@ export namespace Prisma {
     id?: true
     productName?: true
     productWarehouse?: true
-    productTons?: true
+    productionDate?: true
+    materialWarehouses?: true
+    mslkm4Qty?: true
+    mslkm4Price?: true
+    mslkm2Qty?: true
+    mslkm2Price?: true
+    mslkmQty?: true
+    mslkmPrice?: true
+    mslkm0Qty?: true
+    mslkm0Price?: true
+    mslkm6Qty?: true
+    mslkm6Price?: true
+    mjsjm4Qty?: true
+    mjsjm4Price?: true
+    mjsjm2Qty?: true
+    mjsjm2Price?: true
+    mckkmQty?: true
+    mckkmPrice?: true
+    mckkm0Qty?: true
+    mckkm0Price?: true
+    mgjkm0Qty?: true
+    mgjkm0Price?: true
+    mgjkm10Qty?: true
+    mgjkm10Price?: true
+    mlkm2Qty?: true
+    mlkm2Price?: true
+    mlkmQty?: true
+    mlkmPrice?: true
+    mlkq1m2Qty?: true
+    mlkq1m2Price?: true
+    mlkq1m0Qty?: true
+    mlkq1m0Price?: true
+    mlkq1m6Qty?: true
+    mlkq1m6Price?: true
+    fl1Qty?: true
+    fl1Price?: true
     dailyProcessQty?: true
     dailyProcessAmount?: true
     dailyProcessPrice?: true
-    productionDate?: true
-    materialWarehouses?: true
+    dep?: true
     openid?: true
-    M1Qty?: true
-    M1Price?: true
-    M2Qty?: true
-    M2Price?: true
-    M3Qty?: true
-    M3Price?: true
-    M4Qty?: true
-    M4Price?: true
-    M5Qty?: true
-    M5Price?: true
-    M6Qty?: true
-    M6Price?: true
-    M7Qty?: true
-    M7Price?: true
-    M8Qty?: true
-    M8Price?: true
-    M9Qty?: true
-    M9Price?: true
-    wireRopeQty?: true
-    wireRopePrice?: true
-    carShellQty?: true
-    carShellPrice?: true
-    pigIronQty?: true
-    pigIronPrice?: true
-    scrapQty?: true
-    scrapPrice?: true
-    carDismantleQty?: true
-    carDismantlePrice?: true
-    transferQty?: true
-    transferPrice?: true
-    auxiliaryQty?: true
-    auxiliaryPrice?: true
-    material1Qty?: true
-    material1Price?: true
-    material2Qty?: true
-    material2Price?: true
-    material3Qty?: true
-    material3Price?: true
-    material4Qty?: true
-    material4Price?: true
-    material5Qty?: true
-    material5Price?: true
+    phone?: true
+    name?: true
+    updateBy?: true
+    createBy?: true
+    owner?: true
+    cloudId?: true
+    mainDep?: true
+    cloudOpenid?: true
+    productTons?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -40279,56 +40252,57 @@ export namespace Prisma {
     id?: true
     productName?: true
     productWarehouse?: true
-    productTons?: true
-    dailyProcessQty?: true
-    dailyProcessAmount?: true
-    dailyProcessPrice?: true
     productionDate?: true
     materialComposition?: true
     materialWarehouses?: true
+    mslkm4Qty?: true
+    mslkm4Price?: true
+    mslkm2Qty?: true
+    mslkm2Price?: true
+    mslkmQty?: true
+    mslkmPrice?: true
+    mslkm0Qty?: true
+    mslkm0Price?: true
+    mslkm6Qty?: true
+    mslkm6Price?: true
+    mjsjm4Qty?: true
+    mjsjm4Price?: true
+    mjsjm2Qty?: true
+    mjsjm2Price?: true
+    mckkmQty?: true
+    mckkmPrice?: true
+    mckkm0Qty?: true
+    mckkm0Price?: true
+    mgjkm0Qty?: true
+    mgjkm0Price?: true
+    mgjkm10Qty?: true
+    mgjkm10Price?: true
+    mlkm2Qty?: true
+    mlkm2Price?: true
+    mlkmQty?: true
+    mlkmPrice?: true
+    mlkq1m2Qty?: true
+    mlkq1m2Price?: true
+    mlkq1m0Qty?: true
+    mlkq1m0Price?: true
+    mlkq1m6Qty?: true
+    mlkq1m6Price?: true
+    fl1Qty?: true
+    fl1Price?: true
+    dailyProcessQty?: true
+    dailyProcessAmount?: true
+    dailyProcessPrice?: true
+    dep?: true
     openid?: true
-    M1Qty?: true
-    M1Price?: true
-    M2Qty?: true
-    M2Price?: true
-    M3Qty?: true
-    M3Price?: true
-    M4Qty?: true
-    M4Price?: true
-    M5Qty?: true
-    M5Price?: true
-    M6Qty?: true
-    M6Price?: true
-    M7Qty?: true
-    M7Price?: true
-    M8Qty?: true
-    M8Price?: true
-    M9Qty?: true
-    M9Price?: true
-    wireRopeQty?: true
-    wireRopePrice?: true
-    carShellQty?: true
-    carShellPrice?: true
-    pigIronQty?: true
-    pigIronPrice?: true
-    scrapQty?: true
-    scrapPrice?: true
-    carDismantleQty?: true
-    carDismantlePrice?: true
-    transferQty?: true
-    transferPrice?: true
-    auxiliaryQty?: true
-    auxiliaryPrice?: true
-    material1Qty?: true
-    material1Price?: true
-    material2Qty?: true
-    material2Price?: true
-    material3Qty?: true
-    material3Price?: true
-    material4Qty?: true
-    material4Price?: true
-    material5Qty?: true
-    material5Price?: true
+    phone?: true
+    name?: true
+    updateBy?: true
+    createBy?: true
+    owner?: true
+    cloudId?: true
+    mainDep?: true
+    cloudOpenid?: true
+    productTons?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -40424,56 +40398,57 @@ export namespace Prisma {
     id: number
     productName: string | null
     productWarehouse: string | null
-    productTons: Decimal | null
-    dailyProcessQty: Decimal | null
-    dailyProcessAmount: Decimal | null
-    dailyProcessPrice: Decimal | null
     productionDate: string | null
     materialComposition: JsonValue | null
     materialWarehouses: string | null
+    mslkm4Qty: Decimal | null
+    mslkm4Price: Decimal | null
+    mslkm2Qty: Decimal | null
+    mslkm2Price: Decimal | null
+    mslkmQty: Decimal | null
+    mslkmPrice: Decimal | null
+    mslkm0Qty: Decimal | null
+    mslkm0Price: Decimal | null
+    mslkm6Qty: Decimal | null
+    mslkm6Price: Decimal | null
+    mjsjm4Qty: Decimal | null
+    mjsjm4Price: Decimal | null
+    mjsjm2Qty: Decimal | null
+    mjsjm2Price: Decimal | null
+    mckkmQty: Decimal | null
+    mckkmPrice: Decimal | null
+    mckkm0Qty: Decimal | null
+    mckkm0Price: Decimal | null
+    mgjkm0Qty: Decimal | null
+    mgjkm0Price: Decimal | null
+    mgjkm10Qty: Decimal | null
+    mgjkm10Price: Decimal | null
+    mlkm2Qty: Decimal | null
+    mlkm2Price: Decimal | null
+    mlkmQty: Decimal | null
+    mlkmPrice: Decimal | null
+    mlkq1m2Qty: Decimal | null
+    mlkq1m2Price: Decimal | null
+    mlkq1m0Qty: Decimal | null
+    mlkq1m0Price: Decimal | null
+    mlkq1m6Qty: Decimal | null
+    mlkq1m6Price: Decimal | null
+    fl1Qty: Decimal | null
+    fl1Price: Decimal | null
+    dailyProcessQty: Decimal | null
+    dailyProcessAmount: Decimal | null
+    dailyProcessPrice: Decimal | null
+    dep: string | null
     openid: string | null
-    M1Qty: Decimal | null
-    M1Price: Decimal | null
-    M2Qty: Decimal | null
-    M2Price: Decimal | null
-    M3Qty: Decimal | null
-    M3Price: Decimal | null
-    M4Qty: Decimal | null
-    M4Price: Decimal | null
-    M5Qty: Decimal | null
-    M5Price: Decimal | null
-    M6Qty: Decimal | null
-    M6Price: Decimal | null
-    M7Qty: Decimal | null
-    M7Price: Decimal | null
-    M8Qty: Decimal | null
-    M8Price: Decimal | null
-    M9Qty: Decimal | null
-    M9Price: Decimal | null
-    wireRopeQty: Decimal | null
-    wireRopePrice: Decimal | null
-    carShellQty: Decimal | null
-    carShellPrice: Decimal | null
-    pigIronQty: Decimal | null
-    pigIronPrice: Decimal | null
-    scrapQty: Decimal | null
-    scrapPrice: Decimal | null
-    carDismantleQty: Decimal | null
-    carDismantlePrice: Decimal | null
-    transferQty: Decimal | null
-    transferPrice: Decimal | null
-    auxiliaryQty: Decimal | null
-    auxiliaryPrice: Decimal | null
-    material1Qty: Decimal | null
-    material1Price: Decimal | null
-    material2Qty: Decimal | null
-    material2Price: Decimal | null
-    material3Qty: Decimal | null
-    material3Price: Decimal | null
-    material4Qty: Decimal | null
-    material4Price: Decimal | null
-    material5Qty: Decimal | null
-    material5Price: Decimal | null
+    phone: string | null
+    name: string | null
+    updateBy: string | null
+    createBy: string | null
+    owner: string | null
+    cloudId: string | null
+    mainDep: string | null
+    cloudOpenid: string | null
+    productTons: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
     _count: ProcessingCostInputCountAggregateOutputType | null
@@ -40501,56 +40476,57 @@ export namespace Prisma {
     id?: boolean
     productName?: boolean
     productWarehouse?: boolean
-    productTons?: boolean
-    dailyProcessQty?: boolean
-    dailyProcessAmount?: boolean
-    dailyProcessPrice?: boolean
     productionDate?: boolean
     materialComposition?: boolean
     materialWarehouses?: boolean
+    mslkm4Qty?: boolean
+    mslkm4Price?: boolean
+    mslkm2Qty?: boolean
+    mslkm2Price?: boolean
+    mslkmQty?: boolean
+    mslkmPrice?: boolean
+    mslkm0Qty?: boolean
+    mslkm0Price?: boolean
+    mslkm6Qty?: boolean
+    mslkm6Price?: boolean
+    mjsjm4Qty?: boolean
+    mjsjm4Price?: boolean
+    mjsjm2Qty?: boolean
+    mjsjm2Price?: boolean
+    mckkmQty?: boolean
+    mckkmPrice?: boolean
+    mckkm0Qty?: boolean
+    mckkm0Price?: boolean
+    mgjkm0Qty?: boolean
+    mgjkm0Price?: boolean
+    mgjkm10Qty?: boolean
+    mgjkm10Price?: boolean
+    mlkm2Qty?: boolean
+    mlkm2Price?: boolean
+    mlkmQty?: boolean
+    mlkmPrice?: boolean
+    mlkq1m2Qty?: boolean
+    mlkq1m2Price?: boolean
+    mlkq1m0Qty?: boolean
+    mlkq1m0Price?: boolean
+    mlkq1m6Qty?: boolean
+    mlkq1m6Price?: boolean
+    fl1Qty?: boolean
+    fl1Price?: boolean
+    dailyProcessQty?: boolean
+    dailyProcessAmount?: boolean
+    dailyProcessPrice?: boolean
+    dep?: boolean
     openid?: boolean
-    M1Qty?: boolean
-    M1Price?: boolean
-    M2Qty?: boolean
-    M2Price?: boolean
-    M3Qty?: boolean
-    M3Price?: boolean
-    M4Qty?: boolean
-    M4Price?: boolean
-    M5Qty?: boolean
-    M5Price?: boolean
-    M6Qty?: boolean
-    M6Price?: boolean
-    M7Qty?: boolean
-    M7Price?: boolean
-    M8Qty?: boolean
-    M8Price?: boolean
-    M9Qty?: boolean
-    M9Price?: boolean
-    wireRopeQty?: boolean
-    wireRopePrice?: boolean
-    carShellQty?: boolean
-    carShellPrice?: boolean
-    pigIronQty?: boolean
-    pigIronPrice?: boolean
-    scrapQty?: boolean
-    scrapPrice?: boolean
-    carDismantleQty?: boolean
-    carDismantlePrice?: boolean
-    transferQty?: boolean
-    transferPrice?: boolean
-    auxiliaryQty?: boolean
-    auxiliaryPrice?: boolean
-    material1Qty?: boolean
-    material1Price?: boolean
-    material2Qty?: boolean
-    material2Price?: boolean
-    material3Qty?: boolean
-    material3Price?: boolean
-    material4Qty?: boolean
-    material4Price?: boolean
-    material5Qty?: boolean
-    material5Price?: boolean
+    phone?: boolean
+    name?: boolean
+    updateBy?: boolean
+    createBy?: boolean
+    owner?: boolean
+    cloudId?: boolean
+    mainDep?: boolean
+    cloudOpenid?: boolean
+    productTons?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["processingCostInput"]>
@@ -40561,61 +40537,62 @@ export namespace Prisma {
     id?: boolean
     productName?: boolean
     productWarehouse?: boolean
-    productTons?: boolean
-    dailyProcessQty?: boolean
-    dailyProcessAmount?: boolean
-    dailyProcessPrice?: boolean
     productionDate?: boolean
     materialComposition?: boolean
     materialWarehouses?: boolean
+    mslkm4Qty?: boolean
+    mslkm4Price?: boolean
+    mslkm2Qty?: boolean
+    mslkm2Price?: boolean
+    mslkmQty?: boolean
+    mslkmPrice?: boolean
+    mslkm0Qty?: boolean
+    mslkm0Price?: boolean
+    mslkm6Qty?: boolean
+    mslkm6Price?: boolean
+    mjsjm4Qty?: boolean
+    mjsjm4Price?: boolean
+    mjsjm2Qty?: boolean
+    mjsjm2Price?: boolean
+    mckkmQty?: boolean
+    mckkmPrice?: boolean
+    mckkm0Qty?: boolean
+    mckkm0Price?: boolean
+    mgjkm0Qty?: boolean
+    mgjkm0Price?: boolean
+    mgjkm10Qty?: boolean
+    mgjkm10Price?: boolean
+    mlkm2Qty?: boolean
+    mlkm2Price?: boolean
+    mlkmQty?: boolean
+    mlkmPrice?: boolean
+    mlkq1m2Qty?: boolean
+    mlkq1m2Price?: boolean
+    mlkq1m0Qty?: boolean
+    mlkq1m0Price?: boolean
+    mlkq1m6Qty?: boolean
+    mlkq1m6Price?: boolean
+    fl1Qty?: boolean
+    fl1Price?: boolean
+    dailyProcessQty?: boolean
+    dailyProcessAmount?: boolean
+    dailyProcessPrice?: boolean
+    dep?: boolean
     openid?: boolean
-    M1Qty?: boolean
-    M1Price?: boolean
-    M2Qty?: boolean
-    M2Price?: boolean
-    M3Qty?: boolean
-    M3Price?: boolean
-    M4Qty?: boolean
-    M4Price?: boolean
-    M5Qty?: boolean
-    M5Price?: boolean
-    M6Qty?: boolean
-    M6Price?: boolean
-    M7Qty?: boolean
-    M7Price?: boolean
-    M8Qty?: boolean
-    M8Price?: boolean
-    M9Qty?: boolean
-    M9Price?: boolean
-    wireRopeQty?: boolean
-    wireRopePrice?: boolean
-    carShellQty?: boolean
-    carShellPrice?: boolean
-    pigIronQty?: boolean
-    pigIronPrice?: boolean
-    scrapQty?: boolean
-    scrapPrice?: boolean
-    carDismantleQty?: boolean
-    carDismantlePrice?: boolean
-    transferQty?: boolean
-    transferPrice?: boolean
-    auxiliaryQty?: boolean
-    auxiliaryPrice?: boolean
-    material1Qty?: boolean
-    material1Price?: boolean
-    material2Qty?: boolean
-    material2Price?: boolean
-    material3Qty?: boolean
-    material3Price?: boolean
-    material4Qty?: boolean
-    material4Price?: boolean
-    material5Qty?: boolean
-    material5Price?: boolean
+    phone?: boolean
+    name?: boolean
+    updateBy?: boolean
+    createBy?: boolean
+    owner?: boolean
+    cloudId?: boolean
+    mainDep?: boolean
+    cloudOpenid?: boolean
+    productTons?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProcessingCostInputOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "productWarehouse" | "productTons" | "dailyProcessQty" | "dailyProcessAmount" | "dailyProcessPrice" | "productionDate" | "materialComposition" | "materialWarehouses" | "openid" | "M1Qty" | "M1Price" | "M2Qty" | "M2Price" | "M3Qty" | "M3Price" | "M4Qty" | "M4Price" | "M5Qty" | "M5Price" | "M6Qty" | "M6Price" | "M7Qty" | "M7Price" | "M8Qty" | "M8Price" | "M9Qty" | "M9Price" | "wireRopeQty" | "wireRopePrice" | "carShellQty" | "carShellPrice" | "pigIronQty" | "pigIronPrice" | "scrapQty" | "scrapPrice" | "carDismantleQty" | "carDismantlePrice" | "transferQty" | "transferPrice" | "auxiliaryQty" | "auxiliaryPrice" | "material1Qty" | "material1Price" | "material2Qty" | "material2Price" | "material3Qty" | "material3Price" | "material4Qty" | "material4Price" | "material5Qty" | "material5Price" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostInput"]>
+  export type ProcessingCostInputOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productName" | "productWarehouse" | "productionDate" | "materialComposition" | "materialWarehouses" | "mslkm4Qty" | "mslkm4Price" | "mslkm2Qty" | "mslkm2Price" | "mslkmQty" | "mslkmPrice" | "mslkm0Qty" | "mslkm0Price" | "mslkm6Qty" | "mslkm6Price" | "mjsjm4Qty" | "mjsjm4Price" | "mjsjm2Qty" | "mjsjm2Price" | "mckkmQty" | "mckkmPrice" | "mckkm0Qty" | "mckkm0Price" | "mgjkm0Qty" | "mgjkm0Price" | "mgjkm10Qty" | "mgjkm10Price" | "mlkm2Qty" | "mlkm2Price" | "mlkmQty" | "mlkmPrice" | "mlkq1m2Qty" | "mlkq1m2Price" | "mlkq1m0Qty" | "mlkq1m0Price" | "mlkq1m6Qty" | "mlkq1m6Price" | "fl1Qty" | "fl1Price" | "dailyProcessQty" | "dailyProcessAmount" | "dailyProcessPrice" | "dep" | "openid" | "phone" | "name" | "updateBy" | "createBy" | "owner" | "cloudId" | "mainDep" | "cloudOpenid" | "productTons" | "createdAt" | "updatedAt", ExtArgs["result"]["processingCostInput"]>
 
   export type $ProcessingCostInputPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ProcessingCostInput"
@@ -40624,56 +40601,57 @@ export namespace Prisma {
       id: number
       productName: string | null
       productWarehouse: string | null
-      productTons: Prisma.Decimal | null
-      dailyProcessQty: Prisma.Decimal | null
-      dailyProcessAmount: Prisma.Decimal | null
-      dailyProcessPrice: Prisma.Decimal | null
       productionDate: string | null
       materialComposition: Prisma.JsonValue | null
       materialWarehouses: string | null
+      mslkm4Qty: Prisma.Decimal | null
+      mslkm4Price: Prisma.Decimal | null
+      mslkm2Qty: Prisma.Decimal | null
+      mslkm2Price: Prisma.Decimal | null
+      mslkmQty: Prisma.Decimal | null
+      mslkmPrice: Prisma.Decimal | null
+      mslkm0Qty: Prisma.Decimal | null
+      mslkm0Price: Prisma.Decimal | null
+      mslkm6Qty: Prisma.Decimal | null
+      mslkm6Price: Prisma.Decimal | null
+      mjsjm4Qty: Prisma.Decimal | null
+      mjsjm4Price: Prisma.Decimal | null
+      mjsjm2Qty: Prisma.Decimal | null
+      mjsjm2Price: Prisma.Decimal | null
+      mckkmQty: Prisma.Decimal | null
+      mckkmPrice: Prisma.Decimal | null
+      mckkm0Qty: Prisma.Decimal | null
+      mckkm0Price: Prisma.Decimal | null
+      mgjkm0Qty: Prisma.Decimal | null
+      mgjkm0Price: Prisma.Decimal | null
+      mgjkm10Qty: Prisma.Decimal | null
+      mgjkm10Price: Prisma.Decimal | null
+      mlkm2Qty: Prisma.Decimal | null
+      mlkm2Price: Prisma.Decimal | null
+      mlkmQty: Prisma.Decimal | null
+      mlkmPrice: Prisma.Decimal | null
+      mlkq1m2Qty: Prisma.Decimal | null
+      mlkq1m2Price: Prisma.Decimal | null
+      mlkq1m0Qty: Prisma.Decimal | null
+      mlkq1m0Price: Prisma.Decimal | null
+      mlkq1m6Qty: Prisma.Decimal | null
+      mlkq1m6Price: Prisma.Decimal | null
+      fl1Qty: Prisma.Decimal | null
+      fl1Price: Prisma.Decimal | null
+      dailyProcessQty: Prisma.Decimal | null
+      dailyProcessAmount: Prisma.Decimal | null
+      dailyProcessPrice: Prisma.Decimal | null
+      dep: string | null
       openid: string | null
-      M1Qty: Prisma.Decimal | null
-      M1Price: Prisma.Decimal | null
-      M2Qty: Prisma.Decimal | null
-      M2Price: Prisma.Decimal | null
-      M3Qty: Prisma.Decimal | null
-      M3Price: Prisma.Decimal | null
-      M4Qty: Prisma.Decimal | null
-      M4Price: Prisma.Decimal | null
-      M5Qty: Prisma.Decimal | null
-      M5Price: Prisma.Decimal | null
-      M6Qty: Prisma.Decimal | null
-      M6Price: Prisma.Decimal | null
-      M7Qty: Prisma.Decimal | null
-      M7Price: Prisma.Decimal | null
-      M8Qty: Prisma.Decimal | null
-      M8Price: Prisma.Decimal | null
-      M9Qty: Prisma.Decimal | null
-      M9Price: Prisma.Decimal | null
-      wireRopeQty: Prisma.Decimal | null
-      wireRopePrice: Prisma.Decimal | null
-      carShellQty: Prisma.Decimal | null
-      carShellPrice: Prisma.Decimal | null
-      pigIronQty: Prisma.Decimal | null
-      pigIronPrice: Prisma.Decimal | null
-      scrapQty: Prisma.Decimal | null
-      scrapPrice: Prisma.Decimal | null
-      carDismantleQty: Prisma.Decimal | null
-      carDismantlePrice: Prisma.Decimal | null
-      transferQty: Prisma.Decimal | null
-      transferPrice: Prisma.Decimal | null
-      auxiliaryQty: Prisma.Decimal | null
-      auxiliaryPrice: Prisma.Decimal | null
-      material1Qty: Prisma.Decimal | null
-      material1Price: Prisma.Decimal | null
-      material2Qty: Prisma.Decimal | null
-      material2Price: Prisma.Decimal | null
-      material3Qty: Prisma.Decimal | null
-      material3Price: Prisma.Decimal | null
-      material4Qty: Prisma.Decimal | null
-      material4Price: Prisma.Decimal | null
-      material5Qty: Prisma.Decimal | null
-      material5Price: Prisma.Decimal | null
+      phone: string | null
+      name: string | null
+      updateBy: string | null
+      createBy: string | null
+      owner: string | null
+      cloudId: string | null
+      mainDep: string | null
+      cloudOpenid: string | null
+      productTons: Prisma.Decimal | null
       createdAt: Date | null
       updatedAt: Date | null
     }, ExtArgs["result"]["processingCostInput"]>
@@ -41048,56 +41026,57 @@ export namespace Prisma {
     readonly id: FieldRef<"ProcessingCostInput", 'Int'>
     readonly productName: FieldRef<"ProcessingCostInput", 'String'>
     readonly productWarehouse: FieldRef<"ProcessingCostInput", 'String'>
-    readonly productTons: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly dailyProcessQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly dailyProcessAmount: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly dailyProcessPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
     readonly productionDate: FieldRef<"ProcessingCostInput", 'String'>
     readonly materialComposition: FieldRef<"ProcessingCostInput", 'Json'>
     readonly materialWarehouses: FieldRef<"ProcessingCostInput", 'String'>
+    readonly mslkm4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkmQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkmPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm0Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm0Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm6Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mslkm6Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mjsjm4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mjsjm4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mjsjm2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mjsjm2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mckkmQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mckkmPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mckkm0Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mckkm0Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mgjkm0Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mgjkm0Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mgjkm10Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mgjkm10Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkm2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkm2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkmQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkmPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m0Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m0Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m6Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly mlkq1m6Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly fl1Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly fl1Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessQty: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessAmount: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dailyProcessPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly dep: FieldRef<"ProcessingCostInput", 'String'>
     readonly openid: FieldRef<"ProcessingCostInput", 'String'>
-    readonly M1Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M1Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M3Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M3Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M5Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M5Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M6Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M6Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M7Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M7Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M8Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M8Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M9Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly M9Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly wireRopeQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly wireRopePrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly carShellQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly carShellPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly pigIronQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly pigIronPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly scrapQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly scrapPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly carDismantleQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly carDismantlePrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly transferQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly transferPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly auxiliaryQty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly auxiliaryPrice: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material1Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material1Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material2Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material2Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material3Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material3Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material4Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material4Price: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material5Qty: FieldRef<"ProcessingCostInput", 'Decimal'>
-    readonly material5Price: FieldRef<"ProcessingCostInput", 'Decimal'>
+    readonly phone: FieldRef<"ProcessingCostInput", 'String'>
+    readonly name: FieldRef<"ProcessingCostInput", 'String'>
+    readonly updateBy: FieldRef<"ProcessingCostInput", 'String'>
+    readonly createBy: FieldRef<"ProcessingCostInput", 'String'>
+    readonly owner: FieldRef<"ProcessingCostInput", 'String'>
+    readonly cloudId: FieldRef<"ProcessingCostInput", 'String'>
+    readonly mainDep: FieldRef<"ProcessingCostInput", 'String'>
+    readonly cloudOpenid: FieldRef<"ProcessingCostInput", 'String'>
+    readonly productTons: FieldRef<"ProcessingCostInput", 'Decimal'>
     readonly createdAt: FieldRef<"ProcessingCostInput", 'DateTime'>
     readonly updatedAt: FieldRef<"ProcessingCostInput", 'DateTime'>
   }
@@ -46807,56 +46786,57 @@ export namespace Prisma {
     id: 'id',
     productName: 'productName',
     productWarehouse: 'productWarehouse',
-    productTons: 'productTons',
-    dailyProcessQty: 'dailyProcessQty',
-    dailyProcessAmount: 'dailyProcessAmount',
-    dailyProcessPrice: 'dailyProcessPrice',
     productionDate: 'productionDate',
     materialComposition: 'materialComposition',
     materialWarehouses: 'materialWarehouses',
+    mslkm4Qty: 'mslkm4Qty',
+    mslkm4Price: 'mslkm4Price',
+    mslkm2Qty: 'mslkm2Qty',
+    mslkm2Price: 'mslkm2Price',
+    mslkmQty: 'mslkmQty',
+    mslkmPrice: 'mslkmPrice',
+    mslkm0Qty: 'mslkm0Qty',
+    mslkm0Price: 'mslkm0Price',
+    mslkm6Qty: 'mslkm6Qty',
+    mslkm6Price: 'mslkm6Price',
+    mjsjm4Qty: 'mjsjm4Qty',
+    mjsjm4Price: 'mjsjm4Price',
+    mjsjm2Qty: 'mjsjm2Qty',
+    mjsjm2Price: 'mjsjm2Price',
+    mckkmQty: 'mckkmQty',
+    mckkmPrice: 'mckkmPrice',
+    mckkm0Qty: 'mckkm0Qty',
+    mckkm0Price: 'mckkm0Price',
+    mgjkm0Qty: 'mgjkm0Qty',
+    mgjkm0Price: 'mgjkm0Price',
+    mgjkm10Qty: 'mgjkm10Qty',
+    mgjkm10Price: 'mgjkm10Price',
+    mlkm2Qty: 'mlkm2Qty',
+    mlkm2Price: 'mlkm2Price',
+    mlkmQty: 'mlkmQty',
+    mlkmPrice: 'mlkmPrice',
+    mlkq1m2Qty: 'mlkq1m2Qty',
+    mlkq1m2Price: 'mlkq1m2Price',
+    mlkq1m0Qty: 'mlkq1m0Qty',
+    mlkq1m0Price: 'mlkq1m0Price',
+    mlkq1m6Qty: 'mlkq1m6Qty',
+    mlkq1m6Price: 'mlkq1m6Price',
+    fl1Qty: 'fl1Qty',
+    fl1Price: 'fl1Price',
+    dailyProcessQty: 'dailyProcessQty',
+    dailyProcessAmount: 'dailyProcessAmount',
+    dailyProcessPrice: 'dailyProcessPrice',
+    dep: 'dep',
     openid: 'openid',
-    M1Qty: 'M1Qty',
-    M1Price: 'M1Price',
-    M2Qty: 'M2Qty',
-    M2Price: 'M2Price',
-    M3Qty: 'M3Qty',
-    M3Price: 'M3Price',
-    M4Qty: 'M4Qty',
-    M4Price: 'M4Price',
-    M5Qty: 'M5Qty',
-    M5Price: 'M5Price',
-    M6Qty: 'M6Qty',
-    M6Price: 'M6Price',
-    M7Qty: 'M7Qty',
-    M7Price: 'M7Price',
-    M8Qty: 'M8Qty',
-    M8Price: 'M8Price',
-    M9Qty: 'M9Qty',
-    M9Price: 'M9Price',
-    wireRopeQty: 'wireRopeQty',
-    wireRopePrice: 'wireRopePrice',
-    carShellQty: 'carShellQty',
-    carShellPrice: 'carShellPrice',
-    pigIronQty: 'pigIronQty',
-    pigIronPrice: 'pigIronPrice',
-    scrapQty: 'scrapQty',
-    scrapPrice: 'scrapPrice',
-    carDismantleQty: 'carDismantleQty',
-    carDismantlePrice: 'carDismantlePrice',
-    transferQty: 'transferQty',
-    transferPrice: 'transferPrice',
-    auxiliaryQty: 'auxiliaryQty',
-    auxiliaryPrice: 'auxiliaryPrice',
-    material1Qty: 'material1Qty',
-    material1Price: 'material1Price',
-    material2Qty: 'material2Qty',
-    material2Price: 'material2Price',
-    material3Qty: 'material3Qty',
-    material3Price: 'material3Price',
-    material4Qty: 'material4Qty',
-    material4Price: 'material4Price',
-    material5Qty: 'material5Qty',
-    material5Price: 'material5Price',
+    phone: 'phone',
+    name: 'name',
+    updateBy: 'updateBy',
+    createBy: 'createBy',
+    owner: 'owner',
+    cloudId: 'cloudId',
+    mainDep: 'mainDep',
+    cloudOpenid: 'cloudOpenid',
+    productTons: 'productTons',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -47405,7 +47385,16 @@ export namespace Prisma {
     productWarehouse: 'productWarehouse',
     productionDate: 'productionDate',
     materialWarehouses: 'materialWarehouses',
-    openid: 'openid'
+    dep: 'dep',
+    openid: 'openid',
+    phone: 'phone',
+    name: 'name',
+    updateBy: 'updateBy',
+    createBy: 'createBy',
+    owner: 'owner',
+    cloudId: 'cloudId',
+    mainDep: 'mainDep',
+    cloudOpenid: 'cloudOpenid'
   };
 
   export type ProcessingCostInputOrderByRelevanceFieldEnum = (typeof ProcessingCostInputOrderByRelevanceFieldEnum)[keyof typeof ProcessingCostInputOrderByRelevanceFieldEnum]
@@ -50170,56 +50159,57 @@ export namespace Prisma {
     id?: IntFilter<"ProcessingCostInput"> | number
     productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
-    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableFilter<"ProcessingCostInput">
     materialWarehouses?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    mslkm4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dep?: StringNullableFilter<"ProcessingCostInput"> | string | null
     openid?: StringNullableFilter<"ProcessingCostInput"> | string | null
-    M1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    phone?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    name?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    updateBy?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    createBy?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    owner?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    cloudId?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    mainDep?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    cloudOpenid?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
   }
@@ -50228,56 +50218,57 @@ export namespace Prisma {
     id?: SortOrder
     productName?: SortOrderInput | SortOrder
     productWarehouse?: SortOrderInput | SortOrder
-    productTons?: SortOrderInput | SortOrder
-    dailyProcessQty?: SortOrderInput | SortOrder
-    dailyProcessAmount?: SortOrderInput | SortOrder
-    dailyProcessPrice?: SortOrderInput | SortOrder
     productionDate?: SortOrderInput | SortOrder
     materialComposition?: SortOrderInput | SortOrder
     materialWarehouses?: SortOrderInput | SortOrder
+    mslkm4Qty?: SortOrderInput | SortOrder
+    mslkm4Price?: SortOrderInput | SortOrder
+    mslkm2Qty?: SortOrderInput | SortOrder
+    mslkm2Price?: SortOrderInput | SortOrder
+    mslkmQty?: SortOrderInput | SortOrder
+    mslkmPrice?: SortOrderInput | SortOrder
+    mslkm0Qty?: SortOrderInput | SortOrder
+    mslkm0Price?: SortOrderInput | SortOrder
+    mslkm6Qty?: SortOrderInput | SortOrder
+    mslkm6Price?: SortOrderInput | SortOrder
+    mjsjm4Qty?: SortOrderInput | SortOrder
+    mjsjm4Price?: SortOrderInput | SortOrder
+    mjsjm2Qty?: SortOrderInput | SortOrder
+    mjsjm2Price?: SortOrderInput | SortOrder
+    mckkmQty?: SortOrderInput | SortOrder
+    mckkmPrice?: SortOrderInput | SortOrder
+    mckkm0Qty?: SortOrderInput | SortOrder
+    mckkm0Price?: SortOrderInput | SortOrder
+    mgjkm0Qty?: SortOrderInput | SortOrder
+    mgjkm0Price?: SortOrderInput | SortOrder
+    mgjkm10Qty?: SortOrderInput | SortOrder
+    mgjkm10Price?: SortOrderInput | SortOrder
+    mlkm2Qty?: SortOrderInput | SortOrder
+    mlkm2Price?: SortOrderInput | SortOrder
+    mlkmQty?: SortOrderInput | SortOrder
+    mlkmPrice?: SortOrderInput | SortOrder
+    mlkq1m2Qty?: SortOrderInput | SortOrder
+    mlkq1m2Price?: SortOrderInput | SortOrder
+    mlkq1m0Qty?: SortOrderInput | SortOrder
+    mlkq1m0Price?: SortOrderInput | SortOrder
+    mlkq1m6Qty?: SortOrderInput | SortOrder
+    mlkq1m6Price?: SortOrderInput | SortOrder
+    fl1Qty?: SortOrderInput | SortOrder
+    fl1Price?: SortOrderInput | SortOrder
+    dailyProcessQty?: SortOrderInput | SortOrder
+    dailyProcessAmount?: SortOrderInput | SortOrder
+    dailyProcessPrice?: SortOrderInput | SortOrder
+    dep?: SortOrderInput | SortOrder
     openid?: SortOrderInput | SortOrder
-    M1Qty?: SortOrderInput | SortOrder
-    M1Price?: SortOrderInput | SortOrder
-    M2Qty?: SortOrderInput | SortOrder
-    M2Price?: SortOrderInput | SortOrder
-    M3Qty?: SortOrderInput | SortOrder
-    M3Price?: SortOrderInput | SortOrder
-    M4Qty?: SortOrderInput | SortOrder
-    M4Price?: SortOrderInput | SortOrder
-    M5Qty?: SortOrderInput | SortOrder
-    M5Price?: SortOrderInput | SortOrder
-    M6Qty?: SortOrderInput | SortOrder
-    M6Price?: SortOrderInput | SortOrder
-    M7Qty?: SortOrderInput | SortOrder
-    M7Price?: SortOrderInput | SortOrder
-    M8Qty?: SortOrderInput | SortOrder
-    M8Price?: SortOrderInput | SortOrder
-    M9Qty?: SortOrderInput | SortOrder
-    M9Price?: SortOrderInput | SortOrder
-    wireRopeQty?: SortOrderInput | SortOrder
-    wireRopePrice?: SortOrderInput | SortOrder
-    carShellQty?: SortOrderInput | SortOrder
-    carShellPrice?: SortOrderInput | SortOrder
-    pigIronQty?: SortOrderInput | SortOrder
-    pigIronPrice?: SortOrderInput | SortOrder
-    scrapQty?: SortOrderInput | SortOrder
-    scrapPrice?: SortOrderInput | SortOrder
-    carDismantleQty?: SortOrderInput | SortOrder
-    carDismantlePrice?: SortOrderInput | SortOrder
-    transferQty?: SortOrderInput | SortOrder
-    transferPrice?: SortOrderInput | SortOrder
-    auxiliaryQty?: SortOrderInput | SortOrder
-    auxiliaryPrice?: SortOrderInput | SortOrder
-    material1Qty?: SortOrderInput | SortOrder
-    material1Price?: SortOrderInput | SortOrder
-    material2Qty?: SortOrderInput | SortOrder
-    material2Price?: SortOrderInput | SortOrder
-    material3Qty?: SortOrderInput | SortOrder
-    material3Price?: SortOrderInput | SortOrder
-    material4Qty?: SortOrderInput | SortOrder
-    material4Price?: SortOrderInput | SortOrder
-    material5Qty?: SortOrderInput | SortOrder
-    material5Price?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    name?: SortOrderInput | SortOrder
+    updateBy?: SortOrderInput | SortOrder
+    createBy?: SortOrderInput | SortOrder
+    owner?: SortOrderInput | SortOrder
+    cloudId?: SortOrderInput | SortOrder
+    mainDep?: SortOrderInput | SortOrder
+    cloudOpenid?: SortOrderInput | SortOrder
+    productTons?: SortOrderInput | SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
     _relevance?: ProcessingCostInputOrderByRelevanceInput
@@ -50290,56 +50281,57 @@ export namespace Prisma {
     NOT?: ProcessingCostInputWhereInput | ProcessingCostInputWhereInput[]
     productName?: StringNullableFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableFilter<"ProcessingCostInput"> | string | null
-    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableFilter<"ProcessingCostInput">
     materialWarehouses?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    mslkm4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dep?: StringNullableFilter<"ProcessingCostInput"> | string | null
     openid?: StringNullableFilter<"ProcessingCostInput"> | string | null
-    M1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Price?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    phone?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    name?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    updateBy?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    createBy?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    owner?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    cloudId?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    mainDep?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    cloudOpenid?: StringNullableFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableFilter<"ProcessingCostInput"> | Date | string | null
   }, "id">
@@ -50348,56 +50340,57 @@ export namespace Prisma {
     id?: SortOrder
     productName?: SortOrderInput | SortOrder
     productWarehouse?: SortOrderInput | SortOrder
-    productTons?: SortOrderInput | SortOrder
-    dailyProcessQty?: SortOrderInput | SortOrder
-    dailyProcessAmount?: SortOrderInput | SortOrder
-    dailyProcessPrice?: SortOrderInput | SortOrder
     productionDate?: SortOrderInput | SortOrder
     materialComposition?: SortOrderInput | SortOrder
     materialWarehouses?: SortOrderInput | SortOrder
+    mslkm4Qty?: SortOrderInput | SortOrder
+    mslkm4Price?: SortOrderInput | SortOrder
+    mslkm2Qty?: SortOrderInput | SortOrder
+    mslkm2Price?: SortOrderInput | SortOrder
+    mslkmQty?: SortOrderInput | SortOrder
+    mslkmPrice?: SortOrderInput | SortOrder
+    mslkm0Qty?: SortOrderInput | SortOrder
+    mslkm0Price?: SortOrderInput | SortOrder
+    mslkm6Qty?: SortOrderInput | SortOrder
+    mslkm6Price?: SortOrderInput | SortOrder
+    mjsjm4Qty?: SortOrderInput | SortOrder
+    mjsjm4Price?: SortOrderInput | SortOrder
+    mjsjm2Qty?: SortOrderInput | SortOrder
+    mjsjm2Price?: SortOrderInput | SortOrder
+    mckkmQty?: SortOrderInput | SortOrder
+    mckkmPrice?: SortOrderInput | SortOrder
+    mckkm0Qty?: SortOrderInput | SortOrder
+    mckkm0Price?: SortOrderInput | SortOrder
+    mgjkm0Qty?: SortOrderInput | SortOrder
+    mgjkm0Price?: SortOrderInput | SortOrder
+    mgjkm10Qty?: SortOrderInput | SortOrder
+    mgjkm10Price?: SortOrderInput | SortOrder
+    mlkm2Qty?: SortOrderInput | SortOrder
+    mlkm2Price?: SortOrderInput | SortOrder
+    mlkmQty?: SortOrderInput | SortOrder
+    mlkmPrice?: SortOrderInput | SortOrder
+    mlkq1m2Qty?: SortOrderInput | SortOrder
+    mlkq1m2Price?: SortOrderInput | SortOrder
+    mlkq1m0Qty?: SortOrderInput | SortOrder
+    mlkq1m0Price?: SortOrderInput | SortOrder
+    mlkq1m6Qty?: SortOrderInput | SortOrder
+    mlkq1m6Price?: SortOrderInput | SortOrder
+    fl1Qty?: SortOrderInput | SortOrder
+    fl1Price?: SortOrderInput | SortOrder
+    dailyProcessQty?: SortOrderInput | SortOrder
+    dailyProcessAmount?: SortOrderInput | SortOrder
+    dailyProcessPrice?: SortOrderInput | SortOrder
+    dep?: SortOrderInput | SortOrder
     openid?: SortOrderInput | SortOrder
-    M1Qty?: SortOrderInput | SortOrder
-    M1Price?: SortOrderInput | SortOrder
-    M2Qty?: SortOrderInput | SortOrder
-    M2Price?: SortOrderInput | SortOrder
-    M3Qty?: SortOrderInput | SortOrder
-    M3Price?: SortOrderInput | SortOrder
-    M4Qty?: SortOrderInput | SortOrder
-    M4Price?: SortOrderInput | SortOrder
-    M5Qty?: SortOrderInput | SortOrder
-    M5Price?: SortOrderInput | SortOrder
-    M6Qty?: SortOrderInput | SortOrder
-    M6Price?: SortOrderInput | SortOrder
-    M7Qty?: SortOrderInput | SortOrder
-    M7Price?: SortOrderInput | SortOrder
-    M8Qty?: SortOrderInput | SortOrder
-    M8Price?: SortOrderInput | SortOrder
-    M9Qty?: SortOrderInput | SortOrder
-    M9Price?: SortOrderInput | SortOrder
-    wireRopeQty?: SortOrderInput | SortOrder
-    wireRopePrice?: SortOrderInput | SortOrder
-    carShellQty?: SortOrderInput | SortOrder
-    carShellPrice?: SortOrderInput | SortOrder
-    pigIronQty?: SortOrderInput | SortOrder
-    pigIronPrice?: SortOrderInput | SortOrder
-    scrapQty?: SortOrderInput | SortOrder
-    scrapPrice?: SortOrderInput | SortOrder
-    carDismantleQty?: SortOrderInput | SortOrder
-    carDismantlePrice?: SortOrderInput | SortOrder
-    transferQty?: SortOrderInput | SortOrder
-    transferPrice?: SortOrderInput | SortOrder
-    auxiliaryQty?: SortOrderInput | SortOrder
-    auxiliaryPrice?: SortOrderInput | SortOrder
-    material1Qty?: SortOrderInput | SortOrder
-    material1Price?: SortOrderInput | SortOrder
-    material2Qty?: SortOrderInput | SortOrder
-    material2Price?: SortOrderInput | SortOrder
-    material3Qty?: SortOrderInput | SortOrder
-    material3Price?: SortOrderInput | SortOrder
-    material4Qty?: SortOrderInput | SortOrder
-    material4Price?: SortOrderInput | SortOrder
-    material5Qty?: SortOrderInput | SortOrder
-    material5Price?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    name?: SortOrderInput | SortOrder
+    updateBy?: SortOrderInput | SortOrder
+    createBy?: SortOrderInput | SortOrder
+    owner?: SortOrderInput | SortOrder
+    cloudId?: SortOrderInput | SortOrder
+    mainDep?: SortOrderInput | SortOrder
+    cloudOpenid?: SortOrderInput | SortOrder
+    productTons?: SortOrderInput | SortOrder
     createdAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrderInput | SortOrder
     _count?: ProcessingCostInputCountOrderByAggregateInput
@@ -50414,56 +50407,57 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"ProcessingCostInput"> | number
     productName?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     productWarehouse?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
-    productTons?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     productionDate?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     materialComposition?: JsonNullableWithAggregatesFilter<"ProcessingCostInput">
     materialWarehouses?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    mslkm4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    dep?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
     openid?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
-    M1Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M1Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M3Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M5Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M6Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M7Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M8Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    M9Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material1Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material2Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material3Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material4Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
-    material5Price?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
+    phone?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    name?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    updateBy?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    createBy?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    owner?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    cloudId?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    mainDep?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    cloudOpenid?: StringNullableWithAggregatesFilter<"ProcessingCostInput"> | string | null
+    productTons?: DecimalNullableWithAggregatesFilter<"ProcessingCostInput"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"ProcessingCostInput"> | Date | string | null
   }
@@ -53666,56 +53660,57 @@ export namespace Prisma {
   export type ProcessingCostInputCreateInput = {
     productName?: string | null
     productWarehouse?: string | null
-    productTons?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: string | null
+    mslkm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: Decimal | DecimalJsLike | number | string | null
+    fl1Price?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
+    dep?: string | null
     openid?: string | null
-    M1Qty?: Decimal | DecimalJsLike | number | string | null
-    M1Price?: Decimal | DecimalJsLike | number | string | null
-    M2Qty?: Decimal | DecimalJsLike | number | string | null
-    M2Price?: Decimal | DecimalJsLike | number | string | null
-    M3Qty?: Decimal | DecimalJsLike | number | string | null
-    M3Price?: Decimal | DecimalJsLike | number | string | null
-    M4Qty?: Decimal | DecimalJsLike | number | string | null
-    M4Price?: Decimal | DecimalJsLike | number | string | null
-    M5Qty?: Decimal | DecimalJsLike | number | string | null
-    M5Price?: Decimal | DecimalJsLike | number | string | null
-    M6Qty?: Decimal | DecimalJsLike | number | string | null
-    M6Price?: Decimal | DecimalJsLike | number | string | null
-    M7Qty?: Decimal | DecimalJsLike | number | string | null
-    M7Price?: Decimal | DecimalJsLike | number | string | null
-    M8Qty?: Decimal | DecimalJsLike | number | string | null
-    M8Price?: Decimal | DecimalJsLike | number | string | null
-    M9Qty?: Decimal | DecimalJsLike | number | string | null
-    M9Price?: Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
-    carShellQty?: Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
-    scrapQty?: Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
-    transferQty?: Decimal | DecimalJsLike | number | string | null
-    transferPrice?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
-    material1Qty?: Decimal | DecimalJsLike | number | string | null
-    material1Price?: Decimal | DecimalJsLike | number | string | null
-    material2Qty?: Decimal | DecimalJsLike | number | string | null
-    material2Price?: Decimal | DecimalJsLike | number | string | null
-    material3Qty?: Decimal | DecimalJsLike | number | string | null
-    material3Price?: Decimal | DecimalJsLike | number | string | null
-    material4Qty?: Decimal | DecimalJsLike | number | string | null
-    material4Price?: Decimal | DecimalJsLike | number | string | null
-    material5Qty?: Decimal | DecimalJsLike | number | string | null
-    material5Price?: Decimal | DecimalJsLike | number | string | null
+    phone?: string | null
+    name?: string | null
+    updateBy?: string | null
+    createBy?: string | null
+    owner?: string | null
+    cloudId?: string | null
+    mainDep?: string | null
+    cloudOpenid?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -53724,56 +53719,57 @@ export namespace Prisma {
     id?: number
     productName?: string | null
     productWarehouse?: string | null
-    productTons?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: string | null
+    mslkm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: Decimal | DecimalJsLike | number | string | null
+    fl1Price?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
+    dep?: string | null
     openid?: string | null
-    M1Qty?: Decimal | DecimalJsLike | number | string | null
-    M1Price?: Decimal | DecimalJsLike | number | string | null
-    M2Qty?: Decimal | DecimalJsLike | number | string | null
-    M2Price?: Decimal | DecimalJsLike | number | string | null
-    M3Qty?: Decimal | DecimalJsLike | number | string | null
-    M3Price?: Decimal | DecimalJsLike | number | string | null
-    M4Qty?: Decimal | DecimalJsLike | number | string | null
-    M4Price?: Decimal | DecimalJsLike | number | string | null
-    M5Qty?: Decimal | DecimalJsLike | number | string | null
-    M5Price?: Decimal | DecimalJsLike | number | string | null
-    M6Qty?: Decimal | DecimalJsLike | number | string | null
-    M6Price?: Decimal | DecimalJsLike | number | string | null
-    M7Qty?: Decimal | DecimalJsLike | number | string | null
-    M7Price?: Decimal | DecimalJsLike | number | string | null
-    M8Qty?: Decimal | DecimalJsLike | number | string | null
-    M8Price?: Decimal | DecimalJsLike | number | string | null
-    M9Qty?: Decimal | DecimalJsLike | number | string | null
-    M9Price?: Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
-    carShellQty?: Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
-    scrapQty?: Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
-    transferQty?: Decimal | DecimalJsLike | number | string | null
-    transferPrice?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
-    material1Qty?: Decimal | DecimalJsLike | number | string | null
-    material1Price?: Decimal | DecimalJsLike | number | string | null
-    material2Qty?: Decimal | DecimalJsLike | number | string | null
-    material2Price?: Decimal | DecimalJsLike | number | string | null
-    material3Qty?: Decimal | DecimalJsLike | number | string | null
-    material3Price?: Decimal | DecimalJsLike | number | string | null
-    material4Qty?: Decimal | DecimalJsLike | number | string | null
-    material4Price?: Decimal | DecimalJsLike | number | string | null
-    material5Qty?: Decimal | DecimalJsLike | number | string | null
-    material5Price?: Decimal | DecimalJsLike | number | string | null
+    phone?: string | null
+    name?: string | null
+    updateBy?: string | null
+    createBy?: string | null
+    owner?: string | null
+    cloudId?: string | null
+    mainDep?: string | null
+    cloudOpenid?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -53781,56 +53777,57 @@ export namespace Prisma {
   export type ProcessingCostInputUpdateInput = {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
-    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    mslkm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dep?: NullableStringFieldUpdateOperationsInput | string | null
     openid?: NullableStringFieldUpdateOperationsInput | string | null
-    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudId?: NullableStringFieldUpdateOperationsInput | string | null
+    mainDep?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudOpenid?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -53839,56 +53836,57 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
-    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    mslkm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dep?: NullableStringFieldUpdateOperationsInput | string | null
     openid?: NullableStringFieldUpdateOperationsInput | string | null
-    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudId?: NullableStringFieldUpdateOperationsInput | string | null
+    mainDep?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudOpenid?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -53897,56 +53895,57 @@ export namespace Prisma {
     id?: number
     productName?: string | null
     productWarehouse?: string | null
-    productTons?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
     productionDate?: string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: string | null
+    mslkm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: Decimal | DecimalJsLike | number | string | null
+    fl1Price?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: Decimal | DecimalJsLike | number | string | null
+    dep?: string | null
     openid?: string | null
-    M1Qty?: Decimal | DecimalJsLike | number | string | null
-    M1Price?: Decimal | DecimalJsLike | number | string | null
-    M2Qty?: Decimal | DecimalJsLike | number | string | null
-    M2Price?: Decimal | DecimalJsLike | number | string | null
-    M3Qty?: Decimal | DecimalJsLike | number | string | null
-    M3Price?: Decimal | DecimalJsLike | number | string | null
-    M4Qty?: Decimal | DecimalJsLike | number | string | null
-    M4Price?: Decimal | DecimalJsLike | number | string | null
-    M5Qty?: Decimal | DecimalJsLike | number | string | null
-    M5Price?: Decimal | DecimalJsLike | number | string | null
-    M6Qty?: Decimal | DecimalJsLike | number | string | null
-    M6Price?: Decimal | DecimalJsLike | number | string | null
-    M7Qty?: Decimal | DecimalJsLike | number | string | null
-    M7Price?: Decimal | DecimalJsLike | number | string | null
-    M8Qty?: Decimal | DecimalJsLike | number | string | null
-    M8Price?: Decimal | DecimalJsLike | number | string | null
-    M9Qty?: Decimal | DecimalJsLike | number | string | null
-    M9Price?: Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: Decimal | DecimalJsLike | number | string | null
-    carShellQty?: Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: Decimal | DecimalJsLike | number | string | null
-    scrapQty?: Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: Decimal | DecimalJsLike | number | string | null
-    transferQty?: Decimal | DecimalJsLike | number | string | null
-    transferPrice?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: Decimal | DecimalJsLike | number | string | null
-    material1Qty?: Decimal | DecimalJsLike | number | string | null
-    material1Price?: Decimal | DecimalJsLike | number | string | null
-    material2Qty?: Decimal | DecimalJsLike | number | string | null
-    material2Price?: Decimal | DecimalJsLike | number | string | null
-    material3Qty?: Decimal | DecimalJsLike | number | string | null
-    material3Price?: Decimal | DecimalJsLike | number | string | null
-    material4Qty?: Decimal | DecimalJsLike | number | string | null
-    material4Price?: Decimal | DecimalJsLike | number | string | null
-    material5Qty?: Decimal | DecimalJsLike | number | string | null
-    material5Price?: Decimal | DecimalJsLike | number | string | null
+    phone?: string | null
+    name?: string | null
+    updateBy?: string | null
+    createBy?: string | null
+    owner?: string | null
+    cloudId?: string | null
+    mainDep?: string | null
+    cloudOpenid?: string | null
+    productTons?: Decimal | DecimalJsLike | number | string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
   }
@@ -53954,56 +53953,57 @@ export namespace Prisma {
   export type ProcessingCostInputUpdateManyMutationInput = {
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
-    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    mslkm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dep?: NullableStringFieldUpdateOperationsInput | string | null
     openid?: NullableStringFieldUpdateOperationsInput | string | null
-    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudId?: NullableStringFieldUpdateOperationsInput | string | null
+    mainDep?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudOpenid?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -54012,56 +54012,57 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     productName?: NullableStringFieldUpdateOperationsInput | string | null
     productWarehouse?: NullableStringFieldUpdateOperationsInput | string | null
-    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     productionDate?: NullableStringFieldUpdateOperationsInput | string | null
     materialComposition?: NullableJsonNullValueInput | InputJsonValue
     materialWarehouses?: NullableStringFieldUpdateOperationsInput | string | null
+    mslkm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mslkm6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mjsjm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mckkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mgjkm10Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkm2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkmPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m0Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mlkq1m6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    fl1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dailyProcessPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    dep?: NullableStringFieldUpdateOperationsInput | string | null
     openid?: NullableStringFieldUpdateOperationsInput | string | null
-    M1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M6Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M7Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M8Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    M9Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopeQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    wireRopePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carShellPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    pigIronPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    scrapPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantleQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    carDismantlePrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    transferPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    auxiliaryPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material1Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material2Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material3Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material4Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Qty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    material5Price?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    updateBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createBy?: NullableStringFieldUpdateOperationsInput | string | null
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudId?: NullableStringFieldUpdateOperationsInput | string | null
+    mainDep?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudOpenid?: NullableStringFieldUpdateOperationsInput | string | null
+    productTons?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -56644,163 +56645,157 @@ export namespace Prisma {
     id?: SortOrder
     productName?: SortOrder
     productWarehouse?: SortOrder
-    productTons?: SortOrder
-    dailyProcessQty?: SortOrder
-    dailyProcessAmount?: SortOrder
-    dailyProcessPrice?: SortOrder
     productionDate?: SortOrder
     materialComposition?: SortOrder
     materialWarehouses?: SortOrder
+    mslkm4Qty?: SortOrder
+    mslkm4Price?: SortOrder
+    mslkm2Qty?: SortOrder
+    mslkm2Price?: SortOrder
+    mslkmQty?: SortOrder
+    mslkmPrice?: SortOrder
+    mslkm0Qty?: SortOrder
+    mslkm0Price?: SortOrder
+    mslkm6Qty?: SortOrder
+    mslkm6Price?: SortOrder
+    mjsjm4Qty?: SortOrder
+    mjsjm4Price?: SortOrder
+    mjsjm2Qty?: SortOrder
+    mjsjm2Price?: SortOrder
+    mckkmQty?: SortOrder
+    mckkmPrice?: SortOrder
+    mckkm0Qty?: SortOrder
+    mckkm0Price?: SortOrder
+    mgjkm0Qty?: SortOrder
+    mgjkm0Price?: SortOrder
+    mgjkm10Qty?: SortOrder
+    mgjkm10Price?: SortOrder
+    mlkm2Qty?: SortOrder
+    mlkm2Price?: SortOrder
+    mlkmQty?: SortOrder
+    mlkmPrice?: SortOrder
+    mlkq1m2Qty?: SortOrder
+    mlkq1m2Price?: SortOrder
+    mlkq1m0Qty?: SortOrder
+    mlkq1m0Price?: SortOrder
+    mlkq1m6Qty?: SortOrder
+    mlkq1m6Price?: SortOrder
+    fl1Qty?: SortOrder
+    fl1Price?: SortOrder
+    dailyProcessQty?: SortOrder
+    dailyProcessAmount?: SortOrder
+    dailyProcessPrice?: SortOrder
+    dep?: SortOrder
     openid?: SortOrder
-    M1Qty?: SortOrder
-    M1Price?: SortOrder
-    M2Qty?: SortOrder
-    M2Price?: SortOrder
-    M3Qty?: SortOrder
-    M3Price?: SortOrder
-    M4Qty?: SortOrder
-    M4Price?: SortOrder
-    M5Qty?: SortOrder
-    M5Price?: SortOrder
-    M6Qty?: SortOrder
-    M6Price?: SortOrder
-    M7Qty?: SortOrder
-    M7Price?: SortOrder
-    M8Qty?: SortOrder
-    M8Price?: SortOrder
-    M9Qty?: SortOrder
-    M9Price?: SortOrder
-    wireRopeQty?: SortOrder
-    wireRopePrice?: SortOrder
-    carShellQty?: SortOrder
-    carShellPrice?: SortOrder
-    pigIronQty?: SortOrder
-    pigIronPrice?: SortOrder
-    scrapQty?: SortOrder
-    scrapPrice?: SortOrder
-    carDismantleQty?: SortOrder
-    carDismantlePrice?: SortOrder
-    transferQty?: SortOrder
-    transferPrice?: SortOrder
-    auxiliaryQty?: SortOrder
-    auxiliaryPrice?: SortOrder
-    material1Qty?: SortOrder
-    material1Price?: SortOrder
-    material2Qty?: SortOrder
-    material2Price?: SortOrder
-    material3Qty?: SortOrder
-    material3Price?: SortOrder
-    material4Qty?: SortOrder
-    material4Price?: SortOrder
-    material5Qty?: SortOrder
-    material5Price?: SortOrder
+    phone?: SortOrder
+    name?: SortOrder
+    updateBy?: SortOrder
+    createBy?: SortOrder
+    owner?: SortOrder
+    cloudId?: SortOrder
+    mainDep?: SortOrder
+    cloudOpenid?: SortOrder
+    productTons?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProcessingCostInputAvgOrderByAggregateInput = {
     id?: SortOrder
-    productTons?: SortOrder
+    mslkm4Qty?: SortOrder
+    mslkm4Price?: SortOrder
+    mslkm2Qty?: SortOrder
+    mslkm2Price?: SortOrder
+    mslkmQty?: SortOrder
+    mslkmPrice?: SortOrder
+    mslkm0Qty?: SortOrder
+    mslkm0Price?: SortOrder
+    mslkm6Qty?: SortOrder
+    mslkm6Price?: SortOrder
+    mjsjm4Qty?: SortOrder
+    mjsjm4Price?: SortOrder
+    mjsjm2Qty?: SortOrder
+    mjsjm2Price?: SortOrder
+    mckkmQty?: SortOrder
+    mckkmPrice?: SortOrder
+    mckkm0Qty?: SortOrder
+    mckkm0Price?: SortOrder
+    mgjkm0Qty?: SortOrder
+    mgjkm0Price?: SortOrder
+    mgjkm10Qty?: SortOrder
+    mgjkm10Price?: SortOrder
+    mlkm2Qty?: SortOrder
+    mlkm2Price?: SortOrder
+    mlkmQty?: SortOrder
+    mlkmPrice?: SortOrder
+    mlkq1m2Qty?: SortOrder
+    mlkq1m2Price?: SortOrder
+    mlkq1m0Qty?: SortOrder
+    mlkq1m0Price?: SortOrder
+    mlkq1m6Qty?: SortOrder
+    mlkq1m6Price?: SortOrder
+    fl1Qty?: SortOrder
+    fl1Price?: SortOrder
     dailyProcessQty?: SortOrder
     dailyProcessAmount?: SortOrder
     dailyProcessPrice?: SortOrder
-    M1Qty?: SortOrder
-    M1Price?: SortOrder
-    M2Qty?: SortOrder
-    M2Price?: SortOrder
-    M3Qty?: SortOrder
-    M3Price?: SortOrder
-    M4Qty?: SortOrder
-    M4Price?: SortOrder
-    M5Qty?: SortOrder
-    M5Price?: SortOrder
-    M6Qty?: SortOrder
-    M6Price?: SortOrder
-    M7Qty?: SortOrder
-    M7Price?: SortOrder
-    M8Qty?: SortOrder
-    M8Price?: SortOrder
-    M9Qty?: SortOrder
-    M9Price?: SortOrder
-    wireRopeQty?: SortOrder
-    wireRopePrice?: SortOrder
-    carShellQty?: SortOrder
-    carShellPrice?: SortOrder
-    pigIronQty?: SortOrder
-    pigIronPrice?: SortOrder
-    scrapQty?: SortOrder
-    scrapPrice?: SortOrder
-    carDismantleQty?: SortOrder
-    carDismantlePrice?: SortOrder
-    transferQty?: SortOrder
-    transferPrice?: SortOrder
-    auxiliaryQty?: SortOrder
-    auxiliaryPrice?: SortOrder
-    material1Qty?: SortOrder
-    material1Price?: SortOrder
-    material2Qty?: SortOrder
-    material2Price?: SortOrder
-    material3Qty?: SortOrder
-    material3Price?: SortOrder
-    material4Qty?: SortOrder
-    material4Price?: SortOrder
-    material5Qty?: SortOrder
-    material5Price?: SortOrder
+    productTons?: SortOrder
   }
 
   export type ProcessingCostInputMaxOrderByAggregateInput = {
     id?: SortOrder
     productName?: SortOrder
     productWarehouse?: SortOrder
-    productTons?: SortOrder
+    productionDate?: SortOrder
+    materialWarehouses?: SortOrder
+    mslkm4Qty?: SortOrder
+    mslkm4Price?: SortOrder
+    mslkm2Qty?: SortOrder
+    mslkm2Price?: SortOrder
+    mslkmQty?: SortOrder
+    mslkmPrice?: SortOrder
+    mslkm0Qty?: SortOrder
+    mslkm0Price?: SortOrder
+    mslkm6Qty?: SortOrder
+    mslkm6Price?: SortOrder
+    mjsjm4Qty?: SortOrder
+    mjsjm4Price?: SortOrder
+    mjsjm2Qty?: SortOrder
+    mjsjm2Price?: SortOrder
+    mckkmQty?: SortOrder
+    mckkmPrice?: SortOrder
+    mckkm0Qty?: SortOrder
+    mckkm0Price?: SortOrder
+    mgjkm0Qty?: SortOrder
+    mgjkm0Price?: SortOrder
+    mgjkm10Qty?: SortOrder
+    mgjkm10Price?: SortOrder
+    mlkm2Qty?: SortOrder
+    mlkm2Price?: SortOrder
+    mlkmQty?: SortOrder
+    mlkmPrice?: SortOrder
+    mlkq1m2Qty?: SortOrder
+    mlkq1m2Price?: SortOrder
+    mlkq1m0Qty?: SortOrder
+    mlkq1m0Price?: SortOrder
+    mlkq1m6Qty?: SortOrder
+    mlkq1m6Price?: SortOrder
+    fl1Qty?: SortOrder
+    fl1Price?: SortOrder
     dailyProcessQty?: SortOrder
     dailyProcessAmount?: SortOrder
     dailyProcessPrice?: SortOrder
-    productionDate?: SortOrder
-    materialWarehouses?: SortOrder
+    dep?: SortOrder
     openid?: SortOrder
-    M1Qty?: SortOrder
-    M1Price?: SortOrder
-    M2Qty?: SortOrder
-    M2Price?: SortOrder
-    M3Qty?: SortOrder
-    M3Price?: SortOrder
-    M4Qty?: SortOrder
-    M4Price?: SortOrder
-    M5Qty?: SortOrder
-    M5Price?: SortOrder
-    M6Qty?: SortOrder
-    M6Price?: SortOrder
-    M7Qty?: SortOrder
-    M7Price?: SortOrder
-    M8Qty?: SortOrder
-    M8Price?: SortOrder
-    M9Qty?: SortOrder
-    M9Price?: SortOrder
-    wireRopeQty?: SortOrder
-    wireRopePrice?: SortOrder
-    carShellQty?: SortOrder
-    carShellPrice?: SortOrder
-    pigIronQty?: SortOrder
-    pigIronPrice?: SortOrder
-    scrapQty?: SortOrder
-    scrapPrice?: SortOrder
-    carDismantleQty?: SortOrder
-    carDismantlePrice?: SortOrder
-    transferQty?: SortOrder
-    transferPrice?: SortOrder
-    auxiliaryQty?: SortOrder
-    auxiliaryPrice?: SortOrder
-    material1Qty?: SortOrder
-    material1Price?: SortOrder
-    material2Qty?: SortOrder
-    material2Price?: SortOrder
-    material3Qty?: SortOrder
-    material3Price?: SortOrder
-    material4Qty?: SortOrder
-    material4Price?: SortOrder
-    material5Qty?: SortOrder
-    material5Price?: SortOrder
+    phone?: SortOrder
+    name?: SortOrder
+    updateBy?: SortOrder
+    createBy?: SortOrder
+    owner?: SortOrder
+    cloudId?: SortOrder
+    mainDep?: SortOrder
+    cloudOpenid?: SortOrder
+    productTons?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -56809,107 +56804,100 @@ export namespace Prisma {
     id?: SortOrder
     productName?: SortOrder
     productWarehouse?: SortOrder
-    productTons?: SortOrder
+    productionDate?: SortOrder
+    materialWarehouses?: SortOrder
+    mslkm4Qty?: SortOrder
+    mslkm4Price?: SortOrder
+    mslkm2Qty?: SortOrder
+    mslkm2Price?: SortOrder
+    mslkmQty?: SortOrder
+    mslkmPrice?: SortOrder
+    mslkm0Qty?: SortOrder
+    mslkm0Price?: SortOrder
+    mslkm6Qty?: SortOrder
+    mslkm6Price?: SortOrder
+    mjsjm4Qty?: SortOrder
+    mjsjm4Price?: SortOrder
+    mjsjm2Qty?: SortOrder
+    mjsjm2Price?: SortOrder
+    mckkmQty?: SortOrder
+    mckkmPrice?: SortOrder
+    mckkm0Qty?: SortOrder
+    mckkm0Price?: SortOrder
+    mgjkm0Qty?: SortOrder
+    mgjkm0Price?: SortOrder
+    mgjkm10Qty?: SortOrder
+    mgjkm10Price?: SortOrder
+    mlkm2Qty?: SortOrder
+    mlkm2Price?: SortOrder
+    mlkmQty?: SortOrder
+    mlkmPrice?: SortOrder
+    mlkq1m2Qty?: SortOrder
+    mlkq1m2Price?: SortOrder
+    mlkq1m0Qty?: SortOrder
+    mlkq1m0Price?: SortOrder
+    mlkq1m6Qty?: SortOrder
+    mlkq1m6Price?: SortOrder
+    fl1Qty?: SortOrder
+    fl1Price?: SortOrder
     dailyProcessQty?: SortOrder
     dailyProcessAmount?: SortOrder
     dailyProcessPrice?: SortOrder
-    productionDate?: SortOrder
-    materialWarehouses?: SortOrder
+    dep?: SortOrder
     openid?: SortOrder
-    M1Qty?: SortOrder
-    M1Price?: SortOrder
-    M2Qty?: SortOrder
-    M2Price?: SortOrder
-    M3Qty?: SortOrder
-    M3Price?: SortOrder
-    M4Qty?: SortOrder
-    M4Price?: SortOrder
-    M5Qty?: SortOrder
-    M5Price?: SortOrder
-    M6Qty?: SortOrder
-    M6Price?: SortOrder
-    M7Qty?: SortOrder
-    M7Price?: SortOrder
-    M8Qty?: SortOrder
-    M8Price?: SortOrder
-    M9Qty?: SortOrder
-    M9Price?: SortOrder
-    wireRopeQty?: SortOrder
-    wireRopePrice?: SortOrder
-    carShellQty?: SortOrder
-    carShellPrice?: SortOrder
-    pigIronQty?: SortOrder
-    pigIronPrice?: SortOrder
-    scrapQty?: SortOrder
-    scrapPrice?: SortOrder
-    carDismantleQty?: SortOrder
-    carDismantlePrice?: SortOrder
-    transferQty?: SortOrder
-    transferPrice?: SortOrder
-    auxiliaryQty?: SortOrder
-    auxiliaryPrice?: SortOrder
-    material1Qty?: SortOrder
-    material1Price?: SortOrder
-    material2Qty?: SortOrder
-    material2Price?: SortOrder
-    material3Qty?: SortOrder
-    material3Price?: SortOrder
-    material4Qty?: SortOrder
-    material4Price?: SortOrder
-    material5Qty?: SortOrder
-    material5Price?: SortOrder
+    phone?: SortOrder
+    name?: SortOrder
+    updateBy?: SortOrder
+    createBy?: SortOrder
+    owner?: SortOrder
+    cloudId?: SortOrder
+    mainDep?: SortOrder
+    cloudOpenid?: SortOrder
+    productTons?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProcessingCostInputSumOrderByAggregateInput = {
     id?: SortOrder
-    productTons?: SortOrder
+    mslkm4Qty?: SortOrder
+    mslkm4Price?: SortOrder
+    mslkm2Qty?: SortOrder
+    mslkm2Price?: SortOrder
+    mslkmQty?: SortOrder
+    mslkmPrice?: SortOrder
+    mslkm0Qty?: SortOrder
+    mslkm0Price?: SortOrder
+    mslkm6Qty?: SortOrder
+    mslkm6Price?: SortOrder
+    mjsjm4Qty?: SortOrder
+    mjsjm4Price?: SortOrder
+    mjsjm2Qty?: SortOrder
+    mjsjm2Price?: SortOrder
+    mckkmQty?: SortOrder
+    mckkmPrice?: SortOrder
+    mckkm0Qty?: SortOrder
+    mckkm0Price?: SortOrder
+    mgjkm0Qty?: SortOrder
+    mgjkm0Price?: SortOrder
+    mgjkm10Qty?: SortOrder
+    mgjkm10Price?: SortOrder
+    mlkm2Qty?: SortOrder
+    mlkm2Price?: SortOrder
+    mlkmQty?: SortOrder
+    mlkmPrice?: SortOrder
+    mlkq1m2Qty?: SortOrder
+    mlkq1m2Price?: SortOrder
+    mlkq1m0Qty?: SortOrder
+    mlkq1m0Price?: SortOrder
+    mlkq1m6Qty?: SortOrder
+    mlkq1m6Price?: SortOrder
+    fl1Qty?: SortOrder
+    fl1Price?: SortOrder
     dailyProcessQty?: SortOrder
     dailyProcessAmount?: SortOrder
     dailyProcessPrice?: SortOrder
-    M1Qty?: SortOrder
-    M1Price?: SortOrder
-    M2Qty?: SortOrder
-    M2Price?: SortOrder
-    M3Qty?: SortOrder
-    M3Price?: SortOrder
-    M4Qty?: SortOrder
-    M4Price?: SortOrder
-    M5Qty?: SortOrder
-    M5Price?: SortOrder
-    M6Qty?: SortOrder
-    M6Price?: SortOrder
-    M7Qty?: SortOrder
-    M7Price?: SortOrder
-    M8Qty?: SortOrder
-    M8Price?: SortOrder
-    M9Qty?: SortOrder
-    M9Price?: SortOrder
-    wireRopeQty?: SortOrder
-    wireRopePrice?: SortOrder
-    carShellQty?: SortOrder
-    carShellPrice?: SortOrder
-    pigIronQty?: SortOrder
-    pigIronPrice?: SortOrder
-    scrapQty?: SortOrder
-    scrapPrice?: SortOrder
-    carDismantleQty?: SortOrder
-    carDismantlePrice?: SortOrder
-    transferQty?: SortOrder
-    transferPrice?: SortOrder
-    auxiliaryQty?: SortOrder
-    auxiliaryPrice?: SortOrder
-    material1Qty?: SortOrder
-    material1Price?: SortOrder
-    material2Qty?: SortOrder
-    material2Price?: SortOrder
-    material3Qty?: SortOrder
-    material3Price?: SortOrder
-    material4Qty?: SortOrder
-    material4Price?: SortOrder
-    material5Qty?: SortOrder
-    material5Price?: SortOrder
+    productTons?: SortOrder
   }
 
   export type MaterialStorageOrderByRelevanceInput = {

@@ -111,6 +111,164 @@ interface InventoryRow {
   amount: number;
 }
 
+/** 与 API `/api/profit-management/cost-analysis/inventory-value` 一致 */
+interface InventoryValueAnalysisRow {
+  storageArea: string;
+  materialType: string;
+  currentQty: number;
+  currentPrice: number;
+  avgPurchaseUnitPrice: number | null;
+  inventoryAmount: number;
+  earliestPurchaseDate: string | null;
+  latestPurchaseDate: string | null;
+  latestPurchaseUnitPrice: number | null;
+}
+
+function InventoryValueAnalysisSection({
+  rows,
+  loading,
+  error,
+}: {
+  rows: InventoryValueAnalysisRow[];
+  loading: boolean;
+  error: string | null;
+}) {
+  const fmt = (n: number | null | undefined, digits = 2) =>
+    n != null && Number.isFinite(n) ? n.toFixed(digits) : '—';
+  const fmt4 = (n: number | null | undefined) =>
+    n != null && Number.isFinite(n) ? n.toFixed(4) : '—';
+
+  const { totalQty, totalInventoryAmount } = useMemo(() => {
+    let q = 0;
+    let a = 0;
+    for (const r of rows) {
+      q += r.currentQty;
+      a += r.inventoryAmount;
+    }
+    return { totalQty: q, totalInventoryAmount: a };
+  }, [rows]);
+
+  return (
+    <section className="mb-8 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
+      <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          毛料库存价值分析
+        </h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          当前库存来自 MaterialStorage；采购口径与入库同步一致（基地收货 SH）。金额为当前数量×当前计价单价；平均采购单价一般为历史入库加权（不含税）。「毛料库」「毛料库区一」为 4/1 盘点滚存区，平均采购单价列取 MaterialStorage 当前计价单价。
+        </p>
+      </div>
+      {loading && (
+        <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+          正在加载库存价值数据…
+        </div>
+      )}
+      {!loading && error && (
+        <div className="px-4 py-4 text-sm text-red-600 dark:text-red-400">{error}</div>
+      )}
+      {!loading && !error && (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-900/40">
+              <tr>
+                <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  库区
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  毛料名称
+                </th>
+                <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wide text-sky-800 dark:text-sky-300">
+                  当前库存总数量（吨）
+                </th>
+                <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  平均采购单价（元/吨）
+                </th>
+                <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wide text-sky-800 dark:text-sky-300">
+                  库存总金额（元）
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  最早采购日期
+                </th>
+                <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  最近采购日期
+                </th>
+                <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  最近采购单价（元/吨）
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+              {rows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    暂无库存大于 0 的毛料行
+                  </td>
+                </tr>
+              ) : (
+                rows.map((r, i) => (
+                  <tr key={`${r.storageArea}-${r.materialType}-${i}`} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100">
+                      {r.storageArea}
+                    </td>
+                    <td className="px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100">
+                      {r.materialType}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-sky-800 dark:text-sky-300">
+                      {fmt4(r.currentQty)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-gray-900 dark:text-gray-100">
+                      {fmt(r.avgPurchaseUnitPrice)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-sky-800 dark:text-sky-300">
+                      {fmt(r.inventoryAmount)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+                      {r.earliestPurchaseDate ?? '—'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+                      {r.latestPurchaseDate ?? '—'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-gray-900 dark:text-gray-100">
+                      {fmt(r.latestPurchaseUnitPrice)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+            {!loading && !error && rows.length > 0 && (
+              <tfoot className="border-t-2 border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-900/50">
+                <tr>
+                  <td
+                    colSpan={2}
+                    className="whitespace-nowrap px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100"
+                  >
+                    合计
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-sky-800 dark:text-sky-300">
+                    {fmt4(totalQty)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-gray-500 dark:text-gray-400">
+                    —
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-2.5 text-sm text-right tabular-nums text-sky-800 dark:text-sky-300">
+                    {fmt(totalInventoryAmount)}
+                  </td>
+                  <td colSpan={3} className="px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400">
+                    —
+                  </td>
+                </tr>
+              </tfoot>
+            )}
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function CostAnalysis() {
   const [data, setData] = useState<CostAnalysisData | null>(null);
   /** quick：首屏核心指标与趋势已就绪；full：料型分布等已合并 */
@@ -151,6 +309,10 @@ export default function CostAnalysis() {
   const [invClosingRows, setInvClosingRows] = useState<InventoryRow[]>([]);
   const [invLoading, setInvLoading] = useState(false);
   const [invErr, setInvErr] = useState<string | null>(null);
+
+  const [invValueRows, setInvValueRows] = useState<InventoryValueAnalysisRow[]>([]);
+  const [invValueLoading, setInvValueLoading] = useState(true);
+  const [invValueErr, setInvValueErr] = useState<string | null>(null);
 
   const invClosingMin = MATERIAL_INVENTORY_MIN_CLOSING;
   const invClosingMax = useMemo(() => formatYmd(new Date()), []);
@@ -197,6 +359,32 @@ export default function CostAnalysis() {
       cancelled = true;
     };
   }, [invYear, invMonth, invClosingDate]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setInvValueLoading(true);
+      setInvValueErr(null);
+      try {
+        const res = await fetch('/api/profit-management/cost-analysis/inventory-value');
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || `HTTP ${res.status}`);
+        }
+        if (!cancelled) setInvValueRows(json.data?.rows ?? []);
+      } catch (e) {
+        if (!cancelled) {
+          setInvValueErr(e instanceof Error ? e.message : '加载失败');
+          setInvValueRows([]);
+        }
+      } finally {
+        if (!cancelled) setInvValueLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const now = new Date();
@@ -312,7 +500,17 @@ export default function CostAnalysis() {
   };
 
   if (!data && !error) {
-    return <CostAnalysisSkeleton />;
+    return (
+      <CostAnalysisSkeleton
+        topExtra={
+          <InventoryValueAnalysisSection
+            rows={invValueRows}
+            loading={invValueLoading}
+            error={invValueErr}
+          />
+        }
+      />
+    );
   }
 
   if (error && !data) {
@@ -1027,6 +1225,12 @@ export default function CostAnalysis() {
             </div>
           </div>
         </div>
+
+        <InventoryValueAnalysisSection
+          rows={invValueRows}
+          loading={invValueLoading}
+          error={invValueErr}
+        />
 
         {loadStage === 'quick' && (
           <div className="mb-4 rounded-md border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">

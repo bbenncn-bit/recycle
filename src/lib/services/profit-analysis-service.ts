@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate, formatDate } from './profit-service';
 import { calculateLIFOMaterialCost } from './lifo-material-cost-service';
+import {
+  deriveProfitAnalysisCustomer,
+  isExcludedFromProfitAnalysis,
+} from './profit-analysis-warehouse-rules';
 
 export interface ProfitAnalysisData {
   summary: {
@@ -28,9 +32,13 @@ export interface ProfitAnalysisData {
   salesDetails: Array<{            // 销售明细
     deliveryNumber: string;
     deliveryDate: string;
+    /** 品种（与加工表/LIFO 匹配的成品名） */
     productType: string;
+    /** 表格「成品名称」：以 DeliverySettlement.warehouse 为主 */
+    productDisplayName: string;
     warehouse: string;
-    customer: string;              // 发往客户
+    /** 发往客户：库内为空时按 warehouse/product_type 推导（吉钢/萍钢/新钢） */
+    customer: string;
     settlementQuantity: number;   // 结算量（吨）
     transitLoss: number;          // 途损率（如 0.005 表示 0.5%）
     revenue: number;               // 销售收入（元）
@@ -690,7 +698,6 @@ async function buildProfitProductComparison(): Promise<ProfitAnalysisData['produ
   const customerOrder = ['吉钢', '萍钢', '新钢'];
   const rows = await prisma.deliverySettlement.findMany({
     where: {
-      customer: { in: customerOrder },
       productType: { not: null },
       settlementQuantity: { not: null },
       totalSettlementAmount: { not: null },
@@ -699,6 +706,7 @@ async function buildProfitProductComparison(): Promise<ProfitAnalysisData['produ
     select: {
       customer: true,
       productType: true,
+      warehouse: true,
       settlementQuantity: true,
       totalSettlementAmount: true,
       deliveryDate: true,
@@ -710,8 +718,12 @@ async function buildProfitProductComparison(): Promise<ProfitAnalysisData['produ
   const map = new Map<string, KeyAgg>();
 
   for (const row of rows) {
-    const customer = (row.customer || '').trim();
-    const product = (row.productType || '').trim();
+    if (isExcludedFromProfitAnalysis(row.warehouse, row.productType)) continue;
+    const customer =
+      deriveProfitAnalysisCustomer(row.warehouse, row.productType) ||
+      (row.customer || '').trim();
+    const product =
+      (row.warehouse || '').trim() || (row.productType || '').trim();
     if (!customer || !product || !targetCustomers.has(customer)) continue;
     const d = parseDeliveryDate(row.deliveryDate);
     if (!d) continue;
@@ -1002,8 +1014,12 @@ export async function getProfitAnalysisData(
     console.log('⚠️ 未查询到销售数据，返回空结果');
   }
 
-  // 销售明细：在发货日期下界之后、有有效日期的数据（明细表仍展示窗口内全部单）
-  const validSalesForDetails = salesData.filter(sale => parseDeliveryDate(sale.deliveryDate) !== null);
+  // 销售明细：有效发货日期；排除汽拆类（不纳入本模块）
+  const validSalesForDetails = salesData.filter((sale) => {
+    if (parseDeliveryDate(sale.deliveryDate) === null) return false;
+    if (isExcludedFromProfitAnalysis(sale.warehouse, sale.productType)) return false;
+    return true;
+  });
   // 汇总/图表仍基于 salesDetails 再按 queryStartDate/queryEndDate 过滤计算
 
   // 优先从原表 transitloss 列读取途损（该列当前未在 Prisma model 中声明，用原生 SQL 读取）
@@ -1093,8 +1109,12 @@ export async function getProfitAnalysisData(
           const revenue = processDecimal(sale.totalSettlementAmount);
           const quantity = processDecimal(sale.settlementQuantity);
           const netWeightQuantity = processDecimal(sale.netWeight);
-          const productType = sale.productType || '';
-          const customer = (sale.customer || '').trim();
+          const productType = (sale.productType || '').trim();
+          const productDisplayName =
+            (sale.warehouse || '').trim() || productType;
+          const customer =
+            deriveProfitAnalysisCustomer(sale.warehouse, sale.productType) ||
+            (sale.customer || '').trim();
 
           const deliveryDate = parseDeliveryDate(sale.deliveryDate) || new Date();
           const monthKey = formatDate(deliveryDate).slice(0, 7);
@@ -1227,9 +1247,10 @@ export async function getProfitAnalysisData(
           return {
             deliveryNumber: sale.deliveryNumber || '',
             deliveryDate: sale.deliveryDate || '',
-            productType: productType,
+            productType,
+            productDisplayName,
             warehouse: sale.warehouse || '',
-            customer: sale.customer || '',
+            customer,
             settlementQuantity: quantity,
             transitLoss,
             revenue,
@@ -1272,9 +1293,13 @@ export async function getProfitAnalysisData(
           return {
             deliveryNumber: sale.deliveryNumber || '',
             deliveryDate: sale.deliveryDate || '',
-            productType: sale.productType || '',
+            productType: (sale.productType || '').trim(),
+            productDisplayName:
+              (sale.warehouse || '').trim() || (sale.productType || '').trim(),
             warehouse: sale.warehouse || '',
-            customer: sale.customer || '',
+            customer:
+              deriveProfitAnalysisCustomer(sale.warehouse, sale.productType) ||
+              (sale.customer || '').trim(),
             settlementQuantity: 0,
             transitLoss: 0,
             revenue: 0,
