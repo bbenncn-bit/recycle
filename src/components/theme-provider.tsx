@@ -26,8 +26,9 @@ interface ThemeProviderProps {
 }
 
 // Theme is not persisted (no localStorage) to avoid SSR errors when Node has a broken localStorage (e.g. --localstorage-file).
+// 默认暗夜；浅色依赖 html[data-theme=light]，须与 globals 中 @custom-variant dark 一致。
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

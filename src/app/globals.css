@@ -1,7 +1,7 @@
 /* Tailwind 主样式见 layout.tsx：`import 'tailwindcss/index.css'` */
 
-/* 为 Tailwind v4 配置自定义暗色模式变体 */
-@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* 必须 @custom-variant：@variant 不会覆盖内置 dark，系统深色时 dark: 仍随 prefers-color-scheme 生效，导致无法切到浅色 */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 input[type='number'] {
   -moz-appearance: textfield;
