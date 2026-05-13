@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface EnergyConsumptionData {
   timeInterval: 'day' | 'month' | 'year';
@@ -188,7 +188,6 @@ export default function ConsumptionCalculation() {
           .filter(item => item.energyConsumption > 0)
           .map(item => {
             const energyType = item.name.split(' ')[0]; // 只取能源类型名称
-            console.log(`饼图数据 - 原始名称: ${item.name}, 提取类型: ${energyType}, 消费量: ${item.energyConsumption}`);
             return {
               value: item.energyConsumption,
               name: energyType,
@@ -288,9 +287,7 @@ export default function ConsumptionCalculation() {
       '其它': '#6B7280',
       '水': '#06B6D4'
     };
-    const color = colors[energyType] || '#6B7280';
-    console.log(`能源类型: ${energyType}, 颜色: ${color}`);
-    return color;
+    return colors[energyType] || '#6B7280';
   }
 
   if (loading) {
@@ -450,7 +447,7 @@ export default function ConsumptionCalculation() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 饼图 */}
           <div className="bg-white dark:bg-gray-200 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={pieChartOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -458,7 +455,7 @@ export default function ConsumptionCalculation() {
 
           {/* 柱状图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={barChartOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -471,7 +468,7 @@ export default function ConsumptionCalculation() {
             能源消费量趋势分析
           </h2>
           <div className="h-96">
-            <ReactECharts
+            <LazyReactECharts
               option={{
                 title: {
                   text: '能源消费量趋势',

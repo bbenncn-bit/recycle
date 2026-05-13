@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface CarbonAccountingData {
   year: string;
@@ -511,7 +511,7 @@ export default function CarbonAccounting() {
 
         {/* 月度排放量图表 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-          <ReactECharts
+          <LazyReactECharts
             option={monthlyEmissionsChartOption}
             style={{ height: '400px', width: '100%' }}
           />
@@ -527,7 +527,7 @@ export default function CarbonAccounting() {
                 展开全部
               </button>
             </div>
-            <ReactECharts
+            <LazyReactECharts
               option={carbonFlowChartOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -536,7 +536,7 @@ export default function CarbonAccounting() {
           {/* 减排分析 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">减排分析</h3>
-            <ReactECharts
+            <LazyReactECharts
               option={emissionReductionChartOption}
               style={{ height: '400px', width: '100%' }}
             />

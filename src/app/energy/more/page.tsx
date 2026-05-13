@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface CarbonAssetData {
   totalAssets: {
@@ -423,7 +423,7 @@ export default function More() {
                   </div>
                 </div>
                 <div className="h-56">
-                  <ReactECharts
+                  <LazyReactECharts
                     option={assetQuantityPieOption}
                     style={{ height: '100%', width: '100%' }}
                   />
@@ -449,7 +449,7 @@ export default function More() {
                   </div>
                 </div>
                 <div className="h-56">
-                  <ReactECharts
+                  <LazyReactECharts
                     option={assetValuePieOption}
                     style={{ height: '100%', width: '100%' }}
                   />
@@ -558,7 +558,7 @@ export default function More() {
 
             {/* 价格趋势图表 */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-              <ReactECharts
+              <LazyReactECharts
                 option={priceChartOption}
                 style={{ height: '400px', width: '100%' }}
               />

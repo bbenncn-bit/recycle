@@ -322,7 +322,9 @@ async function calculateMaterialCost(
     const cached = await getMaterialCostFromCache(deliveryNumber);
     
     if (cached) {
-      console.log(`从缓存读取材料成本: ${deliveryNumber}`);
+      if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
+        console.log(`从缓存读取材料成本: ${deliveryNumber}`);
+      }
       return {
         cost: cached.materialCost,
         composition: cached.materialComposition,
@@ -348,7 +350,11 @@ async function calculateMaterialCost(
                 cost: ((c.tons ?? 0) / totalTons) * lifoResult.cost,
               }))
             : [];
-        console.log(`缓存未命中，实时 LIFO 计算材料成本: ${deliveryNumber}, ${lifoResult.cost.toFixed(2)} 元`);
+        if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
+          console.log(
+            `缓存未命中，实时 LIFO 计算材料成本: ${deliveryNumber}, ${lifoResult.cost.toFixed(2)} 元`,
+          );
+        }
         return {
           cost: lifoResult.cost,
           composition,
@@ -360,7 +366,9 @@ async function calculateMaterialCost(
     }
 
     // 仍无结果则返回 0（建议执行 CALL sp_update_material_cost_cache 更新缓存）
-    console.warn(`缓存未命中: ${deliveryNumber}，无 LIFO 结果，材料成本显示为 0`);
+    if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
+      console.warn(`缓存未命中: ${deliveryNumber}，无 LIFO 结果，材料成本显示为 0`);
+    }
     return {
       cost: 0,
       composition: [],

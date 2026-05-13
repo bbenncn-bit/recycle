@@ -23,6 +23,11 @@ const mergedDevOrigins = Array.from(
 const nextConfig: NextConfig = {
   ...(!isProd && mergedDevOrigins.length > 0 ? { allowedDevOrigins: mergedDevOrigins } : {}),
 
+  /** 减轻 echarts / heroicons 等包的首屏解析体积 */
+  experimental: {
+    optimizePackageImports: ['echarts', 'echarts-for-react', '@heroicons/react'],
+  },
+
   /**
    * instrumentation / API 等服务端代码若把 mariadb 打进 webpack，会解析其内部的 require('stream') 并报错。
    * 列为外部包，运行时使用 Node 原生解析。
@@ -82,7 +87,8 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self' https:; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; font-src 'self' https: data:; connect-src 'self' https: wss:;",
+              /* 内网 http://IP 部署时需允许 http，否则 fetch/图片可能被浏览器拦截 */
+              "default-src 'self' http: https:; img-src 'self' http: https: data: blob:; style-src 'self' 'unsafe-inline' http: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' http: https:; font-src 'self' http: https: data:; connect-src 'self' http: https: ws: wss: data: blob:;",
           },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },

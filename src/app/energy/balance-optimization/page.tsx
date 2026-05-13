@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface BalanceOptimizationData {
   timeInterval: 'day' | 'month' | 'year';
@@ -623,7 +623,7 @@ export default function BalanceOptimization() {
                   </button>
                 ))}
               </div>
-              <ReactECharts
+              <LazyReactECharts
                 option={energyConsumptionChartOption}
                 style={{ height: '300px', width: '100%' }}
               />
@@ -633,7 +633,7 @@ export default function BalanceOptimization() {
           {/* 光伏发电量 */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <ReactECharts
+              <LazyReactECharts
                 option={photovoltaicChartOption}
                 style={{ height: '300px', width: '100%' }}
               />
@@ -651,7 +651,7 @@ export default function BalanceOptimization() {
                   <option>能源类型</option>
                 </select>
               </div>
-              <ReactECharts
+              <LazyReactECharts
                 option={balanceDifferenceChartOption}
                 style={{ height: '300px', width: '100%' }}
               />
@@ -663,7 +663,7 @@ export default function BalanceOptimization() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 重点设施设备运行监测 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={facilityEquipmentChartOption}
               style={{ height: '400px', width: '100%' }}
             />
@@ -671,7 +671,7 @@ export default function BalanceOptimization() {
 
           {/* 工序运行监测 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={processOperationChartOption}
               style={{ height: '400px', width: '100%' }}
             />

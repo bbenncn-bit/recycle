@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface EnergyCostData {
   totalCost: number;
@@ -360,7 +360,7 @@ export default function AnalysisStrategy() {
 
         {/* 月度能源成本柱状图 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-          <ReactECharts
+          <LazyReactECharts
             option={monthlyChartOption}
             style={{ height: '400px', width: '100%' }}
           />
@@ -373,13 +373,13 @@ export default function AnalysisStrategy() {
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <ReactECharts
+              <LazyReactECharts
                 option={usageChartOption}
                 style={{ height: '300px', width: '100%' }}
               />
             </div>
             <div>
-              <ReactECharts
+              <LazyReactECharts
                 option={costChartOption}
                 style={{ height: '300px', width: '100%' }}
               />

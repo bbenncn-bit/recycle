@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface WasteManagementData {
   summary: {
@@ -426,7 +426,7 @@ export default function WasteManagement() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 固废类别分布 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={categoryPieOption}
               style={{ height: '400px' }}
               opts={{ renderer: 'svg' }}
@@ -435,7 +435,7 @@ export default function WasteManagement() {
 
           {/* 流向分析 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={flowBarOption}
               style={{ height: '400px' }}
               opts={{ renderer: 'svg' }}
@@ -445,7 +445,7 @@ export default function WasteManagement() {
 
         {/* 月度趋势 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <ReactECharts
+          <LazyReactECharts
             option={monthlyTrendOption}
             style={{ height: '400px' }}
             opts={{ renderer: 'svg' }}
@@ -455,7 +455,7 @@ export default function WasteManagement() {
         {/* 利用与处置对比、贮存状态 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={utilizationDisposalOption}
               style={{ height: '400px' }}
               opts={{ renderer: 'svg' }}
@@ -463,7 +463,7 @@ export default function WasteManagement() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={storageStatusOption}
               style={{ height: '400px' }}
               opts={{ renderer: 'svg' }}

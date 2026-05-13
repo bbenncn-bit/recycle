@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface ConsumptionData {
   trend: any[];
@@ -303,7 +303,7 @@ export default function ConsumptionQuery() {
           {/* 今日用能曲线 */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <ReactECharts 
+              <LazyReactECharts 
                 option={todayConsumptionOption} 
                 style={{ height: '400px', width: '100%' }}
               />
@@ -356,7 +356,7 @@ export default function ConsumptionQuery() {
           {/* 能源类型对比 */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <ReactECharts 
+              <LazyReactECharts 
                 option={energyTypeComparisonOption} 
                 style={{ height: '400px', width: '100%' }}
               />

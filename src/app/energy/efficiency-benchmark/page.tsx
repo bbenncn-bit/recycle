@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface EfficiencyBenchmarkData {
   indicatorName: string;
@@ -447,7 +447,7 @@ export default function EfficiencyBenchmark() {
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">合格占比</h3>
             <div className="flex items-center justify-center">
               <div className="w-32 h-32">
-                <ReactECharts
+                <LazyReactECharts
                   option={complianceChartOption}
                   style={{ height: '100%', width: '100%' }}
                 />
@@ -532,7 +532,7 @@ export default function EfficiencyBenchmark() {
 
           {/* 趋势图 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={trendChartOption}
               style={{ height: '400px', width: '100%' }}
             />

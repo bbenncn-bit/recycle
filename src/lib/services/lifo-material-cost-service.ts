@@ -11,10 +11,33 @@ function getRecordField(record: Record<string, unknown>, canonical: string): unk
   return undefined;
 }
 
-/** ProcessingCostInput 实际列名（小写 -> information_schema 中的名字）；一次缓存 */
+/** ProcessingCostInput 实际列名（小写 -> information_schema 中的名字）；短 TTL 缓存 */
 let pciColumnLowerToActual: Map<string, string> | null = null;
 /** 已按当前表结构拼好的 SELECT 列清单（仅含存在的列） */
 let pciSelectListSql: string | null = null;
+let pciShapeCachedAt = 0;
+
+/** information_schema 结果可能滞后或进程长久存活后表结构已变；过期后强制重探测 */
+const PCI_SHAPE_TTL_MS = Number(process.env.PCI_SHAPE_CACHE_TTL_MS ?? '60000');
+
+function isUnknownMysqlColumnError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/Unknown column/i.test(msg)) return true;
+  const any = err as { code?: string; meta?: { code?: string } };
+  if (any?.code === 'P2010') return true;
+  const metaCode = any?.meta?.code;
+  if (typeof metaCode === 'string' && metaCode === '1054') return true;
+  return false;
+}
+
+/** 表结构变更或列探测错误后调用，避免永久缓存过时列清单（典型：Unknown column 'M1_qty'） */
+export function invalidateProcessingCostInputShapeCache(): void {
+  pciColumnLowerToActual = null;
+  pciSelectListSql = null;
+  pciShapeCachedAt = 0;
+}
+
+const lifoDebug = process.env.PROFIT_LIFO_DEBUG === '1';
 
 function quoteMysqlIdent(name: string): string {
   return '`' + name.replace(/`/g, '``') + '`';
@@ -29,13 +52,20 @@ async function getProcessingCostInputSelectShape(): Promise<{
   hasProductionDate: boolean;
   lowerToActual: Map<string, string>;
 }> {
-  if (pciSelectListSql !== null && pciColumnLowerToActual !== null) {
+  const cacheFresh =
+    pciSelectListSql !== null &&
+    pciColumnLowerToActual !== null &&
+    Date.now() - pciShapeCachedAt < PCI_SHAPE_TTL_MS;
+
+  if (cacheFresh) {
     return {
-      selectListSql: pciSelectListSql,
-      hasProductionDate: pciColumnLowerToActual.has('production_date'),
-      lowerToActual: pciColumnLowerToActual,
+      selectListSql: pciSelectListSql!,
+      hasProductionDate: pciColumnLowerToActual!.has('production_date'),
+      lowerToActual: pciColumnLowerToActual!,
     };
   }
+
+  invalidateProcessingCostInputShapeCache();
 
   let lowerToActual = new Map<string, string>();
   try {
@@ -78,6 +108,7 @@ async function getProcessingCostInputSelectShape(): Promise<{
   }
 
   pciSelectListSql = parts.length > 0 ? parts.join(',\n          ') : '`id`';
+  pciShapeCachedAt = Date.now();
 
   return {
     selectListSql: pciSelectListSql,
@@ -296,46 +327,61 @@ export async function calculateLIFOMaterialCost(
     let detailedRecords: any[] = [];
     try {
       const escapedProductName = (productName || '').replace(/'/g, "''");
-      const shape = await getProcessingCostInputSelectShape();
-      if (!shape.hasProductionDate) {
-        console.warn(
-          'ProcessingCostInput 表缺少 production_date 列，无法执行 LIFO 材料成本查询',
-        );
-        return { cost: 0, composition: [], productionRecords: [] };
-      }
-      const colProductName = shape.lowerToActual.get('product_name');
-      if (!colProductName) {
-        console.warn('ProcessingCostInput 表缺少 product_name 列，无法执行 LIFO');
-        return { cost: 0, composition: [], productionRecords: [] };
-      }
-      const colProductionDate = shape.lowerToActual.get('production_date')!;
 
-      let rawQuery = `
+      queryAttempts: for (let attempt = 0; attempt < 2; attempt++) {
+        const shape = await getProcessingCostInputSelectShape();
+        if (!shape.hasProductionDate) {
+          console.warn(
+            'ProcessingCostInput 表缺少 production_date 列，无法执行 LIFO 材料成本查询',
+          );
+          return { cost: 0, composition: [], productionRecords: [] };
+        }
+        const colProductName = shape.lowerToActual.get('product_name');
+        if (!colProductName) {
+          console.warn('ProcessingCostInput 表缺少 product_name 列，无法执行 LIFO');
+          return { cost: 0, composition: [], productionRecords: [] };
+        }
+        const colProductionDate = shape.lowerToActual.get('production_date')!;
+
+        let rawQuery = `
         SELECT 
           ${shape.selectListSql}
         FROM ProcessingCostInput
         WHERE ${quoteMysqlIdent(colProductName)} = '${escapedProductName}'
       `;
 
-      if (productWarehouse) {
-        const whCol = shape.lowerToActual.get('product_warehouse');
-        if (whCol) {
-          const escapedWarehouse = (productWarehouse || '').replace(/'/g, "''");
-          rawQuery += ` AND ${quoteMysqlIdent(whCol)} = '${escapedWarehouse}'`;
+        if (productWarehouse) {
+          const whCol = shape.lowerToActual.get('product_warehouse');
+          if (whCol) {
+            const escapedWarehouse = (productWarehouse || '').replace(/'/g, "''");
+            rawQuery += ` AND ${quoteMysqlIdent(whCol)} = '${escapedWarehouse}'`;
+          }
+        }
+
+        rawQuery += ` AND ${quoteMysqlIdent(colProductionDate)} IS NOT NULL ORDER BY ${quoteMysqlIdent(colProductionDate)} DESC`;
+
+        try {
+          detailedRecords = (await prisma.$queryRawUnsafe(rawQuery)) as any[];
+          break queryAttempts;
+        } catch (queryErr) {
+          if (attempt === 0 && isUnknownMysqlColumnError(queryErr)) {
+            invalidateProcessingCostInputShapeCache();
+            continue;
+          }
+          throw queryErr;
         }
       }
 
-      rawQuery += ` AND ${quoteMysqlIdent(colProductionDate)} IS NOT NULL ORDER BY ${quoteMysqlIdent(colProductionDate)} DESC`;
-
-      detailedRecords = (await prisma.$queryRawUnsafe(rawQuery)) as any[];
-      
       if (!detailedRecords || detailedRecords.length === 0) {
-        console.warn(`未找到 ${productName}${productWarehouse ? ` (${productWarehouse})` : ''} 的生产记录`);
+        if (lifoDebug) {
+          console.warn(
+            `未找到 ${productName}${productWarehouse ? ` (${productWarehouse})` : ''} 的生产记录`,
+          );
+        }
         return { cost: 0, composition: [], productionRecords: [] };
       }
     } catch (error) {
       console.error('使用 raw query 查询 ProcessingCostInput 失败:', error);
-      // 如果查询失败，返回空结果
       return { cost: 0, composition: [], productionRecords: [] };
     }
 
@@ -359,7 +405,11 @@ export async function calculateLIFOMaterialCost(
       })
       .map((item) => item.record);
 
-    console.log(`LIFO 计算: ${productName}${productWarehouse ? ` (${productWarehouse})` : ''}, 销售数量: ${saleQuantity}吨, 销售日期: ${saleDate.toISOString().split('T')[0]}, 找到 ${validRecords.length} 条生产记录`);
+    if (lifoDebug) {
+      console.log(
+        `LIFO 计算: ${productName}${productWarehouse ? ` (${productWarehouse})` : ''}, 销售数量: ${saleQuantity}吨, 销售日期: ${saleDate.toISOString().split('T')[0]}, 找到 ${validRecords.length} 条生产记录`,
+      );
+    }
 
     // LIFO 分配：从最新的生产记录开始消耗
     let remainingQuantity = saleQuantity;
@@ -379,14 +429,18 @@ export async function calculateLIFOMaterialCost(
       const availableQty = prodCost.totalQty;
       
       if (availableQty <= 0) {
-        console.warn(`生产记录 ${record.id} 的可用数量为 0，跳过`);
+        if (lifoDebug) console.warn(`生产记录 ${record.id} 的可用数量为 0，跳过`);
         continue;
       }
 
       const usedQty = Math.min(remainingQuantity, availableQty);
       const usedCost = prodCost.unitCost * usedQty;
-      
-      console.log(`使用生产记录 ${record.id} (${record.production_date || record.productionDate}): 可用${availableQty.toFixed(2)}吨, 使用${usedQty.toFixed(2)}吨, 单位成本${prodCost.unitCost.toFixed(2)}元/吨, 成本${usedCost.toFixed(2)}元`);
+
+      if (lifoDebug) {
+        console.log(
+          `使用生产记录 ${record.id} (${record.production_date || record.productionDate}): 可用${availableQty.toFixed(2)}吨, 使用${usedQty.toFixed(2)}吨, 单位成本${prodCost.unitCost.toFixed(2)}元/吨, 成本${usedCost.toFixed(2)}元`,
+        );
+      }
 
       usedRecords.push({
         id: record.id || 0,
@@ -444,7 +498,11 @@ export async function calculateLIFOMaterialCost(
       tons,
     }));
 
-    console.log(`LIFO 计算结果: 总成本=${totalCost.toFixed(2)}元, 使用${usedRecords.length}条生产记录, 原材料种类=${composition.length}`);
+    if (lifoDebug) {
+      console.log(
+        `LIFO 计算结果: 总成本=${totalCost.toFixed(2)}元, 使用${usedRecords.length}条生产记录, 原材料种类=${composition.length}`,
+      );
+    }
 
     return {
       cost: totalCost,

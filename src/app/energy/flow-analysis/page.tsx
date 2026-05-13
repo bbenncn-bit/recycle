@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface FlowAnalysisData {
   energyType: string;
@@ -364,7 +364,7 @@ export default function FlowAnalysis() {
 
             {/* Sankey 图 */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <ReactECharts
+              <LazyReactECharts
                 option={sankeyChartOption}
                 style={{ height: '600px', width: '100%' }}
               />

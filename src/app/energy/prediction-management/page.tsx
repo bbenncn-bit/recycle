@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
+import LazyReactECharts from '@/components/lazy-react-echarts';
 
 interface PredictionManagementData {
   predictionType: 'short' | 'medium' | 'long';
@@ -446,7 +446,7 @@ export default function PredictionManagement() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 电力消耗总量 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={electricityChartOption}
               style={{ height: '300px', width: '100%' }}
             />
@@ -504,7 +504,7 @@ export default function PredictionManagement() {
 
           {/* 光伏发电量 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={photovoltaicChartOption}
               style={{ height: '300px', width: '100%' }}
             />
@@ -562,7 +562,7 @@ export default function PredictionManagement() {
 
           {/* 天然气消耗总量 */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <ReactECharts
+            <LazyReactECharts
               option={naturalGasChartOption}
               style={{ height: '300px', width: '100%' }}
             />
