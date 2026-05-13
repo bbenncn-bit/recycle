@@ -6,7 +6,11 @@ export default function AcmeLogo() {
     <div
       className="flex flex-row items-center leading-none text-white"
     >
-      <GlobeAltIcon className="h-24 w-24 rotate-[15deg]" />
+      <GlobeAltIcon
+        className="h-24 w-24 shrink-0 rotate-[15deg]"
+        style={{ width: '6rem', height: '6rem' }}
+        aria-hidden
+      />
       <p className="text-[25px]">萍乡再生资源交易中心</p>
     </div>
   );

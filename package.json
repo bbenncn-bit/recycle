@@ -14,6 +14,7 @@
     "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && npm run dev",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "build": "next build",
+    "postbuild": "node scripts/copy-standalone-static.js",
     "build:clean": "npm run clean && npm run build",
     "build:production": "cross-env NODE_ENV=production next build",
     "start": "next start -H 0.0.0.0",
