@@ -37,7 +37,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     if (!mounted || typeof document === 'undefined') return;
-    document.documentElement.setAttribute('data-theme', theme);
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    /* 与 light/dark 模式一致，避免系统/浏览器 UI 仍按系统偏好把页面当深色 */
+    root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
   }, [theme, mounted]);
 
   const toggleTheme = () => {

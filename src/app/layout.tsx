@@ -1,5 +1,3 @@
-/** 从包入口引入 Tailwind（与 globals 里 @import 等价），减轻 Webpack 未挂 PostCSS 时对 globals.css 的解析失败 */
-import 'tailwindcss/index.css';
 import './globals.css';
 import { inter,lusitana } from 'src/components/fonts';
 import { Metadata } from 'next';

@@ -1,6 +1,6 @@
-/* Tailwind 主样式见 layout.tsx：`import 'tailwindcss/index.css'` */
+@import "tailwindcss";
 
-/* 必须 @custom-variant：@variant 不会覆盖内置 dark，系统深色时 dark: 仍随 prefers-color-scheme 生效，导致无法切到浅色 */
+/* 必须与上一行的 @import 同文件、紧随其后，才能覆盖内置 dark（否则会仍按 prefers-color-scheme） */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 input[type='number'] {
@@ -13,10 +13,3 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
-/* 移除这个自定义的 .dark 类，它与 Tailwind 的暗色模式冲突 */
-/* .dark {
-  background-color: #1a202c;
-  color: #e2e8f0;
-} */
-
