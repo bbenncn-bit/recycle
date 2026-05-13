@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev -H 0.0.0.0",
+    "dev": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack -H 0.0.0.0",
     "dev:turbopack": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack -H 0.0.0.0",
     "dev:webpack": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev -H 0.0.0.0",
     "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && npm run dev",
@@ -25,6 +25,7 @@
     "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.0.0",
     "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/postcss": "^4",
     "@types/node-cron": "^3.0.11",
     "bcryptjs": "^3.0.3",
     "dayjs": "^1.11.13",
@@ -40,16 +41,15 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "sharp": "^0.34.2",
+    "tailwindcss": "^4",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cross-env": "^10.1.0",
-    "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
