@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* Tailwind 主样式见 layout.tsx：`import 'tailwindcss/index.css'` */
 
 /* 为 Tailwind v4 配置自定义暗色模式变体 */
 @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

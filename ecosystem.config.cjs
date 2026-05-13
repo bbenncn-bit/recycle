@@ -12,16 +12,19 @@ require("dotenv").config({ path: path.join(__dirname, ".env.production") });
 
 const standaloneServer = path.join(__dirname, ".next", "standalone", "server.js");
 const useStandalone = fs.existsSync(standaloneServer);
+/** Windows 下 PM2 对「脚本=next、args=start」偶发丢失参数，导致等价于裸跑 next（易误入 dev/Webpack）。改用 node 显式拉起 CLI。 */
+const nodeExe = process.execPath;
+const nextCli = path.join(__dirname, "node_modules", "next", "dist", "bin", "next");
 
 module.exports = {
   apps: [
     {
       name: "pxrecycle",
       cwd: __dirname,
-      script: useStandalone
-        ? standaloneServer
-        : path.join(__dirname, "node_modules", "next", "dist", "bin", "next"),
-      args: useStandalone ? [] : ["start", "-H", "0.0.0.0", "-p", "3000"],
+      script: nodeExe,
+      args: useStandalone
+        ? [standaloneServer]
+        : [nextCli, "start", "-H", "0.0.0.0", "-p", "3000"],
       exec_mode: "fork",
       instances: 1,
       autorestart: true,
