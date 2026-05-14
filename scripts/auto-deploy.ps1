@@ -49,16 +49,12 @@ try {
         Write-DeployLog "WARN: 未找到 .env 或 .env.production，生产 DATABASE_URL / OPS_JWT_SECRET 等将无法加载，应用可能起不来。"
     }
 
-    Write-DeployLog "清理 .next 目录..."
-    if (Test-Path ".next") {
-        Remove-Item -Path ".next" -Recurse -Force -ErrorAction SilentlyContinue
-    }
-
     Write-DeployLog "清理 git 本地改动（reset --hard；clean 排除 .env* 以免删掉本机密钥）..."
     & git reset --hard HEAD
     if ($LASTEXITCODE -ne 0) { throw "git reset 失败" }
     # -e 保留未入库的本地环境文件；勿删 .env / .env.production，否则 DATABASE_URL 丢失
-    & git clean -fd -e .env -e .env.local -e .env.production -e .env.development
+    # 排除 .next.deploy-backup：构建前会暂存于此，勿被 clean 删掉
+    & git clean -fd -e .env -e .env.local -e .env.production -e .env.development -e .next.deploy-backup
     if ($LASTEXITCODE -ne 0) { throw "git clean 失败" }
 
     Write-DeployLog "git pull origin $GitBranch ..."
@@ -84,12 +80,33 @@ try {
         exit 1
     }
 
+    # 构建前将 .next 挪走作备份：若 npm run build 失败，可恢复上一版产物（须在 git clean 之后，且 clean 已 -e 排除备份目录）
+    $nextBackup = Join-Path $ProjectPath ".next.deploy-backup"
+    Write-DeployLog "备份现有 .next → $nextBackup（若存在）..."
+    if (Test-Path $nextBackup) {
+        Remove-Item -Path $nextBackup -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    if (Test-Path ".next") {
+        Move-Item -Path ".next" -Destination $nextBackup -Force
+    }
+
     Write-DeployLog "执行 npm run build..."
     $env:NODE_ENV = "production"
     & npm run build
     if ($LASTEXITCODE -ne 0) {
-        Write-DeployLog "ERROR: npm run build 失败"
+        Write-DeployLog "ERROR: npm run build 失败，尝试恢复上一版 .next"
+        if (Test-Path ".next") {
+            Remove-Item -Path ".next" -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        if (Test-Path $nextBackup) {
+            Move-Item -Path $nextBackup -Destination (Join-Path $ProjectPath ".next") -Force
+            Write-DeployLog "已恢复 .next，pm2 仍可使用旧构建；请修复构建错误后重新部署"
+        }
         exit 1
+    }
+    if (Test-Path $nextBackup) {
+        Remove-Item -Path $nextBackup -Recurse -Force -ErrorAction SilentlyContinue
+        Write-DeployLog "构建成功，已删除部署备份 .next.deploy-backup"
     }
 
     $ecosystem = Join-Path $ProjectPath "ecosystem.config.cjs"

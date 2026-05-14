@@ -1,5 +1,5 @@
 import './globals.css';
-import { inter,lusitana } from 'src/components/fonts';
+import { inter } from 'src/components/fonts';
 import { Metadata } from 'next';
 import Navbar from 'src/components/navbar';
 import Footer from 'src/components/footer';

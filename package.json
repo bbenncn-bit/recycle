@@ -28,6 +28,8 @@
     "pm2:save": "pm2 save"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource/lusitana": "^5.2.8",
     "@heroicons/react": "^2.2.0",
     "@prisma/adapter-mariadb": "^7.2.0",
     "@prisma/client": "^7.0.0",
