@@ -611,14 +611,21 @@ export async function getOperationsStatus(): Promise<{
   };
 }
 
-/** 执行 MySQL 存储过程，刷新 MaterialCostCache（与小程序/定时任务同一逻辑） */
-export async function refreshMaterialCostCache(startDate: string, endDate: string): Promise<void> {
+/** 刷新 MaterialCostCache（TypeScript LIFO，支持 alias 材料列与库别解析） */
+export async function refreshMaterialCostCache(startDate: string, endDate: string): Promise<{
+  total: number;
+  success: number;
+  withCost: number;
+}> {
   const s = norm(startDate);
   const e = norm(endDate);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s) || !/^\d{4}-\d{2}-\d{2}$/.test(e)) {
     throw new Error('开始、结束日期须为 YYYY-MM-DD');
   }
-  await prisma.$executeRawUnsafe(`CALL sp_update_material_cost_cache(?, ?)`, s, e);
+  const { refreshMaterialCostCacheUsingTypeScript } = await import(
+    './material-cost-cache-service'
+  );
+  return refreshMaterialCostCacheUsingTypeScript(s, e);
 }
 
 export async function reconcileProductStockWithProcessing(options?: {

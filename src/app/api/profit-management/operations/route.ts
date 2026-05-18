@@ -78,10 +78,13 @@ export async function POST(request: Request) {
     }
 
     if (action === 'refreshMaterialCostCache') {
-      await refreshMaterialCostCache(body.startDate, body.endDate);
+      const stats = await refreshMaterialCostCache(body.startDate, body.endDate);
       return NextResponse.json({
         success: true,
-        data: { message: '已执行 CALL sp_update_material_cost_cache(开始, 结束)' },
+        data: {
+          message: '已用 TypeScript LIFO 刷新 MaterialCostCache（含 alias 材料列）',
+          ...stats,
+        },
       });
     }
 

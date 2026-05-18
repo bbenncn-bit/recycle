@@ -1,4 +1,7 @@
 import { prisma } from '@/lib/prismadb';
+import { calculateLIFOMaterialCost, parseProductionDate } from './lifo-material-cost-service';
+import { resolveLifoMatchParams } from './lifo-match-resolve';
+import { parseWarehouseDate } from './profit-service';
 
 /** 材料构成项（与 MaterialCostCache.material_composition JSON 一致：material, quantity 吨, cost 元） */
 export type MaterialCompositionItem = {
@@ -31,7 +34,12 @@ export async function getMaterialCostFromCache(
       where: { deliveryNumber },
     });
 
-    if (!cache || cache.materialCost == null) {
+  // material_cost = 0 多为旧版 SP 未统计 MSLKM*/MGJKM* 列或库别不匹配；允许走实时 LIFO 重算
+    if (
+      !cache ||
+      cache.materialCost == null ||
+      Number(cache.materialCost) === 0
+    ) {
       return null;
     }
 
@@ -66,4 +74,104 @@ export async function getMaterialCostFromCache(
     console.error('从缓存获取材料成本失败:', error);
     return null;
   }
+}
+
+function parseDeliveryDateForCache(dateStr: string | null): Date | null {
+  return parseProductionDate(dateStr) ?? parseWarehouseDate(dateStr);
+}
+
+/**
+ * 使用 TypeScript LIFO（含 MSLKM、MGJKM 等 alias 材料列、库别解析、同月回退）刷新 MaterialCostCache。
+ * 替代仅统计 M1~M9 列的旧版 sp_update_material_cost_cache。
+ */
+export async function refreshMaterialCostCacheUsingTypeScript(
+  startDate: string,
+  endDate: string,
+): Promise<{ total: number; success: number; withCost: number }> {
+  const sales = await prisma.deliverySettlement.findMany({
+    where: {
+      deliveryNumber: { not: null },
+      productType: { not: null },
+      deliveryDate: { not: null },
+      settlementQuantity: { not: null, gt: 0 },
+    },
+    select: {
+      deliveryNumber: true,
+      productType: true,
+      warehouse: true,
+      deliveryDate: true,
+      settlementQuantity: true,
+    },
+  });
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+  start.setHours(0, 0, 0, 0);
+
+  let total = 0;
+  let success = 0;
+  let withCost = 0;
+
+  for (const sale of sales) {
+    const d = parseDeliveryDateForCache(sale.deliveryDate);
+    if (!d || d < start || d > end) continue;
+    const deliveryNumber = (sale.deliveryNumber || '').trim();
+    if (!deliveryNumber) continue;
+
+    total += 1;
+    const qty = Number(sale.settlementQuantity ?? 0);
+    if (qty <= 0) continue;
+
+    const lifo = await calculateLIFOMaterialCost(
+      (sale.productType || '').trim(),
+      sale.warehouse,
+      qty,
+      d,
+    );
+
+    const totalTons = lifo.composition.reduce((s, c) => s + (c.tons ?? 0), 0);
+    const materialComposition: MaterialCompositionItem[] =
+      totalTons > 0
+        ? lifo.composition.map((c) => ({
+            material: c.material,
+            quantity: c.tons ?? 0,
+            cost: ((c.tons ?? 0) / totalTons) * lifo.cost,
+          }))
+        : [];
+
+    const { productWarehouse } = await resolveLifoMatchParams(
+      sale.productType,
+      sale.warehouse,
+    );
+
+    await prisma.materialCostCache.upsert({
+      where: { deliveryNumber },
+      create: {
+        deliveryNumber,
+        productName: sale.productType,
+        productWarehouse,
+        deliveryDate: sale.deliveryDate,
+        settlementQuantity: qty,
+        materialCost: lifo.cost,
+        materialComposition,
+        productionRecords: lifo.productionRecords,
+      },
+      update: {
+        productName: sale.productType,
+        productWarehouse,
+        deliveryDate: sale.deliveryDate,
+        settlementQuantity: qty,
+        materialCost: lifo.cost,
+        materialComposition,
+        productionRecords: lifo.productionRecords,
+        calculatedAt: new Date(),
+      },
+    });
+
+    success += 1;
+    if (lifo.cost > 0) withCost += 1;
+  }
+
+  return { total, success, withCost };
 }

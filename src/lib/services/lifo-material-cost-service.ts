@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prismadb';
 import { getProcessingCostMaterialQtyFieldLabels } from '@/lib/processing-cost-input-material-columns';
+import { resolveLifoMatchParams } from './lifo-match-resolve';
 import { parseWarehouseDate } from './profit-service';
 
 function getRecordField(record: Record<string, unknown>, canonical: string): unknown {
@@ -305,7 +306,8 @@ export async function calculateLIFOMaterialCost(
   productName: string,
   productWarehouse: string | null,
   saleQuantity: number,
-  saleDate: Date
+  saleDate: Date,
+  options?: { skipResolve?: boolean }
 ): Promise<{
   cost: number;
   composition: Array<{ material: string; tons: number }>;
@@ -321,12 +323,19 @@ export async function calculateLIFOMaterialCost(
     return { cost: 0, composition: [], productionRecords: [] };
   }
 
+  const resolved = options?.skipResolve
+    ? { productName: (productName || '').trim(), productWarehouse }
+    : await resolveLifoMatchParams(productName, productWarehouse);
+
+  const lifoProductName = resolved.productName;
+  let lifoWarehouse = resolved.productWarehouse;
+
   try {
     // 查询该成品的所有生产记录（按生产日期倒序，LIFO：后进先出）
     // 直接使用 raw query；列清单按 information_schema 动态生成，避免库未建 M1_qty 等列时 1054 导致整页失败
     let detailedRecords: any[] = [];
     try {
-      const escapedProductName = (productName || '').replace(/'/g, "''");
+      const escapedProductName = (lifoProductName || '').replace(/'/g, "''");
 
       queryAttempts: for (let attempt = 0; attempt < 2; attempt++) {
         const shape = await getProcessingCostInputSelectShape();
@@ -350,13 +359,16 @@ export async function calculateLIFOMaterialCost(
         WHERE ${quoteMysqlIdent(colProductName)} = '${escapedProductName}'
       `;
 
-        if (productWarehouse) {
+        const appendWarehouseFilter = (wh: string | null) => {
+          if (!wh) return;
           const whCol = shape.lowerToActual.get('product_warehouse');
           if (whCol) {
-            const escapedWarehouse = (productWarehouse || '').replace(/'/g, "''");
-            rawQuery += ` AND ${quoteMysqlIdent(whCol)} = '${escapedWarehouse}'`;
+            const escapedWarehouse = wh.replace(/'/g, "''");
+            rawQuery += ` AND (${quoteMysqlIdent(whCol)} = '${escapedWarehouse}' OR ${quoteMysqlIdent(whCol)} IS NULL OR TRIM(${quoteMysqlIdent(whCol)}) = '')`;
           }
-        }
+        };
+
+        appendWarehouseFilter(lifoWarehouse);
 
         rawQuery += ` AND ${quoteMysqlIdent(colProductionDate)} IS NOT NULL ORDER BY ${quoteMysqlIdent(colProductionDate)} DESC`;
 
@@ -372,10 +384,29 @@ export async function calculateLIFOMaterialCost(
         }
       }
 
+      // 库别过滤过严时重试：仅按成品名匹配（与 MySQL SP 在 warehouse 为空时一致）
+      if ((!detailedRecords || detailedRecords.length === 0) && lifoWarehouse) {
+        lifoWarehouse = null;
+        detailedRecords = [];
+        const shape = await getProcessingCostInputSelectShape();
+        if (shape.hasProductionDate && shape.lowerToActual.get('product_name')) {
+          const colProductName = shape.lowerToActual.get('product_name')!;
+          const colProductionDate = shape.lowerToActual.get('production_date')!;
+          const escapedProductName = lifoProductName.replace(/'/g, "''");
+          let retryQuery = `
+        SELECT 
+          ${shape.selectListSql}
+        FROM ProcessingCostInput
+        WHERE ${quoteMysqlIdent(colProductName)} = '${escapedProductName}'
+        AND ${quoteMysqlIdent(colProductionDate)} IS NOT NULL ORDER BY ${quoteMysqlIdent(colProductionDate)} DESC`;
+          detailedRecords = (await prisma.$queryRawUnsafe(retryQuery)) as any[];
+        }
+      }
+
       if (!detailedRecords || detailedRecords.length === 0) {
         if (lifoDebug) {
           console.warn(
-            `未找到 ${productName}${productWarehouse ? ` (${productWarehouse})` : ''} 的生产记录`,
+            `未找到 ${lifoProductName}${lifoWarehouse ? ` (${lifoWarehouse})` : ''} 的生产记录`,
           );
         }
         return { cost: 0, composition: [], productionRecords: [] };
@@ -385,8 +416,11 @@ export async function calculateLIFOMaterialCost(
       return { cost: 0, composition: [], productionRecords: [] };
     }
 
-    // 过滤销售日期之前的生产记录，并按生产日期倒序排序（LIFO：后进先出）
-    const validRecords = detailedRecords
+    const saleDay = new Date(saleDate);
+    saleDay.setHours(0, 0, 0, 0);
+    const saleMonthKey = `${saleDay.getFullYear()}-${String(saleDay.getMonth() + 1).padStart(2, '0')}`;
+
+    const parsedRecords = detailedRecords
       .map((record: any) => {
         const prodDate = parseProductionDate(record.production_date || record.productionDate);
         return { record, prodDate };
@@ -396,18 +430,38 @@ export async function calculateLIFOMaterialCost(
           console.warn(`无法解析生产日期: ${item.record.production_date || item.record.productionDate}`);
           return false;
         }
-        return item.prodDate <= saleDate;
-      })
-      .sort((a, b) => {
-        // 按生产日期倒序（最新的在前）
-        if (!a.prodDate || !b.prodDate) return 0;
-        return b.prodDate.getTime() - a.prodDate.getTime();
-      })
+        return true;
+      });
+
+    // 过滤销售日期之前的生产记录，并按生产日期倒序排序（LIFO：后进先出）
+    let validRecords = parsedRecords
+      .filter((item) => item.prodDate! <= saleDay)
+      .sort((a, b) => b.prodDate!.getTime() - a.prodDate!.getTime())
       .map((item) => item.record);
+
+    // 同月回退：发货日前无批次时，使用该月内已录入的加工单（常见于月末集中录入生产日期）
+    if (validRecords.length === 0) {
+      const sameMonth = parsedRecords
+        .filter((item) => {
+          const d = item.prodDate!;
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          return key === saleMonthKey;
+        })
+        .sort((a, b) => b.prodDate!.getTime() - a.prodDate!.getTime())
+        .map((item) => item.record);
+      if (sameMonth.length > 0) {
+        validRecords = sameMonth;
+        if (lifoDebug) {
+          console.warn(
+            `LIFO 同月回退: ${lifoProductName} 发货 ${saleDay.toISOString().slice(0, 10)} 前无加工批次，使用当月 ${sameMonth.length} 条加工记录`,
+          );
+        }
+      }
+    }
 
     if (lifoDebug) {
       console.log(
-        `LIFO 计算: ${productName}${productWarehouse ? ` (${productWarehouse})` : ''}, 销售数量: ${saleQuantity}吨, 销售日期: ${saleDate.toISOString().split('T')[0]}, 找到 ${validRecords.length} 条生产记录`,
+        `LIFO 计算: ${lifoProductName}${lifoWarehouse ? ` (${lifoWarehouse})` : ''}, 销售数量: ${saleQuantity}吨, 销售日期: ${saleDate.toISOString().split('T')[0]}, 找到 ${validRecords.length} 条生产记录`,
       );
     }
 
