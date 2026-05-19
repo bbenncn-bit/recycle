@@ -83,11 +83,16 @@ async function main() {
   const all = await prisma.deliverySettlement.findMany({
     where: {
       deliveryNumber: { not: null },
-      productType: { not: null },
       deliveryDate: { not: null },
       settlementQuantity: { not: null, gt: 0 },
+      OR: [{ productType: { not: null } }, { warehouse: { not: null } }],
     },
-    select: { deliveryDate: true },
+    select: {
+      deliveryNumber: true,
+      productType: true,
+      warehouse: true,
+      deliveryDate: true,
+    },
   });
 
   let inRange = 0;
