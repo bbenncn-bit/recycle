@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prismadb';
 import {
   OPS_SESSION_COOKIE,
+  opsSessionCookieSecure,
   signOpsSessionToken,
   verifyPassword,
 } from '@/lib/ops-auth';
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     const res = NextResponse.json({ success: true, data: { username: user.username } });
     res.cookies.set(OPS_SESSION_COOKIE, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: opsSessionCookieSecure(request),
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7,

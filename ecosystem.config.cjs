@@ -38,6 +38,8 @@ module.exports = {
         NODE_ENV: "production",
         PORT: "3000",
         HOSTNAME: "0.0.0.0",
+        /** 项目根目录，供 .ops-jwt-secret 落盘（standalone 时 cwd 可能为 .next/standalone） */
+        OPS_PROJECT_ROOT: __dirname,
         // 15 秒轮询一次；有 PurchaseWarehouseSyncSignal 且 pending=0 时不扫大表
         PURCHASE_AUTO_SYNC_INTERVAL_MS: "15000",
         PURCHASE_AUTO_SYNC_MAX_ROWS: "1000",

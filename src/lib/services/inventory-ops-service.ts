@@ -612,11 +612,7 @@ export async function getOperationsStatus(): Promise<{
 }
 
 /** 刷新 MaterialCostCache（TypeScript LIFO，支持 alias 材料列与库别解析） */
-export async function refreshMaterialCostCache(startDate: string, endDate: string): Promise<{
-  total: number;
-  success: number;
-  withCost: number;
-}> {
+export async function refreshMaterialCostCache(startDate: string, endDate: string) {
   const s = norm(startDate);
   const e = norm(endDate);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s) || !/^\d{4}-\d{2}-\d{2}$/.test(e)) {
@@ -625,7 +621,19 @@ export async function refreshMaterialCostCache(startDate: string, endDate: strin
   const { refreshMaterialCostCacheUsingTypeScript } = await import(
     './material-cost-cache-service'
   );
-  return refreshMaterialCostCacheUsingTypeScript(s, e);
+  const { insertMaterialCostCacheRefreshLog } = await import(
+    './material-cost-cache-log-service'
+  );
+  try {
+    return await refreshMaterialCostCacheUsingTypeScript(s, e);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    await insertMaterialCostCacheRefreshLog(
+      `刷新失败 ${s} ~ ${e}：${msg}`,
+      null,
+    );
+    throw err;
+  }
 }
 
 export async function reconcileProductStockWithProcessing(options?: {

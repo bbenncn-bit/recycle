@@ -1,8 +1,12 @@
 -- ============================================
--- 材料成本缓存更新 - MySQL 存储过程和事件
+-- 材料成本缓存更新 - MySQL 存储过程和事件（历史脚本）
 -- ============================================
--- 说明：此存储过程实现 LIFO（后进先出）材料成本计算
--- 并自动更新 MaterialCostCache 表
+-- 【已废弃】2026-04 起 ProcessingCostInput 已改为 MSLKM*/MGJKM* 等列；
+-- 本文件内 sp_calculate_lifo_material_cost 仍引用 M1~M9，会导致 material_cost=0。
+-- 生产环境请：
+--   1) 执行 prisma/migrations/20260519_disable_material_cost_cache_mysql_event.sql
+--   2) 执行 prisma/migrations/20260519_sp_calculate_lifo_alias_material_columns.sql（可选）
+--   3) 使用应用「运维 → 刷新材料成本缓存」（TypeScript LIFO，含成品名别名与同月回退）
 -- ============================================
 --
 -- 【重要】如何更新 MaterialCostCache 表

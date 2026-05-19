@@ -51,6 +51,14 @@ export default function ProfitOperationsPage() {
   const [maxRows, setMaxRows] = useState(2000);
   const [deleteOrderId, setDeleteOrderId] = useState('');
   const [deleteOrderOpenid, setDeleteOrderOpenid] = useState('');
+  const [cacheRefreshSuccess, setCacheRefreshSuccess] = useState<{
+    startDate: string;
+    endDate: string;
+    total: number;
+    success: number;
+    withCost: number;
+    logId?: number;
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,6 +107,9 @@ export default function ProfitOperationsPage() {
     const label = String(body.action || 'request');
     setBusy(label);
     setLastResult(null);
+    if (body.action === 'refreshMaterialCostCache') {
+      setCacheRefreshSuccess(null);
+    }
     try {
       const res = await fetch('/api/profit-management/operations', {
         method: 'POST',
@@ -110,6 +121,17 @@ export default function ProfitOperationsPage() {
       setLastResult(json);
       if (!res.ok || !json.success) {
         throw new Error(json.error || `HTTP ${res.status}`);
+      }
+      if (body.action === 'refreshMaterialCostCache' && json.data) {
+        const d = json.data as Record<string, unknown>;
+        setCacheRefreshSuccess({
+          startDate: String(body.startDate ?? ''),
+          endDate: String(body.endDate ?? ''),
+          total: Number(d.total ?? 0),
+          success: Number(d.success ?? 0),
+          withCost: Number(d.withCost ?? 0),
+          logId: d.logId != null ? Number(d.logId) : undefined,
+        });
       }
       await loadStatus();
     } catch (e) {
@@ -301,8 +323,10 @@ export default function ProfitOperationsPage() {
           <section className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">材料成本缓存</h3>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              执行 <code className="rounded bg-black/5 px-1 dark:bg-white/10">CALL sp_update_material_cost_cache</code>{' '}
-              写入 MaterialCostCache，供利润分析页使用。
+              使用 TypeScript LIFO（含 MSLKM/MGJKM 等材料列、成品库别解析、同月回退）写入 MaterialCostCache，供利润分析页使用。请勿在库内执行旧版{' '}
+              <code className="rounded bg-black/5 px-1 dark:bg-white/10">CALL sp_update_material_cost_cache</code>
+              或保留每日 MySQL 事件（会按已废弃的 M1~M9 列把成本写回 0）。执行后请查看结果中的{' '}
+              <code className="rounded bg-black/5 px-1 dark:bg-white/10">withCost</code> 是否大于 0。
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div>
@@ -338,6 +362,22 @@ export default function ProfitOperationsPage() {
             >
               {busy === 'refreshMaterialCostCache' ? '执行中…' : '刷新材料成本缓存'}
             </button>
+            {cacheRefreshSuccess && (
+              <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100">
+                <p className="font-medium">材料成本缓存刷新成功</p>
+                <p className="mt-1 text-xs opacity-90">
+                  {cacheRefreshSuccess.startDate} ~ {cacheRefreshSuccess.endDate}：共处理{' '}
+                  {cacheRefreshSuccess.total} 条，写入 {cacheRefreshSuccess.success} 条，材料成本 &gt; 0 共{' '}
+                  {cacheRefreshSuccess.withCost} 条。
+                </p>
+                <a
+                  href="/profit-management/operations/material-cost-cache-logs"
+                  className="mt-2 inline-block text-xs font-medium text-emerald-800 underline dark:text-emerald-300"
+                >
+                  查看刷新日志与汇总说明 →
+                </a>
+              </div>
+            )}
           </section>
         </div>
 

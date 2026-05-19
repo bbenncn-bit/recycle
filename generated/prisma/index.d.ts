@@ -225,6 +225,11 @@ export type ProcessingCostConfig = $Result.DefaultSelection<Prisma.$ProcessingCo
  */
 export type MaterialCostCache = $Result.DefaultSelection<Prisma.$MaterialCostCachePayload>
 /**
+ * Model MaterialCostCacheErrorLog
+ * 材料成本缓存刷新日志（运维每次刷新写入一条汇总）
+ */
+export type MaterialCostCacheErrorLog = $Result.DefaultSelection<Prisma.$MaterialCostCacheErrorLogPayload>
+/**
  * Model OpsConsoleUser
  * 运维控制台账号（Web 登录，与业务用户分离）
  */
@@ -768,6 +773,16 @@ export class PrismaClient<
   get materialCostCache(): Prisma.MaterialCostCacheDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.materialCostCacheErrorLog`: Exposes CRUD operations for the **MaterialCostCacheErrorLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MaterialCostCacheErrorLogs
+    * const materialCostCacheErrorLogs = await prisma.materialCostCacheErrorLog.findMany()
+    * ```
+    */
+  get materialCostCacheErrorLog(): Prisma.MaterialCostCacheErrorLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.opsConsoleUser`: Exposes CRUD operations for the **OpsConsoleUser** model.
     * Example usage:
     * ```ts
@@ -1252,6 +1267,7 @@ export namespace Prisma {
     ProductStock: 'ProductStock',
     ProcessingCostConfig: 'ProcessingCostConfig',
     MaterialCostCache: 'MaterialCostCache',
+    MaterialCostCacheErrorLog: 'MaterialCostCacheErrorLog',
     OpsConsoleUser: 'OpsConsoleUser'
   };
 
@@ -1268,7 +1284,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache" | "opsConsoleUser"
+      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache" | "materialCostCacheErrorLog" | "opsConsoleUser"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4044,6 +4060,72 @@ export namespace Prisma {
           }
         }
       }
+      MaterialCostCacheErrorLog: {
+        payload: Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>
+        fields: Prisma.MaterialCostCacheErrorLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaterialCostCacheErrorLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaterialCostCacheErrorLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          findFirst: {
+            args: Prisma.MaterialCostCacheErrorLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaterialCostCacheErrorLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          findMany: {
+            args: Prisma.MaterialCostCacheErrorLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>[]
+          }
+          create: {
+            args: Prisma.MaterialCostCacheErrorLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          createMany: {
+            args: Prisma.MaterialCostCacheErrorLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MaterialCostCacheErrorLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          update: {
+            args: Prisma.MaterialCostCacheErrorLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.MaterialCostCacheErrorLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaterialCostCacheErrorLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MaterialCostCacheErrorLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialCostCacheErrorLogPayload>
+          }
+          aggregate: {
+            args: Prisma.MaterialCostCacheErrorLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaterialCostCacheErrorLog>
+          }
+          groupBy: {
+            args: Prisma.MaterialCostCacheErrorLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaterialCostCacheErrorLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaterialCostCacheErrorLogCountArgs<ExtArgs>
+            result: $Utils.Optional<MaterialCostCacheErrorLogCountAggregateOutputType> | number
+          }
+        }
+      }
       OpsConsoleUser: {
         payload: Prisma.$OpsConsoleUserPayload<ExtArgs>
         fields: Prisma.OpsConsoleUserFieldRefs
@@ -4260,6 +4342,7 @@ export namespace Prisma {
     productStock?: ProductStockOmit
     processingCostConfig?: ProcessingCostConfigOmit
     materialCostCache?: MaterialCostCacheOmit
+    materialCostCacheErrorLog?: MaterialCostCacheErrorLogOmit
     opsConsoleUser?: OpsConsoleUserOmit
   }
 
@@ -45302,6 +45385,911 @@ export namespace Prisma {
 
 
   /**
+   * Model MaterialCostCacheErrorLog
+   */
+
+  export type AggregateMaterialCostCacheErrorLog = {
+    _count: MaterialCostCacheErrorLogCountAggregateOutputType | null
+    _avg: MaterialCostCacheErrorLogAvgAggregateOutputType | null
+    _sum: MaterialCostCacheErrorLogSumAggregateOutputType | null
+    _min: MaterialCostCacheErrorLogMinAggregateOutputType | null
+    _max: MaterialCostCacheErrorLogMaxAggregateOutputType | null
+  }
+
+  export type MaterialCostCacheErrorLogAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MaterialCostCacheErrorLogSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type MaterialCostCacheErrorLogMinAggregateOutputType = {
+    id: number | null
+    createdAt: Date | null
+    deliveryNumber: string | null
+    errorMessage: string | null
+  }
+
+  export type MaterialCostCacheErrorLogMaxAggregateOutputType = {
+    id: number | null
+    createdAt: Date | null
+    deliveryNumber: string | null
+    errorMessage: string | null
+  }
+
+  export type MaterialCostCacheErrorLogCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    deliveryNumber: number
+    errorMessage: number
+    _all: number
+  }
+
+
+  export type MaterialCostCacheErrorLogAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type MaterialCostCacheErrorLogSumAggregateInputType = {
+    id?: true
+  }
+
+  export type MaterialCostCacheErrorLogMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    deliveryNumber?: true
+    errorMessage?: true
+  }
+
+  export type MaterialCostCacheErrorLogMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    deliveryNumber?: true
+    errorMessage?: true
+  }
+
+  export type MaterialCostCacheErrorLogCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    deliveryNumber?: true
+    errorMessage?: true
+    _all?: true
+  }
+
+  export type MaterialCostCacheErrorLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialCostCacheErrorLog to aggregate.
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCacheErrorLogs to fetch.
+     */
+    orderBy?: MaterialCostCacheErrorLogOrderByWithRelationInput | MaterialCostCacheErrorLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaterialCostCacheErrorLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCacheErrorLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCacheErrorLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MaterialCostCacheErrorLogs
+    **/
+    _count?: true | MaterialCostCacheErrorLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaterialCostCacheErrorLogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaterialCostCacheErrorLogSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaterialCostCacheErrorLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaterialCostCacheErrorLogMaxAggregateInputType
+  }
+
+  export type GetMaterialCostCacheErrorLogAggregateType<T extends MaterialCostCacheErrorLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaterialCostCacheErrorLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaterialCostCacheErrorLog[P]>
+      : GetScalarType<T[P], AggregateMaterialCostCacheErrorLog[P]>
+  }
+
+
+
+
+  export type MaterialCostCacheErrorLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialCostCacheErrorLogWhereInput
+    orderBy?: MaterialCostCacheErrorLogOrderByWithAggregationInput | MaterialCostCacheErrorLogOrderByWithAggregationInput[]
+    by: MaterialCostCacheErrorLogScalarFieldEnum[] | MaterialCostCacheErrorLogScalarFieldEnum
+    having?: MaterialCostCacheErrorLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaterialCostCacheErrorLogCountAggregateInputType | true
+    _avg?: MaterialCostCacheErrorLogAvgAggregateInputType
+    _sum?: MaterialCostCacheErrorLogSumAggregateInputType
+    _min?: MaterialCostCacheErrorLogMinAggregateInputType
+    _max?: MaterialCostCacheErrorLogMaxAggregateInputType
+  }
+
+  export type MaterialCostCacheErrorLogGroupByOutputType = {
+    id: number
+    createdAt: Date | null
+    deliveryNumber: string | null
+    errorMessage: string | null
+    _count: MaterialCostCacheErrorLogCountAggregateOutputType | null
+    _avg: MaterialCostCacheErrorLogAvgAggregateOutputType | null
+    _sum: MaterialCostCacheErrorLogSumAggregateOutputType | null
+    _min: MaterialCostCacheErrorLogMinAggregateOutputType | null
+    _max: MaterialCostCacheErrorLogMaxAggregateOutputType | null
+  }
+
+  type GetMaterialCostCacheErrorLogGroupByPayload<T extends MaterialCostCacheErrorLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaterialCostCacheErrorLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaterialCostCacheErrorLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaterialCostCacheErrorLogGroupByOutputType[P]>
+            : GetScalarType<T[P], MaterialCostCacheErrorLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaterialCostCacheErrorLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    deliveryNumber?: boolean
+    errorMessage?: boolean
+  }, ExtArgs["result"]["materialCostCacheErrorLog"]>
+
+
+
+  export type MaterialCostCacheErrorLogSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    deliveryNumber?: boolean
+    errorMessage?: boolean
+  }
+
+  export type MaterialCostCacheErrorLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "deliveryNumber" | "errorMessage", ExtArgs["result"]["materialCostCacheErrorLog"]>
+
+  export type $MaterialCostCacheErrorLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MaterialCostCacheErrorLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      createdAt: Date | null
+      deliveryNumber: string | null
+      errorMessage: string | null
+    }, ExtArgs["result"]["materialCostCacheErrorLog"]>
+    composites: {}
+  }
+
+  type MaterialCostCacheErrorLogGetPayload<S extends boolean | null | undefined | MaterialCostCacheErrorLogDefaultArgs> = $Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload, S>
+
+  type MaterialCostCacheErrorLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaterialCostCacheErrorLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaterialCostCacheErrorLogCountAggregateInputType | true
+    }
+
+  export interface MaterialCostCacheErrorLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MaterialCostCacheErrorLog'], meta: { name: 'MaterialCostCacheErrorLog' } }
+    /**
+     * Find zero or one MaterialCostCacheErrorLog that matches the filter.
+     * @param {MaterialCostCacheErrorLogFindUniqueArgs} args - Arguments to find a MaterialCostCacheErrorLog
+     * @example
+     * // Get one MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaterialCostCacheErrorLogFindUniqueArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogFindUniqueArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MaterialCostCacheErrorLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaterialCostCacheErrorLogFindUniqueOrThrowArgs} args - Arguments to find a MaterialCostCacheErrorLog
+     * @example
+     * // Get one MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaterialCostCacheErrorLogFindUniqueOrThrowArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialCostCacheErrorLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogFindFirstArgs} args - Arguments to find a MaterialCostCacheErrorLog
+     * @example
+     * // Get one MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaterialCostCacheErrorLogFindFirstArgs>(args?: SelectSubset<T, MaterialCostCacheErrorLogFindFirstArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialCostCacheErrorLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogFindFirstOrThrowArgs} args - Arguments to find a MaterialCostCacheErrorLog
+     * @example
+     * // Get one MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaterialCostCacheErrorLogFindFirstOrThrowArgs>(args?: SelectSubset<T, MaterialCostCacheErrorLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MaterialCostCacheErrorLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MaterialCostCacheErrorLogs
+     * const materialCostCacheErrorLogs = await prisma.materialCostCacheErrorLog.findMany()
+     * 
+     * // Get first 10 MaterialCostCacheErrorLogs
+     * const materialCostCacheErrorLogs = await prisma.materialCostCacheErrorLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const materialCostCacheErrorLogWithIdOnly = await prisma.materialCostCacheErrorLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaterialCostCacheErrorLogFindManyArgs>(args?: SelectSubset<T, MaterialCostCacheErrorLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MaterialCostCacheErrorLog.
+     * @param {MaterialCostCacheErrorLogCreateArgs} args - Arguments to create a MaterialCostCacheErrorLog.
+     * @example
+     * // Create one MaterialCostCacheErrorLog
+     * const MaterialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.create({
+     *   data: {
+     *     // ... data to create a MaterialCostCacheErrorLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaterialCostCacheErrorLogCreateArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogCreateArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MaterialCostCacheErrorLogs.
+     * @param {MaterialCostCacheErrorLogCreateManyArgs} args - Arguments to create many MaterialCostCacheErrorLogs.
+     * @example
+     * // Create many MaterialCostCacheErrorLogs
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaterialCostCacheErrorLogCreateManyArgs>(args?: SelectSubset<T, MaterialCostCacheErrorLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a MaterialCostCacheErrorLog.
+     * @param {MaterialCostCacheErrorLogDeleteArgs} args - Arguments to delete one MaterialCostCacheErrorLog.
+     * @example
+     * // Delete one MaterialCostCacheErrorLog
+     * const MaterialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.delete({
+     *   where: {
+     *     // ... filter to delete one MaterialCostCacheErrorLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaterialCostCacheErrorLogDeleteArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogDeleteArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MaterialCostCacheErrorLog.
+     * @param {MaterialCostCacheErrorLogUpdateArgs} args - Arguments to update one MaterialCostCacheErrorLog.
+     * @example
+     * // Update one MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaterialCostCacheErrorLogUpdateArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogUpdateArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MaterialCostCacheErrorLogs.
+     * @param {MaterialCostCacheErrorLogDeleteManyArgs} args - Arguments to filter MaterialCostCacheErrorLogs to delete.
+     * @example
+     * // Delete a few MaterialCostCacheErrorLogs
+     * const { count } = await prisma.materialCostCacheErrorLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaterialCostCacheErrorLogDeleteManyArgs>(args?: SelectSubset<T, MaterialCostCacheErrorLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialCostCacheErrorLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MaterialCostCacheErrorLogs
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaterialCostCacheErrorLogUpdateManyArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MaterialCostCacheErrorLog.
+     * @param {MaterialCostCacheErrorLogUpsertArgs} args - Arguments to update or create a MaterialCostCacheErrorLog.
+     * @example
+     * // Update or create a MaterialCostCacheErrorLog
+     * const materialCostCacheErrorLog = await prisma.materialCostCacheErrorLog.upsert({
+     *   create: {
+     *     // ... data to create a MaterialCostCacheErrorLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MaterialCostCacheErrorLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaterialCostCacheErrorLogUpsertArgs>(args: SelectSubset<T, MaterialCostCacheErrorLogUpsertArgs<ExtArgs>>): Prisma__MaterialCostCacheErrorLogClient<$Result.GetResult<Prisma.$MaterialCostCacheErrorLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MaterialCostCacheErrorLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogCountArgs} args - Arguments to filter MaterialCostCacheErrorLogs to count.
+     * @example
+     * // Count the number of MaterialCostCacheErrorLogs
+     * const count = await prisma.materialCostCacheErrorLog.count({
+     *   where: {
+     *     // ... the filter for the MaterialCostCacheErrorLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaterialCostCacheErrorLogCountArgs>(
+      args?: Subset<T, MaterialCostCacheErrorLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaterialCostCacheErrorLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MaterialCostCacheErrorLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaterialCostCacheErrorLogAggregateArgs>(args: Subset<T, MaterialCostCacheErrorLogAggregateArgs>): Prisma.PrismaPromise<GetMaterialCostCacheErrorLogAggregateType<T>>
+
+    /**
+     * Group by MaterialCostCacheErrorLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialCostCacheErrorLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaterialCostCacheErrorLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaterialCostCacheErrorLogGroupByArgs['orderBy'] }
+        : { orderBy?: MaterialCostCacheErrorLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaterialCostCacheErrorLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaterialCostCacheErrorLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MaterialCostCacheErrorLog model
+   */
+  readonly fields: MaterialCostCacheErrorLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MaterialCostCacheErrorLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaterialCostCacheErrorLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MaterialCostCacheErrorLog model
+   */
+  interface MaterialCostCacheErrorLogFieldRefs {
+    readonly id: FieldRef<"MaterialCostCacheErrorLog", 'Int'>
+    readonly createdAt: FieldRef<"MaterialCostCacheErrorLog", 'DateTime'>
+    readonly deliveryNumber: FieldRef<"MaterialCostCacheErrorLog", 'String'>
+    readonly errorMessage: FieldRef<"MaterialCostCacheErrorLog", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MaterialCostCacheErrorLog findUnique
+   */
+  export type MaterialCostCacheErrorLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCacheErrorLog to fetch.
+     */
+    where: MaterialCostCacheErrorLogWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCacheErrorLog findUniqueOrThrow
+   */
+  export type MaterialCostCacheErrorLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCacheErrorLog to fetch.
+     */
+    where: MaterialCostCacheErrorLogWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCacheErrorLog findFirst
+   */
+  export type MaterialCostCacheErrorLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCacheErrorLog to fetch.
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCacheErrorLogs to fetch.
+     */
+    orderBy?: MaterialCostCacheErrorLogOrderByWithRelationInput | MaterialCostCacheErrorLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialCostCacheErrorLogs.
+     */
+    cursor?: MaterialCostCacheErrorLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCacheErrorLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCacheErrorLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialCostCacheErrorLogs.
+     */
+    distinct?: MaterialCostCacheErrorLogScalarFieldEnum | MaterialCostCacheErrorLogScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCacheErrorLog findFirstOrThrow
+   */
+  export type MaterialCostCacheErrorLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCacheErrorLog to fetch.
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCacheErrorLogs to fetch.
+     */
+    orderBy?: MaterialCostCacheErrorLogOrderByWithRelationInput | MaterialCostCacheErrorLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialCostCacheErrorLogs.
+     */
+    cursor?: MaterialCostCacheErrorLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCacheErrorLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCacheErrorLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialCostCacheErrorLogs.
+     */
+    distinct?: MaterialCostCacheErrorLogScalarFieldEnum | MaterialCostCacheErrorLogScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCacheErrorLog findMany
+   */
+  export type MaterialCostCacheErrorLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MaterialCostCacheErrorLogs to fetch.
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialCostCacheErrorLogs to fetch.
+     */
+    orderBy?: MaterialCostCacheErrorLogOrderByWithRelationInput | MaterialCostCacheErrorLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MaterialCostCacheErrorLogs.
+     */
+    cursor?: MaterialCostCacheErrorLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialCostCacheErrorLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialCostCacheErrorLogs.
+     */
+    skip?: number
+    distinct?: MaterialCostCacheErrorLogScalarFieldEnum | MaterialCostCacheErrorLogScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialCostCacheErrorLog create
+   */
+  export type MaterialCostCacheErrorLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MaterialCostCacheErrorLog.
+     */
+    data?: XOR<MaterialCostCacheErrorLogCreateInput, MaterialCostCacheErrorLogUncheckedCreateInput>
+  }
+
+  /**
+   * MaterialCostCacheErrorLog createMany
+   */
+  export type MaterialCostCacheErrorLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MaterialCostCacheErrorLogs.
+     */
+    data: MaterialCostCacheErrorLogCreateManyInput | MaterialCostCacheErrorLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MaterialCostCacheErrorLog update
+   */
+  export type MaterialCostCacheErrorLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MaterialCostCacheErrorLog.
+     */
+    data: XOR<MaterialCostCacheErrorLogUpdateInput, MaterialCostCacheErrorLogUncheckedUpdateInput>
+    /**
+     * Choose, which MaterialCostCacheErrorLog to update.
+     */
+    where: MaterialCostCacheErrorLogWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCacheErrorLog updateMany
+   */
+  export type MaterialCostCacheErrorLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MaterialCostCacheErrorLogs.
+     */
+    data: XOR<MaterialCostCacheErrorLogUpdateManyMutationInput, MaterialCostCacheErrorLogUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialCostCacheErrorLogs to update
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * Limit how many MaterialCostCacheErrorLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialCostCacheErrorLog upsert
+   */
+  export type MaterialCostCacheErrorLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MaterialCostCacheErrorLog to update in case it exists.
+     */
+    where: MaterialCostCacheErrorLogWhereUniqueInput
+    /**
+     * In case the MaterialCostCacheErrorLog found by the `where` argument doesn't exist, create a new MaterialCostCacheErrorLog with this data.
+     */
+    create: XOR<MaterialCostCacheErrorLogCreateInput, MaterialCostCacheErrorLogUncheckedCreateInput>
+    /**
+     * In case the MaterialCostCacheErrorLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaterialCostCacheErrorLogUpdateInput, MaterialCostCacheErrorLogUncheckedUpdateInput>
+  }
+
+  /**
+   * MaterialCostCacheErrorLog delete
+   */
+  export type MaterialCostCacheErrorLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+    /**
+     * Filter which MaterialCostCacheErrorLog to delete.
+     */
+    where: MaterialCostCacheErrorLogWhereUniqueInput
+  }
+
+  /**
+   * MaterialCostCacheErrorLog deleteMany
+   */
+  export type MaterialCostCacheErrorLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialCostCacheErrorLogs to delete
+     */
+    where?: MaterialCostCacheErrorLogWhereInput
+    /**
+     * Limit how many MaterialCostCacheErrorLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialCostCacheErrorLog without action
+   */
+  export type MaterialCostCacheErrorLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialCostCacheErrorLog
+     */
+    select?: MaterialCostCacheErrorLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialCostCacheErrorLog
+     */
+    omit?: MaterialCostCacheErrorLogOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model OpsConsoleUser
    */
 
@@ -46907,6 +47895,16 @@ export namespace Prisma {
   export type MaterialCostCacheScalarFieldEnum = (typeof MaterialCostCacheScalarFieldEnum)[keyof typeof MaterialCostCacheScalarFieldEnum]
 
 
+  export const MaterialCostCacheErrorLogScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    deliveryNumber: 'deliveryNumber',
+    errorMessage: 'errorMessage'
+  };
+
+  export type MaterialCostCacheErrorLogScalarFieldEnum = (typeof MaterialCostCacheErrorLogScalarFieldEnum)[keyof typeof MaterialCostCacheErrorLogScalarFieldEnum]
+
+
   export const OpsConsoleUserScalarFieldEnum: {
     id: 'id',
     username: 'username',
@@ -47438,6 +48436,14 @@ export namespace Prisma {
   };
 
   export type MaterialCostCacheOrderByRelevanceFieldEnum = (typeof MaterialCostCacheOrderByRelevanceFieldEnum)[keyof typeof MaterialCostCacheOrderByRelevanceFieldEnum]
+
+
+  export const MaterialCostCacheErrorLogOrderByRelevanceFieldEnum: {
+    deliveryNumber: 'deliveryNumber',
+    errorMessage: 'errorMessage'
+  };
+
+  export type MaterialCostCacheErrorLogOrderByRelevanceFieldEnum = (typeof MaterialCostCacheErrorLogOrderByRelevanceFieldEnum)[keyof typeof MaterialCostCacheErrorLogOrderByRelevanceFieldEnum]
 
 
   export const OpsConsoleUserOrderByRelevanceFieldEnum: {
@@ -50775,6 +51781,56 @@ export namespace Prisma {
     productionRecords?: JsonNullableWithAggregatesFilter<"MaterialCostCache">
     calculatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCache"> | Date | string | null
+  }
+
+  export type MaterialCostCacheErrorLogWhereInput = {
+    AND?: MaterialCostCacheErrorLogWhereInput | MaterialCostCacheErrorLogWhereInput[]
+    OR?: MaterialCostCacheErrorLogWhereInput[]
+    NOT?: MaterialCostCacheErrorLogWhereInput | MaterialCostCacheErrorLogWhereInput[]
+    id?: IntFilter<"MaterialCostCacheErrorLog"> | number
+    createdAt?: DateTimeNullableFilter<"MaterialCostCacheErrorLog"> | Date | string | null
+    deliveryNumber?: StringNullableFilter<"MaterialCostCacheErrorLog"> | string | null
+    errorMessage?: StringNullableFilter<"MaterialCostCacheErrorLog"> | string | null
+  }
+
+  export type MaterialCostCacheErrorLogOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    _relevance?: MaterialCostCacheErrorLogOrderByRelevanceInput
+  }
+
+  export type MaterialCostCacheErrorLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: MaterialCostCacheErrorLogWhereInput | MaterialCostCacheErrorLogWhereInput[]
+    OR?: MaterialCostCacheErrorLogWhereInput[]
+    NOT?: MaterialCostCacheErrorLogWhereInput | MaterialCostCacheErrorLogWhereInput[]
+    createdAt?: DateTimeNullableFilter<"MaterialCostCacheErrorLog"> | Date | string | null
+    deliveryNumber?: StringNullableFilter<"MaterialCostCacheErrorLog"> | string | null
+    errorMessage?: StringNullableFilter<"MaterialCostCacheErrorLog"> | string | null
+  }, "id">
+
+  export type MaterialCostCacheErrorLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    deliveryNumber?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    _count?: MaterialCostCacheErrorLogCountOrderByAggregateInput
+    _avg?: MaterialCostCacheErrorLogAvgOrderByAggregateInput
+    _max?: MaterialCostCacheErrorLogMaxOrderByAggregateInput
+    _min?: MaterialCostCacheErrorLogMinOrderByAggregateInput
+    _sum?: MaterialCostCacheErrorLogSumOrderByAggregateInput
+  }
+
+  export type MaterialCostCacheErrorLogScalarWhereWithAggregatesInput = {
+    AND?: MaterialCostCacheErrorLogScalarWhereWithAggregatesInput | MaterialCostCacheErrorLogScalarWhereWithAggregatesInput[]
+    OR?: MaterialCostCacheErrorLogScalarWhereWithAggregatesInput[]
+    NOT?: MaterialCostCacheErrorLogScalarWhereWithAggregatesInput | MaterialCostCacheErrorLogScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"MaterialCostCacheErrorLog"> | number
+    createdAt?: DateTimeNullableWithAggregatesFilter<"MaterialCostCacheErrorLog"> | Date | string | null
+    deliveryNumber?: StringNullableWithAggregatesFilter<"MaterialCostCacheErrorLog"> | string | null
+    errorMessage?: StringNullableWithAggregatesFilter<"MaterialCostCacheErrorLog"> | string | null
   }
 
   export type OpsConsoleUserWhereInput = {
@@ -54412,6 +55468,52 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type MaterialCostCacheErrorLogCreateInput = {
+    createdAt?: Date | string | null
+    deliveryNumber?: string | null
+    errorMessage?: string | null
+  }
+
+  export type MaterialCostCacheErrorLogUncheckedCreateInput = {
+    id?: number
+    createdAt?: Date | string | null
+    deliveryNumber?: string | null
+    errorMessage?: string | null
+  }
+
+  export type MaterialCostCacheErrorLogUpdateInput = {
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaterialCostCacheErrorLogUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaterialCostCacheErrorLogCreateManyInput = {
+    id?: number
+    createdAt?: Date | string | null
+    deliveryNumber?: string | null
+    errorMessage?: string | null
+  }
+
+  export type MaterialCostCacheErrorLogUpdateManyMutationInput = {
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MaterialCostCacheErrorLogUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type OpsConsoleUserCreateInput = {
     username: string
     passwordHash: string
@@ -57121,6 +58223,41 @@ export namespace Prisma {
     id?: SortOrder
     settlementQuantity?: SortOrder
     materialCost?: SortOrder
+  }
+
+  export type MaterialCostCacheErrorLogOrderByRelevanceInput = {
+    fields: MaterialCostCacheErrorLogOrderByRelevanceFieldEnum | MaterialCostCacheErrorLogOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type MaterialCostCacheErrorLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    deliveryNumber?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type MaterialCostCacheErrorLogAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type MaterialCostCacheErrorLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    deliveryNumber?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type MaterialCostCacheErrorLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    deliveryNumber?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type MaterialCostCacheErrorLogSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type OpsConsoleUserOrderByRelevanceInput = {

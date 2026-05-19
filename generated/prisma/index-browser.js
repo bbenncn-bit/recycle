@@ -648,6 +648,13 @@ exports.Prisma.MaterialCostCacheScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MaterialCostCacheErrorLogScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  deliveryNumber: 'deliveryNumber',
+  errorMessage: 'errorMessage'
+};
+
 exports.Prisma.OpsConsoleUserScalarFieldEnum = {
   id: 'id',
   username: 'username',
@@ -1037,6 +1044,11 @@ exports.Prisma.MaterialCostCacheOrderByRelevanceFieldEnum = {
   deliveryDate: 'deliveryDate'
 };
 
+exports.Prisma.MaterialCostCacheErrorLogOrderByRelevanceFieldEnum = {
+  deliveryNumber: 'deliveryNumber',
+  errorMessage: 'errorMessage'
+};
+
 exports.Prisma.OpsConsoleUserOrderByRelevanceFieldEnum = {
   username: 'username',
   passwordHash: 'passwordHash',
@@ -1087,6 +1099,7 @@ exports.Prisma.ModelName = {
   ProductStock: 'ProductStock',
   ProcessingCostConfig: 'ProcessingCostConfig',
   MaterialCostCache: 'MaterialCostCache',
+  MaterialCostCacheErrorLog: 'MaterialCostCacheErrorLog',
   OpsConsoleUser: 'OpsConsoleUser'
 };
 

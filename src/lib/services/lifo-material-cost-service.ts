@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prismadb';
 import { getProcessingCostMaterialQtyFieldLabels } from '@/lib/processing-cost-input-material-columns';
-import { resolveLifoMatchParams } from './lifo-match-resolve';
+import {
+  findBestProcessingProductName,
+  resolveLifoMatchParams,
+} from './lifo-match-resolve';
 import { parseWarehouseDate } from './profit-service';
 
 function getRecordField(record: Record<string, unknown>, canonical: string): unknown {
@@ -39,6 +42,69 @@ export function invalidateProcessingCostInputShapeCache(): void {
 }
 
 const lifoDebug = process.env.PROFIT_LIFO_DEBUG === '1';
+
+/**
+ * LIFO 扣减吨数：默认「结算量×(1+途损)」。
+ * 当出厂净重明显大于结算量时，不按净重扣减（避免整车净重套在拆分结算单上，如结算 5.46 吨却扣 55 吨）。
+ */
+export function resolveLifoSettlementQuantity(params: {
+  settlementQuantity: number;
+  netWeightQuantity?: number;
+  transitLossRate?: number;
+  /** 净重/结算量超过该倍数时强制按结算量计 */
+  maxNetToSettlementRatio?: number;
+}): number {
+  const qty = params.settlementQuantity;
+  if (qty <= 0) return 0;
+  const transit = params.transitLossRate ?? 0;
+  const withTransit = qty * (1 + transit);
+  const net = params.netWeightQuantity ?? 0;
+  const maxRatio = params.maxNetToSettlementRatio ?? 1.25;
+  if (net <= 0 || net <= qty * maxRatio) {
+    return net > 0 ? net * (1 + transit) : withTransit;
+  }
+  return withTransit;
+}
+
+/**
+ * 单批加工：毛料用量合计相对成品产量的最大合理倍数。
+ * 超过则视为把「累计领料」误录入 *_qty（如 PG34 类 MSLKM_qty≈10877、产量≈1077），
+ * 按 产量/毛料合计 同比折算材料金额，使每吨成品材料成本≈加权毛料单价（约 2000 元/吨级）。
+ */
+const MAX_MATERIAL_QTY_TO_OUTPUT_RATIO = 3;
+
+function normalizeMaterialsToOutputQuantity(
+  materials: Array<{ material: string; qty: number; price: number; cost: number }>,
+  outputQty: number,
+  recordId?: number | string,
+): {
+  materials: Array<{ material: string; qty: number; price: number; cost: number }>;
+  totalCost: number;
+} {
+  const totalCost = materials.reduce((sum, m) => sum + m.cost, 0);
+  if (outputQty <= 0 || materials.length === 0) {
+    return { materials, totalCost };
+  }
+
+  const materialQtySum = materials.reduce((sum, m) => sum + m.qty, 0);
+  if (materialQtySum <= outputQty * MAX_MATERIAL_QTY_TO_OUTPUT_RATIO) {
+    return { materials, totalCost };
+  }
+
+  const scale = outputQty / materialQtySum;
+  const scaled = materials.map((m) => ({
+    ...m,
+    qty: m.qty * scale,
+    cost: m.cost * scale,
+  }));
+  const scaledCost = totalCost * scale;
+
+  console.warn(
+    `[LIFO] 生产记录 ${recordId ?? '?'} 毛料用量合计 ${materialQtySum.toFixed(2)} 吨 > 产量 ${outputQty.toFixed(2)} 吨的 ${MAX_MATERIAL_QTY_TO_OUTPUT_RATIO} 倍，已按 ${(scale * 100).toFixed(2)}% 折算材料成本`,
+  );
+
+  return { materials: scaled, totalCost: scaledCost };
+}
 
 function quoteMysqlIdent(name: string): string {
   return '`' + name.replace(/`/g, '``') + '`';
@@ -270,8 +336,8 @@ function calculateProductionMaterialCost(record: any): {
   unitCost: number; // 每吨成品的材料成本（元/吨）
   materials: Array<{ material: string; qty: number; price: number; cost: number }>;
 } {
-  const materials = extractMaterialCosts(record);
-  const totalCost = materials.reduce((sum, m) => sum + m.cost, 0);
+  let materials = extractMaterialCosts(record);
+  let totalCost = materials.reduce((sum, m) => sum + m.cost, 0);
   // 优先使用 dailyProcess_qty，如果没有则使用 product_tons
   const totalQty =
     processDecimal(record.dailyProcess_qty) ||
@@ -279,6 +345,37 @@ function calculateProductionMaterialCost(record: any): {
     processDecimal(record.product_tons) ||
     processDecimal(record.productTons) ||
     0;
+  // 仅有产量、材料列为空时，用 dailyProcess_amount 作为该批次材料总成本（录入合计）
+  if (materials.length === 0 && totalQty > 0) {
+    const batchAmount =
+      processDecimal(getRecordField(record as Record<string, unknown>, 'dailyProcess_amount')) ||
+      processDecimal(getRecordField(record as Record<string, unknown>, 'dailyProcessAmount'));
+    const batchPrice =
+      processDecimal(getRecordField(record as Record<string, unknown>, 'dailyProcess_price')) ||
+      processDecimal(getRecordField(record as Record<string, unknown>, 'dailyProcessPrice'));
+    // dailyProcess_amount 常与 dailyProcess_price 同为成品金额口径，不能当作材料成本
+    const amountLooksLikeSales =
+      batchPrice > 0 && batchAmount > 0 && Math.abs(batchAmount / totalQty - batchPrice) / batchPrice < 0.05;
+    if (batchAmount > 0 && !amountLooksLikeSales) {
+      totalCost = batchAmount;
+      materials = [
+        {
+          material: '加工录入合计',
+          qty: totalQty,
+          price: batchAmount / totalQty,
+          cost: batchAmount,
+        },
+      ];
+    }
+  }
+
+  const recordIdRaw = getRecordField(record as Record<string, unknown>, 'id');
+  const recordId =
+    recordIdRaw != null && recordIdRaw !== '' ? String(recordIdRaw) : undefined;
+  const normalized = normalizeMaterialsToOutputQuantity(materials, totalQty, recordId);
+  materials = normalized.materials;
+  totalCost = normalized.totalCost;
+
   const unitCost = totalQty > 0 ? totalCost / totalQty : 0;
 
   if (materials.length === 0 && totalQty > 0) {
@@ -404,6 +501,21 @@ export async function calculateLIFOMaterialCost(
       }
 
       if (!detailedRecords || detailedRecords.length === 0) {
+        const altName = await findBestProcessingProductName(lifoProductName);
+        if (altName && altName !== lifoProductName) {
+          if (lifoDebug) {
+            console.warn(
+              `未找到 ${lifoProductName}，改用加工表成品名 ${altName} 重试 LIFO`,
+            );
+          }
+          return calculateLIFOMaterialCost(
+            altName,
+            lifoWarehouse,
+            saleQuantity,
+            saleDate,
+            { skipResolve: true },
+          );
+        }
         if (lifoDebug) {
           console.warn(
             `未找到 ${lifoProductName}${lifoWarehouse ? ` (${lifoWarehouse})` : ''} 的生产记录`,
@@ -439,23 +551,58 @@ export async function calculateLIFOMaterialCost(
       .sort((a, b) => b.prodDate!.getTime() - a.prodDate!.getTime())
       .map((item) => item.record);
 
-    // 同月回退：发货日前无批次时，使用该月内已录入的加工单（常见于月末集中录入生产日期）
+    // 同月回退：发货日前无批次时，用当月已录入批次的加权平均材料单价（避免误用“未来日期”单批 + 毛料 qty 放大）
     if (validRecords.length === 0) {
-      const sameMonth = parsedRecords
+      const sameMonthRecords = parsedRecords
         .filter((item) => {
           const d = item.prodDate!;
           const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
           return key === saleMonthKey;
         })
-        .sort((a, b) => b.prodDate!.getTime() - a.prodDate!.getTime())
         .map((item) => item.record);
-      if (sameMonth.length > 0) {
-        validRecords = sameMonth;
+
+      if (sameMonthRecords.length > 0) {
+        let monthOutputQty = 0;
+        let monthMaterialCost = 0;
+        const monthMaterialTons = new Map<string, number>();
+
+        for (const rec of sameMonthRecords) {
+          const p = calculateProductionMaterialCost(rec);
+          monthOutputQty += p.totalQty;
+          monthMaterialCost += p.totalCost;
+          for (const m of p.materials) {
+            monthMaterialTons.set(m.material, (monthMaterialTons.get(m.material) || 0) + m.qty);
+          }
+        }
+
+        const avgUnitCost = monthOutputQty > 0 ? monthMaterialCost / monthOutputQty : 0;
+        const totalCost = avgUnitCost * saleQuantity;
+        const compTotalTons = Array.from(monthMaterialTons.values()).reduce((s, t) => s + t, 0);
+        const composition = Array.from(monthMaterialTons.entries()).map(([material, tons]) => ({
+          material,
+          tons: compTotalTons > 0 ? (tons / compTotalTons) * saleQuantity : 0,
+        }));
+
         if (lifoDebug) {
           console.warn(
-            `LIFO 同月回退: ${lifoProductName} 发货 ${saleDay.toISOString().slice(0, 10)} 前无加工批次，使用当月 ${sameMonth.length} 条加工记录`,
+            `LIFO 同月均值回退: ${lifoProductName} 发货 ${saleDay.toISOString().slice(0, 10)} 前无批次，当月 ${sameMonthRecords.length} 批加权材料单价 ${avgUnitCost.toFixed(2)} 元/吨`,
           );
         }
+
+        return {
+          cost: totalCost,
+          composition,
+          productionRecords: [
+            {
+              id: sameMonthRecords[0].id || 0,
+              productionDate:
+                sameMonthRecords[0].production_date || sameMonthRecords[0].productionDate || '',
+              quantity: saleQuantity,
+              unitCost: avgUnitCost,
+              totalCost,
+            },
+          ],
+        };
       }
     }
 
@@ -542,6 +689,54 @@ export async function calculateLIFOMaterialCost(
             mat.material,
             (materialComposition.get(mat.material) || 0) + materialTons
           );
+        }
+      }
+    }
+
+    // 严格 LIFO 未扣到任何批次（产量为 0 或单位成本为 0）时，回退当月加权均价
+    if (usedRecords.length === 0 && saleQuantity > 0) {
+      const sameMonthRecords = parsedRecords
+        .filter((item) => {
+          const d = item.prodDate!;
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+          return key === saleMonthKey;
+        })
+        .map((item) => item.record);
+      if (sameMonthRecords.length > 0) {
+        let monthOutputQty = 0;
+        let monthMaterialCost = 0;
+        const monthMaterialTons = new Map<string, number>();
+        for (const rec of sameMonthRecords) {
+          const p = calculateProductionMaterialCost(rec);
+          if (p.unitCost <= 0) continue;
+          monthOutputQty += p.totalQty;
+          monthMaterialCost += p.totalCost;
+          for (const m of p.materials) {
+            monthMaterialTons.set(m.material, (monthMaterialTons.get(m.material) || 0) + m.qty);
+          }
+        }
+        if (monthOutputQty > 0 && monthMaterialCost > 0) {
+          const avgUnitCost = monthMaterialCost / monthOutputQty;
+          const totalCost = avgUnitCost * saleQuantity;
+          const compTotalTons = Array.from(monthMaterialTons.values()).reduce((s, t) => s + t, 0);
+          const composition = Array.from(monthMaterialTons.entries()).map(([material, tons]) => ({
+            material,
+            tons: compTotalTons > 0 ? (tons / compTotalTons) * saleQuantity : 0,
+          }));
+          return {
+            cost: totalCost,
+            composition,
+            productionRecords: [
+              {
+                id: sameMonthRecords[0].id || 0,
+                productionDate:
+                  sameMonthRecords[0].production_date || sameMonthRecords[0].productionDate || '',
+                quantity: saleQuantity,
+                unitCost: avgUnitCost,
+                totalCost,
+              },
+            ],
+          };
         }
       }
     }

@@ -46,7 +46,36 @@ try {
 
     # 建议保留本地 .env / .env.production（勿提交仓库）；git clean -fd 会删未跟踪文件
     if (!(Test-Path ".env.production") -and !(Test-Path ".env")) {
-        Write-DeployLog "WARN: 未找到 .env 或 .env.production，生产 DATABASE_URL / OPS_JWT_SECRET 等将无法加载，应用可能起不来。"
+        Write-DeployLog "WARN: 未找到 .env 或 .env.production，生产 DATABASE_URL 等将无法加载，应用可能起不来。"
+    }
+
+    # 运维登录 JWT：未配置时写入 .ops-jwt-secret，并同步到 .env.production（避免 OPS_JWT_SECRET is required）
+    $opsSecretFile = Join-Path $ProjectPath ".ops-jwt-secret"
+    $envProdPath = Join-Path $ProjectPath ".env.production"
+    $opsSecret = $null
+    if (Test-Path $opsSecretFile) {
+        $opsSecret = (Get-Content $opsSecretFile -Raw).Trim()
+    }
+    if (-not $opsSecret) {
+        $bytes = New-Object byte[] 32
+        [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+        $opsSecret = ([BitConverter]::ToString($bytes)).Replace("-", "").ToLower()
+        Set-Content -Path $opsSecretFile -Value $opsSecret -Encoding UTF8 -NoNewline
+        Write-DeployLog "已生成运维 JWT 密钥: $opsSecretFile"
+    }
+    if (Test-Path $envProdPath) {
+        $envText = Get-Content $envProdPath -Raw
+        if ($envText -notmatch '(?m)^\s*OPS_JWT_SECRET\s*=') {
+            Add-Content -Path $envProdPath -Value "`nOPS_JWT_SECRET=`"$opsSecret`""
+            Write-DeployLog "已在 .env.production 追加 OPS_JWT_SECRET"
+        }
+    } elseif (Test-Path (Join-Path $ProjectPath ".env")) {
+        $envPath = Join-Path $ProjectPath ".env"
+        $envText = Get-Content $envPath -Raw
+        if ($envText -notmatch '(?m)^\s*OPS_JWT_SECRET\s*=') {
+            Add-Content -Path $envPath -Value "`nOPS_JWT_SECRET=`"$opsSecret`""
+            Write-DeployLog "已在 .env 追加 OPS_JWT_SECRET"
+        }
     }
 
     Write-DeployLog "清理 git 本地改动（reset --hard；clean 排除 .env* 以免删掉本机密钥）..."

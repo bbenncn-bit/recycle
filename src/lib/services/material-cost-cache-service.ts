@@ -1,7 +1,15 @@
 import { prisma } from '@/lib/prismadb';
-import { calculateLIFOMaterialCost, parseProductionDate } from './lifo-material-cost-service';
-import { resolveLifoMatchParams } from './lifo-match-resolve';
-import { parseWarehouseDate } from './profit-service';
+import {
+  calculateLIFOMaterialCost,
+  parseProductionDate,
+  resolveLifoSettlementQuantity,
+} from './lifo-material-cost-service';
+import { resolveSaleProductIdentity } from './lifo-match-resolve';
+import {
+  dedupeMaterialCostCacheByDeliveryNumber,
+  insertMaterialCostCacheRefreshLog,
+} from './material-cost-cache-log-service';
+import { isDateInLocalYmdRange, parseLocalYmd, parseWarehouseDate } from './profit-service';
 
 /** 材料构成项（与 MaterialCostCache.material_composition JSON 一致：material, quantity 吨, cost 元） */
 export type MaterialCompositionItem = {
@@ -19,8 +27,24 @@ export type ProductionRecordItem = {
   totalCost: number;
 };
 
+/** 途损：库内可能存 0.5（表示 0.5%）或 0.005 */
+function normalizeTransitLossRate(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return value > 1 ? value / 100 : value;
+}
+
+function processDecimal(value: unknown): number {
+  if (value == null) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return parseFloat(value) || 0;
+  if (typeof value === 'object' && value !== null && 'toString' in value) {
+    return parseFloat(String(value)) || 0;
+  }
+  return 0;
+}
+
 /**
- * 从缓存中获取材料成本（缓存由 MySQL 事件自动更新）
+ * 从 MaterialCostCache 读取材料成本（由运维「刷新材料成本缓存」或利润页实时 LIFO 写入）
  */
 export async function getMaterialCostFromCache(
   deliveryNumber: string
@@ -84,50 +108,113 @@ function parseDeliveryDateForCache(dateStr: string | null): Date | null {
  * 使用 TypeScript LIFO（含 MSLKM、MGJKM 等 alias 材料列、库别解析、同月回退）刷新 MaterialCostCache。
  * 替代仅统计 M1~M9 列的旧版 sp_update_material_cost_cache。
  */
+function trimSaleField(s: string | null | undefined): string {
+  return (s ?? '').trim();
+}
+
+/** 结算单是否具备 LIFO 所需的成品标识（品种或仓库展示名至少一项非空） */
+export function hasSaleProductIdentity(
+  productType: string | null | undefined,
+  warehouse: string | null | undefined,
+): boolean {
+  return trimSaleField(productType) !== '' || trimSaleField(warehouse) !== '';
+}
+
+export type MaterialCostCacheRefreshStats = {
+  total: number;
+  success: number;
+  withCost: number;
+  skippedNoProduct: number;
+  dedupedRows: number;
+  logId: number;
+};
+
 export async function refreshMaterialCostCacheUsingTypeScript(
   startDate: string,
   endDate: string,
-): Promise<{ total: number; success: number; withCost: number }> {
+): Promise<MaterialCostCacheRefreshStats> {
+  const dedupedRows = await dedupeMaterialCostCacheByDeliveryNumber();
+
   const sales = await prisma.deliverySettlement.findMany({
     where: {
       deliveryNumber: { not: null },
-      productType: { not: null },
       deliveryDate: { not: null },
       settlementQuantity: { not: null, gt: 0 },
+      OR: [{ productType: { not: null } }, { warehouse: { not: null } }],
     },
     select: {
+      id: true,
       deliveryNumber: true,
       productType: true,
       warehouse: true,
       deliveryDate: true,
       settlementQuantity: true,
+      netWeight: true,
+      deductionRate: true,
     },
   });
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  end.setHours(23, 59, 59, 999);
-  start.setHours(0, 0, 0, 0);
+  const startYmd = startDate.trim();
+  const endYmd = endDate.trim();
+  if (!parseLocalYmd(startYmd) || !parseLocalYmd(endYmd)) {
+    throw new Error('开始、结束日期须为 YYYY-MM-DD');
+  }
+
+  const transitLossBySaleId = new Map<number, number>();
+  try {
+    const transitRows = await prisma.$queryRaw<Array<{ id: number; transitLoss: unknown }>>`
+      SELECT id, transitloss AS transitLoss FROM DeliverySettlement
+    `;
+    for (const row of transitRows) {
+      const v = normalizeTransitLossRate(processDecimal(row.transitLoss));
+      if (v > 0) transitLossBySaleId.set(Number(row.id), v);
+    }
+  } catch {
+    /* 无 transitloss 列时仅用 deduction_rate */
+  }
 
   let total = 0;
   let success = 0;
   let withCost = 0;
+  let skippedNoProduct = 0;
 
   for (const sale of sales) {
+    if (!hasSaleProductIdentity(sale.productType, sale.warehouse)) continue;
+
     const d = parseDeliveryDateForCache(sale.deliveryDate);
-    if (!d || d < start || d > end) continue;
-    const deliveryNumber = (sale.deliveryNumber || '').trim();
+    if (!d || !isDateInLocalYmdRange(d, startYmd, endYmd)) continue;
+    const deliveryNumber = trimSaleField(sale.deliveryNumber);
     if (!deliveryNumber) continue;
 
     total += 1;
-    const qty = Number(sale.settlementQuantity ?? 0);
-    if (qty <= 0) continue;
+    const settlementQty = Number(sale.settlementQuantity ?? 0);
+    if (settlementQty <= 0) continue;
+
+    const transit =
+      transitLossBySaleId.get(Number(sale.id)) ??
+      normalizeTransitLossRate(processDecimal(sale.deductionRate));
+    const lifoQty = resolveLifoSettlementQuantity({
+      settlementQuantity: settlementQty,
+      netWeightQuantity: processDecimal(sale.netWeight),
+      transitLossRate: transit,
+    });
+    if (lifoQty <= 0) continue;
+
+    const { productName, productWarehouse } = await resolveSaleProductIdentity(
+      sale.productType,
+      sale.warehouse,
+    );
+    if (!productName) {
+      skippedNoProduct += 1;
+      continue;
+    }
 
     const lifo = await calculateLIFOMaterialCost(
-      (sale.productType || '').trim(),
-      sale.warehouse,
-      qty,
+      productName,
+      productWarehouse,
+      lifoQty,
       d,
+      { skipResolve: true },
     );
 
     const totalTons = lifo.composition.reduce((s, c) => s + (c.tons ?? 0), 0);
@@ -140,38 +227,49 @@ export async function refreshMaterialCostCacheUsingTypeScript(
           }))
         : [];
 
-    const { productWarehouse } = await resolveLifoMatchParams(
-      sale.productType,
-      sale.warehouse,
-    );
-
-    await prisma.materialCostCache.upsert({
-      where: { deliveryNumber },
-      create: {
-        deliveryNumber,
-        productName: sale.productType,
-        productWarehouse,
-        deliveryDate: sale.deliveryDate,
-        settlementQuantity: qty,
-        materialCost: lifo.cost,
-        materialComposition,
-        productionRecords: lifo.productionRecords,
-      },
-      update: {
-        productName: sale.productType,
-        productWarehouse,
-        deliveryDate: sale.deliveryDate,
-        settlementQuantity: qty,
-        materialCost: lifo.cost,
-        materialComposition,
-        productionRecords: lifo.productionRecords,
-        calculatedAt: new Date(),
-      },
-    });
-
-    success += 1;
-    if (lifo.cost > 0) withCost += 1;
+    try {
+      await prisma.materialCostCache.upsert({
+        where: { deliveryNumber },
+        create: {
+          deliveryNumber,
+          productName,
+          productWarehouse,
+          deliveryDate: sale.deliveryDate,
+          settlementQuantity: settlementQty,
+          materialCost: lifo.cost,
+          materialComposition,
+          productionRecords: lifo.productionRecords,
+        },
+        update: {
+          productName,
+          productWarehouse,
+          deliveryDate: sale.deliveryDate,
+          settlementQuantity: settlementQty,
+          materialCost: lifo.cost,
+          materialComposition,
+          productionRecords: lifo.productionRecords,
+          calculatedAt: new Date(),
+        },
+      });
+      success += 1;
+      if (lifo.cost > 0) withCost += 1;
+    } catch (err) {
+      console.error(`MaterialCostCache upsert 失败 ${deliveryNumber}:`, err);
+    }
   }
 
-  return { total, success, withCost };
+  const summary = [
+    `刷新成功 ${startYmd} ~ ${endYmd}`,
+    `去重删除 ${dedupedRows} 条重复缓存`,
+    `范围内结算单 ${total} 条`,
+    `写入/更新 ${success} 条`,
+    `材料成本>0: ${withCost} 条`,
+    skippedNoProduct > 0 ? `无法解析成品名: ${skippedNoProduct} 条` : null,
+  ]
+    .filter(Boolean)
+    .join('；');
+
+  const logId = await insertMaterialCostCacheRefreshLog(summary, null);
+
+  return { total, success, withCost, skippedNoProduct, dedupedRows, logId };
 }

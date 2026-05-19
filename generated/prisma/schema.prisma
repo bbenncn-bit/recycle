@@ -621,6 +621,17 @@ model MaterialCostCache {
   @@map("MaterialCostCache")
 }
 
+/// 材料成本缓存刷新日志（运维每次刷新写入一条汇总）
+model MaterialCostCacheErrorLog {
+  id             Int       @id @default(autoincrement()) @map("id")
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+  deliveryNumber String?   @map("delivery_number") @db.VarChar(100)
+  errorMessage   String?   @map("error_message") @db.Text
+
+  @@index([createdAt])
+  @@map("MaterialCostCacheErrorLog")
+}
+
 /// 运维控制台账号（Web 登录，与业务用户分离）
 model OpsConsoleUser {
   id           Int       @id @default(autoincrement())

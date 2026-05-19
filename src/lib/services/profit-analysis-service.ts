@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate, formatDate } from './profit-service';
-import { calculateLIFOMaterialCost } from './lifo-material-cost-service';
+import {
+  calculateLIFOMaterialCost,
+  resolveLifoSettlementQuantity,
+} from './lifo-material-cost-service';
+import { resolveSaleProductIdentity } from './lifo-match-resolve';
 import {
   deriveProfitAnalysisCustomer,
   isExcludedFromProfitAnalysis,
@@ -292,7 +296,7 @@ async function getProductUnitProcessingCost(productName: string): Promise<number
 async function calculateMaterialCost(
   deliveryNumber: string,
   productType: string,
-  materialCalcQuantity: number,
+  lifoQuantity: number,
   deliveryDate: string,
   warehouse?: string | null
 ): Promise<{ 
@@ -306,7 +310,7 @@ async function calculateMaterialCost(
     totalCost: number;
   }>;
 }> {
-  if (materialCalcQuantity <= 0) {
+  if (lifoQuantity <= 0) {
     return { cost: 0, composition: [], productionRecords: [] };
   }
 
@@ -321,15 +325,22 @@ async function calculateMaterialCost(
     const { getMaterialCostFromCache } = await import('./material-cost-cache-service');
     const cached = await getMaterialCostFromCache(deliveryNumber);
     
-    // 缓存未命中或缓存为 0：尝试实时 LIFO（支持 MSLKM*/MGJKM* 列与库别解析）
+    // 缓存未命中或缓存为 0：尝试实时 LIFO（支持 alias 材料列、库别与成品名解析）
     let lifoResult: Awaited<ReturnType<typeof calculateLIFOMaterialCost>> | null = null;
     try {
-      lifoResult = await calculateLIFOMaterialCost(
+      const { productName, productWarehouse } = await resolveSaleProductIdentity(
         productType,
-        warehouse || null,
-        materialCalcQuantity,
-        saleDate
+        warehouse,
       );
+      if (productName) {
+        lifoResult = await calculateLIFOMaterialCost(
+          productName,
+          productWarehouse,
+          lifoQuantity,
+          saleDate,
+          { skipResolve: true },
+        );
+      }
     } catch (lifoErr) {
       console.warn(`实时 LIFO 计算失败 (${deliveryNumber}):`, lifoErr);
     }
@@ -398,7 +409,7 @@ async function calculateMaterialCost(
     const materialDetails: Array<{ material: string; quantity: number; cost: number }> = [];
 
     for (const item of composition) {
-      const qty = materialCalcQuantity * item.ratio;
+      const qty = lifoQuantity * item.ratio;
       const avgPrice = await getMaterialAvgPrice(item.material, saleDate);
       const cost = qty * avgPrice;
       totalCost += cost;
@@ -1136,8 +1147,11 @@ export async function getProfitAnalysisData(
           const transitLoss =
             monthlyTransitLoss ?? (rowTransitLoss > 0 ? rowTransitLoss : DEFAULT_TRANSIT_LOSS_RATE);
           // 材料核算量 = 出厂净重 * (1 + 途损)；净重无效时回退结算量 * (1 + 途损)
-          const baseMaterialQty = netWeightQuantity > 0 ? netWeightQuantity : quantity;
-          const materialCalcQuantity = baseMaterialQty * (1 + transitLoss);
+          const lifoQuantity = resolveLifoSettlementQuantity({
+            settlementQuantity: quantity,
+            netWeightQuantity,
+            transitLossRate: transitLoss,
+          });
           const paramSnapshot = buildParamSnapshot(allParamRows, deliveryDate, customer);
 
           const unitProcessingCost = DEFAULT_PROCESSING_COST_PER_TON;
@@ -1157,7 +1171,7 @@ export async function getProfitAnalysisData(
             const result = await calculateMaterialCost(
               sale.deliveryNumber || '',
               productType,
-              materialCalcQuantity,
+              lifoQuantity,
               sale.deliveryDate || '',
               sale.warehouse || null
             );
@@ -1170,7 +1184,7 @@ export async function getProfitAnalysisData(
 
           // 销售单价(不含税)、材料单价(不含税)
           const salesUnitExclTax = quantity > 0 ? revenue / quantity / 1.13 : 0;
-          const materialUnitExclTax = materialCalcQuantity > 0 ? materialCost / materialCalcQuantity : 0;
+          const materialUnitExclTax = lifoQuantity > 0 ? materialCost / lifoQuantity : 0;
 
           // 入库单加权平均税率（用于税费公式）
           let warehouseTaxRate = 0;
@@ -1278,7 +1292,7 @@ export async function getProfitAnalysisData(
             costParamSnapshot: {
               salesUnitExclTax,
               materialUnitExclTax,
-              materialCalcQuantity,
+              materialCalcQuantity: lifoQuantity,
               warehouseTaxRate,
               transportPerTon: transportPerSettlementTonForTax,
               processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,

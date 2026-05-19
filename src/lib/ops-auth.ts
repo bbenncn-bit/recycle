@@ -1,18 +1,10 @@
 import * as bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
+import { getOpsJwtSecretBytes } from './ops-jwt-secret';
 
 export const OPS_SESSION_COOKIE = 'ops_session';
 
-function jwtSecretBytes(): Uint8Array {
-  const s = process.env.OPS_JWT_SECRET?.trim();
-  if (!s) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('OPS_JWT_SECRET is required in production');
-    }
-    return new TextEncoder().encode('ops-dev-only-change-in-env');
-  }
-  return new TextEncoder().encode(s);
-}
+export { opsSessionCookieSecure, shouldSkipHttpsRedirect } from './ops-jwt-secret';
 
 export async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, 12);
@@ -28,7 +20,7 @@ export type OpsJwtPayload = {
 };
 
 export async function signOpsSessionToken(userId: number, username: string): Promise<string> {
-  const secret = jwtSecretBytes();
+  const secret = getOpsJwtSecretBytes();
   return new SignJWT({ username })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(String(userId))
@@ -39,7 +31,7 @@ export async function signOpsSessionToken(userId: number, username: string): Pro
 
 export async function verifyOpsSessionToken(token: string): Promise<OpsJwtPayload | null> {
   try {
-    const secret = jwtSecretBytes();
+    const secret = getOpsJwtSecretBytes();
     const { payload } = await jwtVerify(token, secret);
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     const username =

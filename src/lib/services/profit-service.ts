@@ -148,6 +148,34 @@ export function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** 将 YYYY-MM-DD 解析为本地 0 点，避免 `new Date('YYYY-MM-DD')` 按 UTC 导致日期比较错位 */
+export function parseLocalYmd(ymd: string): Date | null {
+  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec((ymd || '').trim());
+  if (!m) return null;
+  const year = parseInt(m[1], 10);
+  const month = parseInt(m[2], 10) - 1;
+  const day = parseInt(m[3], 10);
+  if (year < 1900 || year > 2100 || month < 0 || month > 11 || day < 1 || day > 31) {
+    return null;
+  }
+  const d = new Date(year, month, day);
+  if (d.getFullYear() !== year || d.getMonth() !== month || d.getDate() !== day) {
+    return null;
+  }
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/** 判断日期是否在 [startYmd, endYmd]（含端点，按本地日历日） */
+export function isDateInLocalYmdRange(
+  date: Date,
+  startYmd: string,
+  endYmd: string,
+): boolean {
+  const key = formatDate(date);
+  return key >= startYmd && key <= endYmd;
+}
+
 /**
  * 处理成本数据：将 Decimal 转换为 number，处理 null 值
  */
