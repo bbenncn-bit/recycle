@@ -44,7 +44,10 @@ export interface ProfitAnalysisData {
     /** 发往客户：库内为空时按 warehouse/product_type 推导（吉钢/萍钢/新钢） */
     customer: string;
     settlementQuantity: number;   // 结算量（吨）
-    transitLoss: number;          // 途损率（如 0.005 表示 0.5%）
+    /** 出厂净重（吨），DeliverySettlement.net_weight */
+    netWeight: number;
+    /** 磅差（吨），DeliverySettlement.transitloss 原值；列为空时展示 0，核算回退扣杂率 */
+    transitLoss: number;
     revenue: number;               // 销售收入（元）
     materialCost: number;          // 材料成本（元）
     processingCost: number;        // 加工成本（元）
@@ -58,6 +61,8 @@ export interface ProfitAnalysisData {
     immediateRefund: number;       // 即征即退（元）
     governmentSupport: number;     // 政府扶持资金（元）
     profit: number;                // 利润（元）
+    /** 吨钢毛利（元/吨）= 利润(元) / 净重(吨)；净重为 0 时为 0 */
+    profitPerNetTon: number;
     costParamSnapshot?: {          // 其它成本核算参数快照（用于前端核对）
       salesUnitExclTax: number;                // 销售单价（不含税，元/吨）
       materialUnitExclTax: number;             // 材料单价（不含税，元/吨）
@@ -119,7 +124,7 @@ function processDecimal(value: any): number {
   return 0;
 }
 
-/** 将途损率标准化为小数：0.5% => 0.005；若已是小数则原样返回 */
+/** 将扣杂率等「比例」标准化为小数：0.5% => 0.005；仅用于 transitloss 列为空时的回退核算 */
 function normalizeTransitLossRate(value: number): number {
   if (!Number.isFinite(value) || value <= 0) return 0;
   // 容错：若传入的是百分数（如 2.316 表示 2.316%），转成小数 0.02316
@@ -435,7 +440,7 @@ async function calculateProcessingCost(
 
 /** 加工费默认元/吨（用于税费公式，仅当 ProfitParamConfig 无配置时回退） */
 const DEFAULT_PROCESSING_COST_PER_TON = 70;
-/** 途损默认值（0.5%），当月无可用值时回退 */
+/** 扣杂率回退时的默认磅差率（0.5%），仅当 transitloss 列为空时用 (1+率) 核算 */
 const DEFAULT_TRANSIT_LOSS_RATE = 0.005;
 
 /** ProfitParamConfig 单行（用于按发货日期取生效参数） */
@@ -1043,51 +1048,39 @@ export async function getProfitAnalysisData(
   });
   // 汇总/图表仍基于 salesDetails 再按 queryStartDate/queryEndDate 过滤计算
 
-  // 优先从原表 transitloss 列读取途损（该列当前未在 Prisma model 中声明，用原生 SQL 读取）
-  const transitLossBySaleId = new Map<number, number>();
+  /** 每单 DeliverySettlement.transitloss 原值（null=列空）；未在 Prisma 声明，用原生 SQL */
+  const transitLossRawBySaleId = new Map<number, unknown>();
   try {
-    const transitRows = await prisma.$queryRaw<Array<{ id: number; transitLoss: any }>>`
+    const transitRows = await prisma.$queryRaw<Array<{ id: number; transitLoss: unknown }>>`
       SELECT id, transitloss AS transitLoss
       FROM DeliverySettlement
       WHERE delivery_date IS NOT NULL
         AND delivery_date >= ${minDeliveryDateStr}
     `;
     for (const row of transitRows) {
-      const v = normalizeTransitLossRate(processDecimal(row.transitLoss));
-      if (Number.isFinite(v) && v > 0) {
-        transitLossBySaleId.set(Number(row.id), v);
-      }
+      transitLossRawBySaleId.set(Number(row.id), row.transitLoss);
     }
   } catch (e) {
-    // 列不存在或权限受限时回退到 deductionRate（并做比例标准化）
-    console.warn('读取 DeliverySettlement.transitloss 失败，回退 deductionRate:', e);
+    console.warn('读取 DeliverySettlement.transitloss 失败，将按扣杂率/默认磅差回退:', e);
+  }
+
+  function fallbackTransitLossRate(sale: (typeof validSalesForDetails)[0]): number {
+    const d = normalizeTransitLossRate(processDecimal(sale.deductionRate));
+    return d > 0 ? d : DEFAULT_TRANSIT_LOSS_RATE;
+  }
+
+  /** transitloss 列有值（含 0）时返回吨数；列为 NULL 或行未返回时 null（核算走扣杂率） */
+  function getTransitLossTonsFromDb(saleId: number): number | null {
+    if (!transitLossRawBySaleId.has(saleId)) return null;
+    const raw = transitLossRawBySaleId.get(saleId);
+    if (raw === null || raw === undefined) return null;
+    const n = processDecimal(raw as any);
+    if (!Number.isFinite(n)) return null;
+    return n;
   }
 
   // 加载利润可调参数（按发货日期取生效值：变动日期起用 value，之前用 previous_value）
   const allParamRows = await loadAllParamConfigRows();
-  // 以“月”为单位统一途损（来源：DeliverySettlement.deductionRate；缺省回退 0.5%）
-  const monthlyTransitLossMap = new Map<string, number>();
-  const monthlyTransitLossAgg = new Map<string, { sum: number; count: number }>();
-  for (const sale of validSalesForDetails) {
-    const d = parseDeliveryDate(sale.deliveryDate);
-    if (!d) continue;
-    const monthKey = formatDate(d).slice(0, 7);
-    const rateFromTransit = transitLossBySaleId.get(Number(sale.id)) ?? 0;
-    const rateFromDeduction = normalizeTransitLossRate(processDecimal(sale.deductionRate));
-    const rate = rateFromTransit > 0 ? rateFromTransit : rateFromDeduction;
-    if (rate > 0) {
-      const cur = monthlyTransitLossAgg.get(monthKey) || { sum: 0, count: 0 };
-      cur.sum += rate;
-      cur.count += 1;
-      monthlyTransitLossAgg.set(monthKey, cur);
-    }
-  }
-  for (const [monthKey, agg] of monthlyTransitLossAgg.entries()) {
-    monthlyTransitLossMap.set(
-      monthKey,
-      agg.count > 0 ? agg.sum / agg.count : DEFAULT_TRANSIT_LOSS_RATE
-    );
-  }
 
   // 计算每笔销售的利润（按全部明细数据批量处理）
   const salesDetails: ProfitAnalysisData['salesDetails'] = [];
@@ -1138,19 +1131,16 @@ export async function getProfitAnalysisData(
             (sale.customer || '').trim();
 
           const deliveryDate = parseDeliveryDate(sale.deliveryDate) || new Date();
-          const monthKey = formatDate(deliveryDate).slice(0, 7);
-          const monthlyTransitLoss = monthlyTransitLossMap.get(monthKey);
-          const rateFromTransit = transitLossBySaleId.get(Number(sale.id)) ?? 0;
-          const rateFromDeduction = normalizeTransitLossRate(processDecimal(sale.deductionRate));
-          const rowTransitLoss = rateFromTransit > 0 ? rateFromTransit : rateFromDeduction;
-          // 当前以 DeliverySettlement.transitloss（月统一）为准，不再被参数表覆盖
-          const transitLoss =
-            monthlyTransitLoss ?? (rowTransitLoss > 0 ? rowTransitLoss : DEFAULT_TRANSIT_LOSS_RATE);
-          // 材料核算量 = 出厂净重 * (1 + 途损)；净重无效时回退结算量 * (1 + 途损)
+          const saleId = Number(sale.id);
+          const transitLossTonsDb = getTransitLossTonsFromDb(saleId);
+          const transitLossTonsDisplay = transitLossTonsDb !== null ? transitLossTonsDb : 0;
+          const lifoRateFallback = fallbackTransitLossRate(sale);
+          // 材料核算量：有 transitloss(吨) 时净重/结算量 + 磅差吨；否则 (1+扣杂率) 口径
           const lifoQuantity = resolveLifoSettlementQuantity({
             settlementQuantity: quantity,
             netWeightQuantity,
-            transitLossRate: transitLoss,
+            transitLossTons: transitLossTonsDb !== null ? transitLossTonsDb : null,
+            transitLossRate: transitLossTonsDb === null ? lifoRateFallback : undefined,
           });
           const paramSnapshot = buildParamSnapshot(allParamRows, deliveryDate, customer);
 
@@ -1267,6 +1257,8 @@ export async function getProfitAnalysisData(
 
           const revenueExclTax = revenue / 1.13;
           const profit = revenueExclTax - materialCost - processingCost - otherCosts + otherIncome;
+          const profitPerNetTon =
+            netWeightQuantity > 0 ? profit / netWeightQuantity : 0;
 
           return {
             deliveryNumber: sale.deliveryNumber || '',
@@ -1276,7 +1268,8 @@ export async function getProfitAnalysisData(
             warehouse: sale.warehouse || '',
             customer,
             settlementQuantity: quantity,
-            transitLoss,
+            netWeight: netWeightQuantity,
+            transitLoss: transitLossTonsDisplay,
             revenue,
             materialCost,
             processingCost,
@@ -1289,6 +1282,7 @@ export async function getProfitAnalysisData(
             immediateRefund,
             governmentSupport,
             profit,
+            profitPerNetTon,
             costParamSnapshot: {
               salesUnitExclTax,
               materialUnitExclTax,
@@ -1325,6 +1319,7 @@ export async function getProfitAnalysisData(
               deriveProfitAnalysisCustomer(sale.warehouse, sale.productType) ||
               (sale.customer || '').trim(),
             settlementQuantity: 0,
+            netWeight: 0,
             transitLoss: 0,
             revenue: 0,
             materialCost: 0,
@@ -1338,6 +1333,7 @@ export async function getProfitAnalysisData(
             immediateRefund: 0,
             governmentSupport: 0,
             profit: 0,
+            profitPerNetTon: 0,
             costParamSnapshot: {
               salesUnitExclTax: 0,
               materialUnitExclTax: 0,
@@ -1502,6 +1498,17 @@ export async function getProfitAnalysisData(
   if (includeProductComparison) {
     productComparison = await buildProfitProductComparison();
   }
+
+  salesDetails.sort((a, b) => {
+    const da = parseDeliveryDate(a.deliveryDate);
+    const db = parseDeliveryDate(b.deliveryDate);
+    if (da && db) {
+      const diff = da.getTime() - db.getTime();
+      if (diff !== 0) return diff;
+    } else if (da) return -1;
+    else if (db) return 1;
+    return (a.deliveryNumber || '').localeCompare(b.deliveryNumber || '');
+  });
 
   return {
     summary: {

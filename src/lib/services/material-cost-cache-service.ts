@@ -27,7 +27,7 @@ export type ProductionRecordItem = {
   totalCost: number;
 };
 
-/** 途损：库内可能存 0.5（表示 0.5%）或 0.005 */
+/** 磅差：transitloss 列为吨数；列为空时材料核算回退扣杂率（率） */
 function normalizeTransitLossRate(value: number): number {
   if (!Number.isFinite(value) || value <= 0) return 0;
   return value > 1 ? value / 100 : value;
@@ -160,17 +160,27 @@ export async function refreshMaterialCostCacheUsingTypeScript(
     throw new Error('开始、结束日期须为 YYYY-MM-DD');
   }
 
-  const transitLossBySaleId = new Map<number, number>();
+  const DEFAULT_TRANSIT_LOSS_RATE = 0.005;
+
+  const transitLossRawBySaleId = new Map<number, unknown>();
   try {
     const transitRows = await prisma.$queryRaw<Array<{ id: number; transitLoss: unknown }>>`
       SELECT id, transitloss AS transitLoss FROM DeliverySettlement
     `;
     for (const row of transitRows) {
-      const v = normalizeTransitLossRate(processDecimal(row.transitLoss));
-      if (v > 0) transitLossBySaleId.set(Number(row.id), v);
+      transitLossRawBySaleId.set(Number(row.id), row.transitLoss);
     }
   } catch {
     /* 无 transitloss 列时仅用 deduction_rate */
+  }
+
+  function getTransitLossTonsFromDb(saleId: number): number | null {
+    if (!transitLossRawBySaleId.has(saleId)) return null;
+    const raw = transitLossRawBySaleId.get(saleId);
+    if (raw === null || raw === undefined) return null;
+    const n = processDecimal(raw);
+    if (!Number.isFinite(n)) return null;
+    return n;
   }
 
   let total = 0;
@@ -190,13 +200,16 @@ export async function refreshMaterialCostCacheUsingTypeScript(
     const settlementQty = Number(sale.settlementQuantity ?? 0);
     if (settlementQty <= 0) continue;
 
-    const transit =
-      transitLossBySaleId.get(Number(sale.id)) ??
-      normalizeTransitLossRate(processDecimal(sale.deductionRate));
+    const tonsDb = getTransitLossTonsFromDb(Number(sale.id));
+    const rateFallback = (() => {
+      const d = normalizeTransitLossRate(processDecimal(sale.deductionRate));
+      return d > 0 ? d : DEFAULT_TRANSIT_LOSS_RATE;
+    })();
     const lifoQty = resolveLifoSettlementQuantity({
       settlementQuantity: settlementQty,
       netWeightQuantity: processDecimal(sale.netWeight),
-      transitLossRate: transit,
+      transitLossTons: tonsDb !== null ? tonsDb : null,
+      transitLossRate: tonsDb === null ? rateFallback : undefined,
     });
     if (lifoQty <= 0) continue;
 

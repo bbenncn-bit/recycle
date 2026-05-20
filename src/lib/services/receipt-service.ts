@@ -178,20 +178,16 @@ export class ReceiptfcService {
 
       console.log(`🔍 分页查询报废车数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
-      // 获取分页数据
-      const [data, total] = await Promise.all([
-        prisma.receiptfc.findMany({
-          where,
-          orderBy: {
-            orderTime: 'desc'
-          },
-          skip: actualOffset,
-          take: limit
-        }),
-        prisma.receiptfc.count({
-          where
-        })
-      ]);
+      // 串行查询，避免同一请求占用池内两个并发连接（首页多路并发时易触发 pool timeout）
+      const data = await prisma.receiptfc.findMany({
+        where,
+        orderBy: {
+          orderTime: 'desc'
+        },
+        skip: actualOffset,
+        take: limit
+      });
+      const total = await prisma.receiptfc.count({ where });
 
       const processedData = this.processReceiptData(data);
       const totalPages = Math.ceil(total / limit);
@@ -412,20 +408,15 @@ export class ReceiptfgService {
 
       console.log(`🔍 分页查询废钢数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
-      // 获取分页数据
-      const [data, total] = await Promise.all([
-        prisma.receiptfg.findMany({
-          where,
-          orderBy: {
-            orderTime: 'desc'
-          },
-          skip: actualOffset,
-          take: limit
-        }),
-        prisma.receiptfg.count({
-          where
-        })
-      ]);
+      const data = await prisma.receiptfg.findMany({
+        where,
+        orderBy: {
+          orderTime: 'desc'
+        },
+        skip: actualOffset,
+        take: limit
+      });
+      const total = await prisma.receiptfg.count({ where });
 
       const processedData = this.processReceiptData(data);
       const totalPages = Math.ceil(total / limit);

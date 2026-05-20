@@ -41,6 +41,8 @@ export default function Page() {
   const [fgStatsLoading, setFgStatsLoading] = useState(true);
 
   useEffect(() => {
+    if (!datesReady) return;
+
     const fetchFcStatsData = async () => {
       try {
         setFcStatsLoading(true);
@@ -99,9 +101,12 @@ export default function Page() {
       }
     };
 
-    fetchFcStatsData();
-    fetchFgStatsData();
-  }, []);
+    // 串行请求，减轻远程 MySQL 连接池瞬时压力（与下方两张表的 Server Action 并发错开）
+    void (async () => {
+      await fetchFcStatsData();
+      await fetchFgStatsData();
+    })();
+  }, [datesReady]);
 
   const getTotalAmount = () => {
     const fcAmount = fcStatsLoading ? 0 : fcTotalData.reduce((sum, item) => sum + Number(item.taxInclu || 0), 0);
@@ -164,6 +169,7 @@ export default function Page() {
               subtitle={tableSubtitle}
               bgColor="bg-white dark:bg-gray-800"
               selectedDate={selectedDate}
+              initialLoadDelayMs={280}
               fetchBatchData={getReceiptfcDataBatch}
               itemsPerPage={10}
             />

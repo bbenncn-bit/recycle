@@ -1,9 +1,8 @@
 import { PrismaClient } from "../../generated/prisma";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
-declare global {
-  var prisma: PrismaClient | undefined;
-}
+/** Turbopack / HMR 下 `global` 与模块实例可能不一致，用 globalThis 保证单例连接池 */
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 // 获取数据库连接字符串
 function getDatabaseUrl() {
@@ -14,28 +13,36 @@ function getDatabaseUrl() {
   return dbUrl;
 }
 
+function parsePositiveInt(value: string | undefined, fallback: number): number {
+  const n = parseInt(String(value ?? ""), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 // 解析 DATABASE_URL 为配置对象（用于连接池配置）
 function parseDatabaseUrl(url: string) {
   try {
     const parsed = new URL(url);
     // 手动解码密码（URL 解析器不会自动解码密码部分）
     const password = decodeURIComponent(parsed.password);
-    
+
+    const connectionLimit = parsePositiveInt(process.env.DATABASE_CONNECTION_LIMIT, 20);
+    const connectTimeout = parsePositiveInt(process.env.DATABASE_CONNECT_TIMEOUT_MS, 60000);
+    const acquireTimeout = parsePositiveInt(process.env.DATABASE_POOL_ACQUIRE_TIMEOUT_MS, 60000);
+    const queryTimeout = parsePositiveInt(process.env.DATABASE_QUERY_TIMEOUT_MS, 60000);
+
     return {
       host: parsed.hostname,
       port: parseInt(parsed.port) || 3306,
       user: parsed.username,
       password: password, // 使用解码后的密码
       database: parsed.pathname.slice(1),
-      // 连接池配置
+      // 连接池配置（远程库 / 首页并发多时适当加大超时与连接数）
       waitForConnections: true,
-      connectionLimit: 20, // 增加连接池大小
+      connectionLimit,
       queueLimit: 0,
-      // 连接超时配置
-      connectTimeout: 30000, // 30秒连接超时
-      acquireTimeout: 30000, // 30秒从连接池获取连接的超时时间
-      timeout: 30000, // 30秒查询超时
-      // 连接保活配置
+      connectTimeout,
+      acquireTimeout,
+      timeout: queryTimeout,
       enableKeepAlive: true,
       keepAliveInitialDelay: 0,
     };
@@ -52,7 +59,7 @@ const poolConfig = parseDatabaseUrl(dbUrl);
 const adapter = new PrismaMariaDb(poolConfig);
 
 export const prisma =
-  global.prisma ||
+  globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
     // 根据环境调整日志级别
@@ -61,4 +68,6 @@ export const prisma =
       : ["error"], // 生产环境只记录错误
   });
 
-if (process.env.NODE_ENV !== "production") global.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}

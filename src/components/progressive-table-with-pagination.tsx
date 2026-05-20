@@ -34,6 +34,11 @@ interface ProgressiveTableWithPaginationProps {
   bgColor: string;
   /** 当前选中的交易日 YYYY-MM-DD（由页面统一选择） */
   selectedDate: string;
+  /**
+   * 首屏拉第一页前延迟（毫秒），用于首页多表并发时错开 DB 连接，减轻池超时。
+   * 默认 0。
+   */
+  initialLoadDelayMs?: number;
   fetchBatchData: (params: { page: number; limit: number; date: string }) => Promise<{
     data: TableData[];
     pagination: {
@@ -208,6 +213,7 @@ export default function ProgressiveTableWithPagination({
   subtitle,
   bgColor,
   selectedDate,
+  initialLoadDelayMs = 0,
   fetchBatchData,
   itemsPerPage = 10
 }: ProgressiveTableWithPaginationProps) {
@@ -311,8 +317,15 @@ export default function ProgressiveTableWithPagination({
     pageCache.current = {};
     setCurrentPage(1);
     setLoading(true);
-    loadPageData(1, false);
-  }, [selectedDate, loadPageData, itemsPerPage]);
+    if (!initialLoadDelayMs) {
+      loadPageData(1, false);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      loadPageData(1, false);
+    }, initialLoadDelayMs);
+    return () => window.clearTimeout(timer);
+  }, [selectedDate, loadPageData, itemsPerPage, initialLoadDelayMs]);
 
   // 后台预加载策略（在第一页加载完成后，预加载第2-3页）
   useEffect(() => {

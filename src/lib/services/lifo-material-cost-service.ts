@@ -44,22 +44,41 @@ export function invalidateProcessingCostInputShapeCache(): void {
 const lifoDebug = process.env.PROFIT_LIFO_DEBUG === '1';
 
 /**
- * LIFO 扣减吨数：默认「结算量×(1+途损)」。
- * 当出厂净重明显大于结算量时，不按净重扣减（避免整车净重套在拆分结算单上，如结算 5.46 吨却扣 55 吨）。
+ * LIFO 材料核算量（吨）。
+ * - 若提供 **transitLossTons**（DeliverySettlement.transitloss，磅差吨数）：在「净重」或「结算量」基准上加计吨数，不再用 (1+率)。
+ * - 否则沿用 **transitLossRate**：结算量×(1+率)；净重合理时净重×(1+率)。
+ * 当出厂净重明显大于结算量时，不按净重扣减（避免整车净重套在拆分结算单上）。
  */
 export function resolveLifoSettlementQuantity(params: {
   settlementQuantity: number;
   netWeightQuantity?: number;
+  /** 磅差（吨），有值（含 0）时优先按吨加计 */
+  transitLossTons?: number | null;
   transitLossRate?: number;
   /** 净重/结算量超过该倍数时强制按结算量计 */
   maxNetToSettlementRatio?: number;
 }): number {
   const qty = params.settlementQuantity;
   if (qty <= 0) return 0;
-  const transit = params.transitLossRate ?? 0;
-  const withTransit = qty * (1 + transit);
   const net = params.netWeightQuantity ?? 0;
   const maxRatio = params.maxNetToSettlementRatio ?? 1.25;
+
+  const tonsArg = params.transitLossTons;
+  const useTons =
+    tonsArg !== undefined &&
+    tonsArg !== null &&
+    Number.isFinite(Number(tonsArg)) &&
+    Number(tonsArg) >= 0;
+  if (useTons) {
+    const tons = Number(tonsArg);
+    if (net <= 0 || net <= qty * maxRatio) {
+      return net > 0 ? net + tons : qty + tons;
+    }
+    return qty + tons;
+  }
+
+  const transit = params.transitLossRate ?? 0;
+  const withTransit = qty * (1 + transit);
   if (net <= 0 || net <= qty * maxRatio) {
     return net > 0 ? net * (1 + transit) : withTransit;
   }

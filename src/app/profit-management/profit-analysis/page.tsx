@@ -21,6 +21,40 @@ function getMonthKey(deliveryDate: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+/** 表格展示：发货日期不含年份（如 4/1） */
+function formatDeliveryDateNoYear(deliveryDate: string): string {
+  const d = parseDeliveryDate(deliveryDate);
+  if (d) {
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  }
+  const t = deliveryDate.trim();
+  const mdy = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (mdy) return `${parseInt(mdy[1], 10)}/${parseInt(mdy[2], 10)}`;
+  const iso = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${parseInt(iso[2], 10)}/${parseInt(iso[3], 10)}`;
+  return t;
+}
+
+/** 销售明细：按发货日期升序（同日按发货单号） */
+function compareSalesDetailByDeliveryDate(
+  a: { deliveryDate: string; deliveryNumber?: string },
+  b: { deliveryDate: string; deliveryNumber?: string }
+): number {
+  const da = parseDeliveryDate(a.deliveryDate);
+  const db = parseDeliveryDate(b.deliveryDate);
+  if (da && db) {
+    const diff = da.getTime() - db.getTime();
+    if (diff !== 0) return diff;
+  } else if (da) return -1;
+  else if (db) return 1;
+  return (a.deliveryNumber || '').localeCompare(b.deliveryNumber || '');
+}
+
+/** 销售明细表：紧凑单元格，便于多列同屏 */
+const SD_TH =
+  'px-2 py-2 text-left text-[11px] font-medium text-gray-500 dark:text-gray-300 leading-snug align-bottom';
+const SD_TD = 'px-2 py-2 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100 align-middle';
+
 interface ProfitAnalysisData {
   summary: {
     todayProfit: number;
@@ -53,7 +87,8 @@ interface ProfitAnalysisData {
     warehouse: string;
     customer: string;
     settlementQuantity: number;
-    transitLoss: number;
+    netWeight: number;
+    transitLoss: number; // 磅差（吨）DeliverySettlement.transitloss
     revenue: number;
     materialCost: number;
     processingCost: number;
@@ -66,6 +101,7 @@ interface ProfitAnalysisData {
     immediateRefund: number;
     governmentSupport: number;
     profit: number;
+    profitPerNetTon: number;
     costParamSnapshot?: {
       salesUnitExclTax: number;
       materialUnitExclTax: number;
@@ -151,13 +187,18 @@ export default function ProfitAnalysis() {
       byMonth[key].push(sale);
     }
     const keys = Object.keys(byMonth).sort();
+    for (const k of keys) {
+      byMonth[k].sort(compareSalesDetailByDeliveryDate);
+    }
     return { salesDetailsByMonth: byMonth, monthKeys: keys };
   }, [data?.salesDetails]);
 
   // 当前选中月份下的列表与分页
   const currentMonthDetails = useMemo(() => {
     if (!data?.salesDetails?.length) return [];
-    if (!salesDetailMonth) return data.salesDetails;
+    if (!salesDetailMonth) {
+      return [...data.salesDetails].sort(compareSalesDetailByDeliveryDate);
+    }
     return salesDetailsByMonth[salesDetailMonth] ?? [];
   }, [data?.salesDetails, salesDetailMonth, salesDetailsByMonth]);
 
@@ -837,7 +878,48 @@ export default function ProfitAnalysis() {
 
         {/* 销售明细表格：月份导航 + 分页 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">销售明细利润分析</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">销售明细利润分析</h2>
+          <button
+            type="button"
+            onClick={async () => {
+              if (!data?.salesDetails?.length || currentMonthDetails.length === 0) {
+                window.alert('暂无数据可导出');
+                return;
+              }
+              if (data.provisional) {
+                window.alert('精确数据计算中，请稍后再导出');
+                return;
+              }
+              try {
+                const { downloadProfitSalesDetailsExcel } = await import('@/lib/profit-analysis-sales-excel');
+                const includeMonthColumn = salesDetailMonth === '';
+                const filenameBase = includeMonthColumn
+                  ? '利润分析-销售明细-全部'
+                  : `利润分析-销售明细-${salesDetailMonth}`;
+                const reportTitle = salesDetailMonth
+                  ? (() => {
+                      const [y, m] = salesDetailMonth.split('-');
+                      return `${y}年${parseInt(m, 10)}月销售利润分析详表`;
+                    })()
+                  : '销售利润分析详表（全部月份）';
+                await downloadProfitSalesDetailsExcel(currentMonthDetails, {
+                  filenameBase,
+                  includeMonthColumn,
+                  reportTitle,
+                });
+              } catch (e) {
+                console.error(e);
+                window.alert('导出失败，请稍后再试');
+              }
+            }}
+            disabled={!data?.salesDetails?.length || currentMonthDetails.length === 0 || !!data?.provisional}
+            className="shrink-0 inline-flex items-center justify-center rounded-md border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-green-500 dark:bg-green-600 dark:hover:bg-green-500"
+            title="按当前月份筛选导出该月全部明细；选「全部」时导出所有月份并增加「月份」列。表格下方附公式说明。"
+          >
+            导出 Excel
+          </button>
+        </div>
 
           {/* 月份导航（根据 delivery_date 自动累加） */}
           {monthKeys.length > 0 && (
@@ -877,29 +959,50 @@ export default function ProfitAnalysis() {
             </p>
           )}
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="overflow-x-auto -mx-1 sm:mx-0 rounded-md border border-gray-100 dark:border-gray-700/80">
+            <table className="min-w-[980px] w-full divide-y divide-gray-200 dark:divide-gray-700 border-collapse">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发货单号</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发货日期</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">成品名称</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">发往客户</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">结算量(吨)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">销售收入-含税(元)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">途损</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">材料成本(元)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">加工成本(元)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它成本项:运输费+税费+贴现+回款利息(元)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">其它收入项:即征即退+政府扶持(元)</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">利润(元)</th>
+                  <th className={SD_TH}>发货单号</th>
+                  <th className={SD_TH}>发货日期</th>
+                  <th className={SD_TH}>成品名称</th>
+                  <th className={SD_TH}>客户</th>
+                  <th className={SD_TH}>净重(吨)</th>
+                  <th className={SD_TH}>结算量(吨)</th>
+                  <th
+                    className={SD_TH}
+                    title="销售收入-含税(元)"
+                  >
+                    收入(含税)
+                  </th>
+                  <th className={SD_TH}>材料成本(元)</th>
+                  <th className={SD_TH}>加工成本(元)</th>
+                  <th
+                    className={SD_TH}
+                    title="其它成本项：运输费+税费+贴现+回款利息(元)"
+                  >
+                    其它成本(元)
+                  </th>
+                  <th
+                    className={SD_TH}
+                    title="其它收入项：即征即退+政府扶持(元)"
+                  >
+                    其它收入(元)
+                  </th>
+                  <th className={SD_TH}>利润(元)</th>
+                  <th
+                    className={`${SD_TH} bg-amber-50/90 dark:bg-amber-950/40 border-l border-amber-200/80 dark:border-amber-800/50`}
+                    title="吨钢毛利(元/吨)=利润÷净重；净重为0时显示—"
+                  >
+                    吨钢毛利(元/吨)
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {paginatedDetails.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={12}
+                      colSpan={13}
                       className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
                       {data.provisional
@@ -911,20 +1014,22 @@ export default function ProfitAnalysis() {
                   paginatedDetails.map((sale, index) => (
                   <tr
                     key={`${sale.deliveryNumber}-${sale.deliveryDate}-${index}`}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                    className="group hover:bg-gray-50/90 dark:hover:bg-gray-700/70 cursor-pointer"
                     title={sale.materialComposition?.length ? `原材料构成: ${sale.materialComposition.map(m => `${m.material}(${(m.quantity ?? 0).toFixed(2)}吨)`).join(', ')}` : undefined}
                   >
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryNumber}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.deliveryDate}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <td className={SD_TD}>{sale.deliveryNumber}</td>
+                    <td className={SD_TD} title={sale.deliveryDate}>
+                      {formatDeliveryDateNoYear(sale.deliveryDate)}
+                    </td>
+                    <td className={`${SD_TD} max-w-[9rem] truncate`} title={sale.productDisplayName || sale.warehouse || sale.productType}>
                       {sale.productDisplayName || sale.warehouse || sale.productType}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.customer}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.settlementQuantity.toFixed(2)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.revenue.toFixed(2)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{((sale.transitLoss ?? 0) * 100).toFixed(3)}%</td>
+                    <td className={SD_TD}>{sale.customer}</td>
+                    <td className={SD_TD}>{(sale.netWeight ?? 0).toFixed(2)}</td>
+                    <td className={SD_TD}>{sale.settlementQuantity.toFixed(2)}</td>
+                    <td className={SD_TD}>{sale.revenue.toFixed(2)}</td>
                     <td
-                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
                         const hasData = sale.materialCost > 0 && ((sale.materialComposition?.length ?? 0) > 0 || (sale.productionRecords?.length ?? 0) > 0);
                         if (hasData) {
@@ -946,9 +1051,9 @@ export default function ProfitAnalysis() {
                         )}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{sale.processingCost.toFixed(2)}</td>
+                    <td className={SD_TD}>{sale.processingCost.toFixed(2)}</td>
                     <td
-                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
                         if ((sale.otherCosts ?? 0) > 0) {
                           const rect = e.currentTarget.getBoundingClientRect();
@@ -970,7 +1075,7 @@ export default function ProfitAnalysis() {
                       </span>
                     </td>
                     <td
-                      className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 relative group"
+                      className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
                         if ((sale.otherIncome ?? 0) > 0) {
                           const rect = e.currentTarget.getBoundingClientRect();
@@ -991,8 +1096,20 @@ export default function ProfitAnalysis() {
                         )}
                       </span>
                     </td>
-                    <td className={`px-4 py-3 whitespace-nowrap text-sm font-semibold ${sale.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <td className={`${SD_TD} font-semibold ${sale.profit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {sale.profit.toFixed(2)}
+                    </td>
+                    <td
+                      className={`${SD_TD} font-semibold border-l border-amber-200/80 dark:border-amber-800/50 bg-amber-50/85 dark:bg-amber-950/35 group-hover:bg-amber-100/90 dark:group-hover:bg-amber-950/50 ${
+                        (sale.netWeight ?? 0) > 0
+                          ? (sale.profitPerNetTon ?? 0) >= 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-red-600 dark:text-red-400'
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`}
+                      title="吨钢毛利=利润÷净重(吨)"
+                    >
+                      {(sale.netWeight ?? 0) > 0 ? (sale.profitPerNetTon ?? 0).toFixed(2) : '—'}
                     </td>
                   </tr>
                   ))

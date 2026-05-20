@@ -29,6 +29,19 @@ node setup-thumbnails.js setup
 npm run dev
 ```
 
+### 数据库连接池（远程 MySQL / 首页并发易超时时）
+
+在 `.env` 中除 `DATABASE_URL` 外，可按需设置（均为正整数，单位毫秒或个数）：
+
+| 变量 | 说明 |
+|------|------|
+| `DATABASE_CONNECTION_LIMIT` | 池最大连接数，默认 `20` |
+| `DATABASE_CONNECT_TIMEOUT_MS` | 建立连接超时，默认 `60000` |
+| `DATABASE_POOL_ACQUIRE_TIMEOUT_MS` | 从池取连接超时，默认 `60000` |
+| `DATABASE_QUERY_TIMEOUT_MS` | 单次查询超时，默认 `60000` |
+
+若仍出现 `pool timeout`，请检查本机到数据库的网络、`max_connections` 与防火墙。
+
 ## 🎯 缩略图系统
 
 本系统包含自动化的缩略图生成功能：
