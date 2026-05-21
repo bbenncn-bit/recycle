@@ -465,7 +465,7 @@ model ProfitParamConfig {
   steelMill     String?   @db.VarChar(30) @map("steel_mill")           // 萍钢/吉钢/新钢，NULL=通用
   effectiveDate DateTime  @db.Date @map("effective_date")              // 生效日期（精确到日）
   value         Decimal   @db.Decimal(18, 6) @map("value")             // 参数值（新标准）
-  previousValue Decimal?  @db.Decimal(18, 6) @map("previous_value")   // 变动前的值（可选）
+  previousValue String?   @db.Text @map("previous_value")              // 变更历史 JSON：{ "修改时间ISO": 前值, ... }
   unit          String?   @db.VarChar(30) @map("unit")                 // 单位
   remark        String?   @db.VarChar(500) @map("remark")
   createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(0)

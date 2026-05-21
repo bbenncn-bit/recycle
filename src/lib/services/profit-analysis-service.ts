@@ -9,6 +9,11 @@ import {
   deriveProfitAnalysisCustomer,
   isExcludedFromProfitAnalysis,
 } from './profit-analysis-warehouse-rules';
+import {
+  buildParamSnapshot,
+  loadAllParamConfigRows,
+  type ProfitParamSnapshot,
+} from './profit-param-config-service';
 
 export interface ProfitAnalysisData {
   summary: {
@@ -438,153 +443,12 @@ async function calculateProcessingCost(
   return settlementQuantity * unitCost;
 }
 
-/** 加工费默认元/吨（用于税费公式，仅当 ProfitParamConfig 无配置时回退） */
+/** 加工费默认元/吨（ProfitParamConfig 无配置时回退；与 processing_fee_for_refund 一致） */
 const DEFAULT_PROCESSING_COST_PER_TON = 70;
 /** 扣杂率回退时的默认磅差率（0.5%），仅当 transitloss 列为空时用 (1+率) 核算 */
 const DEFAULT_TRANSIT_LOSS_RATE = 0.005;
 
-/** ProfitParamConfig 单行（用于按发货日期取生效参数） */
-type ParamConfigRow = {
-  paramKey: string;
-  steelMill: string | null;
-  effectiveDate: Date;
-  value: number;
-  previousValue: number | null;
-};
-
-/**
- * 按发货日期与钢厂取生效参数值：变动日期起用 value，变动日期前用 previous_value（若为空则用上一版本 value）
- */
-function getEffectiveParamValue(
-  rows: ParamConfigRow[],
-  paramKey: string,
-  steelMill: string | null,
-  deliveryDate: Date
-): number {
-  const normalized = new Date(deliveryDate);
-  normalized.setHours(0, 0, 0, 0);
-  const list = rows.filter(
-    (r) =>
-      r.paramKey === paramKey &&
-      (r.steelMill === null || r.steelMill === steelMill)
-  );
-  if (list.length === 0) return 0;
-  list.sort((a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime());
-  const after = list.find((r) => {
-    const d = new Date(r.effectiveDate);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() > normalized.getTime();
-  });
-  if (after && after.previousValue != null) return after.previousValue;
-  const onOrBefore = list.find((r) => {
-    const d = new Date(r.effectiveDate);
-    d.setHours(0, 0, 0, 0);
-    return d.getTime() <= normalized.getTime();
-  });
-  return onOrBefore ? onOrBefore.value : 0;
-}
-
-/** 某发货日期+钢厂下的可调参数快照（来自 ProfitParamConfig） */
-export interface ProfitParamSnapshot {
-  transportFee: number;           // 运输费元/吨（已按钢厂）
-  roadLossFactor: number;        // 路损系数
-  taxRateMain: number;            // 税费主税率 %
-  taxRateExtra: number;           // 税费附加 %
-  processingFeeForRefund: number; // 即征即退/政府扶持用加工费 元/吨
-  instantRefundRate: number;      // 即征即退比例 %
-  govSubsidyRate41: number;
-  govSubsidyRate10: number;
-  govSubsidyRate80: number;
-  govSubsidyRate003: number;
-  govSubsidyRate100: number;
-  govSubsidyRate70: number;
-  govSubsidyRate38: number;
-  discountRatePinggang: number;   // 贴现率 % 仅萍钢
-  collectionDaysPinggang: number;
-  collectionDaysJigang: number;
-  collectionDaysXingang: number;
-  interestRateAnnual: number;     // 年利率 %
-}
-
-/**
- * 从 ProfitParamConfig 表按发货日期、钢厂生成参数快照（变动日期起用 value，之前用 previous_value）
- */
-function buildParamSnapshot(
-  allRows: ParamConfigRow[],
-  deliveryDate: Date,
-  steelMill: string | null
-): ProfitParamSnapshot {
-  const mill = steelMill || '';
-  const v = (key: string) => getEffectiveParamValue(allRows, key, null, deliveryDate);
-  const vMill = (key: string) => getEffectiveParamValue(allRows, key, mill, deliveryDate);
-  const transportFee =
-    mill === '萍钢' ? vMill('transport_fee_pinggang')
-    : mill === '吉钢' ? vMill('transport_fee_jigang')
-    : mill === '新钢' ? vMill('transport_fee_xingang')
-    : 0;
-  const roadLoss = v('road_loss_factor') || 1.03;
-  return {
-    transportFee,
-    roadLossFactor: roadLoss,
-    taxRateMain: v('tax_rate_main') || 10,
-    taxRateExtra: v('tax_rate_extra') || 0.03,
-    processingFeeForRefund: v('processing_fee_for_refund') || DEFAULT_PROCESSING_COST_PER_TON,
-    instantRefundRate: v('instant_refund_rate') || 30,
-    // getEffectiveParamValue 未命中时返回 0，这里用 || 回退默认值，避免关键参数被 0 覆盖
-    govSubsidyRate41: v('gov_subsidy_rate_41') || 41,
-    govSubsidyRate10: v('gov_subsidy_rate_10') || 10,
-    govSubsidyRate80: v('gov_subsidy_rate_80') || 80,
-    govSubsidyRate003: v('gov_subsidy_rate_003') || 0.03,
-    govSubsidyRate100: v('gov_subsidy_rate_100') || 100,
-    govSubsidyRate70: v('gov_subsidy_rate_70') || 70,
-    govSubsidyRate38: v('gov_subsidy_rate_38') || 38,
-    discountRatePinggang: vMill('discount_rate_pinggang') || 1.8,
-    collectionDaysPinggang: vMill('collection_days_pinggang') || 60,
-    collectionDaysJigang: vMill('collection_days_jigang') || 12,
-    collectionDaysXingang: vMill('collection_days_xingang') || 37,
-    interestRateAnnual: v('interest_rate_annual') || 3,
-  };
-}
-
-/**
- * 加载全部 ProfitParamConfig 并转为 ParamConfigRow[]（供按日期取生效值）
- */
-async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
-  try {
-    // 使用原生 SQL，避免某些环境下 Prisma Client 未生成 profitParamConfig model 导致构建失败
-    const rows = await prisma.$queryRaw<
-      Array<{
-        paramKey: string;
-        steelMill: string | null;
-        effectiveDate: Date | string;
-        value: unknown;
-        previousValue: unknown;
-      }>
-    >`
-      SELECT
-        param_key AS paramKey,
-        steel_mill AS steelMill,
-        effective_date AS effectiveDate,
-        value AS value,
-        previous_value AS previousValue
-      FROM ProfitParamConfig
-    `;
-    return rows.map((r) => {
-      const effectiveDate = new Date(r.effectiveDate);
-      if (Number.isNaN(effectiveDate.getTime())) return null;
-      return {
-        paramKey: r.paramKey,
-        steelMill: r.steelMill,
-        effectiveDate,
-        value: processDecimal(r.value),
-        previousValue: r.previousValue != null ? processDecimal(r.previousValue) : null,
-      } as ParamConfigRow;
-    }).filter((r): r is ParamConfigRow => r !== null);
-  } catch (e) {
-    console.warn('加载 ProfitParamConfig 失败，将使用默认常量:', e);
-    return [];
-  }
-}
+export type { ProfitParamSnapshot };
 
 /**
  * 归一化入库税率到「小数比率」：
@@ -1144,8 +1008,11 @@ export async function getProfitAnalysisData(
           });
           const paramSnapshot = buildParamSnapshot(allParamRows, deliveryDate, customer);
 
-          const unitProcessingCost = DEFAULT_PROCESSING_COST_PER_TON;
-          const processingCost = quantity * unitProcessingCost;
+          // 加工成本 = 加工单价(元/吨) × 净重(吨)；单价来自 ProfitParamConfig.processing_fee_for_refund
+          const processingUnitPerTon = paramSnapshot.processingFeeForRefund;
+          const processingWeight =
+            netWeightQuantity > 0 ? netWeightQuantity : quantity;
+          const processingCost = processingWeight * processingUnitPerTon;
 
           let materialCost = 0;
           let composition: Array<{ material: string; quantity: number; cost: number }> = [];

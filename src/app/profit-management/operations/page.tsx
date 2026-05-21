@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import ProcessingCostInputQueryPanel from '@/components/processing-cost-input-query-panel';
+import ProfitParamConfigPanel from '@/components/profit-param-config-panel';
 
 const JSON_HEADERS: HeadersInit = { 'Content-Type': 'application/json' };
 
@@ -202,8 +204,18 @@ export default function ProfitOperationsPage() {
             <li>
               <strong>最近库存流水</strong>：审计最近毛料变动，不修改数据。
             </li>
+            <li>
+              <strong>加工明细查询</strong>：按月份查看 ProcessingCostInput 投料与成品产量。
+            </li>
+            <li>
+              <strong>利润核算参数</strong>：修改 ProfitParamConfig（加工费、税费、即征即退等）后，利润分析按发货日期与变更历史重算。
+            </li>
           </ul>
         </section>
+
+        <ProcessingCostInputQueryPanel />
+
+        <ProfitParamConfigPanel />
 
         <section className="rounded-lg border border-blue-200 bg-blue-50/90 p-4 text-sm text-blue-950 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-100">
           <h2 className="font-medium text-blue-950 dark:text-blue-50">增量同步会不会打乱加工单对毛料的扣减？</h2>
