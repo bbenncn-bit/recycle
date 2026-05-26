@@ -19,7 +19,11 @@ export async function middleware(request: NextRequest) {
   }
 
   const path = request.nextUrl.pathname;
-  if (path.startsWith('/profit-management/operations')) {
+  const needsOpsSession =
+    path.startsWith('/profit-management/operations') ||
+    path.startsWith('/profit-management/production-entry');
+
+  if (needsOpsSession) {
     if (path === '/profit-management/operations/login' || path === '/profit-management/operations/register') {
       return NextResponse.next();
     }

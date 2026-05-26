@@ -272,6 +272,177 @@ export async function incrementMaterialStorageForProcessingDelete(
   );
 }
 
+/** 生产加工录入：扣减毛料库存（与云函数 decrementMaterialStorage 一致） */
+export async function decrementMaterialStorageForProductionInsert(
+  warehouse: string,
+  materialType: string,
+  tons: number,
+  meta: {
+    recordId: number;
+    productionDate?: string | null;
+    operatorOpenid?: string | null;
+  },
+  db: PrismaDb = prisma
+): Promise<{ touched: boolean; frozen?: boolean }> {
+  const q = toNum(tons);
+  if (!norm(warehouse) || !norm(materialType) || q == null || q <= 0) {
+    return { touched: false };
+  }
+  return adjustMaterialStorage(
+    {
+      warehouse,
+      materialType,
+      deltaQty: -q,
+      changeType: 'PRODUCTION_CONSUME',
+      sourceType: 'ProcessingCostInput',
+      sourceRef: String(meta.recordId),
+      businessDate: meta.productionDate ?? null,
+      note: 'insertProcessingCost',
+    },
+    db
+  );
+}
+
+/** 生产加工录入：成品入库（与云函数 incrementProductStock 一致） */
+export async function incrementProductStockForProcessingInsert(
+  productName: string,
+  warehouseCode: string | null | undefined,
+  tons: number,
+  meta: {
+    recordId: number;
+    productionDate?: string | null;
+    defaultPrice?: number | null;
+    operatorOpenid?: string | null;
+  },
+  db: PrismaDb = prisma
+): Promise<{ ok: boolean; beforeQty?: number; afterQty?: number; created?: boolean }> {
+  const t = toNum(tons);
+  const pn = norm(productName);
+  const wh = norm(warehouseCode);
+  if (!pn || t == null || t <= 0) return { ok: false };
+
+  let row = await db.productStock.findFirst({
+    where: wh ? { productName: pn, warehouseCode: wh } : { productName: pn },
+  });
+
+  if (!row) {
+    const defaultPrice = toNum(meta.defaultPrice);
+    const created = await db.productStock.create({
+      data: {
+        productName: pn,
+        warehouseCode: wh || null,
+        stockQty: t,
+        currentPrice: defaultPrice,
+      },
+    });
+    await appendMaterialStorageLog(
+      {
+        business_date: meta.productionDate ?? null,
+        change_type: 'PRODUCT_STOCK_IN',
+        source_type: 'ProcessingCostInput',
+        source_ref: String(meta.recordId),
+        storage_area: wh || '未指定仓库',
+        material_type: pn,
+        qty_before: 0,
+        qty_delta: t,
+        qty_after: t,
+        price_before: null,
+        price_after: defaultPrice,
+        amount_delta_yuan: null,
+        operator_openid: meta.operatorOpenid ?? null,
+        photo_urls: null,
+        note: 'insertProcessingCost 成品入库(新建行)',
+      },
+      db
+    );
+    return { ok: true, beforeQty: 0, afterQty: t, created: true };
+  }
+
+  const cur = toNum(row.stockQty) ?? 0;
+  const newQty = cur + t;
+  const priceBefore = toNum(row.currentPrice);
+  await db.productStock.update({
+    where: { id: row.id },
+    data: { stockQty: newQty },
+  });
+  await appendMaterialStorageLog(
+    {
+      business_date: meta.productionDate ?? null,
+      change_type: 'PRODUCT_STOCK_IN',
+      source_type: 'ProcessingCostInput',
+      source_ref: String(meta.recordId),
+      storage_area: wh || '未指定仓库',
+      material_type: pn,
+      qty_before: cur,
+      qty_delta: t,
+      qty_after: newQty,
+      price_before: priceBefore,
+      price_after: priceBefore,
+      amount_delta_yuan: null,
+      operator_openid: meta.operatorOpenid ?? null,
+      photo_urls: null,
+      note: 'insertProcessingCost 成品入库',
+    },
+    db
+  );
+  return { ok: true, beforeQty: cur, afterQty: newQty, created: false };
+}
+
+/** 成品移库：源库扣减、目的库增加（目的库须已存在） */
+export async function productStockTransfer(opts: {
+  productName: string;
+  fromWarehouse: string;
+  toProductName: string;
+  toWarehouse: string;
+  quantity: number;
+  operatorOpenid?: string | null;
+}): Promise<{ success: boolean; error?: string }> {
+  const productName = norm(opts.productName);
+  const fromWarehouse = norm(opts.fromWarehouse);
+  const toProductName = norm(opts.toProductName);
+  const toWarehouse = norm(opts.toWarehouse);
+  const quantity = toNum(opts.quantity);
+  if (!productName || !fromWarehouse || !toProductName || !toWarehouse) {
+    return { success: false, error: '缺少源/目的成品名称或库区' };
+  }
+  if (fromWarehouse === toWarehouse && productName === toProductName) {
+    return { success: false, error: '源与目的不能相同' };
+  }
+  if (quantity == null || quantity <= 0) {
+    return { success: false, error: '移库重量必须大于 0' };
+  }
+
+  const src = await prisma.productStock.findFirst({
+    where: { productName, warehouseCode: fromWarehouse },
+  });
+  if (!src) return { success: false, error: '源成品库记录不存在' };
+  const srcStock = toNum(src.stockQty) ?? 0;
+  if (srcStock < quantity) {
+    return { success: false, error: `源库库存不足（当前 ${srcStock} 吨）` };
+  }
+
+  const dst = await prisma.productStock.findFirst({
+    where: { productName: toProductName, warehouseCode: toWarehouse },
+  });
+  if (!dst) {
+    return { success: false, error: '目的成品库记录不存在，移库仅支持已有库区' };
+  }
+
+  const dstStock = toNum(dst.stockQty) ?? 0;
+  const newSrc = Math.max(0, srcStock - quantity);
+  const newDst = dstStock + quantity;
+  await prisma.productStock.update({
+    where: { id: src.id },
+    data: { stockQty: newSrc },
+  });
+  await prisma.productStock.update({
+    where: { id: dst.id },
+    data: { stockQty: newDst },
+  });
+
+  return { success: true };
+}
+
 /** 删除加工单：扣减当时增加的成品库存 */
 export async function decrementProductStockForProcessingDelete(
   productName: string,

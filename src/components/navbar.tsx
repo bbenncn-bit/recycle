@@ -15,6 +15,7 @@ const navigation = [
     dropdown: [
       { name: '成本分析', href: '/profit-management/cost-analysis' },
       { name: '利润分析', href: '/profit-management/profit-analysis' },
+      { name: '生产加工', href: '/profit-management/production-entry' },
       { name: '运维', href: '/profit-management/operations/login' },
     ]
   },
@@ -54,6 +55,9 @@ function isSubNavItemActive(subItem: { name: string; href: string }, pathname: s
   if (subItem.name === '运维') {
     return pathname.startsWith('/profit-management/operations');
   }
+  if (subItem.name === '生产加工') {
+    return pathname.startsWith('/profit-management/production-entry');
+  }
   return pathname === subItem.href;
 }
 
@@ -79,6 +83,7 @@ export default function Navbar() {
   const profitMgmtSectionActive =
     pathname === '/profit-management/cost-analysis' ||
     pathname === '/profit-management/profit-analysis' ||
+    pathname.startsWith('/profit-management/production-entry') ||
     pathname.startsWith('/profit-management/operations');
 
   // 处理桌面端鼠标悬停事件

@@ -2,6 +2,30 @@
  * 加工表 ProcessingCostInput 毛料数量列：2026-04 起与 MaterialStorage.alias_name 一致（前缀 + _qty / _price）。
  * 与云函数 mysql MATERIAL_ALIAS_COLUMN_PREFIXES、删除回滚逻辑保持一致。
  */
+/** Prisma 字段名（camelCase）与 alias 前缀对应，用于写入 ProcessingCostInput */
+export const MATERIAL_ALIAS_PRISMA_FIELDS: Record<
+  string,
+  { qty: string; price: string }
+> = {
+  MSLKM4: { qty: 'mslkm4Qty', price: 'mslkm4Price' },
+  MSLKM2: { qty: 'mslkm2Qty', price: 'mslkm2Price' },
+  MSLKM: { qty: 'mslkmQty', price: 'mslkmPrice' },
+  MSLKM0: { qty: 'mslkm0Qty', price: 'mslkm0Price' },
+  MSLKM6: { qty: 'mslkm6Qty', price: 'mslkm6Price' },
+  MJSJM4: { qty: 'mjsjm4Qty', price: 'mjsjm4Price' },
+  MJSJM2: { qty: 'mjsjm2Qty', price: 'mjsjm2Price' },
+  MCKKM: { qty: 'mckkmQty', price: 'mckkmPrice' },
+  MCKKM0: { qty: 'mckkm0Qty', price: 'mckkm0Price' },
+  MGJKM0: { qty: 'mgjkm0Qty', price: 'mgjkm0Price' },
+  MGJKM10: { qty: 'mgjkm10Qty', price: 'mgjkm10Price' },
+  MLKM2: { qty: 'mlkm2Qty', price: 'mlkm2Price' },
+  MLKM: { qty: 'mlkmQty', price: 'mlkmPrice' },
+  MLKQ1M2: { qty: 'mlkq1m2Qty', price: 'mlkq1m2Price' },
+  MLKQ1M0: { qty: 'mlkq1m0Qty', price: 'mlkq1m0Price' },
+  MLKQ1M6: { qty: 'mlkq1m6Qty', price: 'mlkq1m6Price' },
+  FL1: { qty: 'fl1Qty', price: 'fl1Price' },
+};
+
 export const MATERIAL_ALIAS_PREFIXES = [
   'MSLKM4',
   'MSLKM2',
@@ -73,6 +97,23 @@ export const LEGACY_MATERIAL_QTY_LABELS: Record<string, string> = {
 let cachedQtyFieldLabels: Record<string, string> | null = null;
 
 /** LIFO / 材料成本：qty 列名 -> 展示材料名 */
+export function normalizeMaterialAlias(value: string | null | undefined): string {
+  return (value || '').toString().trim().toUpperCase();
+}
+
+export function getColumnPrefixByMaterial(item: {
+  material: string;
+  shortName?: string;
+}): string | null {
+  const alias = normalizeMaterialAlias(item.shortName);
+  if (alias && MATERIAL_ALIAS_PREFIXES.includes(alias as (typeof MATERIAL_ALIAS_PREFIXES)[number])) {
+    return alias;
+  }
+  const materialName = (item.material || '').trim();
+  if (materialName === '辅料1' || materialName === 'FL1') return 'FL1';
+  return null;
+}
+
 export function getProcessingCostMaterialQtyFieldLabels(): Record<string, string> {
   if (cachedQtyFieldLabels) return cachedQtyFieldLabels;
   const out: Record<string, string> = { ...LEGACY_MATERIAL_QTY_LABELS };
