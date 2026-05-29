@@ -587,6 +587,17 @@ model ProductStock {
   @@map("ProductStock")
 }
 
+/// 成品库销售出库台账：结算导入按发货净重幂等扣减成品库（发货单号唯一）
+model ProductStockSaleLog {
+  deliveryNumber String    @id @map("delivery_number") @db.VarChar(100)
+  productName    String?   @db.VarChar(100) @map("product_name")
+  appliedQty     Decimal?  @db.Decimal(18, 3) @map("applied_qty")
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@map("ProductStockSaleLog")
+}
+
 /// 加工成本配置表（上月吨加工成本）
 model ProcessingCostConfig {
   id                    Int       @id @default(autoincrement()) @map("id")
