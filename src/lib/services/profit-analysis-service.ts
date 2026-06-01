@@ -12,7 +12,9 @@ import {
 import {
   buildParamSnapshot,
   loadAllParamConfigRows,
+  computeProfitSubitems,
   type ProfitParamSnapshot,
+  type ProfitRowBasis,
 } from './profit-param-config-service';
 
 export interface ProfitAnalysisData {
@@ -521,38 +523,6 @@ async function getWeightedAvgTaxRate(
   return weighted / totalQty;
 }
 
-/**
- * 运输费元/吨（含税价/路损系数）：从参数快照取
- */
-function getTransportPerTonFromSnapshot(s: ProfitParamSnapshot, _customer: string): number {
-  if (s.roadLossFactor <= 0) return s.transportFee;
-  return s.transportFee / s.roadLossFactor;
-}
-
-/**
- * 贴现费用元/吨：仅萍钢，销售单价(不含税)*1.13*贴现率%
- */
-function getDiscountPerTonFromSnapshot(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
-  if ((customer || '').trim() !== '萍钢') return 0;
-  // 业务口径固定：萍钢贴现费用=销售单价(不含税)*1.13*1.8%
-  const pinggangDiscountRate = 1.8;
-  return salesUnitExclTax * 1.13 * (pinggangDiscountRate / 100);
-}
-
-/**
- * 回款周期资金利息元/吨：销售单价(不含税)*1.13*年利率%/360*天数
- */
-function getInterestPerTonFromSnapshot(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
-  const c = (customer || '').trim();
-  let days = 0;
-  // 业务口径固定：萍钢回款天数=60天
-  if (c === '萍钢') days = 60;
-  else if (c === '吉钢') days = s.collectionDaysJigang;
-  else if (c === '新钢') days = s.collectionDaysXingang;
-  if (days === 0) return 0;
-  return salesUnitExclTax * 1.13 * (s.interestRateAnnual / 100 / 360) * days;
-}
-
 function getProfitSalesMinDeliveryDateStr(): string {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -1008,12 +978,6 @@ export async function getProfitAnalysisData(
           });
           const paramSnapshot = buildParamSnapshot(allParamRows, deliveryDate, customer);
 
-          // 加工成本 = 加工单价(元/吨) × 净重(吨)；单价来自 ProfitParamConfig.processing_fee_for_refund
-          const processingUnitPerTon = paramSnapshot.processingFeeForRefund;
-          const processingWeight =
-            netWeightQuantity > 0 ? netWeightQuantity : quantity;
-          const processingCost = processingWeight * processingUnitPerTon;
-
           let materialCost = 0;
           let composition: Array<{ material: string; quantity: number; cost: number }> = [];
           let productionRecords: Array<{
@@ -1054,78 +1018,34 @@ export async function getProfitAnalysisData(
             warehouseTaxRate = 0.13;
           }
 
-          // 运输费口径：客户运价(含税) * 出厂重量；出厂重量=净重/1.03
-          const transportWeightForCalc = netWeightQuantity > 0 ? netWeightQuantity : quantity;
-          const transportCost =
-            transportWeightForCalc > 0 && paramSnapshot.roadLossFactor > 0
-              ? paramSnapshot.transportFee * (transportWeightForCalc / paramSnapshot.roadLossFactor)
-              : 0;
-          const transportPerSettlementTonForTax = quantity > 0 ? transportCost / quantity : 0;
+          // 9 加工成本 / 10 其它成本 / 11 其它收入 / 利润 / 吨钢毛利：复用共享纯函数，
+          // 确保利润分析与运维页"试算"完全一致。
+          const sub = computeProfitSubitems(
+            {
+              customer,
+              revenueInclTax: revenue,
+              settlementQuantity: quantity,
+              netWeight: netWeightQuantity,
+              materialCost,
+              materialUnitExclTax,
+              warehouseTaxRate,
+            },
+            paramSnapshot
+          );
+
+          const processingCost = sub.processingCost;
+          const transportCost = sub.transportCost;
+          const taxCost = sub.taxCost;
+          const discountCost = sub.discountCost;
+          const interestCost = sub.interestCost;
+          const otherCosts = sub.otherCosts;
+          const immediateRefund = sub.immediateRefund;
+          const governmentSupport = sub.governmentSupport;
+          const otherIncome = sub.otherIncome;
+          const profit = sub.profit;
+          const profitPerNetTon = sub.profitPerNetTon;
           const taxMain = paramSnapshot.taxRateMain / 100;
           const taxExtra = paramSnapshot.taxRateExtra / 100;
-          const taxBasePerTon =
-            quantity > 0
-              ? salesUnitExclTax * 0.13 -
-                materialUnitExclTax * warehouseTaxRate -
-                transportPerSettlementTonForTax * 0.03 -
-                paramSnapshot.processingFeeForRefund * 0.09
-              : 0;
-          const taxPerTon =
-            quantity > 0
-              ? taxBasePerTon * taxMain +
-                (salesUnitExclTax + materialUnitExclTax) * taxExtra
-              : 0;
-          const discountPerTon = getDiscountPerTonFromSnapshot(salesUnitExclTax, customer, paramSnapshot);
-          const interestPerTon = getInterestPerTonFromSnapshot(salesUnitExclTax, customer, paramSnapshot);
-
-          const taxCost = taxPerTon * quantity;
-          const discountCost = discountPerTon * quantity;
-          const interestCost = interestPerTon * quantity;
-
-          const otherCosts = transportCost + taxCost + discountCost + interestCost;
-
-          // 其它收入项：即征即退 + 政府扶持资金（参数来自 ProfitParamConfig，按发货日期取生效值）
-          let immediateRefundPerTon = 0;
-          let governmentSupportPerTon = 0;
-          if (customer === '萍钢' || customer === '新钢' || customer === '吉钢') {
-            const baseTransport = transportPerSettlementTonForTax;
-            const taxBasePerTon =
-              salesUnitExclTax * 0.13 -
-              materialUnitExclTax * warehouseTaxRate -
-              baseTransport * 0.03 -
-              paramSnapshot.processingFeeForRefund * 0.09;
-
-            const r70 = paramSnapshot.govSubsidyRate70 / 100;
-            const r38 = paramSnapshot.govSubsidyRate38 / 100;
-            const r41 = paramSnapshot.govSubsidyRate41 / 100;
-            const r10 = paramSnapshot.govSubsidyRate10 / 100;
-            const r80 = paramSnapshot.govSubsidyRate80 / 100;
-            const r003 = paramSnapshot.govSubsidyRate003 / 100;
-            const r100 = paramSnapshot.govSubsidyRate100 / 100;
-            const commonSupportPerTon =
-              taxBasePerTon * r10 * r80 +
-              (salesUnitExclTax + materialUnitExclTax) * r003 * r100;
-
-            if (customer === '吉钢') {
-              // 吉钢：无即征即退；政府扶持按「税费基数×41% + 税费基数×10%×80% + (销+材)×0.03%×100%」
-              immediateRefundPerTon = 0;
-              governmentSupportPerTon = taxBasePerTon * r41 + commonSupportPerTon;
-            } else {
-              // 萍钢/新钢：含即征即退；政府扶持按「税费基数×70%×38% + 税费基数×10%×80% + (销+材)×0.03%×100%」
-              const irRate = paramSnapshot.instantRefundRate / 100;
-              immediateRefundPerTon = taxBasePerTon * irRate;
-              governmentSupportPerTon = taxBasePerTon * r70 * r38 + commonSupportPerTon;
-            }
-          }
-
-          const immediateRefund = immediateRefundPerTon * quantity;
-          const governmentSupport = governmentSupportPerTon * quantity;
-          const otherIncome = immediateRefund + governmentSupport;
-
-          const revenueExclTax = revenue / 1.13;
-          const profit = revenueExclTax - materialCost - processingCost - otherCosts + otherIncome;
-          const profitPerNetTon =
-            netWeightQuantity > 0 ? profit / netWeightQuantity : 0;
 
           return {
             deliveryNumber: sale.deliveryNumber || '',
@@ -1155,12 +1075,12 @@ export async function getProfitAnalysisData(
               materialUnitExclTax,
               materialCalcQuantity: lifoQuantity,
               warehouseTaxRate,
-              transportPerTon: transportPerSettlementTonForTax,
+              transportPerTon: sub.transportPerTon,
               processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,
               taxMainRate: taxMain,
               taxExtraRate: taxExtra,
-              taxBasePerTon,
-              taxPerTon,
+              taxBasePerTon: sub.taxBasePerTon,
+              taxPerTon: sub.taxPerTon,
               instantRefundRate: paramSnapshot.instantRefundRate / 100,
               govSubsidyRate41: paramSnapshot.govSubsidyRate41 / 100,
               govSubsidyRate70: paramSnapshot.govSubsidyRate70 / 100,
@@ -1390,5 +1310,237 @@ export async function getProfitAnalysisData(
     weekBreakdown,
     salesDetails,
     productComparison,
+  };
+}
+
+/** 运维页"试算"用：单行结算样本（列 1-8）+ 推导出的利润基础量 */
+export interface ProfitPreviewBasis {
+  found: boolean;
+  /** 实际使用的月份 YYYY-MM */
+  month: string;
+  /** 当月无数据时回退到最近一条结算单 */
+  usedFallback: boolean;
+  /** 样本结算单发货日期（ISO，用于按日期取生效参数快照） */
+  deliveryDateIso: string;
+  sample: {
+    deliveryNumber: string;
+    deliveryDate: string;
+    productType: string;
+    productDisplayName: string;
+    warehouse: string;
+    customer: string;
+    settlementQuantity: number;
+    netWeight: number;
+    revenue: number;
+    materialCost: number;
+  };
+  basis: ProfitRowBasis;
+}
+
+/**
+ * 取"当月第一行结算单"（无则回退最近一条），计算其利润基础量（材料成本、材料单价、入库税率等）。
+ * 供运维页参数试算复用——基础量与参数无关，只需算一次；改参数时只重算 computeProfitSubitems。
+ */
+export async function getProfitPreviewBasis(monthArg?: string): Promise<ProfitPreviewBasis> {
+  const now = new Date();
+  const monthStr =
+    monthArg && /^\d{4}-\d{2}$/.test(monthArg)
+      ? monthArg
+      : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const selectFields = {
+    id: true,
+    deliveryNumber: true,
+    deliveryDate: true,
+    productType: true,
+    warehouse: true,
+    customer: true,
+    settlementQuantity: true,
+    netWeight: true,
+    deductionRate: true,
+    totalSettlementAmount: true,
+  } as const;
+
+  const isValid = (s: { deliveryDate: string | null; warehouse: string | null; productType: string | null }) =>
+    parseDeliveryDate(s.deliveryDate) !== null &&
+    !isExcludedFromProfitAnalysis(s.warehouse, s.productType);
+
+  type SaleRow = {
+    id: number | bigint;
+    deliveryNumber: string | null;
+    deliveryDate: string | null;
+    productType: string | null;
+    warehouse: string | null;
+    customer: string | null;
+    settlementQuantity: unknown;
+    netWeight: unknown;
+    deductionRate: unknown;
+    totalSettlementAmount: unknown;
+  };
+
+  let usedFallback = false;
+  let sale: SaleRow | null = null;
+
+  // 1) 当月候选，取最早一条有效结算单
+  const monthRows = (await prisma.deliverySettlement.findMany({
+    where: {
+      totalSettlementAmount: { not: null },
+      settlementQuantity: { not: null },
+      deliveryDate: { startsWith: monthStr },
+    },
+    select: selectFields,
+    take: 200,
+  })) as SaleRow[];
+  const monthValid = monthRows
+    .filter(isValid)
+    .sort((a, b) => {
+      const da = parseDeliveryDate(a.deliveryDate)?.getTime() ?? 0;
+      const db = parseDeliveryDate(b.deliveryDate)?.getTime() ?? 0;
+      return da - db;
+    });
+  if (monthValid.length > 0) {
+    sale = monthValid[0];
+  } else {
+    // 2) 回退：最近一条有效结算单
+    usedFallback = true;
+    const recentRows = (await prisma.deliverySettlement.findMany({
+      where: {
+        totalSettlementAmount: { not: null },
+        settlementQuantity: { not: null },
+        deliveryDate: { not: null },
+      },
+      select: selectFields,
+      orderBy: { deliveryDate: 'desc' },
+      take: 200,
+    })) as SaleRow[];
+    const recentValid = recentRows
+      .filter(isValid)
+      .sort((a, b) => {
+        const da = parseDeliveryDate(a.deliveryDate)?.getTime() ?? 0;
+        const db = parseDeliveryDate(b.deliveryDate)?.getTime() ?? 0;
+        return db - da;
+      });
+    sale = recentValid[0] ?? null;
+  }
+
+  if (!sale) {
+    return {
+      found: false,
+      month: monthStr,
+      usedFallback,
+      deliveryDateIso: new Date().toISOString(),
+      sample: {
+        deliveryNumber: '',
+        deliveryDate: '',
+        productType: '',
+        productDisplayName: '',
+        warehouse: '',
+        customer: '',
+        settlementQuantity: 0,
+        netWeight: 0,
+        revenue: 0,
+        materialCost: 0,
+      },
+      basis: {
+        customer: '',
+        revenueInclTax: 0,
+        settlementQuantity: 0,
+        netWeight: 0,
+        materialCost: 0,
+        materialUnitExclTax: 0,
+        warehouseTaxRate: 0,
+      },
+    };
+  }
+
+  const revenue = processDecimal(sale.totalSettlementAmount);
+  const quantity = processDecimal(sale.settlementQuantity);
+  const netWeightQuantity = processDecimal(sale.netWeight);
+  const productType = (sale.productType || '').trim();
+  const productDisplayName = (sale.warehouse || '').trim() || productType;
+  const customer =
+    deriveProfitAnalysisCustomer(sale.warehouse, sale.productType) ||
+    (sale.customer || '').trim();
+  const deliveryDate = parseDeliveryDate(sale.deliveryDate) || new Date();
+  const saleId = Number(sale.id);
+
+  // transitloss（单行）
+  let transitLossTonsDb: number | null = null;
+  try {
+    const rows = await prisma.$queryRaw<Array<{ transitLoss: unknown }>>`
+      SELECT transitloss AS transitLoss FROM DeliverySettlement WHERE id = ${saleId} LIMIT 1
+    `;
+    if (rows.length > 0 && rows[0].transitLoss !== null && rows[0].transitLoss !== undefined) {
+      const n = processDecimal(rows[0].transitLoss);
+      if (Number.isFinite(n)) transitLossTonsDb = n;
+    }
+  } catch {
+    transitLossTonsDb = null;
+  }
+  const fallbackRate = (() => {
+    const d = normalizeTransitLossRate(processDecimal(sale!.deductionRate));
+    return d > 0 ? d : DEFAULT_TRANSIT_LOSS_RATE;
+  })();
+  const lifoQuantity = resolveLifoSettlementQuantity({
+    settlementQuantity: quantity,
+    netWeightQuantity,
+    transitLossTons: transitLossTonsDb !== null ? transitLossTonsDb : null,
+    transitLossRate: transitLossTonsDb === null ? fallbackRate : undefined,
+  });
+
+  let materialCost = 0;
+  let composition: Array<{ material: string; quantity: number; cost: number }> = [];
+  let productionRecords: Array<{ id: number; productionDate: string; quantity: number; unitCost: number; totalCost: number }> = [];
+  try {
+    const result = await calculateMaterialCost(
+      sale.deliveryNumber || '',
+      productType,
+      lifoQuantity,
+      sale.deliveryDate || '',
+      sale.warehouse || null
+    );
+    materialCost = result.cost;
+    composition = result.composition;
+    productionRecords = result.productionRecords || [];
+  } catch (e) {
+    console.warn('试算样本材料成本计算失败:', e);
+  }
+
+  const materialUnitExclTax = lifoQuantity > 0 ? materialCost / lifoQuantity : 0;
+  let warehouseTaxRate = 0;
+  try {
+    const compForTax = composition.map((c) => ({ material: c.material, quantity: c.quantity }));
+    const recsForTax = productionRecords.map((r) => ({ productionDate: r.productionDate, quantity: r.quantity }));
+    warehouseTaxRate = await getWeightedAvgTaxRate(compForTax, recsForTax);
+  } catch {
+    warehouseTaxRate = 0.13;
+  }
+
+  return {
+    found: true,
+    month: monthStr,
+    usedFallback,
+    deliveryDateIso: deliveryDate.toISOString(),
+    sample: {
+      deliveryNumber: sale.deliveryNumber || '',
+      deliveryDate: sale.deliveryDate || '',
+      productType,
+      productDisplayName,
+      warehouse: sale.warehouse || '',
+      customer,
+      settlementQuantity: quantity,
+      netWeight: netWeightQuantity,
+      revenue,
+      materialCost,
+    },
+    basis: {
+      customer,
+      revenueInclTax: revenue,
+      settlementQuantity: quantity,
+      netWeight: netWeightQuantity,
+      materialCost,
+      materialUnitExclTax,
+      warehouseTaxRate,
+    },
   };
 }

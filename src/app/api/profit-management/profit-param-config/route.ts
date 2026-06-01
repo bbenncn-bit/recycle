@@ -5,6 +5,8 @@ import {
   listProfitParamConfigForAdmin,
 } from '@/lib/services/profit-param-config-service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const denied = await assertInventoryOpsAuthorized(request);
   if (denied) return denied;
