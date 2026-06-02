@@ -54,6 +54,8 @@ function compareSalesDetailByDeliveryDate(
 const SD_TH =
   'px-2 py-2 text-left text-[11px] font-medium text-gray-500 dark:text-gray-300 leading-snug align-bottom';
 const SD_TD = 'px-2 py-2 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100 align-middle';
+/** 月合计行数字后的小字单位 */
+const SD_TOTAL_UNIT = 'ml-0.5 text-[10px] font-normal text-gray-500 dark:text-gray-400';
 
 interface ProfitAnalysisData {
   summary: {
@@ -207,6 +209,63 @@ export default function ProfitAnalysis() {
     const from = (salesDetailPage - 1) * SALES_DETAILS_PAGE_SIZE;
     return currentMonthDetails.slice(from, from + SALES_DETAILS_PAGE_SIZE);
   }, [currentMonthDetails, salesDetailPage]);
+
+  /** 当前筛选范围（选定月或「全部」）的销售明细累计合计 */
+  const salesDetailMonthTotal = useMemo(() => {
+    const list = currentMonthDetails;
+    if (!list.length) return null;
+    let netWeight = 0;
+    let settlementQuantity = 0;
+    let revenue = 0;
+    let materialCost = 0;
+    let processingCost = 0;
+    let otherCosts = 0;
+    let otherIncome = 0;
+    let profit = 0;
+    let profitPerNetTonSum = 0;
+    let profitPerNetTonCount = 0;
+    for (const s of list) {
+      netWeight += s.netWeight ?? 0;
+      settlementQuantity += s.settlementQuantity ?? 0;
+      revenue += s.revenue ?? 0;
+      materialCost += s.materialCost ?? 0;
+      processingCost += s.processingCost ?? 0;
+      otherCosts += s.otherCosts ?? 0;
+      otherIncome += s.otherIncome ?? 0;
+      profit += s.profit ?? 0;
+      const nw = s.netWeight ?? 0;
+      if (nw > 0) {
+        profitPerNetTonSum += s.profitPerNetTon ?? 0;
+        profitPerNetTonCount += 1;
+      }
+    }
+    const avgProfitPerNetTon =
+      profitPerNetTonCount > 0
+        ? profitPerNetTonSum / profitPerNetTonCount
+        : netWeight > 0
+          ? profit / netWeight
+          : 0;
+    const label =
+      salesDetailMonth === ''
+        ? '合计'
+        : (() => {
+            const [, m] = salesDetailMonth.split('-');
+            return `${parseInt(m, 10)}月合计`;
+          })();
+    return {
+      label,
+      netWeight,
+      settlementQuantity,
+      revenueWan: revenue / 10000,
+      materialCostWan: materialCost / 10000,
+      processingCostWan: processingCost / 10000,
+      otherCostsWan: otherCosts / 10000,
+      otherIncomeWan: otherIncome / 10000,
+      profitWan: profit / 10000,
+      avgProfitPerNetTon,
+      profit,
+    };
+  }, [currentMonthDetails, salesDetailMonth]);
 
   // 数据加载后默认选中第一个月份
   useEffect(() => {
@@ -1115,6 +1174,92 @@ export default function ProfitAnalysis() {
                   ))
                 )}
               </tbody>
+              {salesDetailMonthTotal && paginatedDetails.length > 0 && (
+                <tfoot className="bg-gray-100 dark:bg-gray-700/90 border-t-2 border-gray-300 dark:border-gray-600">
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-2 py-2.5 text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap"
+                    >
+                      {salesDetailMonthTotal.label}
+                      <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
+                        （{currentMonthDetails.length} 笔）
+                      </span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="净重累计，单位：吨"
+                    >
+                      {salesDetailMonthTotal.netWeight.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>吨</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="结算量累计，单位：吨"
+                    >
+                      {salesDetailMonthTotal.settlementQuantity.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>吨</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="收入(含税)累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.revenueWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="材料成本累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.materialCostWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="加工成本累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.processingCostWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="其它成本累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.otherCostsWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className="px-2 py-2.5 text-xs font-bold tabular-nums text-gray-900 dark:text-white"
+                      title="其它收入累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.otherIncomeWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className={`px-2 py-2.5 text-xs font-bold tabular-nums ${
+                        salesDetailMonthTotal.profit >= 0
+                          ? 'text-green-700 dark:text-green-400'
+                          : 'text-red-700 dark:text-red-400'
+                      }`}
+                      title="利润累计，单位：万元"
+                    >
+                      {salesDetailMonthTotal.profitWan.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>万元</span>
+                    </td>
+                    <td
+                      className={`px-2 py-2.5 text-xs font-bold tabular-nums border-l border-amber-200/80 dark:border-amber-800/50 bg-amber-50/90 dark:bg-amber-950/40 ${
+                        salesDetailMonthTotal.avgProfitPerNetTon >= 0
+                          ? 'text-green-700 dark:text-green-400'
+                          : 'text-red-700 dark:text-red-400'
+                      }`}
+                      title="吨钢毛利：有净重的各行 profitPerNetTon 算术平均，单位：元/吨"
+                    >
+                      {salesDetailMonthTotal.avgProfitPerNetTon.toFixed(2)}
+                      <span className={SD_TOTAL_UNIT}>元/吨</span>
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
 
