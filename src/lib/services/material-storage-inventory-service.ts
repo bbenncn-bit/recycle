@@ -30,6 +30,56 @@ export interface MaterialStorageRowSnapshot {
   price: number;
 }
 
+/** MaterialStorage 标准毛料目录（库区 + 毛料类型 + 别名） */
+export interface MaterialStorageCatalogEntry {
+  storageArea: string;
+  materialType: string;
+  aliasName: string;
+  key: string;
+}
+
+export async function loadMaterialStorageCatalog(): Promise<MaterialStorageCatalogEntry[]> {
+  const rows = await prisma.materialStorage.findMany({
+    select: { storageArea: true, materialType: true, aliasName: true },
+    orderBy: [{ storageArea: 'asc' }, { materialType: 'asc' }],
+  });
+  return rows.map((r) => {
+    const storageArea = norm(r.storageArea) || '—';
+    const materialType = norm(r.materialType) || '—';
+    return {
+      storageArea,
+      materialType,
+      aliasName: norm(r.aliasName),
+      key: `${storageArea}\0${materialType}`,
+    };
+  });
+}
+
+/**
+ * 将加工耗用/采购行上的库区+名称（可能是 alias_name）解析为标准 key：storage_area\0material_type。
+ * 与滚存 matchStorageRowIndex 口径一致：先库区+毛料类型，再按别名匹配。
+ */
+export function buildMaterialStorageKeyResolver(
+  catalog: MaterialStorageCatalogEntry[]
+): (warehouse: string, materialOrAlias: string) => string | null {
+  const canonicalKeySet = new Set(catalog.map((e) => e.key));
+  const aliasToKey = new Map<string, string>();
+  for (const e of catalog) {
+    if (e.aliasName) aliasToKey.set(e.aliasName, e.key);
+  }
+  return (warehouse: string, materialOrAlias: string): string | null => {
+    const w = norm(warehouse);
+    const m = norm(materialOrAlias);
+    if (!m) return null;
+    const exact = `${w}\0${m}`;
+    if (canonicalKeySet.has(exact)) return exact;
+    const byAlias = aliasToKey.get(m);
+    if (byAlias) return byAlias;
+    const byType = catalog.find((e) => e.materialType === m && (!w || e.storageArea === w));
+    return byType?.key ?? null;
+  };
+}
+
 type CompItem = {
   warehouse?: string;
   material?: string;

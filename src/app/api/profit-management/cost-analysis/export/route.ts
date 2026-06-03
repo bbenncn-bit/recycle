@@ -3,10 +3,13 @@ import ExcelJS from 'exceljs';
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
 import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+import { purchaseInboundStorageArea } from '@/lib/purchase-warehouse-location';
 import { parseProductionDate } from '@/lib/services/lifo-material-cost-service';
 import {
+  buildMaterialStorageKeyResolver,
   getClosingStateThroughDate,
   getOpeningStateFirstDayOfMonth,
+  loadMaterialStorageCatalog,
   MATERIAL_INVENTORY_ROLL_START,
 } from '@/lib/services/material-storage-inventory-service';
 import { extractCompositionFromProcessingRow } from '@/lib/services/processing-order-delete-service';
@@ -41,6 +44,24 @@ function formatYmd(d: Date): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 }
+
+type QtyAmountAgg = { qty: number; amount: number };
+
+function addQtyAmount(map: Map<string, QtyAmountAgg>, key: string, qty: number, amount: number) {
+  if (qty === 0 && amount === 0) return;
+  const cur = map.get(key) || { qty: 0, amount: 0 };
+  cur.qty += qty;
+  cur.amount += amount;
+  map.set(key, cur);
+}
+
+function weightedUnitPrice(agg: QtyAmountAgg | undefined): number {
+  if (!agg || agg.qty <= 0) return 0;
+  return agg.amount / agg.qty;
+}
+
+const LEDGER_COL_COUNT = 14;
+const LEDGER_LAST_COL = 1 + LEDGER_COL_COUNT;
 
 function applyTableBorderAndHeader(
   sheet: ExcelJS.Worksheet,
@@ -291,16 +312,18 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
   const dayBeforeStart = new Date(startDay);
   dayBeforeStart.setDate(dayBeforeStart.getDate() - 1);
 
-  // 毛料：期初/入库/加工领取/期末（按 库区+毛料）
+  // 毛料：仅 MaterialStorage 标准目录（库区 + 毛料类型）；加工耗用 alias 须映射到 material_type
+  const materialCatalog = await loadMaterialStorageCatalog();
+  const resolveMaterialKey = buildMaterialStorageKeyResolver(materialCatalog);
+
   let openingRows = await getOpeningStateFirstDayOfMonth(startDay.getFullYear(), startDay.getMonth() + 1);
   if (dayBeforeStart.getTime() >= MATERIAL_INVENTORY_ROLL_START.getTime()) {
     openingRows = await getClosingStateThroughDate(formatYmd(dayBeforeStart));
   }
-  const closingRows = await getClosingStateThroughDate(formatYmd(endDay));
   const openingMap = new Map(openingRows.map((r) => [`${r.storageArea}\0${r.materialType}`, r]));
-  const closingMap = new Map(closingRows.map((r) => [`${r.storageArea}\0${r.materialType}`, r]));
 
   const inMap = new Map<string, number>();
+  const inPurchaseAgg = new Map<string, QtyAmountAgg>();
   const purchases = await prisma.purchaseWarehouse.findMany({
     where: {
       warehouseDate: { not: null, gte: formatYmd(startDay), lte: formatYmd(endDay) },
@@ -313,6 +336,8 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
       warehouseDate: true,
       status: true,
       estimatedDryBasis: true,
+      totalPriceExcludingTax: true,
+      unitPriceExcludingTax: true,
     },
   });
   for (const p of purchases) {
@@ -320,8 +345,15 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     if ((p.status || '').includes('红冲') || (p.status || '').includes('撤销')) continue;
     const d = parseWarehouseDate(p.warehouseDate);
     if (!d || d < startDay || d > endDay) continue;
-    const key = `${(p.warehouseArea || '').trim()}\0${(p.material || '').trim()}`;
-    inMap.set(key, (inMap.get(key) || 0) + toNum(p.estimatedDryBasis));
+    const area = purchaseInboundStorageArea(p);
+    const material = (p.material || '').trim();
+    const key = resolveMaterialKey(area, material);
+    if (!key) continue;
+    const qty = toNum(p.estimatedDryBasis);
+    let amount = toNum(p.totalPriceExcludingTax);
+    if (!amount && qty) amount = toNum(p.unitPriceExcludingTax) * qty;
+    inMap.set(key, (inMap.get(key) || 0) + qty);
+    addQtyAmount(inPurchaseAgg, key, qty, amount);
   }
 
   const consumeMap = new Map<string, number>();
@@ -335,8 +367,9 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
       const wh = (item.warehouse || '').toString().trim();
       const mat = (item.material || '').toString().trim();
       const tons = toNum(item.tons);
-      if (!wh || !mat || tons <= 0) continue;
-      const key = `${wh}\0${mat}`;
+      if (!mat || tons <= 0) continue;
+      const key = resolveMaterialKey(wh, mat);
+      if (!key) continue;
       consumeMap.set(key, (consumeMap.get(key) || 0) + tons);
     }
   }
@@ -349,24 +382,20 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     consume: number;
     closing: number;
   };
-  const materialKeys = new Set<string>([
-    ...openingMap.keys(),
-    ...closingMap.keys(),
-    ...inMap.keys(),
-    ...consumeMap.keys(),
-  ]);
-  const materialRows: MaterialLedgerRow[] = Array.from(materialKeys).map((k) => {
-    const [area, material] = k.split('\0');
+  // 期末数量按本表口径：期初 + 本期采购入库 − 本期加工领取（与金额列一致，不用滚存快照以免与 alias 加工耗用脱节）
+  const materialRows: MaterialLedgerRow[] = materialCatalog.map((entry) => {
+    const opening = toNum(openingMap.get(entry.key)?.qty);
+    const inbound = toNum(inMap.get(entry.key));
+    const consume = toNum(consumeMap.get(entry.key));
     return {
-      area,
-      material,
-      opening: toNum(openingMap.get(k)?.qty),
-      inbound: toNum(inMap.get(k)),
-      consume: toNum(consumeMap.get(k)),
-      closing: toNum(closingMap.get(k)?.qty),
+      area: entry.storageArea,
+      material: entry.materialType,
+      opening,
+      inbound,
+      consume,
+      closing: opening + inbound - consume,
     };
   });
-  materialRows.sort((a, b) => a.area.localeCompare(b.area) || a.material.localeCompare(b.material));
 
   // 成品：期初库存/加工量/销售出库/期末库存（按 成品+仓库）
   const currentStocks = await prisma.productStock.findMany({
@@ -404,9 +433,18 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
 
   const processInRange = new Map<string, number>();
   const processAfterEnd = new Map<string, number>();
+  const processInRangeAgg = new Map<string, QtyAmountAgg>();
+  const processBeforeStartAgg = new Map<string, QtyAmountAgg>();
   const pRows = await prisma.processingCostInput.findMany({
     where: { productionDate: { not: null } },
-    select: { productName: true, productWarehouse: true, dailyProcessQty: true, productionDate: true },
+    select: {
+      productName: true,
+      productWarehouse: true,
+      dailyProcessQty: true,
+      dailyProcessAmount: true,
+      dailyProcessPrice: true,
+      productionDate: true,
+    },
   });
   for (const r of pRows) {
     const d = parseProductionDate(r.productionDate);
@@ -415,15 +453,32 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     if (!key) continue;
     const qty = toNum(r.dailyProcessQty);
     if (qty <= 0) continue;
+    let amount = toNum(r.dailyProcessAmount);
+    if (!amount) {
+      const px = toNum(r.dailyProcessPrice);
+      if (px) amount = px * qty;
+    }
     if (d > endDay) processAfterEnd.set(key, (processAfterEnd.get(key) || 0) + qty);
-    else if (d >= startDay) processInRange.set(key, (processInRange.get(key) || 0) + qty);
+    else if (d >= startDay) {
+      processInRange.set(key, (processInRange.get(key) || 0) + qty);
+      addQtyAmount(processInRangeAgg, key, qty, amount);
+    } else if (d < startDay) {
+      addQtyAmount(processBeforeStartAgg, key, qty, amount);
+    }
   }
 
   const saleInRange = new Map<string, number>();
   const saleAfterEnd = new Map<string, number>();
+  const saleInRangeAgg = new Map<string, QtyAmountAgg>();
   const sRows = await prisma.deliverySettlement.findMany({
     where: { deliveryDate: { not: null } },
-    select: { productType: true, warehouse: true, settlementQuantity: true, deliveryDate: true },
+    select: {
+      productType: true,
+      warehouse: true,
+      settlementQuantity: true,
+      totalSettlementAmount: true,
+      deliveryDate: true,
+    },
   });
   for (const r of sRows) {
     const d = parseWarehouseDate(r.deliveryDate);
@@ -432,8 +487,12 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     if (!key) continue;
     const qty = toNum(r.settlementQuantity);
     if (qty <= 0) continue;
+    const amount = toNum(r.totalSettlementAmount);
     if (d > endDay) saleAfterEnd.set(key, (saleAfterEnd.get(key) || 0) + qty);
-    else if (d >= startDay) saleInRange.set(key, (saleInRange.get(key) || 0) + qty);
+    else if (d >= startDay) {
+      saleInRange.set(key, (saleInRange.get(key) || 0) + qty);
+      addQtyAmount(saleInRangeAgg, key, qty, amount);
+    }
   }
 
   const productRows = stockRows.map((sr) => {
@@ -454,51 +513,296 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
   });
   productRows.sort((a, b) => a.product.localeCompare(b.product) || a.warehouse.localeCompare(b.warehouse));
 
-  const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet('基地收货与成品统计');
-  sheet.columns = [
-    { header: 'A', width: 6 },
-    { header: 'B', width: 16 },
-    { header: 'C', width: 16 },
-    { header: 'D', width: 16 },
-    { header: 'E', width: 16 },
-    { header: 'F', width: 16 },
-    { header: 'G', width: 16 },
+  const materialHeader = [
+    '',
+    '毛料库区',
+    '毛料类型',
+    '期初数量(吨)',
+    '期初平均单价（元）',
+    '期初总金额（元）',
+    '本期采购入库数量(吨)',
+    '本期采购平均单价（元）',
+    '本期采购入库总金额（元）',
+    '本期加工领取数量(吨)',
+    '本期加工领取单价（元）',
+    '本期加工领取总金额（元）',
+    '期末库存数量(吨)',
+    '期末库存单价（元）',
+    '期末库存总金额（元）',
   ];
-  sheet.mergeCells('A1:F1');
-  sheet.getCell('A1').value = `基地收货/加工/成品统计（${startDateStr} ~ ${endDateStr}）`;
-  sheet.getCell('A1').font = { name: 'Microsoft YaHei', bold: true, size: 14 };
-  sheet.getCell('A1').alignment = { horizontal: 'center' };
 
-  let row = 3;
-  sheet.getRow(row).values = ['', '毛料库区', '毛料类型', '期初库存(吨)', '本期采购入库(吨)', '本期加工领取(吨)', '期末库存(吨)'];
+  const productHeader = [
+    '',
+    '成品名称',
+    '成品仓库',
+    '期初库存数量(吨)',
+    '期初平均单价（元）',
+    '期初总金额（元）',
+    '加工数量(吨)',
+    '本期成品入库单价（元）',
+    '本期成品入库总金额（元）',
+    '本期销售出库数量(吨)',
+    '本期销售出库单价(元)',
+    '本期销售出库总金额(元)',
+    '期末库存数量(吨)',
+    '期末库存单价（元）',
+    '期末库存总金额（元）',
+  ];
+
+  type MaterialExportRow = {
+    area: string;
+    material: string;
+    openingQty: number;
+    openingPrice: number;
+    openingAmount: number;
+    inboundQty: number;
+    inboundPrice: number;
+    inboundAmount: number;
+    consumeQty: number;
+    consumePrice: number;
+    consumeAmount: number;
+    closingQty: number;
+    closingPrice: number;
+    closingAmount: number;
+  };
+
+  const materialExportRows: MaterialExportRow[] = materialRows.map((r) => {
+    const key = `${r.area}\0${r.material}`;
+    const openingPrice = r.opening > 0 ? toNum(openingMap.get(key)?.price) : 0;
+    const openingAmount = r.opening * openingPrice;
+    const inAgg = inPurchaseAgg.get(key);
+    const inboundPrice = weightedUnitPrice(inAgg);
+    const inboundAmount = r.inbound * inboundPrice;
+    const consumeDenom = r.opening + r.inbound;
+    const consumePrice =
+      consumeDenom > 0 ? (openingAmount + inboundAmount) / consumeDenom : 0;
+    const consumeAmount = r.consume * consumePrice;
+    const closingAmount = openingAmount + inboundAmount - consumeAmount;
+    const closingPrice = r.closing > 0 ? closingAmount / r.closing : 0;
+    return {
+      area: r.area,
+      material: r.material,
+      openingQty: r.opening,
+      openingPrice,
+      openingAmount,
+      inboundQty: r.inbound,
+      inboundPrice,
+      inboundAmount,
+      consumeQty: r.consume,
+      consumePrice,
+      consumeAmount,
+      closingQty: r.closing,
+      closingPrice,
+      closingAmount,
+    };
+  });
+
+  type ProductExportRow = {
+    product: string;
+    warehouse: string;
+    openingQty: number;
+    openingPrice: number;
+    openingAmount: number;
+    processQty: number;
+    processPrice: number;
+    processAmount: number;
+    salesQty: number;
+    salesPrice: number;
+    salesAmount: number;
+    closingQty: number;
+    closingPrice: number;
+    closingAmount: number;
+  };
+
+  const productExportRows: ProductExportRow[] = productRows.map((r) => {
+    const key = `${r.product}\0${r.warehouse}`;
+    const openingPrice = r.opening > 0 ? weightedUnitPrice(processBeforeStartAgg.get(key)) : 0;
+    const openingAmount = r.opening * openingPrice;
+    const processPrice = weightedUnitPrice(processInRangeAgg.get(key));
+    const processAmount = r.process * processPrice;
+    const salesPrice = weightedUnitPrice(saleInRangeAgg.get(key));
+    const salesAmount = r.sales * salesPrice;
+    const closingAmount = openingAmount + processAmount - salesAmount;
+    const closingPrice = r.closing > 0 ? closingAmount / r.closing : 0;
+    return {
+      product: r.product,
+      warehouse: r.warehouse,
+      openingQty: r.opening,
+      openingPrice,
+      openingAmount,
+      processQty: r.process,
+      processPrice,
+      processAmount,
+      salesQty: r.sales,
+      salesPrice,
+      salesAmount,
+      closingQty: r.closing,
+      closingPrice,
+      closingAmount,
+    };
+  });
+
+  const sumMaterialTotals = (rows: MaterialExportRow[]) => {
+    const t = {
+      openingQty: 0,
+      openingAmount: 0,
+      inboundQty: 0,
+      inboundAmount: 0,
+      consumeQty: 0,
+      consumeAmount: 0,
+      closingQty: 0,
+      closingAmount: 0,
+    };
+    for (const r of rows) {
+      t.openingQty += r.openingQty;
+      t.openingAmount += r.openingAmount;
+      t.inboundQty += r.inboundQty;
+      t.inboundAmount += r.inboundAmount;
+      t.consumeQty += r.consumeQty;
+      t.consumeAmount += r.consumeAmount;
+      t.closingQty += r.closingQty;
+      t.closingAmount += r.closingAmount;
+    }
+    return t;
+  };
+
+  const sumProductTotals = (rows: ProductExportRow[]) => {
+    const t = {
+      openingQty: 0,
+      openingAmount: 0,
+      processQty: 0,
+      processAmount: 0,
+      salesQty: 0,
+      salesAmount: 0,
+      closingQty: 0,
+      closingAmount: 0,
+    };
+    for (const r of rows) {
+      t.openingQty += r.openingQty;
+      t.openingAmount += r.openingAmount;
+      t.processQty += r.processQty;
+      t.processAmount += r.processAmount;
+      t.salesQty += r.salesQty;
+      t.salesAmount += r.salesAmount;
+      t.closingQty += r.closingQty;
+      t.closingAmount += r.closingAmount;
+    }
+    return t;
+  };
+
+  const materialRowToValues = (r: MaterialExportRow): (string | number)[] => [
+    '',
+    r.area,
+    r.material,
+    Number(r.openingQty.toFixed(3)),
+    Number(r.openingPrice.toFixed(2)),
+    Number(r.openingAmount.toFixed(2)),
+    Number(r.inboundQty.toFixed(3)),
+    Number(r.inboundPrice.toFixed(2)),
+    Number(r.inboundAmount.toFixed(2)),
+    Number(r.consumeQty.toFixed(3)),
+    Number(r.consumePrice.toFixed(2)),
+    Number(r.consumeAmount.toFixed(2)),
+    Number(r.closingQty.toFixed(3)),
+    Number(r.closingPrice.toFixed(2)),
+    Number(r.closingAmount.toFixed(2)),
+  ];
+
+  const productRowToValues = (r: ProductExportRow): (string | number)[] => [
+    '',
+    r.product,
+    r.warehouse,
+    Number(r.openingQty.toFixed(3)),
+    Number(r.openingPrice.toFixed(2)),
+    Number(r.openingAmount.toFixed(2)),
+    Number(r.processQty.toFixed(3)),
+    Number(r.processPrice.toFixed(2)),
+    Number(r.processAmount.toFixed(2)),
+    Number(r.salesQty.toFixed(3)),
+    Number(r.salesPrice.toFixed(2)),
+    Number(r.salesAmount.toFixed(2)),
+    Number(r.closingQty.toFixed(3)),
+    Number(r.closingPrice.toFixed(2)),
+    Number(r.closingAmount.toFixed(2)),
+  ];
+
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('基地毛料与成品统计');
+  for (let c = 1; c <= LEDGER_LAST_COL; c++) {
+    sheet.getColumn(c).width = c === 1 ? 4 : 14;
+  }
+
+  const titleMergeEnd = String.fromCharCode(64 + LEDGER_LAST_COL);
+  sheet.mergeCells(`A1:${titleMergeEnd}1`);
+  sheet.getCell('A1').value = `基地毛料统计（${startDateStr} ~ ${endDateStr}）`;
+  sheet.getCell('A1').font = { name: 'Microsoft YaHei', bold: true, size: 14 };
+  sheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+
+  let row = 2;
+  const materialHeaderRow = row;
+  sheet.getRow(row).values = materialHeader;
   row++;
-  let mo = 0, mi = 0, mc = 0, me = 0;
-  for (const r of materialRows) {
-    sheet.getRow(row).values = ['', r.area, r.material, Number(r.opening.toFixed(3)), Number(r.inbound.toFixed(3)), Number(r.consume.toFixed(3)), Number(r.closing.toFixed(3))];
-    mo += r.opening; mi += r.inbound; mc += r.consume; me += r.closing;
+  for (const r of materialExportRows) {
+    sheet.getRow(row).values = materialRowToValues(r);
     row++;
   }
-  sheet.getRow(row).values = ['', '合计', '', Number(mo.toFixed(3)), Number(mi.toFixed(3)), Number(mc.toFixed(3)), Number(me.toFixed(3))];
+  const mTotal = sumMaterialTotals(materialExportRows);
+  sheet.getRow(row).values = [
+    '',
+    '合计',
+    '',
+    Number(mTotal.openingQty.toFixed(3)),
+    mTotal.openingQty > 0 ? Number((mTotal.openingAmount / mTotal.openingQty).toFixed(2)) : 0,
+    Number(mTotal.openingAmount.toFixed(2)),
+    Number(mTotal.inboundQty.toFixed(3)),
+    mTotal.inboundQty > 0 ? Number((mTotal.inboundAmount / mTotal.inboundQty).toFixed(2)) : 0,
+    Number(mTotal.inboundAmount.toFixed(2)),
+    Number(mTotal.consumeQty.toFixed(3)),
+    mTotal.consumeQty > 0 ? Number((mTotal.consumeAmount / mTotal.consumeQty).toFixed(2)) : 0,
+    Number(mTotal.consumeAmount.toFixed(2)),
+    Number(mTotal.closingQty.toFixed(3)),
+    mTotal.closingQty > 0 ? Number((mTotal.closingAmount / mTotal.closingQty).toFixed(2)) : 0,
+    Number(mTotal.closingAmount.toFixed(2)),
+  ];
   sheet.getRow(row).font = { name: 'Microsoft YaHei', bold: true, size: 10 };
-  applyTableBorderAndHeader(sheet, 3, row, 2, 7);
+  applyTableBorderAndHeader(sheet, materialHeaderRow, row, 2, LEDGER_LAST_COL);
 
   row += 2;
-  const productHeaderRow = row;
-  sheet.getRow(row).values = ['', '成品名称', '成品仓库', '期初库存(吨)', '加工量(吨)', '销售出库(吨)', '期末库存(吨)'];
+  sheet.mergeCells(`A${row}:${titleMergeEnd}${row}`);
+  sheet.getCell(`A${row}`).value = `基地成品统计（${startDateStr} ~ ${endDateStr}）`;
+  sheet.getCell(`A${row}`).font = { name: 'Microsoft YaHei', bold: true, size: 14 };
+  sheet.getCell(`A${row}`).alignment = { horizontal: 'center', vertical: 'middle' };
   row++;
-  let po = 0, pp = 0, ps = 0, pe = 0;
-  for (const r of productRows) {
-    sheet.getRow(row).values = ['', r.product, r.warehouse, Number(r.opening.toFixed(3)), Number(r.process.toFixed(3)), Number(r.sales.toFixed(3)), Number(r.closing.toFixed(3))];
-    po += r.opening; pp += r.process; ps += r.sales; pe += r.closing;
+  const productHeaderRow = row;
+  sheet.getRow(row).values = productHeader;
+  row++;
+  for (const r of productExportRows) {
+    sheet.getRow(row).values = productRowToValues(r);
     row++;
   }
-  sheet.getRow(row).values = ['', '合计', '', Number(po.toFixed(3)), Number(pp.toFixed(3)), Number(ps.toFixed(3)), Number(pe.toFixed(3))];
+  const pTotal = sumProductTotals(productExportRows);
+  sheet.getRow(row).values = [
+    '',
+    '合计',
+    '',
+    Number(pTotal.openingQty.toFixed(3)),
+    pTotal.openingQty > 0 ? Number((pTotal.openingAmount / pTotal.openingQty).toFixed(2)) : 0,
+    Number(pTotal.openingAmount.toFixed(2)),
+    Number(pTotal.processQty.toFixed(3)),
+    pTotal.processQty > 0 ? Number((pTotal.processAmount / pTotal.processQty).toFixed(2)) : 0,
+    Number(pTotal.processAmount.toFixed(2)),
+    Number(pTotal.salesQty.toFixed(3)),
+    pTotal.salesQty > 0 ? Number((pTotal.salesAmount / pTotal.salesQty).toFixed(2)) : 0,
+    Number(pTotal.salesAmount.toFixed(2)),
+    Number(pTotal.closingQty.toFixed(3)),
+    pTotal.closingQty > 0 ? Number((pTotal.closingAmount / pTotal.closingQty).toFixed(2)) : 0,
+    Number(pTotal.closingAmount.toFixed(2)),
+  ];
   sheet.getRow(row).font = { name: 'Microsoft YaHei', bold: true, size: 10 };
-  applyTableBorderAndHeader(sheet, productHeaderRow, row, 2, 7);
+  applyTableBorderAndHeader(sheet, productHeaderRow, row, 2, LEDGER_LAST_COL);
 
   const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
-  const filename = `基地收货与成品统计_${startDateStr}_至_${endDateStr}.xlsx`;
+  const filename = `基地毛料与成品统计_${startDateStr}_至_${endDateStr}.xlsx`;
   return new NextResponse(buffer, {
     status: 200,
     headers: {

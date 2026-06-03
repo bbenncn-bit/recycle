@@ -485,7 +485,7 @@ export default function CostAnalysis() {
       a.href = url;
       a.download =
         mode === 'inventory'
-          ? `基地收货与成品统计_${exportStartDate}_至_${exportEndDate}.xlsx`
+          ? `基地毛料与成品统计_${exportStartDate}_至_${exportEndDate}.xlsx`
           : `毛料采购汇总_${exportStartDate}_至_${exportEndDate}.xlsx`;
       document.body.appendChild(a);
       a.click();
