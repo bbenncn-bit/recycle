@@ -13,6 +13,10 @@ import {
   MATERIAL_INVENTORY_ROLL_START,
 } from '@/lib/services/material-storage-inventory-service';
 import { extractCompositionFromProcessingRow } from '@/lib/services/processing-order-delete-service';
+import {
+  extractProductWarehouseCode,
+  resolveSaleProductIdentity,
+} from '@/lib/services/lifo-match-resolve';
 
 function normalizeDateBoundary(dateStr: string, endOfDay: boolean): Date | null {
   const d = new Date(dateStr);
@@ -321,6 +325,8 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     openingRows = await getClosingStateThroughDate(formatYmd(dayBeforeStart));
   }
   const openingMap = new Map(openingRows.map((r) => [`${r.storageArea}\0${r.materialType}`, r]));
+  const closingRows = await getClosingStateThroughDate(formatYmd(endDay));
+  const closingMap = new Map(closingRows.map((r) => [`${r.storageArea}\0${r.materialType}`, r]));
 
   const inMap = new Map<string, number>();
   const inPurchaseAgg = new Map<string, QtyAmountAgg>();
@@ -382,20 +388,15 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     consume: number;
     closing: number;
   };
-  // 期末数量按本表口径：期初 + 本期采购入库 − 本期加工领取（与金额列一致，不用滚存快照以免与 alias 加工耗用脱节）
-  const materialRows: MaterialLedgerRow[] = materialCatalog.map((entry) => {
-    const opening = toNum(openingMap.get(entry.key)?.qty);
-    const inbound = toNum(inMap.get(entry.key));
-    const consume = toNum(consumeMap.get(entry.key));
-    return {
-      area: entry.storageArea,
-      material: entry.materialType,
-      opening,
-      inbound,
-      consume,
-      closing: opening + inbound - consume,
-    };
-  });
+  // 期初/期末数量与金额均取滚存快照（截止日前一日 / 截止日），保证上月期末 = 次月期初
+  const materialRows: MaterialLedgerRow[] = materialCatalog.map((entry) => ({
+    area: entry.storageArea,
+    material: entry.materialType,
+    opening: toNum(openingMap.get(entry.key)?.qty),
+    inbound: toNum(inMap.get(entry.key)),
+    consume: toNum(consumeMap.get(entry.key)),
+    closing: toNum(closingMap.get(entry.key)?.qty),
+  }));
 
   // 成品：期初库存/加工量/销售出库/期末库存（按 成品+仓库）
   const currentStocks = await prisma.productStock.findMany({
@@ -428,13 +429,34 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     if (warehouse && currentMap.has(exact)) return exact;
     const keys = productToKeys.get(product) || [];
     if (keys.length === 1) return keys[0];
+    if (warehouse && keys.length > 1) {
+      const code = extractProductWarehouseCode(warehouse) || warehouse.toUpperCase();
+      const hit = keys.find((k) => {
+        const wh = k.split('\0')[1] || '';
+        return wh === code || wh.toUpperCase() === code;
+      });
+      if (hit) return hit;
+    }
     return null;
   };
 
+  const settlementToStockKeyCache = new Map<string, string | null>();
+  const resolveSettlementToStockKey = async (
+    productType: string | null | undefined,
+    warehouse: string | null | undefined
+  ): Promise<string | null> => {
+    const cacheKey = `${(productType || '').trim()}\0${(warehouse || '').trim()}`;
+    if (settlementToStockKeyCache.has(cacheKey)) {
+      return settlementToStockKeyCache.get(cacheKey) ?? null;
+    }
+    const identity = await resolveSaleProductIdentity(productType, warehouse);
+    const key = resolveStockKey(identity.productName, identity.productWarehouse);
+    settlementToStockKeyCache.set(cacheKey, key);
+    return key;
+  };
+
   const processInRange = new Map<string, number>();
-  const processAfterEnd = new Map<string, number>();
   const processInRangeAgg = new Map<string, QtyAmountAgg>();
-  const processBeforeStartAgg = new Map<string, QtyAmountAgg>();
   const pRows = await prisma.processingCostInput.findMany({
     where: { productionDate: { not: null } },
     select: {
@@ -458,18 +480,19 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
       const px = toNum(r.dailyProcessPrice);
       if (px) amount = px * qty;
     }
-    if (d > endDay) processAfterEnd.set(key, (processAfterEnd.get(key) || 0) + qty);
-    else if (d >= startDay) {
+    if (d >= startDay && d <= endDay) {
       processInRange.set(key, (processInRange.get(key) || 0) + qty);
       addQtyAmount(processInRangeAgg, key, qty, amount);
-    } else if (d < startDay) {
-      addQtyAmount(processBeforeStartAgg, key, qty, amount);
     }
   }
 
   const saleInRange = new Map<string, number>();
-  const saleAfterEnd = new Map<string, number>();
   const saleInRangeAgg = new Map<string, QtyAmountAgg>();
+  /** 起始日前的销售加权（期初平均销售单价） */
+  const saleBeforeStartAgg = new Map<string, QtyAmountAgg>();
+  /** 截止日（含）前的累计销售加权（期末库存计价；次月期初与之对齐） */
+  const saleThroughEndAgg = new Map<string, QtyAmountAgg>();
+  const saleEvents: Array<{ d: Date; key: string; qty: number }> = [];
   const sRows = await prisma.deliverySettlement.findMany({
     where: { deliveryDate: { not: null } },
     select: {
@@ -483,31 +506,43 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
   for (const r of sRows) {
     const d = parseWarehouseDate(r.deliveryDate);
     if (!d) continue;
-    const key = resolveStockKey(r.productType, r.warehouse);
+    const key = await resolveSettlementToStockKey(r.productType, r.warehouse);
     if (!key) continue;
     const qty = toNum(r.settlementQuantity);
     if (qty <= 0) continue;
     const amount = toNum(r.totalSettlementAmount);
-    if (d > endDay) saleAfterEnd.set(key, (saleAfterEnd.get(key) || 0) + qty);
-    else if (d >= startDay) {
+    saleEvents.push({ d, key, qty });
+    if (d < startDay) addQtyAmount(saleBeforeStartAgg, key, qty, amount);
+    if (d >= startDay && d <= endDay) {
       saleInRange.set(key, (saleInRange.get(key) || 0) + qty);
       addQtyAmount(saleInRangeAgg, key, qty, amount);
     }
+    if (d <= endDay) addQtyAmount(saleThroughEndAgg, key, qty, amount);
   }
+
+  const productQtyAt = (asOfEnd: Date, key: string): number => {
+    const asOf = new Date(asOfEnd);
+    asOf.setHours(23, 59, 59, 999);
+    let q = currentMap.get(key) || 0;
+    for (const r of pRows) {
+      const d = parseProductionDate(r.productionDate);
+      if (!d || d <= asOf) continue;
+      if (resolveStockKey(r.productName, r.productWarehouse) !== key) continue;
+      q -= toNum(r.dailyProcessQty);
+    }
+    for (const evt of saleEvents) {
+      if (evt.key !== key || evt.d <= asOf) continue;
+      q += evt.qty;
+    }
+    return Math.max(0, q);
+  };
 
   const productRows = stockRows.map((sr) => {
     const key = `${sr.product}\0${sr.warehouse}`;
-    const current = currentMap.get(key) || 0;
-    const pAfter = processAfterEnd.get(key) || 0;
-    const sAfter = saleAfterEnd.get(key) || 0;
-    const inferredClosing = current - pAfter + sAfter;
     const pRange = processInRange.get(key) || 0;
     const sRange = saleInRange.get(key) || 0;
-    const inferredOpening = inferredClosing - pRange + sRange;
-
-    // 报表展示口径：期初不展示负值；若因历史错账反推为负，则按 0 展示并由本期流转重算期末
-    const opening = Math.max(0, inferredOpening);
-    const closing = Math.max(0, opening + pRange - sRange);
+    const opening = productQtyAt(dayBeforeStart, key);
+    const closing = productQtyAt(endDay, key);
 
     return { product: sr.product, warehouse: sr.warehouse, opening, process: pRange, sales: sRange, closing };
   });
@@ -577,8 +612,8 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
     const consumePrice =
       consumeDenom > 0 ? (openingAmount + inboundAmount) / consumeDenom : 0;
     const consumeAmount = r.consume * consumePrice;
-    const closingAmount = openingAmount + inboundAmount - consumeAmount;
-    const closingPrice = r.closing > 0 ? closingAmount / r.closing : 0;
+    const closingPrice = r.closing > 0 ? toNum(closingMap.get(key)?.price) : 0;
+    const closingAmount = r.closing * closingPrice;
     return {
       area: r.area,
       material: r.material,
@@ -616,14 +651,16 @@ async function buildInventoryWorkbook(startDate: Date, endDate: Date, startDateS
 
   const productExportRows: ProductExportRow[] = productRows.map((r) => {
     const key = `${r.product}\0${r.warehouse}`;
-    const openingPrice = r.opening > 0 ? weightedUnitPrice(processBeforeStartAgg.get(key)) : 0;
+    // 期初均价：起始日前 DeliverySettlement 销售加权均价；无历史销售则为 0
+    const openingPrice = weightedUnitPrice(saleBeforeStartAgg.get(key));
     const openingAmount = r.opening * openingPrice;
     const processPrice = weightedUnitPrice(processInRangeAgg.get(key));
     const processAmount = r.process * processPrice;
     const salesPrice = weightedUnitPrice(saleInRangeAgg.get(key));
     const salesAmount = r.sales * salesPrice;
-    const closingAmount = openingAmount + processAmount - salesAmount;
-    const closingPrice = r.closing > 0 ? closingAmount / r.closing : 0;
+    // 期末单价/金额：截止日本表累计销售加权均价 × 期末数量（与次月期初「起始日前销售均价」口径衔接，不用销售收入冲减库存）
+    const closingPrice = weightedUnitPrice(saleThroughEndAgg.get(key));
+    const closingAmount = r.closing * closingPrice;
     return {
       product: r.product,
       warehouse: r.warehouse,
