@@ -33,9 +33,15 @@ type ProfitSubitems = {
   taxPerTon: number;
   discountPerTon: number;
   interestPerTon: number;
+  taxBaseTotal: number;
+  discountTranche1: number;
+  discountTranche2: number;
   immediateRefundPerTon: number;
   governmentSupportPerTon: number;
   refundBaseTotal: number;
+  governmentSupportMain: number;
+  governmentSupportStamp: number;
+  governmentSupportTaxExtra: number;
 };
 
 type PreviewSample = {
@@ -105,17 +111,19 @@ const ITEM_PARAM_KEYS: Record<ItemKey, string[]> = {
     'tax_rate_extra',
     'discount_rate_pinggang',
     'collection_days_pinggang',
+    'reverse_discount_annual_rate',
+    'reverse_discount_occupancy_days',
     'collection_days_jigang',
     'collection_days_xingang',
     'interest_rate_annual',
   ],
   '11': [
     'instant_refund_rate',
+    'gov_subsidy_rate',
     'gov_subsidy_rate_41',
-    'gov_subsidy_rate_10',
-    'gov_subsidy_rate_80',
-    'gov_subsidy_rate_003',
-    'gov_subsidy_rate_100',
+    'gov_subsidy_rate_70',
+    'is_give_ces',
+    'is_give_tax_extra',
   ],
 };
 
@@ -547,6 +555,9 @@ function ItemConfigModal({
           ? resolveParam('transport_fee_xingang')
           : 0;
   const pDiscountRate = resolveParam('discount_rate_pinggang');
+  const pDiscountDays = customer === '萍钢' ? resolveParam('collection_days_pinggang') : 0;
+  const pReverseRate = resolveParam('reverse_discount_annual_rate');
+  const pReverseDays = resolveParam('reverse_discount_occupancy_days');
   const pCollectionDays =
     customer === '萍钢'
       ? resolveParam('collection_days_pinggang')
@@ -555,31 +566,21 @@ function ItemConfigModal({
         : customer === '新钢'
           ? resolveParam('collection_days_xingang')
           : 0;
+  const revenueInclTotal = sample?.revenue ?? 0;
   const pInstantRefund = resolveParam('instant_refund_rate');
-  const pR41 = resolveParam('gov_subsidy_rate_41');
-  const pR10 = resolveParam('gov_subsidy_rate_10');
-  const pR80 = resolveParam('gov_subsidy_rate_80');
-  const pR003 = resolveParam('gov_subsidy_rate_003');
-  const pR100 = resolveParam('gov_subsidy_rate_100');
-  const isInstantRefundMill = customer === '萍钢' || customer === '新钢';
+  const pGovRate = allRows.some((x) => x.paramKey === 'gov_subsidy_rate')
+    ? resolveParam('gov_subsidy_rate')
+    : resolveParam('gov_subsidy_rate_41');
+  const pGov70 = resolveParam('gov_subsidy_rate_70');
+  const pGiveCes = resolveParam('is_give_ces');
+  const pGiveTaxExtra = resolveParam('is_give_tax_extra');
+  const giveCesFlag = pGiveCes >= 1 ? 1 : 0;
+  const giveTaxExtraFlag = pGiveTaxExtra >= 1 ? 1 : 0;
+  const isInstantRefundMill = customer === '新钢';
 
-  // 税费（项10）税基逐步展开（按吨）
-  const baseStep1 = salesExcl * 0.13;
-  const baseStep2 = matUnit * whTax;
-  const baseStep3 = transportPerTon * 0.03;
-  const baseStep4 = pProcessing * 0.09;
-  const baseSteps: string[] = [
-    `税基 base = 销价不含税×13% − 材料单价不含税×入库税率 − 运输费/吨×3% − 加工费×9%`,
-    `= ${fmt(salesExcl)}×13%(${fmt(baseStep1)}) − ${fmt(matUnit)}×${fmt(whTax * 100)}%(${fmt(baseStep2)}) − ${fmt(transportPerTon)}×3%(${fmt(baseStep3)}) − ${fmt(pProcessing)}×9%(${fmt(baseStep4)})`,
-    `= ${fmt(base)} 元/吨`,
-  ];
-
-  // 其它收入（项11）基数：按"本单总额"，与财务确认口径一致
-  const r41 = pR41 / 100;
-  const r10 = pR10 / 100;
-  const r80 = pR80 / 100;
-  const r003 = pR003 / 100;
-  const r100 = pR100 / 100;
+  // 其它收入（项11）基数：按"本单总额"
+  const rGov = pGovRate / 100;
+  const r70 = pGov70 / 100;
   const revenueExclTotal = (sample?.revenue ?? 0) / 1.13;
   const matCostTotal = sample?.materialCost ?? 0;
   const procCostTotal = subitems?.processingCost ?? 0;
@@ -590,13 +591,18 @@ function ItemConfigModal({
     `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${fmt(whTax * 100)}%(${fmt(matCostTotal * whTax)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
     `= ${fmt(refundBase)} 元`,
   ];
-  const govT1 = refundBase * r41;
-  const govT2 = refundBase * r10 * r80;
-  const govT3 = (revenueExclTotal + matCostTotal) * r003 * r100;
+  const govT1 = isInstantRefundMill ? refundBase * rGov * r70 : refundBase * rGov;
+  const govT2 = (revenueExclTotal + matCostTotal) * 0.0003 * giveCesFlag;
+  const govT3 = refundBase * 0.1 * giveTaxExtraFlag;
 
-  const factoryWeight = pRoadLoss > 0 ? nw / pRoadLoss : 0;
-  const taxTermMain = base * (pTaxMain / 100);
-  const taxTermExtra = (salesExcl + matUnit) * (pTaxExtra / 100);
+  const taxBaseTotal = subitems?.taxBaseTotal ?? 0;
+  const taxTermMain = taxBaseTotal * (pTaxMain / 100);
+  const taxTermExtra = (revenueExclTotal + matCostTotal) * (pTaxExtra / 100);
+  const taxBaseSteps: string[] = [
+    `税费基数 = 收入不含税×13% − 材料成本×入库税率 − 加工成本×9% − 运输费×3%`,
+    `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${fmt(whTax * 100)}%(${fmt(matCostTotal * whTax)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
+    `= ${fmt(taxBaseTotal)} 元`,
+  ];
 
   const breakdown: Array<{ label: string; value: number; steps: string[] }> = (() => {
     if (!subitems) return [];
@@ -619,20 +625,19 @@ function ItemConfigModal({
           label: '运输费',
           value: subitems.transportCost,
           steps: [
-            `运输费 = 客户运价含税(transport_fee_${customer || '钢厂'}) × (净重 ÷ 路损系数 road_loss_factor)`,
-            `出厂重量 = ${fmt(nw, 3)} ÷ ${fmt(pRoadLoss)} = ${fmt(factoryWeight, 3)} 吨`,
-            `= ${fmt(pTransportFee)} 元/吨 × ${fmt(factoryWeight, 3)} 吨 = ${fmt(subitems.transportCost)} 元`,
+            `运输费 = 运输费(transport_fee_${customer || '钢厂'}) ÷ 路损系数(road_loss_factor) × 净重`,
+            `= ${fmt(pTransportFee)} ÷ ${fmt(pRoadLoss)} × ${fmt(nw, 3)} 吨`,
+            `= ${fmt(subitems.transportCost)} 元`,
           ],
         },
         {
           label: '税费',
           value: subitems.taxCost,
           steps: [
-            ...baseSteps,
-            `主税额/吨 = 税基 ${fmt(base)} × 主税率(tax_rate_main) ${fmt(pTaxMain)}% = ${fmt(taxTermMain)}`,
-            `附加税/吨 = (销价不含税 ${fmt(salesExcl)} + 材料单价不含税 ${fmt(matUnit)}) × 附加税率(tax_rate_extra) ${fmt(pTaxExtra)}% = ${fmt(taxTermExtra)}`,
-            `税费/吨 = ${fmt(taxTermMain)} + ${fmt(taxTermExtra)} = ${fmt(subitems.taxPerTon)}`,
-            `税费 = ${fmt(subitems.taxPerTon)} × 结算量 ${fmt(q, 3)} = ${fmt(subitems.taxCost)} 元`,
+            ...taxBaseSteps,
+            `主税 = 税费基数 × 主税率(tax_rate_main) ${fmt(pTaxMain)}% = ${fmt(taxTermMain)} 元`,
+            `附加税 = (收入不含税 ${fmt(revenueExclTotal)} + 材料成本 ${fmt(matCostTotal)}) × 附加税率(tax_rate_extra) ${fmt(pTaxExtra)}% = ${fmt(taxTermExtra)} 元`,
+            `税费 = ${fmt(taxTermMain)} + ${fmt(taxTermExtra)} = ${fmt(subitems.taxCost)} 元`,
           ],
         },
         {
@@ -641,10 +646,9 @@ function ItemConfigModal({
           steps:
             customer === '萍钢'
               ? [
-                  `贴现费用 = 销售收入含税单价 × 贴现率(discount_rate_pinggang) × 结算量`,
-                  `含税单价 = 销价不含税 ${fmt(salesExcl)} × 1.13 = ${fmt(salesIncl)}`,
-                  `贴现/吨 = ${fmt(salesIncl)} × ${fmt(pDiscountRate)}% = ${fmt(subitems.discountPerTon)}`,
-                  `贴现费用 = ${fmt(subitems.discountPerTon)} × 结算量 ${fmt(q, 3)} = ${fmt(subitems.discountCost)} 元`,
+                  `段1 = 销售收入含税 ${fmt(revenueInclTotal)} × 贴现年利率(discount_rate_pinggang) ${fmt(pDiscountRate)}% × 贴现天数(collection_days_pinggang) ${fmt(pDiscountDays, 0)} ÷ 360 = ${fmt(subitems.discountTranche1)} 元`,
+                  `段2 = 销售收入含税 ${fmt(revenueInclTotal)} × 反贴现息年利率(reverse_discount_annual_rate) ${fmt(pReverseRate)}% × 占用天数(reverse_discount_occupancy_days) ${fmt(pReverseDays, 0)} ÷ 360 = ${fmt(subitems.discountTranche2)} 元`,
+                  `贴现费用 = 段1 + 段2 = ${fmt(subitems.discountCost)} 元`,
                 ]
               : [`贴现费用仅「萍钢」计提；当前客户「${customer || '—'}」不计提，为 0 元`],
         },
@@ -652,10 +656,9 @@ function ItemConfigModal({
           label: '回款利息',
           value: subitems.interestCost,
           steps: [
-            `回款利息 = 销售收入含税单价 × 年利率(interest_rate_annual) ÷ 360 × 回款天数(collection_days_${customer || '钢厂'}) × 结算量`,
-            `含税单价 = 销价不含税 ${fmt(salesExcl)} × 1.13 = ${fmt(salesIncl)}`,
-            `利息/吨 = ${fmt(salesIncl)} × ${fmt(pInterestAnnual)}% ÷ 360 × ${fmt(pCollectionDays, 0)} 天 = ${fmt(subitems.interestPerTon)}`,
-            `回款利息 = ${fmt(subitems.interestPerTon)} × 结算量 ${fmt(q, 3)} = ${fmt(subitems.interestCost)} 元`,
+            `回款利息 = 销售收入含税 × 年利率(interest_rate_annual) ÷ 360 × 回款周期(collection_days_${customer || '钢厂'})`,
+            `= ${fmt(revenueInclTotal)} × ${fmt(pInterestAnnual)}% ÷ 360 × ${fmt(pCollectionDays, 0)} 天`,
+            `= ${fmt(subitems.interestCost)} 元`,
           ],
         },
       ];
@@ -669,17 +672,19 @@ function ItemConfigModal({
               ...refundBaseSteps,
               `即征即退 = 基数 ${fmt(refundBase)} × 即征即退率(instant_refund_rate) ${fmt(pInstantRefund)}% = ${fmt(subitems.immediateRefund)} 元`,
             ]
-          : [`即征即退仅「萍钢 / 新钢」计提；当前客户「${customer || '—'}」为 0 元`],
+          : [`即征即退仅「新钢」计提；当前客户「${customer || '—'}」为 0 元`],
       },
       {
         label: '政府扶持资金',
         value: subitems.governmentSupport,
         steps: [
           ...refundBaseSteps,
-          `项1 = 基数 ${fmt(refundBase)} × 38%(gov_subsidy_rate_41=${fmt(pR41)}) = ${fmt(govT1)}`,
-          `项2 = 基数 ${fmt(refundBase)} × 10%(gov_subsidy_rate_10=${fmt(pR10)}) × 80%(gov_subsidy_rate_80=${fmt(pR80)}) = ${fmt(govT2)}`,
-          `项3 = (收入不含税 ${fmt(revenueExclTotal)} + 材料成本 ${fmt(matCostTotal)}) × 0.03%(gov_subsidy_rate_003=${fmt(pR003)}) × 100%(gov_subsidy_rate_100=${fmt(pR100)}) = ${fmt(govT3)}`,
-          `政府扶持 = 项1 + 项2 + 项3 = ${fmt(govT1)} + ${fmt(govT2)} + ${fmt(govT3)} = ${fmt(subitems.governmentSupport)} 元`,
+          isInstantRefundMill
+            ? `项1(主比例) = 基数 × gov_subsidy_rate ${fmt(pGovRate)}% × 70%(gov_subsidy_rate_70) = ${fmt(subitems.governmentSupportMain)} 元`
+            : `项1(主比例) = 基数 × gov_subsidy_rate ${fmt(pGovRate)}% = ${fmt(subitems.governmentSupportMain)} 元`,
+          `项2(印花税) = (收入不含税+材料成本) × 0.03% × is_give_ces(${giveCesFlag}) = ${fmt(subitems.governmentSupportStamp)} 元`,
+          `项3(城建及教育) = 基数 × 10% × is_give_tax_extra(${giveTaxExtraFlag}) = ${fmt(subitems.governmentSupportTaxExtra)} 元`,
+          `政府扶持 = 项1 + 项2 + 项3 = ${fmt(subitems.governmentSupport)} 元`,
         ],
       },
     ];
@@ -702,8 +707,10 @@ function ItemConfigModal({
           样本：<strong>{sample?.productDisplayName}</strong>（{sample?.customer}）净重 {fmt(sample?.netWeight, 3)} 吨 / 结算量{' '}
           {fmt(sample?.settlementQuantity, 3)} 吨 / 收入(含税) {fmt(sample?.revenue)} 元。
           {item === '9' && '加工成本 = 加工单价(元/吨) × 净重。'}
-          {item === '10' && '其它成本 = 运输费 + 税费 + 贴现费用 + 回款利息。'}
-          {item === '11' && '其它收入 = 即征即退 + 政府扶持资金；基数 base = 销价(不含税)×13% − 材料单价(不含税)×入库税率 − 运输费/吨×3% − 加工费×9%。'}
+          {item === '10' &&
+            '其它成本 = 运输费(运价÷路损×净重) + 税费 + 贴现费用(仅萍钢两段) + 回款利息；参数均来自 ProfitParamConfig。'}
+          {item === '11' &&
+            '其它收入 = 即征即退(仅新钢) + 政府扶持；基数 = 收入不含税×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%。'}
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700">

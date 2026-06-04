@@ -80,15 +80,23 @@ export interface ProfitAnalysisData {
       taxMainRate: number;                     // 主税率（小数，如 0.10）
       taxExtraRate: number;                    // 附加税率（小数，如 0.0005）
       taxBasePerTon: number;                   // 税费基数（元/吨）
+      taxBaseTotal: number;                    // 税费基数（本单总额，元）
       taxPerTon: number;                       // 税费（元/吨）
+      discountRatePinggang: number;            // 贴现年利率（小数）
+      discountDaysPinggang: number;            // 贴现天数
+      reverseDiscountAnnualRate: number;       // 反贴现息年利率（小数）
+      reverseDiscountOccupancyDays: number;    // 反贴现占用天数
+      interestRateAnnual: number;              // 回款年利率（小数）
+      collectionDays: number;                  // 回款周期（天）
       instantRefundRate: number;               // 即征即退比例（小数）
-      govSubsidyRate41: number;                // 政府扶持比例 41%（小数）
-      govSubsidyRate70: number;                // 政府扶持比例 70%（小数）
-      govSubsidyRate38: number;                // 政府扶持比例 38%（小数）
-      govSubsidyRate10: number;                // 政府扶持比例 10%（小数）
-      govSubsidyRate80: number;                // 政府扶持比例 80%（小数）
-      govSubsidyRate003: number;               // 政府扶持比例 0.03%（小数）
-      govSubsidyRate100: number;               // 政府扶持比例 100%（小数）
+      govSubsidyRate: number;                  // 政府扶持主比例（小数）
+      govSubsidyRate70: number;                // 即征即退为是时 ×70%（小数）
+      isGiveCes: number;                       // 印花税扶持是否结给 0/1
+      isGiveTaxExtra: number;                  // 城建及教育附加扶持是否结给 0/1
+      refundBaseTotal: number;                 // 其它收入基数（总额）
+      governmentSupportMain: number;
+      governmentSupportStamp: number;
+      governmentSupportTaxExtra: number;
     };
     materialComposition: Array<{   // 原材料构成（与 MaterialCostCache 一致：quantity 吨, cost 元）
       material: string;
@@ -1080,15 +1088,30 @@ export async function getProfitAnalysisData(
               taxMainRate: taxMain,
               taxExtraRate: taxExtra,
               taxBasePerTon: sub.taxBasePerTon,
+              taxBaseTotal: sub.taxBaseTotal,
               taxPerTon: sub.taxPerTon,
+              discountRatePinggang: paramSnapshot.discountRatePinggang / 100,
+              discountDaysPinggang: paramSnapshot.collectionDaysPinggang,
+              reverseDiscountAnnualRate: paramSnapshot.reverseDiscountAnnualRate / 100,
+              reverseDiscountOccupancyDays: paramSnapshot.reverseDiscountOccupancyDays,
+              interestRateAnnual: paramSnapshot.interestRateAnnual / 100,
+              collectionDays:
+                customer === '萍钢'
+                  ? paramSnapshot.collectionDaysPinggang
+                  : customer === '吉钢'
+                    ? paramSnapshot.collectionDaysJigang
+                    : customer === '新钢'
+                      ? paramSnapshot.collectionDaysXingang
+                      : 0,
               instantRefundRate: paramSnapshot.instantRefundRate / 100,
-              govSubsidyRate41: paramSnapshot.govSubsidyRate41 / 100,
+              govSubsidyRate: paramSnapshot.govSubsidyRate / 100,
               govSubsidyRate70: paramSnapshot.govSubsidyRate70 / 100,
-              govSubsidyRate38: paramSnapshot.govSubsidyRate38 / 100,
-              govSubsidyRate10: paramSnapshot.govSubsidyRate10 / 100,
-              govSubsidyRate80: paramSnapshot.govSubsidyRate80 / 100,
-              govSubsidyRate003: paramSnapshot.govSubsidyRate003 / 100,
-              govSubsidyRate100: paramSnapshot.govSubsidyRate100 / 100,
+              isGiveCes: paramSnapshot.isGiveCes >= 1 ? 1 : 0,
+              isGiveTaxExtra: paramSnapshot.isGiveTaxExtra >= 1 ? 1 : 0,
+              refundBaseTotal: sub.refundBaseTotal,
+              governmentSupportMain: sub.governmentSupportMain,
+              governmentSupportStamp: sub.governmentSupportStamp,
+              governmentSupportTaxExtra: sub.governmentSupportTaxExtra,
             },
             materialComposition: composition,
             productionRecords,
@@ -1131,15 +1154,23 @@ export async function getProfitAnalysisData(
               taxMainRate: 0,
               taxExtraRate: 0,
               taxBasePerTon: 0,
+              taxBaseTotal: 0,
               taxPerTon: 0,
+              discountRatePinggang: 0,
+              discountDaysPinggang: 0,
+              reverseDiscountAnnualRate: 0,
+              reverseDiscountOccupancyDays: 0,
+              interestRateAnnual: 0,
+              collectionDays: 0,
               instantRefundRate: 0,
-              govSubsidyRate41: 0,
+              govSubsidyRate: 0,
               govSubsidyRate70: 0,
-              govSubsidyRate38: 0,
-              govSubsidyRate10: 0,
-              govSubsidyRate80: 0,
-              govSubsidyRate003: 0,
-              govSubsidyRate100: 0,
+              isGiveCes: 0,
+              isGiveTaxExtra: 0,
+              refundBaseTotal: 0,
+              governmentSupportMain: 0,
+              governmentSupportStamp: 0,
+              governmentSupportTaxExtra: 0,
             },
             materialComposition: [],
             productionRecords: [],

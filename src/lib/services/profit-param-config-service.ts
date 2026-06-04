@@ -28,18 +28,24 @@ export interface ProfitParamSnapshot {
   taxRateExtra: number;
   processingFeeForRefund: number;
   instantRefundRate: number;
-  govSubsidyRate41: number;
-  govSubsidyRate10: number;
-  govSubsidyRate80: number;
-  govSubsidyRate003: number;
-  govSubsidyRate100: number;
+  /** 政府扶持主比例 gov_subsidy_rate（%），兼容旧键 gov_subsidy_rate_41 */
+  govSubsidyRate: number;
+  /** 即征即退为是时主比例再乘系数 gov_subsidy_rate_70（%） */
   govSubsidyRate70: number;
-  govSubsidyRate38: number;
+  /** 印花税扶持是否结给 is_give_ces：0 不结给 / 1 结给 */
+  isGiveCes: number;
+  /** 城建及教育税附加扶持是否结给 is_give_tax_extra：0 不结给 / 1 结给 */
+  isGiveTaxExtra: number;
   discountRatePinggang: number;
+  /** 萍钢贴现天数（collection_days_pinggang，与回款周期共用参数键） */
   collectionDaysPinggang: number;
   collectionDaysJigang: number;
   collectionDaysXingang: number;
   interestRateAnnual: number;
+  /** 反贴现息年利率 reverse_discount_annual_rate */
+  reverseDiscountAnnualRate: number;
+  /** 反贴现息占用天数 reverse_discount_occupancy_days */
+  reverseDiscountOccupancyDays: number;
 }
 
 const DEFAULT_PROCESSING_COST_PER_TON = 70;
@@ -171,18 +177,17 @@ export function buildParamSnapshot(
     processingFeeForRefund:
       v('processing_fee_for_refund') ?? DEFAULT_PROCESSING_COST_PER_TON,
     instantRefundRate: v('instant_refund_rate') ?? 30,
-    govSubsidyRate41: v('gov_subsidy_rate_41') ?? 41,
-    govSubsidyRate10: v('gov_subsidy_rate_10') ?? 10,
-    govSubsidyRate80: v('gov_subsidy_rate_80') ?? 80,
-    govSubsidyRate003: v('gov_subsidy_rate_003') ?? 0.03,
-    govSubsidyRate100: v('gov_subsidy_rate_100') ?? 100,
+    govSubsidyRate: v('gov_subsidy_rate') ?? v('gov_subsidy_rate_41') ?? 38,
     govSubsidyRate70: v('gov_subsidy_rate_70') ?? 70,
-    govSubsidyRate38: v('gov_subsidy_rate_38') ?? 38,
-    discountRatePinggang: vMill('discount_rate_pinggang') ?? 2.18,
-    collectionDaysPinggang: vMill('collection_days_pinggang') ?? 18,
+    isGiveCes: v('is_give_ces') ?? 0,
+    isGiveTaxExtra: v('is_give_tax_extra') ?? 0,
+    discountRatePinggang: vMill('discount_rate_pinggang') ?? 1.2,
+    collectionDaysPinggang: vMill('collection_days_pinggang') ?? 120,
     collectionDaysJigang: vMill('collection_days_jigang') ?? 12,
     collectionDaysXingang: vMill('collection_days_xingang') ?? 37,
     interestRateAnnual: v('interest_rate_annual') ?? 3,
+    reverseDiscountAnnualRate: v('reverse_discount_annual_rate') ?? 5.6,
+    reverseDiscountOccupancyDays: v('reverse_discount_occupancy_days') ?? 60,
   };
 }
 
@@ -227,30 +232,49 @@ export interface ProfitSubitems {
   salesUnitExclTax: number;
   transportPerTon: number;
   taxBasePerTon: number;
+  /** 税费基数（本单总额，元） */
+  taxBaseTotal: number;
   taxPerTon: number;
   discountPerTon: number;
   interestPerTon: number;
+  /** 贴现费用第一段（萍钢：含税收入×贴现年利率×贴现天数/360） */
+  discountTranche1: number;
+  /** 贴现费用第二段（萍钢：含税收入×反贴现息年利率×占用天数/360） */
+  discountTranche2: number;
   immediateRefundPerTon: number;
   governmentSupportPerTon: number;
   /** 其它收入项基数（本单总额）：收入不含税×13% − 材料成本×入库税率 − 加工成本×9% − 运输费×3% */
   refundBaseTotal: number;
+  governmentSupportMain: number;
+  governmentSupportStamp: number;
+  governmentSupportTaxExtra: number;
 }
 
-/** 贴现费用元/吨：仅萍钢，销售单价(不含税)×1.13×贴现率%（贴现率来自配置 discount_rate_pinggang） */
-function computeDiscountPerTon(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
-  if ((customer || '').trim() !== '萍钢') return 0;
-  return salesUnitExclTax * 1.13 * (s.discountRatePinggang / 100);
+/** 10-③ 贴现费用（元）：仅萍钢 = 销售收入含税×贴现年利率×贴现天数/360 + 销售收入含税×反贴现息年利率×反贴现占用天数/360 */
+function computeDiscountCost(revenueInclTax: number, customer: string, s: ProfitParamSnapshot): {
+  discountCost: number;
+  tranche1: number;
+  tranche2: number;
+} {
+  if ((customer || '').trim() !== '萍钢') return { discountCost: 0, tranche1: 0, tranche2: 0 };
+  const tranche1 =
+    revenueInclTax * (s.discountRatePinggang / 100) * (s.collectionDaysPinggang / 360);
+  const tranche2 =
+    revenueInclTax *
+    (s.reverseDiscountAnnualRate / 100) *
+    (s.reverseDiscountOccupancyDays / 360);
+  return { discountCost: tranche1 + tranche2, tranche1, tranche2 };
 }
 
-/** 回款周期资金利息元/吨：销售单价(不含税)×1.13×年利率%/360×回款天数（天数来自配置，按钢厂） */
-function computeInterestPerTon(salesUnitExclTax: number, customer: string, s: ProfitParamSnapshot): number {
+/** 10-④ 回款周期资金利息（元）= 销售收入含税×年利率/360×回款周期天数 */
+function computeInterestCost(revenueInclTax: number, customer: string, s: ProfitParamSnapshot): number {
   const c = (customer || '').trim();
   let days = 0;
   if (c === '萍钢') days = s.collectionDaysPinggang;
   else if (c === '吉钢') days = s.collectionDaysJigang;
   else if (c === '新钢') days = s.collectionDaysXingang;
-  if (days === 0) return 0;
-  return salesUnitExclTax * 1.13 * (s.interestRateAnnual / 100 / 360) * days;
+  if (days <= 0) return 0;
+  return revenueInclTax * (s.interestRateAnnual / 100 / 360) * days;
 }
 
 export function computeProfitSubitems(basis: ProfitRowBasis, s: ProfitParamSnapshot): ProfitSubitems {
@@ -268,66 +292,69 @@ export function computeProfitSubitems(basis: ProfitRowBasis, s: ProfitParamSnaps
   const processingWeight = netWeight > 0 ? netWeight : quantity;
   const processingCost = processingWeight * s.processingFeeForRefund;
 
-  // 10-① 运输费 = 客户运价(含税) × 出厂重量(=净重/路损系数)
+  // 10-① 运输费 = [运输费]/[路损系数]×净重
   const transportWeight = netWeight > 0 ? netWeight : quantity;
   const transportCost =
     transportWeight > 0 && s.roadLossFactor > 0
-      ? s.transportFee * (transportWeight / s.roadLossFactor)
+      ? (s.transportFee / s.roadLossFactor) * transportWeight
       : 0;
   const transportPerTon = quantity > 0 ? transportCost / quantity : 0;
 
-  // 税费基数 base = 销价(不含税)×13% − 材料单价(不含税)×入库税率 − 运输费/吨×3% − 加工费×9%
-  const taxBasePerTon =
-    quantity > 0
-      ? salesUnitExclTax * 0.13 -
-        materialUnitExclTax * warehouseTaxRate -
-        transportPerTon * 0.03 -
-        s.processingFeeForRefund * 0.09
-      : 0;
-
-  // 10-② 税费/吨 = base×主税率% + (销价+材料单价)×附加税率%
-  const taxMain = s.taxRateMain / 100;
-  const taxExtra = s.taxRateExtra / 100;
-  const taxPerTon =
-    quantity > 0 ? taxBasePerTon * taxMain + (salesUnitExclTax + materialUnitExclTax) * taxExtra : 0;
-
-  // 10-③ 贴现费用/吨、10-④ 回款利息/吨
-  const discountPerTon = computeDiscountPerTon(salesUnitExclTax, customer, s);
-  const interestPerTon = computeInterestPerTon(salesUnitExclTax, customer, s);
-
-  const taxCost = taxPerTon * quantity;
-  const discountCost = discountPerTon * quantity;
-  const interestCost = interestPerTon * quantity;
-  const otherCosts = transportCost + taxCost + discountCost + interestCost;
-
-  // 11 其它收入 = 即征即退 + 政府扶持资金（财务确认口径：基数与各项均按本单"总额"，不再乘结算量）
-  //   基数 refundBase = 收入(不含税)×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%
-  //   政府扶持 = refundBase×38%(gov_subsidy_rate_41)
-  //            + refundBase×10%(gov_subsidy_rate_10)×80%(gov_subsidy_rate_80)
-  //            + (收入不含税 + 材料成本)×0.03%(gov_subsidy_rate_003)×100%(gov_subsidy_rate_100)
-  //     说明：原 70%×38%（即征即退为是）分支已弃用（两参数置 0），所有钢厂统一用 38% 主系数。
-  //   即征即退（仅萍钢/新钢）= refundBase × 即征即退率(instant_refund_rate)
   const revenueExclTax = revenue / 1.13;
-  const refundBaseTotal =
+
+  // 10-② 税费 = (收入不含税×13% − 材料成本×入库税率 − 加工成本×9% − 运输费×3%)×主税率 + (收入不含税+材料成本)×附加税率
+  const taxBaseTotal =
     revenueExclTax * 0.13 -
     materialCost * warehouseTaxRate -
     processingCost * 0.09 -
     transportCost * 0.03;
+  const taxMain = s.taxRateMain / 100;
+  const taxExtra = s.taxRateExtra / 100;
+  const taxCost = taxBaseTotal * taxMain + (revenueExclTax + materialCost) * taxExtra;
+  const taxBasePerTon = quantity > 0 ? taxBaseTotal / quantity : 0;
+  const taxPerTon = quantity > 0 ? taxCost / quantity : 0;
 
+  // 10-③ 贴现费用（仅萍钢，两段）
+  const { discountCost, tranche1: discountTranche1, tranche2: discountTranche2 } =
+    computeDiscountCost(revenue, customer, s);
+  const discountPerTon = quantity > 0 ? discountCost / quantity : 0;
+
+  // 10-④ 回款周期资金利息
+  const interestCost = computeInterestCost(revenue, customer, s);
+  const interestPerTon = quantity > 0 ? interestCost / quantity : 0;
+
+  const otherCosts = transportCost + taxCost + discountCost + interestCost;
+
+  // 11 其它收入 = 即征即退 + 政府扶持资金（基数与税费/其它收入口径一致，按本单总额）
+  //   基数 base = 收入不含税×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%
+  //   即征即退（仅新钢）= base × instant_refund_rate
+  //   政府扶持（萍钢/吉钢/新钢）：
+  //     即征即退为否：base×gov_subsidy_rate + (收入不含税+材料)×0.03%×is_give_ces + base×10%×is_give_tax_extra
+  //     即征即退为是（新钢）：base×gov_subsidy_rate×70% + 同上两项
+  const refundBaseTotal = taxBaseTotal;
+
+  const isInstantRefundCustomer = customer === '新钢';
   let immediateRefund = 0;
   let governmentSupport = 0;
+  let governmentSupportMain = 0;
+  let governmentSupportStamp = 0;
+  let governmentSupportTaxExtra = 0;
+
+  if (customer === '新钢') {
+    immediateRefund = refundBaseTotal * (s.instantRefundRate / 100);
+  }
+
   if (customer === '萍钢' || customer === '新钢' || customer === '吉钢') {
-    const r41 = s.govSubsidyRate41 / 100;
-    const r10 = s.govSubsidyRate10 / 100;
-    const r80 = s.govSubsidyRate80 / 100;
-    const r003 = s.govSubsidyRate003 / 100;
-    const r100 = s.govSubsidyRate100 / 100;
+    const rMain = s.govSubsidyRate / 100;
+    const r70 = s.govSubsidyRate70 / 100;
+    const giveCes = s.isGiveCes >= 1 ? 1 : 0;
+    const giveTaxExtra = s.isGiveTaxExtra >= 1 ? 1 : 0;
+    const mainCoeff = isInstantRefundCustomer ? rMain * r70 : rMain;
+    governmentSupportMain = refundBaseTotal * mainCoeff;
+    governmentSupportStamp = (revenueExclTax + materialCost) * 0.0003 * giveCes;
+    governmentSupportTaxExtra = refundBaseTotal * 0.1 * giveTaxExtra;
     governmentSupport =
-      refundBaseTotal * r41 +
-      refundBaseTotal * r10 * r80 +
-      (revenueExclTax + materialCost) * r003 * r100;
-    const isInstantRefund = customer === '萍钢' || customer === '新钢';
-    immediateRefund = isInstantRefund ? refundBaseTotal * (s.instantRefundRate / 100) : 0;
+      governmentSupportMain + governmentSupportStamp + governmentSupportTaxExtra;
   }
   const otherIncome = immediateRefund + governmentSupport;
   const immediateRefundPerTon = quantity > 0 ? immediateRefund / quantity : 0;
@@ -351,12 +378,18 @@ export function computeProfitSubitems(basis: ProfitRowBasis, s: ProfitParamSnaps
     salesUnitExclTax,
     transportPerTon,
     taxBasePerTon,
+    taxBaseTotal,
     taxPerTon,
     discountPerTon,
     interestPerTon,
+    discountTranche1,
+    discountTranche2,
     immediateRefundPerTon,
     governmentSupportPerTon,
     refundBaseTotal,
+    governmentSupportMain,
+    governmentSupportStamp,
+    governmentSupportTaxExtra,
   };
 }
 
