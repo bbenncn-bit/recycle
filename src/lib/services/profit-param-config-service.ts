@@ -50,6 +50,16 @@ export interface ProfitParamSnapshot {
 
 const DEFAULT_PROCESSING_COST_PER_TON = 70;
 
+/** 全局参数：steel_mill 为 NULL 或空字符串 */
+function isGlobalSteelMill(v: string | null | undefined): boolean {
+  return !(v ?? '').trim();
+}
+
+function normSteelMill(v: string | null | undefined): string | null {
+  const t = (v ?? '').trim();
+  return t || null;
+}
+
 function processDecimal(value: unknown): number {
   if (value == null) return 0;
   if (typeof value === 'number') return value;
@@ -123,13 +133,15 @@ export function getEffectiveParamValueOrNull(
 ): number | null {
   const normalized = new Date(deliveryDate);
   normalized.setHours(0, 0, 0, 0);
-  const list = rows.filter(
-    (r) =>
-      r.paramKey === paramKey &&
-      (r.steelMill === steelMill || r.steelMill === null)
-  );
+  const mill = normSteelMill(steelMill);
+  const list = rows.filter((r) => {
+    if (r.paramKey !== paramKey) return false;
+    if (mill === null) return isGlobalSteelMill(r.steelMill);
+    const rMill = normSteelMill(r.steelMill);
+    return rMill === mill || rMill === null;
+  });
   if (list.length === 0) return null;
-  const specific = list.filter((r) => r.steelMill === steelMill);
+  const specific = list.filter((r) => normSteelMill(r.steelMill) === mill);
   const pool = specific.length > 0 ? specific : list;
   pool.sort((a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime());
   const row =
@@ -191,6 +203,71 @@ export function buildParamSnapshot(
   };
 }
 
+/** ProfitParamConfig 中「入库单税率」参数键（单位 %） */
+export const WAREHOUSE_TAX_PARAM_KEY = 'inbound_tax_rate';
+
+/**
+ * 入库单税率（%）：LIFO 溯源失败时，从 ProfitParamConfig 读取 inbound_tax_rate。
+ */
+export function resolveWarehouseTaxRatePercentFromConfig(
+  allRows: ParamConfigRow[],
+  deliveryDate: Date,
+  steelMill?: string | null
+): number | null {
+  const mill = normSteelMill(steelMill);
+  const tryMills: (string | null)[] = mill ? [mill, null] : [null];
+  for (const m of tryMills) {
+    const byKey = getEffectiveParamValueOrNull(
+      allRows,
+      WAREHOUSE_TAX_PARAM_KEY,
+      m,
+      deliveryDate
+    );
+    if (byKey != null && Number.isFinite(byKey) && byKey > 0) return byKey;
+  }
+
+  const nameRows = allRows.filter(
+    (r) =>
+      (r.nameCn || '').trim() === '入库单税率' &&
+      (mill ? normSteelMill(r.steelMill) === mill || isGlobalSteelMill(r.steelMill) : isGlobalSteelMill(r.steelMill))
+  );
+  const pickRow =
+    nameRows.find((r) => r.paramKey === WAREHOUSE_TAX_PARAM_KEY) ?? nameRows[0];
+  if (pickRow) {
+    const hist = parseProfitParamHistory(pickRow.previousValueRaw);
+    const pct = getParamValueAtDeliveryDate(pickRow.value, hist, deliveryDate);
+    return Number.isFinite(pct) && pct > 0 ? pct : null;
+  }
+  return null;
+}
+
+/** 入库单税率（小数，如 0.13）；配置缺失或 ≤0 时返回 0 */
+export function resolveWarehouseTaxRateDecimalFromConfig(
+  allRows: ParamConfigRow[],
+  deliveryDate: Date,
+  steelMill?: string | null
+): number {
+  const pct = resolveWarehouseTaxRatePercentFromConfig(allRows, deliveryDate, steelMill);
+  return pct != null && pct > 0 ? pct / 100 : 0;
+}
+
+/**
+ * 确定本单实际采用的入库单税率：LIFO 溯源 > 0 时优先；否则 inbound_tax_rate（%→小数）。
+ */
+export function resolveFinalWarehouseTaxRate(
+  lifoDecimal: number,
+  allRows: ParamConfigRow[],
+  deliveryDate: Date,
+  steelMill?: string | null
+): { rate: number; fromLifo: boolean; percent: number } {
+  if (lifoDecimal > 0) {
+    return { rate: lifoDecimal, fromLifo: true, percent: lifoDecimal * 100 };
+  }
+  const pct = resolveWarehouseTaxRatePercentFromConfig(allRows, deliveryDate, steelMill);
+  const rate = pct != null && pct > 0 ? pct / 100 : 0;
+  return { rate, fromLifo: false, percent: pct ?? 0 };
+}
+
 // ---------------------------------------------------------------------------
 // 共享纯函数：由列 1-8（结算单 + 材料成本）推导出的"基础量"出发，
 // 套用 ProfitParamSnapshot 参数，算出 9 加工成本 / 10 其它成本 / 11 其它收入
@@ -211,8 +288,32 @@ export interface ProfitRowBasis {
   materialCost: number;
   /** 材料单价（不含税，元/吨）= 材料成本 / 材料核算量 */
   materialUnitExclTax: number;
-  /** 入库单加权平均税率（小数，如 0.13） */
+  /** 入库单税率（小数，如 0.13）；LIFO 溯源或 inbound_tax_rate 配置 */
   warehouseTaxRate: number;
+  /** true 表示 warehouseTaxRate 来自 PurchaseWarehouse 溯源，非配置参数 */
+  warehouseTaxRateFromLifo?: boolean;
+}
+
+/** 试算/展示前：将 inbound_tax_rate 写入 basis.warehouseTaxRate（与 computeProfitSubitems 一致） */
+export function applyWarehouseTaxToBasis(
+  basis: ProfitRowBasis,
+  allRows: ParamConfigRow[],
+  deliveryDate: Date
+): ProfitRowBasis {
+  if (basis.warehouseTaxRateFromLifo && (basis.warehouseTaxRate ?? 0) > 0) {
+    return basis;
+  }
+  const resolved = resolveFinalWarehouseTaxRate(
+    0,
+    allRows,
+    deliveryDate,
+    basis.customer
+  );
+  return {
+    ...basis,
+    warehouseTaxRate: resolved.rate,
+    warehouseTaxRateFromLifo: resolved.fromLifo,
+  };
 }
 
 /** 利润子项计算结果（含每吨明细，便于 UI 透出与核对公式） */

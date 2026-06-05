@@ -65,6 +65,7 @@ type PreviewBasis = {
   materialCost: number;
   materialUnitExclTax: number;
   warehouseTaxRate: number;
+  warehouseTaxRateFromLifo?: boolean;
 };
 
 type PreviewPayload = {
@@ -103,6 +104,7 @@ function fmt(n: number | undefined | null, digits = 2): string {
 const ITEM_PARAM_KEYS: Record<ItemKey, string[]> = {
   '9': ['processing_fee_for_refund'],
   '10': [
+    'inbound_tax_rate',
     'transport_fee_pinggang',
     'transport_fee_jigang',
     'transport_fee_xingang',
@@ -118,6 +120,7 @@ const ITEM_PARAM_KEYS: Record<ItemKey, string[]> = {
     'interest_rate_annual',
   ],
   '11': [
+    'inbound_tax_rate',
     'instant_refund_rate',
     'gov_subsidy_rate',
     'gov_subsidy_rate_41',
@@ -586,9 +589,14 @@ function ItemConfigModal({
   const procCostTotal = subitems?.processingCost ?? 0;
   const transCostTotal = subitems?.transportCost ?? 0;
   const refundBase = subitems?.refundBaseTotal ?? 0;
+  const inboundTaxPct = whTax * 100;
+  const inboundTaxLabel = basis?.warehouseTaxRateFromLifo
+    ? `溯源加权 ${fmt(inboundTaxPct, 4)}%`
+    : `入库单税率(inbound_tax_rate) ${fmt(inboundTaxPct, 4)}%`;
+  const matTaxAmt = matCostTotal * whTax;
   const refundBaseSteps: string[] = [
     `基数 base = 收入不含税×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%`,
-    `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${fmt(whTax * 100)}%(${fmt(matCostTotal * whTax)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
+    `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${inboundTaxLabel}(${fmt(matTaxAmt)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
     `= ${fmt(refundBase)} 元`,
   ];
   const govT1 = isInstantRefundMill ? refundBase * rGov * r70 : refundBase * rGov;
@@ -600,7 +608,7 @@ function ItemConfigModal({
   const taxTermExtra = (revenueExclTotal + matCostTotal) * (pTaxExtra / 100);
   const taxBaseSteps: string[] = [
     `税费基数 = 收入不含税×13% − 材料成本×入库税率 − 加工成本×9% − 运输费×3%`,
-    `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${fmt(whTax * 100)}%(${fmt(matCostTotal * whTax)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
+    `= ${fmt(revenueExclTotal)}×13%(${fmt(revenueExclTotal * 0.13)}) − ${fmt(matCostTotal)}×${inboundTaxLabel}(${fmt(matTaxAmt)}) − ${fmt(procCostTotal)}×9%(${fmt(procCostTotal * 0.09)}) − ${fmt(transCostTotal)}×3%(${fmt(transCostTotal * 0.03)})`,
     `= ${fmt(taxBaseTotal)} 元`,
   ];
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { assertInventoryOpsAuthorized } from '@/lib/inventory-ops-request-auth';
 import { getProfitPreviewBasis } from '@/lib/services/profit-analysis-service';
 import {
+  applyWarehouseTaxToBasis,
   buildParamSnapshot,
   computeProfitSubitems,
   loadAllParamConfigRows,
@@ -23,12 +24,13 @@ export async function GET(request: Request) {
 
     const rows = await loadAllParamConfigRows();
     const deliveryDate = new Date(preview.deliveryDateIso);
-    const snapshot = buildParamSnapshot(rows, deliveryDate, preview.basis.customer);
-    const subitems = computeProfitSubitems(preview.basis, snapshot);
+    const effectiveBasis = applyWarehouseTaxToBasis(preview.basis, rows, deliveryDate);
+    const snapshot = buildParamSnapshot(rows, deliveryDate, effectiveBasis.customer);
+    const subitems = computeProfitSubitems(effectiveBasis, snapshot);
 
     return NextResponse.json({
       success: true,
-      data: { ...preview, snapshot, subitems },
+      data: { ...preview, basis: effectiveBasis, snapshot, subitems },
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
@@ -76,8 +78,15 @@ export async function POST(request: Request) {
     );
 
     const deliveryDate = deliveryDateIso ? new Date(deliveryDateIso) : new Date();
-    const snapshot = buildParamSnapshot(draftRows, deliveryDate, basis.customer);
-    const subitems = computeProfitSubitems(basis, snapshot);
+    const effectiveBasis = applyWarehouseTaxToBasis(
+      basis.warehouseTaxRateFromLifo && (basis.warehouseTaxRate ?? 0) > 0
+        ? basis
+        : { ...basis, warehouseTaxRate: 0, warehouseTaxRateFromLifo: false },
+      draftRows,
+      deliveryDate
+    );
+    const snapshot = buildParamSnapshot(draftRows, deliveryDate, effectiveBasis.customer);
+    const subitems = computeProfitSubitems(effectiveBasis, snapshot);
 
     return NextResponse.json({ success: true, data: { snapshot, subitems } });
   } catch (e) {

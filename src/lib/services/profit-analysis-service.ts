@@ -13,9 +13,15 @@ import {
   buildParamSnapshot,
   loadAllParamConfigRows,
   computeProfitSubitems,
+  resolveFinalWarehouseTaxRate,
   type ProfitParamSnapshot,
   type ProfitRowBasis,
 } from './profit-param-config-service';
+import {
+  createWarehouseTaxRateContext,
+  getWeightedAvgWarehouseTaxRate,
+  type WarehouseTaxRateContext,
+} from './weighted-warehouse-tax-rate';
 
 export interface ProfitAnalysisData {
   summary: {
@@ -74,8 +80,11 @@ export interface ProfitAnalysisData {
       salesUnitExclTax: number;                // 销售单价（不含税，元/吨）
       materialUnitExclTax: number;             // 材料单价（不含税，元/吨）
       materialCalcQuantity: number;            // 材料成本核算数量（吨，优先出厂净重 net_weight）
-      warehouseTaxRate: number;                // 入库单加权税率（小数，如 0.13 表示 13%）
+      warehouseTaxRate: number;                // 入库单税率（小数）；LIFO 溯源或 ProfitParamConfig
+      warehouseTaxRateFromLifo?: boolean;      // true=PurchaseWarehouse 溯源加权；false=配置参数
       transportPerTon: number;                 // 运输费（元/吨）
+      transportFeeConfigured: number;          // 配置运价（元/吨，含税）
+      roadLossFactor: number;                  // 路损系数 road_loss_factor
       processingFeeForRefundPerTon: number;    // 加工费参数（元/吨）
       taxMainRate: number;                     // 主税率（小数，如 0.10）
       taxExtraRate: number;                    // 附加税率（小数，如 0.0005）
@@ -86,6 +95,8 @@ export interface ProfitAnalysisData {
       discountDaysPinggang: number;            // 贴现天数
       reverseDiscountAnnualRate: number;       // 反贴现息年利率（小数）
       reverseDiscountOccupancyDays: number;    // 反贴现占用天数
+      discountTranche1: number;                // 贴现费用段1（元）
+      discountTranche2: number;                // 贴现费用段2（元）
       interestRateAnnual: number;              // 回款年利率（小数）
       collectionDays: number;                  // 回款周期（天）
       instantRefundRate: number;               // 即征即退比例（小数）
@@ -466,71 +477,6 @@ export type { ProfitParamSnapshot };
  * - 1    -> 0.01（1%）
  * - 0.13 -> 0.13（13%，部分来源直接存小数）
  */
-function normalizeWarehouseTaxRate(raw: number): number {
-  const v = Number.isFinite(raw) ? raw : 0;
-  if (v <= 0) return 0;
-  if (v > 1) return v / 100;
-  if (v === 1) return 0.01;
-  return v;
-}
-
-/**
- * 根据材料构成与生产记录，计算加权平均「入库单税率」（从 PurchaseWarehouse.tax_rate 取数）
- * 按生产日期找到各毛料当时的采购税率，再按材料用量加权
- */
-async function getWeightedAvgTaxRate(
-  materialComposition: Array<{ material: string; quantity: number }>,
-  productionRecords: Array<{ productionDate: string; quantity: number }>
-): Promise<number> {
-  if (!materialComposition?.length || !productionRecords?.length) return 0;
-  const totalProdQty = productionRecords.reduce((s, r) => s + (r.quantity ?? 0), 0);
-  if (totalProdQty <= 0) return 0;
-  // 加权平均生产日期（时间戳）
-  let sumT = 0;
-  for (const r of productionRecords) {
-    const d = parseWarehouseDate(r.productionDate);
-    if (d) sumT += (r.quantity ?? 0) * d.getTime();
-  }
-  const avgDate = new Date(sumT / totalProdQty);
-  const materials = [...new Set(materialComposition.map(m => m.material).filter(Boolean))];
-  const taxRates = new Map<string, number>();
-  for (const mat of materials) {
-    try {
-      const rows = await prisma.purchaseWarehouse.findMany({
-        where: {
-          material: mat,
-          warehouseDate: { not: null },
-          taxRate: { not: null },
-        },
-        select: { warehouseDate: true, taxRate: true },
-        take: 200,
-      });
-      let bestRate: number | null = null;
-      let bestDate: Date | null = null;
-      for (const row of rows) {
-        const whDate = parseWarehouseDate(row.warehouseDate);
-        if (!whDate || whDate > avgDate) continue;
-        if (row.taxRate == null) continue;
-        if (!bestDate || whDate.getTime() > bestDate.getTime()) {
-          bestDate = whDate;
-          bestRate = normalizeWarehouseTaxRate(processDecimal(row.taxRate));
-        }
-      }
-      if (bestRate != null) taxRates.set(mat, bestRate);
-    } catch {
-      // 忽略单料查询失败
-    }
-  }
-  const totalQty = materialComposition.reduce((s, m) => s + (m.quantity ?? 0), 0);
-  if (totalQty <= 0) return 0;
-  let weighted = 0;
-  for (const m of materialComposition) {
-    const rate = taxRates.get(m.material) ?? 0;
-    weighted += (m.quantity ?? 0) * rate;
-  }
-  return weighted / totalQty;
-}
-
 function getProfitSalesMinDeliveryDateStr(): string {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -923,6 +869,13 @@ export async function getProfitAnalysisData(
 
   // 加载利润可调参数（按发货日期取生效值：变动日期起用 value，之前用 previous_value）
   const allParamRows = await loadAllParamConfigRows();
+  let warehouseTaxRateCtx: WarehouseTaxRateContext;
+  try {
+    warehouseTaxRateCtx = await createWarehouseTaxRateContext();
+  } catch (e) {
+    console.warn('加载 MaterialStorage 目录失败，入库税率将按发货日回退:', e);
+    warehouseTaxRateCtx = { catalog: [], cache: new Map() };
+  }
 
   // 计算每笔销售的利润（按全部明细数据批量处理）
   const salesDetails: ProfitAnalysisData['salesDetails'] = [];
@@ -1015,15 +968,41 @@ export async function getProfitAnalysisData(
           const salesUnitExclTax = quantity > 0 ? revenue / quantity / 1.13 : 0;
           const materialUnitExclTax = lifoQuantity > 0 ? materialCost / lifoQuantity : 0;
 
-          // 入库单加权平均税率（用于税费公式）
+          // 入库单税率：LIFO 溯源加权；溯源为 0 时用 ProfitParamConfig inbound_tax_rate（%）
           let warehouseTaxRate = 0;
+          let warehouseTaxRateFromLifo = false;
           try {
-            const compForTax = composition.map(c => ({ material: c.material, quantity: c.quantity }));
-            const recsForTax = productionRecords.map(r => ({ productionDate: r.productionDate, quantity: r.quantity }));
-            warehouseTaxRate = await getWeightedAvgTaxRate(compForTax, recsForTax);
+            const compForTax = composition.map((c) => ({
+              material: c.material,
+              quantity: c.quantity,
+            }));
+            const recsForTax = productionRecords.map((r) => ({
+              productionDate: r.productionDate,
+              quantity: r.quantity,
+            }));
+            const lifoRate = await getWeightedAvgWarehouseTaxRate(
+              compForTax,
+              recsForTax,
+              warehouseTaxRateCtx,
+              deliveryDate
+            );
+            const resolved = resolveFinalWarehouseTaxRate(
+              lifoRate,
+              allParamRows,
+              deliveryDate,
+              customer
+            );
+            warehouseTaxRate = resolved.rate;
+            warehouseTaxRateFromLifo = resolved.fromLifo;
           } catch {
-            // 默认 13%
-            warehouseTaxRate = 0.13;
+            const resolved = resolveFinalWarehouseTaxRate(
+              0,
+              allParamRows,
+              deliveryDate,
+              customer
+            );
+            warehouseTaxRate = resolved.rate;
+            warehouseTaxRateFromLifo = resolved.fromLifo;
           }
 
           // 9 加工成本 / 10 其它成本 / 11 其它收入 / 利润 / 吨钢毛利：复用共享纯函数，
@@ -1083,7 +1062,10 @@ export async function getProfitAnalysisData(
               materialUnitExclTax,
               materialCalcQuantity: lifoQuantity,
               warehouseTaxRate,
+              warehouseTaxRateFromLifo,
               transportPerTon: sub.transportPerTon,
+              transportFeeConfigured: paramSnapshot.transportFee,
+              roadLossFactor: paramSnapshot.roadLossFactor,
               processingFeeForRefundPerTon: paramSnapshot.processingFeeForRefund,
               taxMainRate: taxMain,
               taxExtraRate: taxExtra,
@@ -1094,6 +1076,8 @@ export async function getProfitAnalysisData(
               discountDaysPinggang: paramSnapshot.collectionDaysPinggang,
               reverseDiscountAnnualRate: paramSnapshot.reverseDiscountAnnualRate / 100,
               reverseDiscountOccupancyDays: paramSnapshot.reverseDiscountOccupancyDays,
+              discountTranche1: sub.discountTranche1,
+              discountTranche2: sub.discountTranche2,
               interestRateAnnual: paramSnapshot.interestRateAnnual / 100,
               collectionDays:
                 customer === '萍钢'
@@ -1150,6 +1134,8 @@ export async function getProfitAnalysisData(
               materialCalcQuantity: 0,
               warehouseTaxRate: 0,
               transportPerTon: 0,
+              transportFeeConfigured: 0,
+              roadLossFactor: 0,
               processingFeeForRefundPerTon: 0,
               taxMainRate: 0,
               taxExtraRate: 0,
@@ -1160,6 +1146,8 @@ export async function getProfitAnalysisData(
               discountDaysPinggang: 0,
               reverseDiscountAnnualRate: 0,
               reverseDiscountOccupancyDays: 0,
+              discountTranche1: 0,
+              discountTranche2: 0,
               interestRateAnnual: 0,
               collectionDays: 0,
               instantRefundRate: 0,
@@ -1539,12 +1527,38 @@ export async function getProfitPreviewBasis(monthArg?: string): Promise<ProfitPr
 
   const materialUnitExclTax = lifoQuantity > 0 ? materialCost / lifoQuantity : 0;
   let warehouseTaxRate = 0;
+  let warehouseTaxRateFromLifo = false;
+  const allParamRows = await loadAllParamConfigRows();
   try {
+    const taxCtx = await createWarehouseTaxRateContext();
     const compForTax = composition.map((c) => ({ material: c.material, quantity: c.quantity }));
-    const recsForTax = productionRecords.map((r) => ({ productionDate: r.productionDate, quantity: r.quantity }));
-    warehouseTaxRate = await getWeightedAvgTaxRate(compForTax, recsForTax);
+    const recsForTax = productionRecords.map((r) => ({
+      productionDate: r.productionDate,
+      quantity: r.quantity,
+    }));
+    const lifoRate = await getWeightedAvgWarehouseTaxRate(
+      compForTax,
+      recsForTax,
+      taxCtx,
+      deliveryDate
+    );
+    const resolved = resolveFinalWarehouseTaxRate(
+      lifoRate,
+      allParamRows,
+      deliveryDate,
+      customer
+    );
+    warehouseTaxRate = resolved.rate;
+    warehouseTaxRateFromLifo = resolved.fromLifo;
   } catch {
-    warehouseTaxRate = 0.13;
+    const resolved = resolveFinalWarehouseTaxRate(
+      0,
+      allParamRows,
+      deliveryDate,
+      customer
+    );
+    warehouseTaxRate = resolved.rate;
+    warehouseTaxRateFromLifo = resolved.fromLifo;
   }
 
   return {
@@ -1572,6 +1586,7 @@ export async function getProfitPreviewBasis(monthArg?: string): Promise<ProfitPr
       materialCost,
       materialUnitExclTax,
       warehouseTaxRate,
+      warehouseTaxRateFromLifo,
     },
   };
 }

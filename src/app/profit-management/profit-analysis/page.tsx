@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import LazyReactECharts from '@/components/lazy-react-echarts';
 import { ProfitAnalysisSkeleton } from '@/components/profit-dashboard-skeletons';
 
@@ -33,6 +33,29 @@ function formatDeliveryDateNoYear(deliveryDate: string): string {
   const iso = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return `${parseInt(iso[2], 10)}/${parseInt(iso[3], 10)}`;
   return t;
+}
+
+/** 计算过程内嵌参数：[中文名3%] */
+function paramBracket(label: string, value: string): string {
+  return `[${label}${value}]`;
+}
+
+function pctBracket(label: string, rate: number, decimals = 2): string {
+  return paramBracket(label, `${(rate * 100).toFixed(decimals)}%`);
+}
+
+function transportFeeLabel(customer: string): string {
+  if (customer === '萍钢') return '萍钢运输费单价';
+  if (customer === '吉钢') return '吉钢运输费单价';
+  if (customer === '新钢') return '新钢运输费单价';
+  return '运输费单价';
+}
+
+function collectionDaysLabel(customer: string): string {
+  if (customer === '萍钢') return '萍钢回款周期';
+  if (customer === '吉钢') return '吉钢回款周期';
+  if (customer === '新钢') return '新钢回款周期';
+  return '回款周期';
 }
 
 /** 销售明细：按发货日期升序（同日按发货单号） */
@@ -109,7 +132,10 @@ interface ProfitAnalysisData {
       materialUnitExclTax: number;
       materialCalcQuantity: number;
       warehouseTaxRate: number;
+      warehouseTaxRateFromLifo?: boolean;
       transportPerTon: number;
+      transportFeeConfigured: number;
+      roadLossFactor: number;
       processingFeeForRefundPerTon: number;
       taxMainRate: number;
       taxExtraRate: number;
@@ -120,6 +146,8 @@ interface ProfitAnalysisData {
       discountDaysPinggang: number;
       reverseDiscountAnnualRate: number;
       reverseDiscountOccupancyDays: number;
+      discountTranche1: number;
+      discountTranche2: number;
       interestRateAnnual: number;
       collectionDays: number;
       instantRefundRate: number;
@@ -171,6 +199,34 @@ export default function ProfitAnalysis() {
     kind: 'material' | 'otherCosts' | 'otherIncome';
     sale: ProfitAnalysisData['salesDetails'][0];
   } | null>(null);
+  const tooltipHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTooltipHideTimer = useCallback(() => {
+    if (tooltipHideTimerRef.current) {
+      clearTimeout(tooltipHideTimerRef.current);
+      tooltipHideTimerRef.current = null;
+    }
+  }, []);
+  const scheduleTooltipHide = useCallback(() => {
+    clearTooltipHideTimer();
+    tooltipHideTimerRef.current = setTimeout(() => setTooltipData(null), 300);
+  }, [clearTooltipHideTimer]);
+  const showTooltip = useCallback(
+    (
+      e: React.MouseEvent<HTMLTableCellElement>,
+      kind: 'material' | 'otherCosts' | 'otherIncome',
+      sale: ProfitAnalysisData['salesDetails'][0]
+    ) => {
+      clearTooltipHideTimer();
+      const rect = e.currentTarget.getBoundingClientRect();
+      setTooltipData({
+        x: rect.left + rect.width / 2,
+        y: rect.bottom,
+        kind,
+        sale,
+      });
+    },
+    [clearTooltipHideTimer]
+  );
   const [windowWidth, setWindowWidth] = useState<number>(1920); // 默认值，避免 SSR 错误
   const [salesDetailMonth, setSalesDetailMonth] = useState<string>(''); // 当前选中的月份 YYYY-MM，空表示“全部”
   const [salesDetailPage, setSalesDetailPage] = useState(1);
@@ -184,6 +240,8 @@ export default function ProfitAnalysis() {
       return () => window.removeEventListener('resize', handleResize);
     }
   }, []);
+
+  useEffect(() => () => clearTooltipHideTimer(), [clearTooltipHideTimer]);
 
   // 按月份分组销售明细（根据 delivery_date 月/日/年 格式解析）
   type SalesDetails = ProfitAnalysisData['salesDetails'];
@@ -1099,17 +1157,9 @@ export default function ProfitAnalysis() {
                       className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
                         const hasData = sale.materialCost > 0 && ((sale.materialComposition?.length ?? 0) > 0 || (sale.productionRecords?.length ?? 0) > 0);
-                        if (hasData) {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipData({
-                            x: rect.left + rect.width / 2,
-                            y: rect.bottom,
-                            kind: 'material',
-                            sale,
-                          });
-                        }
+                        if (hasData) showTooltip(e, 'material', sale);
                       }}
-                      onMouseLeave={() => setTooltipData(null)}
+                      onMouseLeave={scheduleTooltipHide}
                     >
                       <span className="cursor-help">
                         {(sale.materialCost ?? 0).toFixed(2)}
@@ -1122,17 +1172,9 @@ export default function ProfitAnalysis() {
                     <td
                       className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
-                        if ((sale.otherCosts ?? 0) > 0) {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipData({
-                            x: rect.left + rect.width / 2,
-                            y: rect.bottom,
-                            kind: 'otherCosts',
-                            sale,
-                          });
-                        }
+                        if ((sale.otherCosts ?? 0) > 0) showTooltip(e, 'otherCosts', sale);
                       }}
-                      onMouseLeave={() => setTooltipData(null)}
+                      onMouseLeave={scheduleTooltipHide}
                     >
                       <span className="cursor-help">
                         {(sale.otherCosts ?? 0).toFixed(2)}
@@ -1144,21 +1186,18 @@ export default function ProfitAnalysis() {
                     <td
                       className={`${SD_TD} relative group`}
                       onMouseEnter={(e) => {
-                        if ((sale.otherIncome ?? 0) > 0) {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setTooltipData({
-                            x: rect.left + rect.width / 2,
-                            y: rect.bottom,
-                            kind: 'otherIncome',
-                            sale,
-                          });
+                        const c = sale.customer;
+                        if (c === '萍钢' || c === '吉钢' || c === '新钢') {
+                          showTooltip(e, 'otherIncome', sale);
                         }
                       }}
-                      onMouseLeave={() => setTooltipData(null)}
+                      onMouseLeave={scheduleTooltipHide}
                     >
                       <span className="cursor-help">
                         {(sale.otherIncome ?? 0).toFixed(2)}
-                        {(sale.otherIncome ?? 0) > 0 && (
+                        {(sale.customer === '萍钢' ||
+                          sale.customer === '吉钢' ||
+                          sale.customer === '新钢') && (
                           <span className="ml-1 text-blue-500 text-xs">ℹ️</span>
                         )}
                       </span>
@@ -1333,8 +1372,8 @@ export default function ProfitAnalysis() {
               minWidth: '450px',
               maxWidth: '650px',
             }}
-            onMouseEnter={() => {}} // 保持 tooltip 显示
-            onMouseLeave={() => setTooltipData(null)}
+            onMouseEnter={clearTooltipHideTimer}
+            onMouseLeave={scheduleTooltipHide}
           >
             <div className="mb-3">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -1373,13 +1412,24 @@ export default function ProfitAnalysis() {
             {tooltipData.sale.materialComposition && tooltipData.sale.materialComposition.length > 0 && (() => {
               const comp = tooltipData.sale.materialComposition!;
               const targetName = '材料成本(元)';
+              const prodTons =
+                tooltipData.sale.costParamSnapshot?.materialCalcQuantity ??
+                (tooltipData.sale.productionRecords?.reduce((s, r) => s + (r.quantity ?? 0), 0) ||
+                  tooltipData.sale.settlementQuantity);
+              const nodeLabel = (name: string, tons: number) => `${name}\n${tons.toFixed(2)}吨`;
               const nodes = [
-                ...comp.map(m => ({ name: m.material })),
-                { name: targetName },
+                ...comp.map((m) => ({
+                  name: nodeLabel(m.material, m.quantity ?? 0),
+                })),
+                { name: nodeLabel(targetName, prodTons) },
               ];
               const links = comp
                 .filter(m => (m.quantity ?? 0) > 0)
-                .map(m => ({ source: m.material, target: targetName, value: m.quantity }));
+                .map(m => ({
+                  source: nodeLabel(m.material, m.quantity ?? 0),
+                  target: nodeLabel(targetName, prodTons),
+                  value: m.quantity,
+                }));
               const avgProdDate = (() => {
                 const recs = tooltipData.sale.productionRecords;
                 if (!recs?.length) return null;
@@ -1430,7 +1480,7 @@ export default function ProfitAnalysis() {
                           data: nodes,
                           links: links,
                           lineStyle: { curveness: 0.5 },
-                          label: { fontSize: 11 },
+                          label: { fontSize: 10, lineHeight: 14 },
                         },
                       ],
                     }}
@@ -1453,48 +1503,40 @@ export default function ProfitAnalysis() {
               minWidth: '420px',
               maxWidth: '520px',
             }}
-            onMouseEnter={() => {}}
-            onMouseLeave={() => setTooltipData(null)}
+            onMouseEnter={clearTooltipHideTimer}
+            onMouseLeave={scheduleTooltipHide}
           >
             {(() => {
               const s = tooltipData.sale;
               const qty = s.settlementQuantity || 0;
+              const nw = s.netWeight ?? 0;
               const transport = s.transportCost ?? 0;
               const tax = s.taxCost ?? 0;
               const discount = s.discountCost ?? 0;
               const interest = s.interestCost ?? 0;
               const total = s.otherCosts ?? 0;
-              const transportPerTon = qty > 0 ? transport / qty : 0;
-              const taxPerTon = qty > 0 ? tax / qty : 0;
-              const discountPerTon = qty > 0 ? discount / qty : 0;
-              const interestPerTon = qty > 0 ? interest / qty : 0;
-              const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
-              const materialQty = s.costParamSnapshot?.materialCalcQuantity ?? qty;
-              const materialUnitExclTax = materialQty > 0 ? s.materialCost / materialQty : 0;
               const snap = s.costParamSnapshot;
-              const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
-              const snapMaterialExTax = snap?.materialUnitExclTax ?? materialUnitExclTax;
-              const snapWarehouseTaxRate = snap?.warehouseTaxRate ?? 0;
-              const snapTransportPerTon = snap?.transportPerTon ?? transportPerTon;
-              const snapProcessFeePerTon = snap?.processingFeeForRefundPerTon ?? 0;
-              const snapTaxMain = snap?.taxMainRate ?? 0;
-              const snapTaxExtra = snap?.taxExtraRate ?? 0;
+              const whTax = snap?.warehouseTaxRate ?? 0;
+              const whTaxLabel = snap?.warehouseTaxRateFromLifo
+                ? '入库单加权税率'
+                : '入库单税率(inbound_tax_rate)';
               const revenueExcl = s.revenue / 1.13;
-              const snapTaxBaseTotal =
+              const taxBase =
                 snap?.taxBaseTotal ??
                 revenueExcl * 0.13 -
-                  s.materialCost * snapWarehouseTaxRate -
+                  s.materialCost * whTax -
                   (s.processingCost ?? 0) * 0.09 -
                   transport * 0.03;
-              const snapTaxPerTon = snap?.taxPerTon ?? taxPerTon;
-              const snapTaxFormulaMain = snapTaxBaseTotal * snapTaxMain;
-              const snapTaxFormulaExtra = (revenueExcl + s.materialCost) * snapTaxExtra;
-              const snapDiscountRate = (snap?.discountRatePinggang ?? 0) * 100;
-              const snapDiscountDays = snap?.discountDaysPinggang ?? 0;
-              const snapReverseRate = (snap?.reverseDiscountAnnualRate ?? 0) * 100;
-              const snapReverseDays = snap?.reverseDiscountOccupancyDays ?? 0;
-              const snapInterestRate = (snap?.interestRateAnnual ?? 0) * 100;
-              const snapCollectionDays = snap?.collectionDays ?? 0;
+              const taxMain = snap?.taxMainRate ?? 0;
+              const taxExtra = snap?.taxExtraRate ?? 0;
+              const taxMainAmt = taxBase * taxMain;
+              const taxExtraAmt = (revenueExcl + s.materialCost) * taxExtra;
+              const pTransport = snap?.transportFeeConfigured ?? 0;
+              const pRoad = snap?.roadLossFactor ?? 1.03;
+              const d1 = snap?.discountTranche1 ?? 0;
+              const d2 = snap?.discountTranche2 ?? 0;
+              const tLabel = transportFeeLabel(s.customer);
+              const cLabel = collectionDaysLabel(s.customer);
               return (
                 <>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -1503,54 +1545,74 @@ export default function ProfitAnalysis() {
                   <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
                     <div>发货单号: {s.deliveryNumber}</div>
                     <div>
-                      客户: {s.customer} | 成品:{' '}
-                      {s.productDisplayName || s.warehouse || s.productType}
+                      客户: {s.customer} | 成品: {s.productDisplayName || s.warehouse || s.productType}
                     </div>
-                    <div>结算量: {qty.toFixed(2)} 吨</div>
+                    <div>净重: {nw.toFixed(3)} 吨 | 结算量: {qty.toFixed(2)} 吨 | 收入(含税): {s.revenue.toFixed(2)} 元</div>
                   </div>
-                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">
-                    <div>运输费: {transport.toFixed(2)} 元（≈ {transportPerTon.toFixed(2)} 元/吨）</div>
-                    <div>税费: {tax.toFixed(2)} 元（≈ {taxPerTon.toFixed(2)} 元/吨）</div>
-                    <div>贴现费用: {discount.toFixed(2)} 元（≈ {discountPerTon.toFixed(2)} 元/吨）</div>
-                    <div>回款周期资金利息: {interest.toFixed(2)} 元（≈ {interestPerTon.toFixed(2)} 元/吨）</div>
-                    <div className="font-semibold mt-1">
-                      合计: {total.toFixed(2)} 元
+                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-2 space-y-1">
+                    <div>运输费: <strong>{transport.toFixed(2)}</strong> 元</div>
+                    <div>税费: <strong>{tax.toFixed(2)}</strong> 元</div>
+                    <div>贴现费用: <strong>{discount.toFixed(2)}</strong> 元</div>
+                    <div>回款周期资金利息: <strong>{interest.toFixed(2)}</strong> 元</div>
+                    <div className="font-semibold mt-1 border-t border-gray-200 dark:border-gray-600 pt-1">
+                      其它成本合计: {total.toFixed(2)} 元
                     </div>
                   </div>
-                  <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                      本单实际参数快照（系统用于核算）
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                      计算过程
                     </h4>
-                    <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside mb-2">
-                      <li>销售单价(不含税): {snapSalesExTax.toFixed(2)} 元/吨</li>
-                      <li>材料单价(不含税): {snapMaterialExTax.toFixed(2)} 元/吨</li>
-                      <li>入库单加权税率: {(snapWarehouseTaxRate * 100).toFixed(4)}%</li>
-                      <li>运输费: {snapTransportPerTon.toFixed(2)} 元/吨；加工费参数: {snapProcessFeePerTon.toFixed(2)} 元/吨</li>
-                      <li>主税率: {(snapTaxMain * 100).toFixed(2)}%；附加税率: {(snapTaxExtra * 100).toFixed(4)}%</li>
-                      <li>税费基数(总额): {snapTaxBaseTotal.toFixed(2)} 元；税费: {tax.toFixed(2)} 元（≈ {snapTaxPerTon.toFixed(4)} 元/吨）</li>
-                    </ul>
-                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                      计算公式（按吨）概览
-                    </h4>
-                    <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
-                      <li>销售单价(不含税) ≈ {snapSalesExTax.toFixed(2)} 元/吨 = 销售收入 / 结算量 / 1.13</li>
-                      <li>材料单价(不含税) ≈ {snapMaterialExTax.toFixed(2)} 元/吨 = 材料成本 / 材料核算量(优先出厂净重)</li>
-                      <li>运输费 = 运价÷路损系数×净重（本单 {transport.toFixed(2)} 元）</li>
-                      <li>税费 = (收入不含税×13% − 材料成本×入库税率 − 加工成本×9% − 运输费×3%)×主税率 + (收入不含税+材料成本)×附加税率</li>
-                      <li className="text-amber-700 dark:text-amber-300">
-                        代入税费: 基数 {snapTaxBaseTotal.toFixed(2)} × {(snapTaxMain * 100).toFixed(2)}% + ({revenueExcl.toFixed(2)}+{s.materialCost.toFixed(2)})×{(snapTaxExtra * 100).toFixed(4)}% = {snapTaxFormulaMain.toFixed(2)} + {snapTaxFormulaExtra.toFixed(2)} = {tax.toFixed(2)} 元
-                      </li>
-                      <li>贴现费用(仅萍钢): 收入含税×贴现年利率×贴现天数/360 + 收入含税×反贴现息年利率×占用天数/360</li>
-                      {s.customer === '萍钢' && (
-                        <li className="text-amber-700 dark:text-amber-300">
-                          代入贴现: {s.revenue.toFixed(2)}×{snapDiscountRate.toFixed(2)}%×{snapDiscountDays}÷360 + {s.revenue.toFixed(2)}×{snapReverseRate.toFixed(2)}%×{snapReverseDays}÷360 = {discount.toFixed(2)} 元
-                        </li>
-                      )}
-                      <li>回款利息 = 收入含税×年利率/360×回款周期（本客户 {snapCollectionDays} 天）</li>
-                      <li className="text-amber-700 dark:text-amber-300">
-                        代入利息: {s.revenue.toFixed(2)}×{snapInterestRate.toFixed(2)}%÷360×{snapCollectionDays} = {interest.toFixed(2)} 元
-                      </li>
-                    </ul>
+                    <div className="space-y-2 text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">运输费</div>
+                        <div>
+                          运输费 = {paramBracket(tLabel, `${pTransport.toFixed(2)}元/吨`)} ÷ {paramBracket('路损系数', pRoad.toFixed(4))} × 净重{nw.toFixed(3)}吨
+                        </div>
+                        <div className="text-amber-700 dark:text-amber-300 mt-0.5">
+                          = {transport.toFixed(2)} 元
+                        </div>
+                      </div>
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">税费</div>
+                        <div>
+                          税费基数 = 收入不含税×{pctBracket('增值税率', 0.13)} − 材料成本×{pctBracket(whTaxLabel, whTax, 4)} − 加工成本×{pctBracket('加工成本税率', 0.09)} − 运输费×{pctBracket('运输费税率', 0.03)}
+                        </div>
+                        <div>= {taxBase.toFixed(2)} 元</div>
+                        <div>
+                          税费 = 基数×{pctBracket('主税率', taxMain)} + (收入不含税+材料成本)×{pctBracket('附加税率', taxExtra, 4)}
+                        </div>
+                        <div className="text-amber-700 dark:text-amber-300 mt-0.5">
+                          = {taxMainAmt.toFixed(2)} + {taxExtraAmt.toFixed(2)} = {tax.toFixed(2)} 元
+                        </div>
+                      </div>
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">贴现费用</div>
+                        {s.customer === '萍钢' ? (
+                          <>
+                            <div>
+                              段1 = 收入含税×{pctBracket('萍钢贴现率', snap?.discountRatePinggang ?? 0)}×{paramBracket('萍钢贴现天数', `${snap?.discountDaysPinggang ?? 0}天`)}÷360
+                            </div>
+                            <div>
+                              段2 = 收入含税×{pctBracket('反向贴现年利率', snap?.reverseDiscountAnnualRate ?? 0)}×{paramBracket('反向贴现占用天数', `${snap?.reverseDiscountOccupancyDays ?? 0}天`)}÷360
+                            </div>
+                            <div className="text-amber-700 dark:text-amber-300 mt-0.5">
+                              段1 {d1.toFixed(2)} + 段2 {d2.toFixed(2)} = {discount.toFixed(2)} 元
+                            </div>
+                          </>
+                        ) : (
+                          <div>仅萍钢计提，当前客户为 0 元</div>
+                        )}
+                      </div>
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">回款周期资金利息</div>
+                        <div>
+                          回款利息 = 收入含税×{pctBracket('年利率', snap?.interestRateAnnual ?? 0)}÷360×{paramBracket(cLabel, `${snap?.collectionDays ?? 0}天`)}
+                        </div>
+                        <div className="text-amber-700 dark:text-amber-300 mt-0.5">
+                          = {interest.toFixed(2)} 元
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </>
               );
@@ -1569,50 +1631,38 @@ export default function ProfitAnalysis() {
               minWidth: '420px',
               maxWidth: '520px',
             }}
-            onMouseEnter={() => {}}
-            onMouseLeave={() => setTooltipData(null)}
+            onMouseEnter={clearTooltipHideTimer}
+            onMouseLeave={scheduleTooltipHide}
           >
             {(() => {
               const s = tooltipData.sale;
               const qty = s.settlementQuantity || 0;
+              const nw = s.netWeight ?? 0;
               const imm = s.immediateRefund ?? 0;
               const gov = s.governmentSupport ?? 0;
               const total = s.otherIncome ?? 0;
-              const immPerTon = qty > 0 ? imm / qty : 0;
-              const govPerTon = qty > 0 ? gov / qty : 0;
-              const salesUnitExclTax = qty > 0 ? s.revenue / qty / 1.13 : 0;
-              const materialQty = s.costParamSnapshot?.materialCalcQuantity ?? qty;
-              const materialUnitExclTax = materialQty > 0 ? s.materialCost / materialQty : 0;
-              const baseTransport = s.customer === '萍钢' ? 20.6 / 1.03 : s.customer === '新钢' ? 48 / 1.03 : 0;
               const snap = s.costParamSnapshot;
-              const snapSalesExTax = snap?.salesUnitExclTax ?? salesUnitExclTax;
-              const snapMaterialExTax = snap?.materialUnitExclTax ?? materialUnitExclTax;
-              const snapWarehouseTaxRate = snap?.warehouseTaxRate ?? 0;
-              const snapTransportPerTon = snap?.transportPerTon ?? baseTransport;
-              const snapProcessFeePerTon = snap?.processingFeeForRefundPerTon ?? 0;
+              const whTax = snap?.warehouseTaxRate ?? 0;
+              const whTaxLabel = snap?.warehouseTaxRateFromLifo
+                ? '入库单加权税率'
+                : '入库单税率(inbound_tax_rate)';
               const revenueExcl = s.revenue / 1.13;
-              const snapRefundBase =
+              const base =
                 snap?.refundBaseTotal ??
-                snap?.taxBaseTotal ??
                 revenueExcl * 0.13 -
-                  s.materialCost * (snap?.warehouseTaxRate ?? 0) -
+                  s.materialCost * whTax -
                   (s.processingCost ?? 0) * 0.09 -
                   (s.transportCost ?? 0) * 0.03;
-              const snapIrRate = snap?.instantRefundRate ?? 0.3;
-              const rGov = snap?.govSubsidyRate ?? 0.38;
-              const r70 = snap?.govSubsidyRate70 ?? 0.7;
+              const snapIrRate = snap?.instantRefundRate ?? 0;
+              const rGov = snap?.govSubsidyRate ?? 0;
+              const r70 = snap?.govSubsidyRate70 ?? 0;
               const giveCes = snap?.isGiveCes ?? 0;
               const giveTaxExtra = snap?.isGiveTaxExtra ?? 0;
               const isXingang = s.customer === '新钢';
-              const govMain =
-                snap?.governmentSupportMain ??
-                snapRefundBase * (isXingang ? rGov * r70 : rGov);
-              const govStamp =
-                snap?.governmentSupportStamp ??
-                (revenueExcl + s.materialCost) * 0.0003 * giveCes;
-              const govTaxExtra =
-                snap?.governmentSupportTaxExtra ?? snapRefundBase * 0.1 * giveTaxExtra;
-              const immFormula = isXingang ? snapRefundBase * snapIrRate : 0;
+              const hasGovMill = s.customer === '萍钢' || s.customer === '新钢' || s.customer === '吉钢';
+              const govMain = snap?.governmentSupportMain ?? 0;
+              const govStamp = snap?.governmentSupportStamp ?? 0;
+              const govTaxExtra = snap?.governmentSupportTaxExtra ?? 0;
               return (
                 <>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -1621,41 +1671,69 @@ export default function ProfitAnalysis() {
                   <div className="text-xs text-gray-600 dark:text-gray-300 mb-2 space-y-1">
                     <div>发货单号: {s.deliveryNumber}</div>
                     <div>
-                      客户: {s.customer} | 成品:{' '}
-                      {s.productDisplayName || s.warehouse || s.productType}
+                      客户: {s.customer} | 成品: {s.productDisplayName || s.warehouse || s.productType}
                     </div>
-                    <div>结算量: {qty.toFixed(2)} 吨</div>
+                    <div>净重: {nw.toFixed(3)} 吨 | 结算量: {qty.toFixed(2)} 吨 | 收入(含税): {s.revenue.toFixed(2)} 元</div>
                   </div>
-                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-3 space-y-1">
-                    <div>即征即退: {imm.toFixed(2)} 元（≈ {immPerTon.toFixed(2)} 元/吨）</div>
-                    <div>政府扶持资金: {gov.toFixed(2)} 元（≈ {govPerTon.toFixed(2)} 元/吨）</div>
-                    <div className="font-semibold mt-1">
-                      合计: {total.toFixed(2)} 元
+                  <div className="text-xs text-gray-700 dark:text-gray-200 mb-2 space-y-1">
+                    <div>即征即退: <strong>{imm.toFixed(2)}</strong> 元</div>
+                    <div>政府扶持资金: <strong>{gov.toFixed(2)}</strong> 元</div>
+                    <div className="font-semibold mt-1 border-t border-gray-200 dark:border-gray-600 pt-1">
+                      其它收入合计: {total.toFixed(2)} 元
                     </div>
                   </div>
-                  {(s.customer === '萍钢' || s.customer === '新钢' || s.customer === '吉钢') && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                      <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                        计算公式（按吨）概览
-                      </h4>
-                      <p className="text-[11px] text-gray-600 dark:text-gray-400 mb-1">
-                        销售单价(不含税) ≈ {salesUnitExclTax.toFixed(2)} 元/吨；材料单价(不含税) ≈ {materialUnitExclTax.toFixed(2)} 元/吨；运输费基数 ≈ {baseTransport.toFixed(2)} 元/吨。
-                      </p>
-                      <ul className="text-[11px] text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
-                        <li>基数 = 收入不含税×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%（本单 {snapRefundBase.toFixed(2)} 元）</li>
-                        <li>即征即退：仅新钢 = 基数 × instant_refund_rate</li>
-                        <li>
-                          政府扶持：即征即退为否 → 基数×gov_subsidy_rate + (收入不含税+材料)×0.03%×is_give_ces + 基数×10%×is_give_tax_extra；为是（新钢）→ 主项再×70%
-                        </li>
-                        <li className="text-emerald-700 dark:text-emerald-300">
-                          代入(即征即退): {isXingang ? `${snapRefundBase.toFixed(2)}×${(snapIrRate * 100).toFixed(0)}% = ${immFormula.toFixed(2)}` : '0'} 元（本单 {imm.toFixed(2)} 元）
-                        </li>
-                        <li className="text-emerald-700 dark:text-emerald-300">
-                          代入(政府扶持): 主项 {govMain.toFixed(2)} + 印花税 {govStamp.toFixed(2)}(is_give_ces={giveCes}) + 城建教育 {govTaxExtra.toFixed(2)}(is_give_tax_extra={giveTaxExtra}) = {gov.toFixed(2)} 元
-                        </li>
-                      </ul>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+                    <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                      计算过程
+                    </h4>
+                    <div className="space-y-2 text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">基数</div>
+                        <div>
+                          基数 = 收入不含税×{pctBracket('增值税率', 0.13)} − 材料成本×{pctBracket(whTaxLabel, whTax, 4)} − 加工成本×{pctBracket('加工成本税率', 0.09)} − 运输费×{pctBracket('运输费税率', 0.03)}
+                        </div>
+                        <div className="text-gray-500 dark:text-gray-400 mt-0.5">
+                          = {revenueExcl.toFixed(2)}×13%({(revenueExcl * 0.13).toFixed(2)}) − {s.materialCost.toFixed(2)}×{pctBracket(whTaxLabel, whTax, 4)}({(s.materialCost * whTax).toFixed(2)}) − {(s.processingCost ?? 0).toFixed(2)}×9%({((s.processingCost ?? 0) * 0.09).toFixed(2)}) − {(s.transportCost ?? 0).toFixed(2)}×3%({((s.transportCost ?? 0) * 0.03).toFixed(2)})
+                        </div>
+                        <div className="text-emerald-700 dark:text-emerald-300 mt-0.5">
+                          = {base.toFixed(2)} 元
+                        </div>
+                      </div>
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">即征即退</div>
+                        {isXingang ? (
+                          <div className="text-emerald-700 dark:text-emerald-300">
+                            即征即退 = 基数 × {pctBracket('即征即退比例', snapIrRate)} = {imm.toFixed(2)} 元
+                          </div>
+                        ) : (
+                          <div>仅新钢计提，当前客户为 0 元</div>
+                        )}
+                      </div>
+                      <div className="rounded border border-gray-200 dark:border-gray-600 p-2 bg-gray-50/80 dark:bg-gray-900/50">
+                        <div className="font-medium text-gray-800 dark:text-gray-100">政府扶持资金</div>
+                        {hasGovMill ? (
+                          <>
+                            <div>
+                              {isXingang
+                                ? `主项 = 基数×${pctBracket('政府扶持比例', rGov)}×${pctBracket('即征即退70%系数', r70)}`
+                                : `主项 = 基数×${pctBracket('政府扶持比例', rGov)}`}
+                            </div>
+                            <div>
+                              印花税 = (收入不含税+材料成本)×{pctBracket('印花税率', 0.0003, 4)}×{paramBracket('是否结给印花税', giveCes ? '是' : '否')}
+                            </div>
+                            <div>
+                              城建及教育 = 基数×{pctBracket('城建教育比例', 0.1)}×{paramBracket('是否结给城建教育', giveTaxExtra ? '是' : '否')}
+                            </div>
+                            <div className="text-emerald-700 dark:text-emerald-300 mt-0.5">
+                              主项 {govMain.toFixed(2)} + 印花税 {govStamp.toFixed(2)} + 城建教育 {govTaxExtra.toFixed(2)} = {gov.toFixed(2)} 元
+                            </div>
+                          </>
+                        ) : (
+                          <div>仅萍钢/吉钢/新钢计提</div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </>
               );
             })()}
