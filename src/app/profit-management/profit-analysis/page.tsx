@@ -288,8 +288,6 @@ export default function ProfitAnalysis() {
     let otherCosts = 0;
     let otherIncome = 0;
     let profit = 0;
-    let profitPerNetTonSum = 0;
-    let profitPerNetTonCount = 0;
     for (const s of list) {
       netWeight += s.netWeight ?? 0;
       settlementQuantity += s.settlementQuantity ?? 0;
@@ -299,18 +297,8 @@ export default function ProfitAnalysis() {
       otherCosts += s.otherCosts ?? 0;
       otherIncome += s.otherIncome ?? 0;
       profit += s.profit ?? 0;
-      const nw = s.netWeight ?? 0;
-      if (nw > 0) {
-        profitPerNetTonSum += s.profitPerNetTon ?? 0;
-        profitPerNetTonCount += 1;
-      }
     }
-    const avgProfitPerNetTon =
-      profitPerNetTonCount > 0
-        ? profitPerNetTonSum / profitPerNetTonCount
-        : netWeight > 0
-          ? profit / netWeight
-          : 0;
+    const profitPerNetTon = netWeight > 0 ? profit / netWeight : 0;
     const label =
       salesDetailMonth === ''
         ? '合计'
@@ -328,7 +316,7 @@ export default function ProfitAnalysis() {
       otherCostsWan: otherCosts / 10000,
       otherIncomeWan: otherIncome / 10000,
       profitWan: profit / 10000,
-      avgProfitPerNetTon,
+      profitPerNetTon,
       profit,
     };
   }, [currentMonthDetails, salesDetailMonth]);
@@ -1295,13 +1283,13 @@ export default function ProfitAnalysis() {
                     </td>
                     <td
                       className={`px-2 py-2.5 text-xs font-bold tabular-nums border-l border-amber-200/80 dark:border-amber-800/50 bg-amber-50/90 dark:bg-amber-950/40 ${
-                        salesDetailMonthTotal.avgProfitPerNetTon >= 0
+                        salesDetailMonthTotal.profitPerNetTon >= 0
                           ? 'text-green-700 dark:text-green-400'
                           : 'text-red-700 dark:text-red-400'
                       }`}
-                      title="吨钢毛利：有净重的各行 profitPerNetTon 算术平均，单位：元/吨"
+                      title="吨钢毛利 = 月合计利润 ÷ 月合计净重，单位：元/吨"
                     >
-                      {salesDetailMonthTotal.avgProfitPerNetTon.toFixed(2)}
+                      {salesDetailMonthTotal.profitPerNetTon.toFixed(2)}
                       <span className={SD_TOTAL_UNIT}>元/吨</span>
                     </td>
                   </tr>
