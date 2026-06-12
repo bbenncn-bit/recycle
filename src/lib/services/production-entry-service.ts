@@ -12,6 +12,13 @@ import {
   incrementProductStockForProcessingInsert,
   productStockTransfer,
 } from '@/lib/services/inventory-ops-service';
+import {
+  extractProductWarehouseCode,
+  resolveSaleProductIdentity,
+} from '@/lib/services/lifo-match-resolve';
+import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+import { purchaseInboundStorageArea } from '@/lib/purchase-warehouse-location';
+import { MATERIAL_INVENTORY_ROLL_START } from '@/lib/services/material-storage-inventory-service';
 
 const PRODUCT_LIST_FALLBACK = [
   { id: 'JG散料|JGSL', name: 'JG散料', warehouse: 'JGSL', stockQty: 0, currentPrice: 0 },
@@ -66,76 +73,410 @@ export type InsertProcessingCostPayload = {
   name?: string;
 };
 
-export async function getProductStockForEntry() {
-  const rows = await prisma.productStock.findMany({
+export type ProductStockEntryItem = {
+  id: string;
+  name: string;
+  warehouse: string;
+  /** 净库存 = 总加工 − 总销售（吨） */
+  stockQty: number;
+  totalProcessedQty: number;
+  totalSalesQty: number;
+  currentPrice: number;
+};
+
+function productEntryKey(name: string, warehouse: string): string {
+  return `${norm(name)}\0${norm(warehouse)}`;
+}
+
+async function getTotalProcessedQtyByProductKey(): Promise<Map<string, number>> {
+  const rows = await prisma.$queryRawUnsafe<
+    Array<{
+      product_name: string | null;
+      product_warehouse: string | null;
+      total_qty: unknown;
+    }>
+  >(
+    `SELECT product_name, product_warehouse,
+            SUM(COALESCE(dailyProcess_qty, product_tons, 0)) AS total_qty
+       FROM ProcessingCostInput
+      WHERE product_name IS NOT NULL AND TRIM(product_name) <> ''
+      GROUP BY product_name, product_warehouse`
+  );
+  const map = new Map<string, number>();
+  for (const r of rows) {
+    const name = norm(r.product_name);
+    const warehouse = norm(r.product_warehouse);
+    if (!name) continue;
+    const qty = toNum(r.total_qty) ?? 0;
+    if (qty <= 0) continue;
+    map.set(productEntryKey(name, warehouse), qty);
+  }
+  return map;
+}
+
+function buildWarehousesByProduct(keys: Iterable<string>): Map<string, string[]> {
+  const map = new Map<string, string[]>();
+  for (const key of keys) {
+    const sep = key.indexOf('\0');
+    if (sep < 0) continue;
+    const name = key.slice(0, sep);
+    const warehouse = key.slice(sep + 1);
+    if (!name) continue;
+    if (!map.has(name)) map.set(name, []);
+    if (warehouse && !map.get(name)!.includes(warehouse)) {
+      map.get(name)!.push(warehouse);
+    }
+  }
+  return map;
+}
+
+/** 按成品汇总销售出库吨数：DeliverySettlement.net_weight（出厂净重，非结算量） */
+async function getTotalSalesQtyByProductKey(
+  knownProductKeys: Set<string>
+): Promise<Map<string, number>> {
+  const warehousesByProduct = buildWarehousesByProduct(knownProductKeys);
+  const settlements = await prisma.deliverySettlement.findMany({
     select: {
-      productName: true,
-      warehouseCode: true,
-      stockQty: true,
-      currentPrice: true,
-      updateTime: true,
+      productType: true,
+      warehouse: true,
+      netWeight: true,
     },
-    take: 500,
-    orderBy: { id: 'asc' },
+    take: 50000,
   });
-  if (!rows.length) return PRODUCT_LIST_FALLBACK;
-  return rows
-    .filter((r) => norm(r.productName))
-    .map((r) => {
-      const name = norm(r.productName);
-      const warehouse = norm(r.warehouseCode);
-      return {
-        id: `${name}|${warehouse}`,
-        name,
-        warehouse,
-        stockQty: toNum(r.stockQty) ?? 0,
-        currentPrice: toNum(r.currentPrice) ?? 0,
-      };
+
+  const identityCache = new Map<string, { name: string; warehouse: string } | null>();
+  const totals = new Map<string, number>();
+
+  for (const row of settlements) {
+    const qty = toNum(row.netWeight);
+    if (qty == null || qty <= 0) continue;
+
+    const cacheKey = `${norm(row.productType)}\0${norm(row.warehouse)}`;
+    if (!identityCache.has(cacheKey)) {
+      const identity = await resolveSaleProductIdentity(row.productType, row.warehouse);
+      const name = norm(identity.productName);
+      if (!name) {
+        identityCache.set(cacheKey, null);
+      } else {
+        let warehouse = norm(identity.productWarehouse);
+        if (!warehouse) {
+          warehouse =
+            extractProductWarehouseCode(row.warehouse) ||
+            extractProductWarehouseCode(row.productType) ||
+            '';
+        }
+        if (!warehouse) {
+          const whs = warehousesByProduct.get(name) ?? [];
+          if (whs.length === 1) warehouse = whs[0];
+        }
+        identityCache.set(cacheKey, { name, warehouse });
+      }
+    }
+    const identity = identityCache.get(cacheKey);
+    if (!identity || !identity.name) continue;
+
+    const key = productEntryKey(identity.name, identity.warehouse);
+    totals.set(key, (totals.get(key) ?? 0) + qty);
+  }
+  return totals;
+}
+
+export async function getProductStockForEntry(): Promise<ProductStockEntryItem[]> {
+  const [stockRows, processedMap] = await Promise.all([
+    prisma.productStock.findMany({
+      select: {
+        productName: true,
+        warehouseCode: true,
+        currentPrice: true,
+      },
+      take: 500,
+      orderBy: { id: 'asc' },
+    }),
+    getTotalProcessedQtyByProductKey(),
+  ]);
+
+  const baseList =
+    stockRows.length > 0
+      ? stockRows
+          .filter((r) => norm(r.productName))
+          .map((r) => ({
+            name: norm(r.productName),
+            warehouse: norm(r.warehouseCode),
+            currentPrice: toNum(r.currentPrice) ?? 0,
+          }))
+      : PRODUCT_LIST_FALLBACK.map((p) => ({
+          name: p.name,
+          warehouse: p.warehouse,
+          currentPrice: p.currentPrice,
+        }));
+
+  const unionKeys = new Set<string>();
+  for (const p of baseList) {
+    if (p.name && p.warehouse) unionKeys.add(productEntryKey(p.name, p.warehouse));
+  }
+  for (const k of processedMap.keys()) unionKeys.add(k);
+
+  const salesMap = await getTotalSalesQtyByProductKey(unionKeys);
+  for (const k of salesMap.keys()) unionKeys.add(k);
+
+  const priceByKey = new Map(
+    baseList.map((p) => [productEntryKey(p.name, p.warehouse), p.currentPrice])
+  );
+  const nameWhByKey = new Map(
+    baseList.map((p) => [productEntryKey(p.name, p.warehouse), p])
+  );
+
+  const items: ProductStockEntryItem[] = [];
+  for (const key of unionKeys) {
+    const [name, warehouse] = key.split('\0');
+    if (!name) continue;
+    const meta = nameWhByKey.get(key) ?? { name, warehouse: warehouse || '', currentPrice: 0 };
+    const totalProcessedQty = processedMap.get(key) ?? 0;
+    const totalSalesQty = salesMap.get(key) ?? 0;
+    const stockQty = totalProcessedQty - totalSalesQty;
+    items.push({
+      id: `${meta.name}|${meta.warehouse}`,
+      name: meta.name,
+      warehouse: meta.warehouse,
+      stockQty,
+      totalProcessedQty,
+      totalSalesQty,
+      currentPrice: priceByKey.get(key) ?? meta.currentPrice ?? 0,
     });
+  }
+
+  items.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN') || a.warehouse.localeCompare(b.warehouse));
+  return items.length > 0 ? items : PRODUCT_LIST_FALLBACK.map((p) => ({
+    ...p,
+    totalProcessedQty: 0,
+    totalSalesQty: 0,
+  }));
+}
+
+export type MaterialStorageEntryItem = {
+  name: string;
+  shortName: string;
+  currentPrice: number;
+  /** 净库存 = 累计采购 − 累计加工使用（吨） */
+  stockQty: number;
+  /** 累计采购（吨）：4/1 期初滚存 + 基地收货入库 */
+  totalPurchaseQty: number;
+  /** 累计加工使用（吨）：ProcessingCostInput.material_composition 汇总 */
+  totalProcessingUsageQty: number;
+};
+
+type MaterialCatalogRow = {
+  storageArea: string;
+  materialType: string;
+  aliasName: string;
+  openingQty: number;
+  currentPrice: number;
+};
+
+function materialEntryKey(storageArea: string, materialType: string): string {
+  return `${norm(storageArea)}\0${norm(materialType)}`;
+}
+
+function resolveMaterialCatalogKey(
+  catalog: MaterialCatalogRow[],
+  warehouse: string,
+  materialOrAlias: string
+): string | null {
+  const w = norm(warehouse);
+  const m = norm(materialOrAlias);
+  if (!m) return null;
+
+  if (w) {
+    const byType = catalog.find(
+      (r) => norm(r.storageArea) === w && norm(r.materialType) === m
+    );
+    if (byType) return materialEntryKey(byType.storageArea, byType.materialType);
+
+    const byAlias = catalog.find(
+      (r) => norm(r.storageArea) === w && norm(r.aliasName) === m
+    );
+    if (byAlias) return materialEntryKey(byAlias.storageArea, byAlias.materialType);
+  }
+
+  const aliasHits = catalog.filter((r) => norm(r.aliasName) === m);
+  if (aliasHits.length === 1) {
+    return materialEntryKey(aliasHits[0].storageArea, aliasHits[0].materialType);
+  }
+  if (w && aliasHits.length > 1) {
+    const hit = aliasHits.find((r) => norm(r.storageArea) === w);
+    if (hit) return materialEntryKey(hit.storageArea, hit.materialType);
+  }
+
+  return null;
+}
+
+async function processingTableHasMaterialComposition(): Promise<boolean> {
+  try {
+    const rows = await prisma.$queryRawUnsafe<Array<{ cnt: bigint | number }>>(
+      "SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND LOWER(TABLE_NAME) = LOWER('ProcessingCostInput') AND COLUMN_NAME = 'material_composition'"
+    );
+    return Number(rows[0]?.cnt ?? 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
+function parseCompositionJson(raw: unknown): Array<{
+  warehouse?: string;
+  material?: string;
+  shortName?: string;
+  tons?: number;
+}> | null {
+  if (raw == null) return null;
+  let arr: unknown[];
+  if (typeof raw === 'string') {
+    try {
+      arr = JSON.parse(raw) as unknown[];
+    } catch {
+      return null;
+    }
+  } else if (Array.isArray(raw)) {
+    arr = raw;
+  } else {
+    return null;
+  }
+  if (!arr.length) return null;
+  return arr as Array<{
+    warehouse?: string;
+    material?: string;
+    shortName?: string;
+    tons?: number;
+  }>;
+}
+
+async function getTotalMaterialPurchaseByKey(
+  catalog: MaterialCatalogRow[]
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  for (const row of catalog) {
+    map.set(materialEntryKey(row.storageArea, row.materialType), row.openingQty);
+  }
+
+  const rollStart = MATERIAL_INVENTORY_ROLL_START;
+  const minStr = `${rollStart.getFullYear()}-${String(rollStart.getMonth() + 1).padStart(2, '0')}-${String(rollStart.getDate()).padStart(2, '0')}`;
+
+  const purchases = await prisma.purchaseWarehouse.findMany({
+    where: { warehouseDate: { not: null, gte: minStr } },
+    select: {
+      receiptNo: true,
+      warehouse: true,
+      warehouseArea: true,
+      material: true,
+      estimatedDryBasis: true,
+      status: true,
+    },
+    take: 100000,
+  });
+
+  for (const p of purchases) {
+    const st = norm(p.status);
+    if (st.includes('红冲') || st.includes('撤销')) continue;
+    if (!isBaseSelfReceipt(p.receiptNo, p.warehouse)) continue;
+    const area = purchaseInboundStorageArea(p);
+    const key = resolveMaterialCatalogKey(catalog, area, p.material || '');
+    if (!key) continue;
+    const qty = toNum(p.estimatedDryBasis);
+    if (qty == null || qty === 0) continue;
+    map.set(key, (map.get(key) ?? 0) + qty);
+  }
+  return map;
+}
+
+async function getTotalMaterialProcessingUsageByKey(
+  catalog: MaterialCatalogRow[]
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (!(await processingTableHasMaterialComposition())) return map;
+
+  const raw = await prisma.$queryRawUnsafe<
+    Array<{ material_composition: unknown }>
+  >('SELECT material_composition FROM ProcessingCostInput WHERE material_composition IS NOT NULL');
+
+  for (const row of raw) {
+    const comp = parseCompositionJson(row.material_composition);
+    if (!comp?.length) continue;
+    for (const item of comp) {
+      const tons = toNum(item.tons);
+      if (tons == null || tons <= 0) continue;
+      const key = resolveMaterialCatalogKey(
+        catalog,
+        item.warehouse || '',
+        item.material || item.shortName || ''
+      );
+      if (!key) continue;
+      map.set(key, (map.get(key) ?? 0) + tons);
+    }
+  }
+  return map;
 }
 
 export async function getMaterialStorageForEntry(): Promise<
-  Record<
-    string,
-    Array<{ name: string; shortName: string; currentPrice: number; stockQty: number }>
-  >
+  Record<string, MaterialStorageEntryItem[]>
 > {
   const rows = await prisma.materialStorage.findMany({
     select: {
       storageArea: true,
       materialType: true,
       aliasName: true,
-      currentQty: true,
+      qty20260331: true,
       currentPrice: true,
     },
     take: 2000,
   });
 
-  const grouped: Record<
-    string,
-    Array<{ name: string; shortName: string; currentPrice: number; stockQty: number }>
-  > = {};
+  const catalog: MaterialCatalogRow[] = rows
+    .map((r) => ({
+      storageArea: norm(r.storageArea),
+      materialType: norm(r.materialType),
+      aliasName: norm(r.aliasName),
+      openingQty: toNum(r.qty20260331) ?? 0,
+      currentPrice: toNum(r.currentPrice) ?? 0,
+    }))
+    .filter((r) => r.storageArea && r.materialType);
 
-  for (const r of rows) {
-    const wh = norm(r.storageArea);
-    const mat = norm(r.materialType);
-    if (!wh || !mat) continue;
-    const alias = norm(r.aliasName) || mat;
+  const [purchaseMap, usageMap] = await Promise.all([
+    getTotalMaterialPurchaseByKey(catalog),
+    getTotalMaterialProcessingUsageByKey(catalog),
+  ]);
+
+  const grouped: Record<string, MaterialStorageEntryItem[]> = {};
+
+  for (const row of catalog) {
+    const wh = row.storageArea;
+    const mat = row.materialType;
+    const key = materialEntryKey(wh, mat);
+    const totalPurchaseQty = purchaseMap.get(key) ?? row.openingQty;
+    const totalProcessingUsageQty = usageMap.get(key) ?? 0;
+    const stockQty = totalPurchaseQty - totalProcessingUsageQty;
+    const alias = row.aliasName || mat;
     if (!grouped[wh]) grouped[wh] = [];
-    const exists = grouped[wh].some((x) => x.name === mat);
-    if (exists) continue;
+    if (grouped[wh].some((x) => x.name === mat)) continue;
     grouped[wh].push({
       name: mat,
       shortName: alias,
-      currentPrice: toNum(r.currentPrice) ?? 0,
-      stockQty: toNum(r.currentQty) ?? 0,
+      currentPrice: row.currentPrice,
+      stockQty,
+      totalPurchaseQty,
+      totalProcessingUsageQty,
     });
   }
 
   const staticMap = buildStaticWarehouseMaterials();
   for (const wh of WAREHOUSE_LIST) {
     if (!grouped[wh] || grouped[wh].length === 0) {
-      grouped[wh] = staticMap[wh] || [];
+      grouped[wh] = (staticMap[wh] || []).map((m) => ({
+        name: m.name,
+        shortName: m.shortName,
+        currentPrice: m.currentPrice,
+        stockQty: 0,
+        totalPurchaseQty: 0,
+        totalProcessingUsageQty: 0,
+      }));
     }
   }
   return grouped;

@@ -10,14 +10,22 @@ type ProductItem = {
   name: string;
   warehouse: string;
   stockQty: number;
+  totalProcessedQty: number;
+  totalSalesQty: number;
   currentPrice: number;
 };
+
+function formatProductStockTons(n: number): string {
+  return Number.isFinite(n) ? n.toFixed(2) : '0.00';
+}
 
 type MaterialRow = {
   name: string;
   shortName: string;
   currentPrice: number;
   stockQty: number;
+  totalPurchaseQty: number;
+  totalProcessingUsageQty: number;
   key: string;
   selected: boolean;
   tons: string;
@@ -71,7 +79,17 @@ export default function ProductionEntryPage() {
   const [productList, setProductList] = useState<ProductItem[]>([]);
   const [warehouseList, setWarehouseList] = useState<string[]>([]);
   const [warehouseMaterials, setWarehouseMaterials] = useState<
-    Record<string, Array<{ name: string; shortName: string; currentPrice: number; stockQty: number }>>
+    Record<
+      string,
+      Array<{
+        name: string;
+        shortName: string;
+        currentPrice: number;
+        stockQty: number;
+        totalPurchaseQty: number;
+        totalProcessingUsageQty: number;
+      }>
+    >
   >({});
 
   const [productionDateYmd, setProductionDateYmd] = useState(() => formatYmd(now));
@@ -217,7 +235,7 @@ export default function ProductionEntryPage() {
     }
     setTransferProductName(item.name);
     setTransferFromWarehouse(item.warehouse);
-    setTransferMaxQty(item.stockQty);
+    setTransferMaxQty(Math.max(0, item.stockQty));
     setTransferQuantity('');
     setTransferDestinations(destinations);
     setTransferToIndex(0);
@@ -530,7 +548,11 @@ export default function ProductionEntryPage() {
                   <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
                   <div className="text-xs text-gray-500 mt-1">仓库: {item.warehouse}</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                    库存: {item.stockQty} 吨
+                    库存: 总加工{formatProductStockTons(item.totalProcessedQty)}吨 − 总出厂净重
+                    {formatProductStockTons(item.totalSalesQty)}吨 ={' '}
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {formatProductStockTons(item.stockQty)}吨
+                    </span>
                   </div>
                   {item.currentPrice > 0 && (
                     <div className="text-xs text-sky-700 dark:text-sky-300">
@@ -607,7 +629,14 @@ export default function ProductionEntryPage() {
                       </div>
                       <div className="text-xs text-gray-500">{row.shortName}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        库存 {row.stockQty} 吨 · 参考价 {row.currentPrice} 元/吨
+                        库存: 累计采购{formatProductStockTons(row.totalPurchaseQty)}吨 − 累计加工使用
+                        {formatProductStockTons(row.totalProcessingUsageQty)}吨 ={' '}
+                        <span className="font-medium text-gray-800 dark:text-gray-200">
+                          {formatProductStockTons(row.stockQty)}吨
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-500">
+                        参考价 {row.currentPrice} 元/吨
                       </div>
                     </button>
                     {(row.selected || row.tons) && (
