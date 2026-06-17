@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prismadb';
+import { compareReceiptOrderTimeForDisplay } from '@/lib/receipt-display-sort';
+import { generateProgressiveUrls, parseImageUrls } from '@/lib/image-utils';
 import { HOME_DEFAULT_DATE_KEY } from '@/lib/receipt-home-dates';
 
 const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -78,6 +80,65 @@ export interface PaginatedResult<T> {
     totalPages: number;
     hasMore: boolean;
     currentBatch?: string;
+  };
+}
+
+/** 按展示排序分页（白天优先）：一次取全量字段，避免二次按 id 查询丢字段 */
+async function fetchReceiptfcPageSorted(
+  where: Record<string, unknown>,
+  page: number,
+  limit: number,
+  actualOffset: number,
+  processFn: (data: ReceiptData[]) => ProcessedReceiptData[]
+): Promise<PaginatedResult<ProcessedReceiptData>> {
+  const rows = await prisma.receiptfc.findMany({ where });
+  rows.sort((a, b) => compareReceiptOrderTimeForDisplay(a.orderTime, b.orderTime));
+  const total = rows.length;
+  const slice = rows.slice(actualOffset, actualOffset + limit);
+  const processedData = processFn(slice as ReceiptData[]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    data: processedData,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasMore: page < totalPages,
+      currentBatch:
+        processedData.length > 0
+          ? `${actualOffset + 1}-${actualOffset + processedData.length}`
+          : undefined,
+    },
+  };
+}
+
+async function fetchReceiptfgPageSorted(
+  where: Record<string, unknown>,
+  page: number,
+  limit: number,
+  actualOffset: number,
+  processFn: (data: ReceiptData[]) => ProcessedReceiptData[]
+): Promise<PaginatedResult<ProcessedReceiptData>> {
+  const rows = await prisma.receiptfg.findMany({ where });
+  rows.sort((a, b) => compareReceiptOrderTimeForDisplay(a.orderTime, b.orderTime));
+  const total = rows.length;
+  const slice = rows.slice(actualOffset, actualOffset + limit);
+  const processedData = processFn(slice as ReceiptData[]);
+  const totalPages = Math.ceil(total / limit);
+  return {
+    data: processedData,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasMore: page < totalPages,
+      currentBatch:
+        processedData.length > 0
+          ? `${actualOffset + 1}-${actualOffset + processedData.length}`
+          : undefined,
+    },
   };
 }
 
@@ -178,34 +239,13 @@ export class ReceiptfcService {
 
       console.log(`🔍 分页查询报废车数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
-      // 串行查询，避免同一请求占用池内两个并发连接（首页多路并发时易触发 pool timeout）
-      const data = await prisma.receiptfc.findMany({
+      return fetchReceiptfcPageSorted(
         where,
-        orderBy: {
-          orderTime: 'desc'
-        },
-        skip: actualOffset,
-        take: limit
-      });
-      const total = await prisma.receiptfc.count({ where });
-
-      const processedData = this.processReceiptData(data);
-      const totalPages = Math.ceil(total / limit);
-      const hasMore = page < totalPages;
-
-      console.log(`✅ 成功获取 ${processedData.length} 条报废车数据 (${actualOffset + 1}-${actualOffset + processedData.length}/${total})`);
-
-      return {
-        data: processedData,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-          hasMore,
-          currentBatch: `${actualOffset + 1}-${actualOffset + processedData.length}`
-        }
-      };
+        page,
+        limit,
+        actualOffset,
+        (data) => this.processReceiptData(data)
+      );
     } catch (error) {
       console.error('❌ 分批获取报废车数据失败:', error);
       throw error;
@@ -238,12 +278,11 @@ export class ReceiptfcService {
    */
   private static processReceiptData(data: ReceiptData[]): ProcessedReceiptData[] {
     return data.map(item => {
-      const originalUrl = this.parseImageUrls(item.imgUrls);
-      const progressiveUrls = originalUrl ? this.generateProgressiveUrls(originalUrl) : null;
+      const originalUrl = parseImageUrls(item.imgUrls);
+      const progressiveUrls = originalUrl ? generateProgressiveUrls(originalUrl) : null;
 
       return {
         ...item,
-        // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
         taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
         unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
         weight: item.weight ? item.weight.toString() : null,
@@ -256,59 +295,6 @@ export class ReceiptfcService {
         thumbnailSource: 'cdn' as const
       };
     });
-  }
-
-  /**
-   * 解析图片URL
-   */
-  private static parseImageUrls(imgUrls: any): string | null {
-    if (!imgUrls) return null;
-
-    try {
-      if (typeof imgUrls === 'string') {
-        if (imgUrls.trim().startsWith('[')) {
-          const parsed = JSON.parse(imgUrls);
-          return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
-        }
-        if (imgUrls.includes(',')) {
-          const urls = imgUrls.split(',').map(url => url.trim()).filter(Boolean);
-          return urls.length > 0 ? urls[0] : null;
-        }
-        return imgUrls.trim() || null;
-      }
-
-      if (Array.isArray(imgUrls)) {
-        return imgUrls.length > 0 ? imgUrls[0] : null;
-      }
-
-      return null;
-    } catch (error) {
-      console.warn('解析图片 URL 失败:', error);
-      return null;
-    }
-  }
-
-  /**
-   * 生成CDN压缩URL
-   */
-  private static generateProgressiveUrls(originalUrl: string): {
-    tiny: string;
-    small: string;
-    medium: string;
-    original: string;
-  } {
-    if (!originalUrl) {
-      return { tiny: '', small: '', medium: '', original: '' };
-    }
-
-    const separator = originalUrl.includes('?') ? '&' : '?';
-
-    return {
-      tiny: `${originalUrl}${separator}w=48&h=48&q=10&format=webp&fit=cover`,
-      small: `${originalUrl}${separator}w=80&h=80&q=25&format=webp&fit=cover`,
-      medium: `${originalUrl}${separator}w=120&h=120&q=40&format=webp&fit=cover`,
-      original: originalUrl
-    };
   }
 }
 
@@ -408,33 +394,13 @@ export class ReceiptfgService {
 
       console.log(`🔍 分页查询废钢数据 - 日期筛选: ${params.date || 'latest-day'}`);
 
-      const data = await prisma.receiptfg.findMany({
+      return fetchReceiptfgPageSorted(
         where,
-        orderBy: {
-          orderTime: 'desc'
-        },
-        skip: actualOffset,
-        take: limit
-      });
-      const total = await prisma.receiptfg.count({ where });
-
-      const processedData = this.processReceiptData(data);
-      const totalPages = Math.ceil(total / limit);
-      const hasMore = page < totalPages;
-
-      console.log(`✅ 成功获取 ${processedData.length} 条废钢数据 (${actualOffset + 1}-${actualOffset + processedData.length}/${total})`);
-
-      return {
-        data: processedData,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-          hasMore,
-          currentBatch: `${actualOffset + 1}-${actualOffset + processedData.length}`
-        }
-      };
+        page,
+        limit,
+        actualOffset,
+        (data) => this.processReceiptData(data)
+      );
     } catch (error) {
       console.error('❌ 分批获取废钢数据失败:', error);
       throw error;
@@ -467,12 +433,11 @@ export class ReceiptfgService {
    */
   private static processReceiptData(data: ReceiptData[]): ProcessedReceiptData[] {
     return data.map(item => {
-      const originalUrl = this.parseImageUrls(item.imgUrls);
-      const progressiveUrls = originalUrl ? this.generateProgressiveUrls(originalUrl) : null;
+      const originalUrl = parseImageUrls(item.imgUrls);
+      const progressiveUrls = originalUrl ? generateProgressiveUrls(originalUrl) : null;
 
       return {
         ...item,
-        // 将 Prisma Decimal 对象转换为字符串，以便序列化传递给 Client Component
         taxInclu: item.taxInclu ? item.taxInclu.toString() : null,
         unitpriceIncluTax: item.unitpriceIncluTax ? item.unitpriceIncluTax.toString() : null,
         weight: item.weight ? item.weight.toString() : null,
@@ -485,58 +450,5 @@ export class ReceiptfgService {
         thumbnailSource: 'cdn' as const
       };
     });
-  }
-
-  /**
-   * 解析图片URL
-   */
-  private static parseImageUrls(imgUrls: any): string | null {
-    if (!imgUrls) return null;
-
-    try {
-      if (typeof imgUrls === 'string') {
-        if (imgUrls.trim().startsWith('[')) {
-          const parsed = JSON.parse(imgUrls);
-          return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
-        }
-        if (imgUrls.includes(',')) {
-          const urls = imgUrls.split(',').map(url => url.trim()).filter(Boolean);
-          return urls.length > 0 ? urls[0] : null;
-        }
-        return imgUrls.trim() || null;
-      }
-
-      if (Array.isArray(imgUrls)) {
-        return imgUrls.length > 0 ? imgUrls[0] : null;
-      }
-
-      return null;
-    } catch (error) {
-      console.warn('解析图片 URL 失败:', error);
-      return null;
-    }
-  }
-
-  /**
-   * 生成CDN压缩URL
-   */
-  private static generateProgressiveUrls(originalUrl: string): {
-    tiny: string;
-    small: string;
-    medium: string;
-    original: string;
-  } {
-    if (!originalUrl) {
-      return { tiny: '', small: '', medium: '', original: '' };
-    }
-
-    const separator = originalUrl.includes('?') ? '&' : '?';
-
-    return {
-      tiny: `${originalUrl}${separator}w=48&h=48&q=10&format=webp&fit=cover`,
-      small: `${originalUrl}${separator}w=80&h=80&q=25&format=webp&fit=cover`,
-      medium: `${originalUrl}${separator}w=120&h=120&q=40&format=webp&fit=cover`,
-      original: originalUrl
-    };
   }
 }

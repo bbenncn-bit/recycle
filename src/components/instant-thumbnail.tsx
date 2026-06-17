@@ -48,22 +48,23 @@ export default function InstantThumbnail({
 
   // 优化的渐进式加载策略
   useEffect(() => {
-    if (!progressiveUrls.tiny) return;
+    const initialSrc = progressiveUrls.tiny || progressiveUrls.original;
+    if (!initialSrc) return;
 
     let isCancelled = false;
     
     const loadSequence = async () => {
       try {
         // 如果是数据库缩略图（base64），立即显示
-        if (thumbnailSource === 'database' && progressiveUrls.tiny.startsWith('data:')) {
+        if (thumbnailSource === 'database' && initialSrc.startsWith('data:')) {
           if (!isCancelled) {
-            setCurrentSrc(progressiveUrls.tiny);
+            setCurrentSrc(initialSrc);
             setIsLoading(false);
           }
           
           // 延迟加载更高质量版本
           setTimeout(async () => {
-            if (!isCancelled && progressiveUrls.small && progressiveUrls.small !== progressiveUrls.tiny) {
+            if (!isCancelled && progressiveUrls.small && progressiveUrls.small !== initialSrc) {
               setCurrentSrc(progressiveUrls.small);
             }
           }, 200);
@@ -86,11 +87,11 @@ export default function InstantThumbnail({
           
         } else {
           // CDN缩略图的渐进加载
-          setCurrentSrc(progressiveUrls.tiny);
+          setCurrentSrc(initialSrc);
           setIsLoading(false);
           
           // 预加载后续版本
-          if (progressiveUrls.small && progressiveUrls.small !== progressiveUrls.tiny) {
+          if (progressiveUrls.small && progressiveUrls.small !== initialSrc) {
             const img = new Image();
             img.onload = () => {
               if (!isCancelled) {
@@ -192,7 +193,7 @@ export default function InstantThumbnail({
 
   }, [showModal, progressiveUrls, currentSrc]);
 
-  if (imageError || !progressiveUrls.tiny) {
+  if (imageError || (!progressiveUrls.tiny && !progressiveUrls.original)) {
     return (
       <div className={`${className} bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center`}>
         <span className="text-xs text-gray-400">无图片</span>
@@ -313,7 +314,18 @@ export default function InstantThumbnail({
             src={currentSrc} 
             alt={alt}
             className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-all duration-200 cursor-pointer hover:opacity-90 hover:scale-105 shadow-sm hover:shadow-md rounded-lg object-cover`}
-            onError={() => setImageError(true)}
+            onError={() => {
+              if (
+                progressiveUrls.original &&
+                currentSrc !== progressiveUrls.original
+              ) {
+                setCurrentSrc(progressiveUrls.original);
+                setImageError(false);
+                setIsLoading(false);
+              } else {
+                setImageError(true);
+              }
+            }}
             onLoad={() => setIsLoading(false)}
             onClick={handleThumbnailClick}
             title="点击查看大图"

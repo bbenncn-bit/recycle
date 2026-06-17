@@ -70,32 +70,57 @@ export function generateProgressiveUrls(originalUrl: string): {
   };
 }
 
-// 解析图片数组中的第一个URL
-export function parseImageUrls(imgUrls: any): string | null {
+// 解析图片数组中的第一个有效 URL
+function normalizeImageUrlEntry(entry: unknown): string | null {
+  if (!entry) return null;
+  if (typeof entry === 'string') {
+    const s = entry.trim();
+    if (!s || s === 'null' || s === 'undefined' || s === '[]') return null;
+    return s;
+  }
+  if (typeof entry === 'object') {
+    const obj = entry as Record<string, unknown>;
+    const candidate = obj.url ?? obj.imgUrl ?? obj.imageUrl ?? obj.src;
+    if (typeof candidate === 'string') return normalizeImageUrlEntry(candidate);
+  }
+  return null;
+}
+
+export function parseImageUrls(imgUrls: unknown): string | null {
   if (!imgUrls) return null;
-  
+
   try {
-    // 如果是字符串，尝试解析为JSON数组
     if (typeof imgUrls === 'string') {
-      // 处理可能的JSON字符串
-      if (imgUrls.trim().startsWith('[')) {
-        const parsed = JSON.parse(imgUrls);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      const trimmed = imgUrls.trim();
+      if (!trimmed || trimmed === 'null' || trimmed === 'undefined' || trimmed === '[]') {
+        return null;
       }
-      // 处理逗号分隔的字符串
-      if (imgUrls.includes(',')) {
-        const urls = imgUrls.split(',').map(url => url.trim()).filter(Boolean);
-        return urls.length > 0 ? urls[0] : null;
+      if (trimmed.startsWith('[')) {
+        const parsed = JSON.parse(trimmed) as unknown;
+        if (!Array.isArray(parsed)) return null;
+        for (const entry of parsed) {
+          const url = normalizeImageUrlEntry(entry);
+          if (url) return url;
+        }
+        return null;
       }
-      // 单个URL字符串
-      return imgUrls.trim() || null;
+      if (trimmed.includes(',')) {
+        for (const part of trimmed.split(',')) {
+          const url = normalizeImageUrlEntry(part);
+          if (url) return url;
+        }
+        return null;
+      }
+      return normalizeImageUrlEntry(trimmed);
     }
-    
-    // 如果已经是数组
+
     if (Array.isArray(imgUrls)) {
-      return imgUrls.length > 0 ? imgUrls[0] : null;
+      for (const entry of imgUrls) {
+        const url = normalizeImageUrlEntry(entry);
+        if (url) return url;
+      }
     }
-    
+
     return null;
   } catch (error) {
     console.warn('解析图片 URL 失败:', error);

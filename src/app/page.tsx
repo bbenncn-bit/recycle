@@ -116,8 +116,8 @@ export default function Page() {
 
   const tableSubtitle =
     selectedDate === HOME_DEFAULT_DATE_KEY
-      ? '默认窗口：今日00:00-02:00 + 昨日全天（按时间倒序）'
-      : `${selectedDate} 全天交易记录（按时间倒序）`;
+      ? '默认窗口：今日00:00-02:00 + 昨日全天（7:00-19:00 优先，同日内按时间倒序）'
+      : `${selectedDate} 全天交易记录（7:00-19:00 优先，同日内按时间倒序）`;
 
   return (
     <main className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
