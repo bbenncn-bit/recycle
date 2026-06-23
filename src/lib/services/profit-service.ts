@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prismadb';
 import { normalizeMaterialCategoryLabel } from '@/lib/material-label';
 import { classifyCostReceipt } from '@/lib/cost-receipt-classification';
+import { formatDate, parseWarehouseDate } from '@/lib/warehouse-date';
+
+export { formatDate, parseWarehouseDate };
 
 export interface CostAnalysisData {
   summary: {
@@ -79,73 +82,6 @@ export interface CostAnalysisData {
     months: string[];
     costs: number[];
   };
-}
-
-/**
- * 解析入库日期字符串为 Date 对象
- * 支持多种日期格式：'2024-01-15'、'2024/01/15'、'2024-1-5' 等
- */
-export function parseWarehouseDate(dateStr: string | null): Date | null {
-  if (!dateStr) return null;
-  
-  // 去除首尾空格
-  const trimmed = dateStr.trim();
-  if (!trimmed) return null;
-  
-  // 尝试多种日期格式
-  const formats = [
-    // 标准格式：2024-01-15, 2024-1-5
-    /^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+\d{1,2}:\d{1,2}:\d{1,2})?$/,
-    // 斜杠格式：2024/01/15, 2024/1/5
-    /^(\d{4})\/(\d{1,2})\/(\d{1,2})(?:\s+\d{1,2}:\d{1,2}:\d{1,2})?$/,
-    // 紧凑格式：20240115
-    /^(\d{4})(\d{2})(\d{2})$/,
-    // 中文格式：2024年1月15日
-    /^(\d{4})年(\d{1,2})月(\d{1,2})日?$/,
-    // 点分隔：2024.01.15
-    /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,
-  ];
-  
-  for (const format of formats) {
-    const match = trimmed.match(format);
-    if (match) {
-      const year = parseInt(match[1]);
-      const month = parseInt(match[2]) - 1; // 月份从0开始
-      const day = parseInt(match[3]);
-      
-      // 验证日期有效性
-      if (year < 1900 || year > 2100) continue;
-      if (month < 0 || month > 11) continue;
-      if (day < 1 || day > 31) continue;
-      
-      const date = new Date(year, month, day);
-      if (!isNaN(date.getTime()) && date.getFullYear() === year && date.getMonth() === month && date.getDate() === day) {
-        return date;
-      }
-    }
-  }
-  
-  // 如果都不匹配，尝试直接解析（ISO格式等）
-  const date = new Date(trimmed);
-  if (!isNaN(date.getTime())) {
-    // 验证解析出的日期是否合理（年份在合理范围内）
-    const year = date.getFullYear();
-    if (year >= 1900 && year <= 2100) {
-      return date;
-    }
-  }
-  
-  return null;
-}
-
-/**
- * 格式化日期为 YYYY-MM-DD
- */
-export function formatDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
 
 /** 将 YYYY-MM-DD 解析为本地 0 点，避免 `new Date('YYYY-MM-DD')` 按 UTC 导致日期比较错位 */

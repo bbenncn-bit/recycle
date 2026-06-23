@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getInventoryValueAnalysisRows } from '@/lib/services/material-inventory-value-analysis';
 
+export const maxDuration = 120;
+
 export async function GET() {
   try {
     const rows = await getInventoryValueAnalysisRows();

@@ -6,6 +6,8 @@ import { ProfitAnalysisSkeleton } from '@/components/profit-dashboard-skeletons'
 import {
   ProfitAnalysisLoadingHint,
   ProfitChartLoadingVeil,
+  ProfitTableComputingHint,
+  AnimatedEllipsis,
 } from '@/components/profit-analysis-loading-hint';
 
 const SALES_DETAILS_PAGE_SIZE = 10;
@@ -23,6 +25,14 @@ function getMonthKey(deliveryDate: string): string {
   const d = parseDeliveryDate(deliveryDate);
   if (!d) return '';
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/** 月份 Tab 文案（同年多个月只显示「N月」） */
+function formatMonthTabLabel(key: string, allKeys: string[]): string {
+  const [y, m] = key.split('-');
+  return allKeys.some((k) => k !== key && k.startsWith(y))
+    ? `${parseInt(m, 10)}月`
+    : `${y}年${parseInt(m, 10)}月`;
 }
 
 /** 表格展示：发货日期不含年份（如 4/1） */
@@ -196,6 +206,8 @@ export default function ProfitAnalysis() {
   const [data, setData] = useState<ProfitAnalysisData | null>(null);
   /** idle：未就绪；shell：粗算首屏；core：精确数据已就绪；full：成品对比已合并 */
   const [loadStage, setLoadStage] = useState<'idle' | 'shell' | 'core' | 'full'>('idle');
+  const [loadStartedAt] = useState(() => Date.now());
+  const [availableMonths, setAvailableMonths] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [tooltipData, setTooltipData] = useState<{
     x: number;
@@ -258,12 +270,21 @@ export default function ProfitAnalysis() {
       if (!byMonth[key]) byMonth[key] = [];
       byMonth[key].push(sale);
     }
-    const keys = Object.keys(byMonth).sort();
+    const keySet = new Set<string>(availableMonths);
+    for (const k of Object.keys(byMonth)) keySet.add(k);
+    const keys = Array.from(keySet).sort().reverse();
     for (const k of keys) {
-      byMonth[k].sort(compareSalesDetailByDeliveryDate);
+      if (byMonth[k]) {
+        byMonth[k].sort(compareSalesDetailByDeliveryDate);
+      }
     }
     return { salesDetailsByMonth: byMonth, monthKeys: keys };
-  }, [data?.salesDetails]);
+  }, [data?.salesDetails, availableMonths]);
+
+  const focusMonthLabel = useMemo(() => {
+    if (!salesDetailMonth) return undefined;
+    return formatMonthTabLabel(salesDetailMonth, monthKeys);
+  }, [salesDetailMonth, monthKeys]);
 
   // 当前选中月份下的列表与分页
   const currentMonthDetails = useMemo(() => {
@@ -325,13 +346,13 @@ export default function ProfitAnalysis() {
     };
   }, [currentMonthDetails, salesDetailMonth]);
 
-  // 数据加载后默认选中第一个月份
+  // 数据加载后默认选中最近月份（新→旧列表的第一项）
   useEffect(() => {
     if (monthKeys.length > 0 && salesDetailMonth === '') {
       setSalesDetailMonth(monthKeys[0]);
       setSalesDetailPage(1);
     }
-  }, [monthKeys.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [monthKeys.join(','), salesDetailMonth]);
 
   const onMonthChange = (key: string) => {
     setSalesDetailMonth(key);
@@ -344,6 +365,21 @@ export default function ProfitAnalysis() {
     const fetchData = async () => {
       setLoadStage('idle');
       setError(null);
+      setAvailableMonths([]);
+
+      fetch('/api/profit-management/profit-analysis?phase=months')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json) => {
+          if (cancelled || !json?.success) return;
+          const months: string[] = json.data?.months ?? [];
+          setAvailableMonths(months);
+          if (months.length > 0) {
+            setSalesDetailMonth((prev) => prev || months[0]);
+          }
+        })
+        .catch((e) => {
+          console.warn('利润分析：月份列表未返回', e);
+        });
 
       // 粗算首屏与精确数据并行请求，缩短白屏等待
       fetch('/api/profit-management/profit-analysis?phase=shell')
@@ -426,7 +462,7 @@ export default function ProfitAnalysis() {
   if (!data && !error) {
     return (
       <>
-        <ProfitAnalysisLoadingHint stage={loadStage} />
+        <ProfitAnalysisLoadingHint stage={loadStage} loadStartedAt={loadStartedAt} />
         <ProfitAnalysisSkeleton />
       </>
     );
@@ -828,7 +864,12 @@ export default function ProfitAnalysis() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <ProfitAnalysisLoadingHint stage={loadStage} provisional={data?.provisional} />
+      <ProfitAnalysisLoadingHint
+        stage={loadStage}
+        provisional={data?.provisional}
+        focusMonthLabel={focusMonthLabel}
+        loadStartedAt={loadStartedAt}
+      />
       <div className="max-w-7xl mx-auto">
         {/* 页面标题 */}
         <div className="mb-8">
@@ -855,7 +896,10 @@ export default function ProfitAnalysis() {
 
         {data.provisional && (
           <div className="mb-4 rounded-md border border-sky-200/90 bg-sky-50/90 px-3 py-2 text-sm text-sky-950 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-100">
-            <strong>粗算首屏</strong>：已展示今日收入、按默认加工费（元/吨）估算的加工成本及趋势图；材料成本（LIFO）、利润与销售明细在后台精确计算中，完成后将自动刷新为正式数据。
+            <strong>粗算首屏</strong>：已展示今日收入与趋势粗算；销售明细需先<strong>全量</strong>完成材料 LIFO 核算后，再按月份切片展示
+            {focusMonthLabel ? `（默认 ${focusMonthLabel}）` : '（默认最近月份）'}
+            ，请稍候
+            <AnimatedEllipsis />
           </div>
         )}
 
@@ -1059,8 +1103,7 @@ export default function ProfitAnalysis() {
                 全部
               </button>
               {monthKeys.map((key) => {
-                const [y, m] = key.split('-');
-                const label = monthKeys.some(k => k !== key && k.startsWith(y)) ? `${parseInt(m, 10)}月` : `${y}年${parseInt(m, 10)}月`;
+                const label = formatMonthTabLabel(key, monthKeys);
                 return (
                   <button
                     key={key}
@@ -1079,7 +1122,7 @@ export default function ProfitAnalysis() {
 
           {data.provisional && monthKeys.length === 0 && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              下方表格结构已就绪；行数据将在精确计算完成后自动出现。
+              下方表格结构已就绪；行数据将在全量 LIFO 精确计算完成后自动出现。
             </p>
           )}
 
@@ -1129,9 +1172,11 @@ export default function ProfitAnalysis() {
                       colSpan={13}
                       className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
-                      {data.provisional
-                        ? '销售明细正在逐单精确计算（含材料 LIFO、税费等），请稍候…'
-                        : '暂无数据'}
+                      {data.provisional ? (
+                        <ProfitTableComputingHint monthLabel={focusMonthLabel} />
+                      ) : (
+                        '暂无数据'
+                      )}
                     </td>
                   </tr>
                 ) : (

@@ -3,6 +3,7 @@ import {
   getProfitAnalysisData,
   getProfitAnalysisProductComparisonOnly,
   getProfitAnalysisShellData,
+  listProfitAnalysisMonthKeys,
 } from '@/lib/services/profit-analysis-service';
 
 // 设置较长的超时时间（5分钟）
@@ -37,6 +38,11 @@ export async function GET(request: Request) {
     if (phase === 'shell') {
       const data = await getProfitAnalysisShellData();
       return NextResponse.json({ success: true, data });
+    }
+
+    if (phase === 'months') {
+      const months = await listProfitAnalysisMonthKeys();
+      return NextResponse.json({ success: true, data: { months } });
     }
 
     console.log('开始获取利润分析数据...');

@@ -742,6 +742,31 @@ export async function getProfitAnalysisProductComparisonOnly(): Promise<
   return buildProfitProductComparison();
 }
 
+/** 可选月份键（新→旧），仅查发货日期，不做 LIFO */
+export async function listProfitAnalysisMonthKeys(): Promise<string[]> {
+  const minDeliveryDateStr = getProfitSalesMinDeliveryDateStr();
+  const rows = await prisma.deliverySettlement.findMany({
+    where: {
+      totalSettlementAmount: { not: null },
+      settlementQuantity: { not: null },
+      deliveryDate: { not: null, gte: minDeliveryDateStr },
+    },
+    select: {
+      deliveryDate: true,
+      warehouse: true,
+      productType: true,
+    },
+  });
+  const keys = new Set<string>();
+  for (const row of rows) {
+    if (isExcludedFromProfitAnalysis(row.warehouse, row.productType)) continue;
+    const d = parseDeliveryDate(row.deliveryDate);
+    if (!d) continue;
+    keys.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  return Array.from(keys).sort().reverse();
+}
+
 /**
  * 获取利润分析数据
  * @param options.includeProductComparison 为 false 时跳过成品对比（加快首屏，可后续单独请求）

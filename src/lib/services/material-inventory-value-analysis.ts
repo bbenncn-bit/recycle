@@ -47,11 +47,18 @@ type Agg = {
   latest: { date: Date; id: number; unitPrice: number | null } | null;
 };
 
+const CACHE_MS = 3 * 60 * 1000;
+let rowsCache: { at: number; rows: InventoryValueAnalysisRow[] } | null = null;
+
 /**
  * 毛料库存价值分析：当前库存来自 MaterialStorage；
  * 采购口径与入库同步一致（基地收货 SH、非红冲撤销），按库区+物料汇总 PurchaseWarehouse。
  */
 export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAnalysisRow[]> {
+  if (rowsCache && Date.now() - rowsCache.at < CACHE_MS) {
+    return rowsCache.rows;
+  }
+
   const storages = await prisma.materialStorage.findMany({
     where: {
       currentQty: { gt: 0 },
@@ -65,73 +72,76 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     orderBy: [{ storageArea: 'asc' }, { materialType: 'asc' }],
   });
 
-  const purchases = await prisma.purchaseWarehouse.findMany({
-    select: {
-      id: true,
-      receiptNo: true,
-      warehouse: true,
-      warehouseArea: true,
-      material: true,
-      estimatedDryBasis: true,
-      totalPriceExcludingTax: true,
-      unitPriceExcludingTax: true,
-      warehouseDate: true,
-      warehouseTime: true,
-      status: true,
-    },
-    orderBy: { id: 'asc' },
-  });
+  const materialTypes = [
+    ...new Set(storages.map((s) => norm(s.materialType)).filter(Boolean)),
+  ];
 
   const aggByKey = new Map<string, Agg>();
 
-  for (const r of purchases) {
-    const st = norm(r.status);
-    if (st.includes('红冲') || st.includes('撤销')) continue;
-    if (!isBaseSelfReceipt(r.receiptNo, r.warehouse)) continue;
+  if (materialTypes.length > 0) {
+    const purchases = await prisma.purchaseWarehouse.findMany({
+      where: {
+        material: { in: materialTypes },
+      },
+      select: {
+        id: true,
+        receiptNo: true,
+        warehouse: true,
+        warehouseArea: true,
+        material: true,
+        estimatedDryBasis: true,
+        totalPriceExcludingTax: true,
+        unitPriceExcludingTax: true,
+        warehouseDate: true,
+        warehouseTime: true,
+        status: true,
+      },
+      orderBy: { id: 'asc' },
+    });
 
-    const storageArea = purchaseInboundStorageArea(r);
-    const materialType = norm(r.material);
-    const qty = toNum(r.estimatedDryBasis);
-    let lineAmount = toNum(r.totalPriceExcludingTax);
-    const unitPx = toNum(r.unitPriceExcludingTax);
+    for (const r of purchases) {
+      const st = norm(r.status);
+      if (st.includes('红冲') || st.includes('撤销')) continue;
+      if (!isBaseSelfReceipt(r.receiptNo, r.warehouse)) continue;
 
-    if (!storageArea || !materialType || qty == null || qty === 0) continue;
+      const storageArea = purchaseInboundStorageArea(r);
+      const materialType = norm(r.material);
+      const qty = toNum(r.estimatedDryBasis);
+      let lineAmount = toNum(r.totalPriceExcludingTax);
+      const unitPx = toNum(r.unitPriceExcludingTax);
 
-    // 总价缺失时用单价×数量，避免「只加吨数不加金额」把加权均价异常拉低
-    if (lineAmount == null && unitPx != null && qty != null) {
-      lineAmount = unitPx * qty;
-    }
-    // 仍无法还原金额则不参与加权汇总（否则分母偏大、均价失真）
-    if (lineAmount == null) continue;
+      if (!storageArea || !materialType || qty == null || qty === 0) continue;
 
-    const key = `${storageArea}\0${materialType}`;
-    let agg = aggByKey.get(key);
-    if (!agg) {
-      agg = {
-        sumQty: 0,
-        sumAmount: 0,
-        minDate: null,
-        latest: null,
-      };
-      aggByKey.set(key, agg);
-    }
+      if (lineAmount == null && unitPx != null && qty != null) {
+        lineAmount = unitPx * qty;
+      }
+      if (lineAmount == null) continue;
 
-    agg.sumQty += qty;
-    agg.sumAmount += lineAmount;
+      const key = `${storageArea}\0${materialType}`;
+      let agg = aggByKey.get(key);
+      if (!agg) {
+        agg = {
+          sumQty: 0,
+          sumAmount: 0,
+          minDate: null,
+          latest: null,
+        };
+        aggByKey.set(key, agg);
+      }
 
-    const dateStr = norm(r.warehouseDate || r.warehouseTime);
-    const d = parseWarehouseDate(dateStr || null);
-    if (d) {
-      if (!agg.minDate || d < agg.minDate) agg.minDate = d;
+      agg.sumQty += qty;
+      agg.sumAmount += lineAmount;
 
-      const prev = agg.latest;
-      const id = r.id;
-      if (
-        !prev ||
-        d > prev.date ||
-        (d.getTime() === prev.date.getTime() && id > prev.id)
-      ) {
-        agg.latest = { date: d, id, unitPrice: unitPx };
+      const dateStr = norm(r.warehouseDate || r.warehouseTime);
+      const d = parseWarehouseDate(dateStr || null);
+      if (d) {
+        if (!agg.minDate || d < agg.minDate) agg.minDate = d;
+
+        const prev = agg.latest;
+        const id = r.id;
+        if (!prev || d > prev.date || (d.getTime() === prev.date.getTime() && id > prev.id)) {
+          agg.latest = { date: d, id, unitPrice: unitPx };
+        }
       }
     }
   }
@@ -173,5 +183,6 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     });
   }
 
+  rowsCache = { at: Date.now(), rows };
   return rows;
 }
