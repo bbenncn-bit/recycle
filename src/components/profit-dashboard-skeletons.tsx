@@ -115,7 +115,7 @@ export function ProfitAnalysisSkeleton() {
         </div>
 
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          正在计算销售与利润明细（成品对比稍后补齐）…
+          正在计算销售与利润明细（含材料 LIFO），通常需数秒至数十秒，请稍候…
         </p>
       </div>
     </div>

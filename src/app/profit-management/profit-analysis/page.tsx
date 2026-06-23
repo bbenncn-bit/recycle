@@ -3,6 +3,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import LazyReactECharts from '@/components/lazy-react-echarts';
 import { ProfitAnalysisSkeleton } from '@/components/profit-dashboard-skeletons';
+import {
+  ProfitAnalysisLoadingHint,
+  ProfitChartLoadingVeil,
+} from '@/components/profit-analysis-loading-hint';
 
 const SALES_DETAILS_PAGE_SIZE = 10;
 
@@ -341,18 +345,17 @@ export default function ProfitAnalysis() {
       setLoadStage('idle');
       setError(null);
 
-      try {
-        const shellRes = await fetch('/api/profit-management/profit-analysis?phase=shell');
-        if (shellRes.ok) {
-          const shellJson = await shellRes.json();
-          if (shellJson.success && shellJson.data && !cancelled) {
-            setData(shellJson.data);
-            setLoadStage('shell');
-          }
-        }
-      } catch (e) {
-        console.warn('利润分析：粗算首屏未返回，将直接等待精确数据', e);
-      }
+      // 粗算首屏与精确数据并行请求，缩短白屏等待
+      fetch('/api/profit-management/profit-analysis?phase=shell')
+        .then((shellRes) => (shellRes.ok ? shellRes.json() : null))
+        .then((shellJson) => {
+          if (cancelled || !shellJson?.success || !shellJson.data) return;
+          setData(shellJson.data);
+          setLoadStage('shell');
+        })
+        .catch((e) => {
+          console.warn('利润分析：粗算首屏未返回，将直接等待精确数据', e);
+        });
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 300000);
@@ -421,7 +424,12 @@ export default function ProfitAnalysis() {
   }, []);
 
   if (!data && !error) {
-    return <ProfitAnalysisSkeleton />;
+    return (
+      <>
+        <ProfitAnalysisLoadingHint stage={loadStage} />
+        <ProfitAnalysisSkeleton />
+      </>
+    );
   }
 
   if (error && !data) {
@@ -820,6 +828,7 @@ export default function ProfitAnalysis() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <ProfitAnalysisLoadingHint stage={loadStage} provisional={data?.provisional} />
       <div className="max-w-7xl mx-auto">
         {/* 页面标题 */}
         <div className="mb-8">
@@ -973,7 +982,8 @@ export default function ProfitAnalysis() {
         {/* 图表区域 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* 日利润趋势图 */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <ProfitChartLoadingVeil show={!!data.provisional} />
             <LazyReactECharts
               option={dailyTrendOption}
               style={{ height: '400px', width: '100%' }}
@@ -981,7 +991,8 @@ export default function ProfitAnalysis() {
           </div>
 
           {/* 周利润分解图 */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <ProfitChartLoadingVeil show={!!data.provisional} />
             <LazyReactECharts
               option={weekBreakdownOption}
               style={{ height: '400px', width: '100%' }}
@@ -1341,7 +1352,8 @@ export default function ProfitAnalysis() {
 
         {/* 成品对比分析图 */}
         {!data.provisional && data.productComparison.labels.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <ProfitChartLoadingVeil show={loadStage === 'core'} />
             <LazyReactECharts
               option={productComparisonOption}
               style={{ height: '400px', width: '100%' }}

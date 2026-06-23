@@ -909,7 +909,7 @@ export async function getProfitAnalysisData(
   }
 
   // 批量处理销售数据（适当提高并发，减轻总耗时）
-  const BATCH_SIZE = 24;
+  const BATCH_SIZE = 36;
   for (let i = 0; i < validSalesForDetails.length; i += BATCH_SIZE) {
     const batch = validSalesForDetails.slice(i, i + BATCH_SIZE);
     const batchResults = await Promise.all(
