@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `OpsConsoleUser` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(64) NOT NULL,
   `password_hash` VARCHAR(255) NOT NULL,
+  `permission` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1已开通',
   `last_login_at` DATETIME(0) NULL,
   `last_login_ip` VARCHAR(45) NULL,
   `created_at` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -215,6 +215,11 @@ export type MaterialStorage = $Result.DefaultSelection<Prisma.$MaterialStoragePa
  */
 export type ProductStock = $Result.DefaultSelection<Prisma.$ProductStockPayload>
 /**
+ * Model ProductStockSaleLog
+ * 成品库销售出库台账：结算导入按发货净重幂等扣减成品库（发货单号唯一）
+ */
+export type ProductStockSaleLog = $Result.DefaultSelection<Prisma.$ProductStockSaleLogPayload>
+/**
  * Model ProcessingCostConfig
  * 加工成本配置表（上月吨加工成本）
  */
@@ -753,6 +758,16 @@ export class PrismaClient<
   get productStock(): Prisma.ProductStockDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.productStockSaleLog`: Exposes CRUD operations for the **ProductStockSaleLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductStockSaleLogs
+    * const productStockSaleLogs = await prisma.productStockSaleLog.findMany()
+    * ```
+    */
+  get productStockSaleLog(): Prisma.ProductStockSaleLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.processingCostConfig`: Exposes CRUD operations for the **ProcessingCostConfig** model.
     * Example usage:
     * ```ts
@@ -1265,6 +1280,7 @@ export namespace Prisma {
     ProcessingCostInput: 'ProcessingCostInput',
     MaterialStorage: 'MaterialStorage',
     ProductStock: 'ProductStock',
+    ProductStockSaleLog: 'ProductStockSaleLog',
     ProcessingCostConfig: 'ProcessingCostConfig',
     MaterialCostCache: 'MaterialCostCache',
     MaterialCostCacheErrorLog: 'MaterialCostCacheErrorLog',
@@ -1284,7 +1300,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "processingCostConfig" | "materialCostCache" | "materialCostCacheErrorLog" | "opsConsoleUser"
+      modelProps: "cAHoldings" | "cAMarketCards" | "cAPieChart" | "cAPriceChart" | "cBComparisonChart" | "cBMonthlyDetails" | "cBSummaryCards" | "cFDetails" | "cFPieChart" | "cFTrendChart" | "eAConsumptionTrend" | "eAMonthSummary" | "eAStrategy" | "eATypeComparison" | "eBParamCards" | "eBPieChart" | "eBResults" | "eBTrendChart" | "eCenergyFlowRealTime" | "eCenergyTypes" | "eChistory" | "eCrealTime" | "eEBenchmarkRankCards" | "eEGaugeMetrics" | "eERankingList" | "eETrendChartData" | "eFSankeyLinks" | "eFSankeyNodes" | "eFSummaryTable" | "sCRanking" | "sCSankeyData" | "receiptfc" | "receiptfg" | "wasteManagement" | "purchaseWarehouse" | "deliverySettlement" | "profitParamConfig" | "processingCostInput" | "materialStorage" | "productStock" | "productStockSaleLog" | "processingCostConfig" | "materialCostCache" | "materialCostCacheErrorLog" | "opsConsoleUser"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3928,6 +3944,72 @@ export namespace Prisma {
           }
         }
       }
+      ProductStockSaleLog: {
+        payload: Prisma.$ProductStockSaleLogPayload<ExtArgs>
+        fields: Prisma.ProductStockSaleLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductStockSaleLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductStockSaleLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductStockSaleLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductStockSaleLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          findMany: {
+            args: Prisma.ProductStockSaleLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>[]
+          }
+          create: {
+            args: Prisma.ProductStockSaleLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          createMany: {
+            args: Prisma.ProductStockSaleLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProductStockSaleLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          update: {
+            args: Prisma.ProductStockSaleLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductStockSaleLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductStockSaleLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductStockSaleLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductStockSaleLogPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductStockSaleLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductStockSaleLog>
+          }
+          groupBy: {
+            args: Prisma.ProductStockSaleLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductStockSaleLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductStockSaleLogCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductStockSaleLogCountAggregateOutputType> | number
+          }
+        }
+      }
       ProcessingCostConfig: {
         payload: Prisma.$ProcessingCostConfigPayload<ExtArgs>
         fields: Prisma.ProcessingCostConfigFieldRefs
@@ -4340,6 +4422,7 @@ export namespace Prisma {
     processingCostInput?: ProcessingCostInputOmit
     materialStorage?: MaterialStorageOmit
     productStock?: ProductStockOmit
+    productStockSaleLog?: ProductStockSaleLogOmit
     processingCostConfig?: ProcessingCostConfigOmit
     materialCostCache?: MaterialCostCacheOmit
     materialCostCacheErrorLog?: MaterialCostCacheErrorLogOmit
@@ -38861,13 +38944,11 @@ export namespace Prisma {
   export type ProfitParamConfigAvgAggregateOutputType = {
     id: number | null
     value: Decimal | null
-    previousValue: Decimal | null
   }
 
   export type ProfitParamConfigSumAggregateOutputType = {
     id: number | null
     value: Decimal | null
-    previousValue: Decimal | null
   }
 
   export type ProfitParamConfigMinAggregateOutputType = {
@@ -38879,7 +38960,7 @@ export namespace Prisma {
     steelMill: string | null
     effectiveDate: Date | null
     value: Decimal | null
-    previousValue: Decimal | null
+    previousValue: string | null
     unit: string | null
     remark: string | null
     createdAt: Date | null
@@ -38895,7 +38976,7 @@ export namespace Prisma {
     steelMill: string | null
     effectiveDate: Date | null
     value: Decimal | null
-    previousValue: Decimal | null
+    previousValue: string | null
     unit: string | null
     remark: string | null
     createdAt: Date | null
@@ -38923,13 +39004,11 @@ export namespace Prisma {
   export type ProfitParamConfigAvgAggregateInputType = {
     id?: true
     value?: true
-    previousValue?: true
   }
 
   export type ProfitParamConfigSumAggregateInputType = {
     id?: true
     value?: true
-    previousValue?: true
   }
 
   export type ProfitParamConfigMinAggregateInputType = {
@@ -39076,7 +39155,7 @@ export namespace Prisma {
     steelMill: string | null
     effectiveDate: Date
     value: Decimal
-    previousValue: Decimal | null
+    previousValue: string | null
     unit: string | null
     remark: string | null
     createdAt: Date | null
@@ -39150,7 +39229,7 @@ export namespace Prisma {
       steelMill: string | null
       effectiveDate: Date
       value: Prisma.Decimal
-      previousValue: Prisma.Decimal | null
+      previousValue: string | null
       unit: string | null
       remark: string | null
       createdAt: Date | null
@@ -39532,7 +39611,7 @@ export namespace Prisma {
     readonly steelMill: FieldRef<"ProfitParamConfig", 'String'>
     readonly effectiveDate: FieldRef<"ProfitParamConfig", 'DateTime'>
     readonly value: FieldRef<"ProfitParamConfig", 'Decimal'>
-    readonly previousValue: FieldRef<"ProfitParamConfig", 'Decimal'>
+    readonly previousValue: FieldRef<"ProfitParamConfig", 'String'>
     readonly unit: FieldRef<"ProfitParamConfig", 'String'>
     readonly remark: FieldRef<"ProfitParamConfig", 'String'>
     readonly createdAt: FieldRef<"ProfitParamConfig", 'DateTime'>
@@ -43472,6 +43551,911 @@ export namespace Prisma {
 
 
   /**
+   * Model ProductStockSaleLog
+   */
+
+  export type AggregateProductStockSaleLog = {
+    _count: ProductStockSaleLogCountAggregateOutputType | null
+    _avg: ProductStockSaleLogAvgAggregateOutputType | null
+    _sum: ProductStockSaleLogSumAggregateOutputType | null
+    _min: ProductStockSaleLogMinAggregateOutputType | null
+    _max: ProductStockSaleLogMaxAggregateOutputType | null
+  }
+
+  export type ProductStockSaleLogAvgAggregateOutputType = {
+    appliedQty: Decimal | null
+  }
+
+  export type ProductStockSaleLogSumAggregateOutputType = {
+    appliedQty: Decimal | null
+  }
+
+  export type ProductStockSaleLogMinAggregateOutputType = {
+    deliveryNumber: string | null
+    productName: string | null
+    appliedQty: Decimal | null
+    createdAt: Date | null
+  }
+
+  export type ProductStockSaleLogMaxAggregateOutputType = {
+    deliveryNumber: string | null
+    productName: string | null
+    appliedQty: Decimal | null
+    createdAt: Date | null
+  }
+
+  export type ProductStockSaleLogCountAggregateOutputType = {
+    deliveryNumber: number
+    productName: number
+    appliedQty: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ProductStockSaleLogAvgAggregateInputType = {
+    appliedQty?: true
+  }
+
+  export type ProductStockSaleLogSumAggregateInputType = {
+    appliedQty?: true
+  }
+
+  export type ProductStockSaleLogMinAggregateInputType = {
+    deliveryNumber?: true
+    productName?: true
+    appliedQty?: true
+    createdAt?: true
+  }
+
+  export type ProductStockSaleLogMaxAggregateInputType = {
+    deliveryNumber?: true
+    productName?: true
+    appliedQty?: true
+    createdAt?: true
+  }
+
+  export type ProductStockSaleLogCountAggregateInputType = {
+    deliveryNumber?: true
+    productName?: true
+    appliedQty?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ProductStockSaleLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductStockSaleLog to aggregate.
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStockSaleLogs to fetch.
+     */
+    orderBy?: ProductStockSaleLogOrderByWithRelationInput | ProductStockSaleLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductStockSaleLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStockSaleLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStockSaleLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductStockSaleLogs
+    **/
+    _count?: true | ProductStockSaleLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProductStockSaleLogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProductStockSaleLogSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductStockSaleLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductStockSaleLogMaxAggregateInputType
+  }
+
+  export type GetProductStockSaleLogAggregateType<T extends ProductStockSaleLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductStockSaleLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductStockSaleLog[P]>
+      : GetScalarType<T[P], AggregateProductStockSaleLog[P]>
+  }
+
+
+
+
+  export type ProductStockSaleLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductStockSaleLogWhereInput
+    orderBy?: ProductStockSaleLogOrderByWithAggregationInput | ProductStockSaleLogOrderByWithAggregationInput[]
+    by: ProductStockSaleLogScalarFieldEnum[] | ProductStockSaleLogScalarFieldEnum
+    having?: ProductStockSaleLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductStockSaleLogCountAggregateInputType | true
+    _avg?: ProductStockSaleLogAvgAggregateInputType
+    _sum?: ProductStockSaleLogSumAggregateInputType
+    _min?: ProductStockSaleLogMinAggregateInputType
+    _max?: ProductStockSaleLogMaxAggregateInputType
+  }
+
+  export type ProductStockSaleLogGroupByOutputType = {
+    deliveryNumber: string
+    productName: string | null
+    appliedQty: Decimal | null
+    createdAt: Date | null
+    _count: ProductStockSaleLogCountAggregateOutputType | null
+    _avg: ProductStockSaleLogAvgAggregateOutputType | null
+    _sum: ProductStockSaleLogSumAggregateOutputType | null
+    _min: ProductStockSaleLogMinAggregateOutputType | null
+    _max: ProductStockSaleLogMaxAggregateOutputType | null
+  }
+
+  type GetProductStockSaleLogGroupByPayload<T extends ProductStockSaleLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductStockSaleLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductStockSaleLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductStockSaleLogGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductStockSaleLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductStockSaleLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    deliveryNumber?: boolean
+    productName?: boolean
+    appliedQty?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["productStockSaleLog"]>
+
+
+
+  export type ProductStockSaleLogSelectScalar = {
+    deliveryNumber?: boolean
+    productName?: boolean
+    appliedQty?: boolean
+    createdAt?: boolean
+  }
+
+  export type ProductStockSaleLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"deliveryNumber" | "productName" | "appliedQty" | "createdAt", ExtArgs["result"]["productStockSaleLog"]>
+
+  export type $ProductStockSaleLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductStockSaleLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      deliveryNumber: string
+      productName: string | null
+      appliedQty: Prisma.Decimal | null
+      createdAt: Date | null
+    }, ExtArgs["result"]["productStockSaleLog"]>
+    composites: {}
+  }
+
+  type ProductStockSaleLogGetPayload<S extends boolean | null | undefined | ProductStockSaleLogDefaultArgs> = $Result.GetResult<Prisma.$ProductStockSaleLogPayload, S>
+
+  type ProductStockSaleLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProductStockSaleLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProductStockSaleLogCountAggregateInputType | true
+    }
+
+  export interface ProductStockSaleLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductStockSaleLog'], meta: { name: 'ProductStockSaleLog' } }
+    /**
+     * Find zero or one ProductStockSaleLog that matches the filter.
+     * @param {ProductStockSaleLogFindUniqueArgs} args - Arguments to find a ProductStockSaleLog
+     * @example
+     * // Get one ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductStockSaleLogFindUniqueArgs>(args: SelectSubset<T, ProductStockSaleLogFindUniqueArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProductStockSaleLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProductStockSaleLogFindUniqueOrThrowArgs} args - Arguments to find a ProductStockSaleLog
+     * @example
+     * // Get one ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductStockSaleLogFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductStockSaleLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductStockSaleLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogFindFirstArgs} args - Arguments to find a ProductStockSaleLog
+     * @example
+     * // Get one ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductStockSaleLogFindFirstArgs>(args?: SelectSubset<T, ProductStockSaleLogFindFirstArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductStockSaleLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogFindFirstOrThrowArgs} args - Arguments to find a ProductStockSaleLog
+     * @example
+     * // Get one ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductStockSaleLogFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductStockSaleLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProductStockSaleLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductStockSaleLogs
+     * const productStockSaleLogs = await prisma.productStockSaleLog.findMany()
+     * 
+     * // Get first 10 ProductStockSaleLogs
+     * const productStockSaleLogs = await prisma.productStockSaleLog.findMany({ take: 10 })
+     * 
+     * // Only select the `deliveryNumber`
+     * const productStockSaleLogWithDeliveryNumberOnly = await prisma.productStockSaleLog.findMany({ select: { deliveryNumber: true } })
+     * 
+     */
+    findMany<T extends ProductStockSaleLogFindManyArgs>(args?: SelectSubset<T, ProductStockSaleLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProductStockSaleLog.
+     * @param {ProductStockSaleLogCreateArgs} args - Arguments to create a ProductStockSaleLog.
+     * @example
+     * // Create one ProductStockSaleLog
+     * const ProductStockSaleLog = await prisma.productStockSaleLog.create({
+     *   data: {
+     *     // ... data to create a ProductStockSaleLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductStockSaleLogCreateArgs>(args: SelectSubset<T, ProductStockSaleLogCreateArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProductStockSaleLogs.
+     * @param {ProductStockSaleLogCreateManyArgs} args - Arguments to create many ProductStockSaleLogs.
+     * @example
+     * // Create many ProductStockSaleLogs
+     * const productStockSaleLog = await prisma.productStockSaleLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductStockSaleLogCreateManyArgs>(args?: SelectSubset<T, ProductStockSaleLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProductStockSaleLog.
+     * @param {ProductStockSaleLogDeleteArgs} args - Arguments to delete one ProductStockSaleLog.
+     * @example
+     * // Delete one ProductStockSaleLog
+     * const ProductStockSaleLog = await prisma.productStockSaleLog.delete({
+     *   where: {
+     *     // ... filter to delete one ProductStockSaleLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductStockSaleLogDeleteArgs>(args: SelectSubset<T, ProductStockSaleLogDeleteArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProductStockSaleLog.
+     * @param {ProductStockSaleLogUpdateArgs} args - Arguments to update one ProductStockSaleLog.
+     * @example
+     * // Update one ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductStockSaleLogUpdateArgs>(args: SelectSubset<T, ProductStockSaleLogUpdateArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProductStockSaleLogs.
+     * @param {ProductStockSaleLogDeleteManyArgs} args - Arguments to filter ProductStockSaleLogs to delete.
+     * @example
+     * // Delete a few ProductStockSaleLogs
+     * const { count } = await prisma.productStockSaleLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductStockSaleLogDeleteManyArgs>(args?: SelectSubset<T, ProductStockSaleLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductStockSaleLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductStockSaleLogs
+     * const productStockSaleLog = await prisma.productStockSaleLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductStockSaleLogUpdateManyArgs>(args: SelectSubset<T, ProductStockSaleLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductStockSaleLog.
+     * @param {ProductStockSaleLogUpsertArgs} args - Arguments to update or create a ProductStockSaleLog.
+     * @example
+     * // Update or create a ProductStockSaleLog
+     * const productStockSaleLog = await prisma.productStockSaleLog.upsert({
+     *   create: {
+     *     // ... data to create a ProductStockSaleLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductStockSaleLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductStockSaleLogUpsertArgs>(args: SelectSubset<T, ProductStockSaleLogUpsertArgs<ExtArgs>>): Prisma__ProductStockSaleLogClient<$Result.GetResult<Prisma.$ProductStockSaleLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProductStockSaleLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogCountArgs} args - Arguments to filter ProductStockSaleLogs to count.
+     * @example
+     * // Count the number of ProductStockSaleLogs
+     * const count = await prisma.productStockSaleLog.count({
+     *   where: {
+     *     // ... the filter for the ProductStockSaleLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductStockSaleLogCountArgs>(
+      args?: Subset<T, ProductStockSaleLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductStockSaleLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductStockSaleLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductStockSaleLogAggregateArgs>(args: Subset<T, ProductStockSaleLogAggregateArgs>): Prisma.PrismaPromise<GetProductStockSaleLogAggregateType<T>>
+
+    /**
+     * Group by ProductStockSaleLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductStockSaleLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductStockSaleLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductStockSaleLogGroupByArgs['orderBy'] }
+        : { orderBy?: ProductStockSaleLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductStockSaleLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductStockSaleLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductStockSaleLog model
+   */
+  readonly fields: ProductStockSaleLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductStockSaleLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductStockSaleLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductStockSaleLog model
+   */
+  interface ProductStockSaleLogFieldRefs {
+    readonly deliveryNumber: FieldRef<"ProductStockSaleLog", 'String'>
+    readonly productName: FieldRef<"ProductStockSaleLog", 'String'>
+    readonly appliedQty: FieldRef<"ProductStockSaleLog", 'Decimal'>
+    readonly createdAt: FieldRef<"ProductStockSaleLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductStockSaleLog findUnique
+   */
+  export type ProductStockSaleLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStockSaleLog to fetch.
+     */
+    where: ProductStockSaleLogWhereUniqueInput
+  }
+
+  /**
+   * ProductStockSaleLog findUniqueOrThrow
+   */
+  export type ProductStockSaleLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStockSaleLog to fetch.
+     */
+    where: ProductStockSaleLogWhereUniqueInput
+  }
+
+  /**
+   * ProductStockSaleLog findFirst
+   */
+  export type ProductStockSaleLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStockSaleLog to fetch.
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStockSaleLogs to fetch.
+     */
+    orderBy?: ProductStockSaleLogOrderByWithRelationInput | ProductStockSaleLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductStockSaleLogs.
+     */
+    cursor?: ProductStockSaleLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStockSaleLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStockSaleLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductStockSaleLogs.
+     */
+    distinct?: ProductStockSaleLogScalarFieldEnum | ProductStockSaleLogScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStockSaleLog findFirstOrThrow
+   */
+  export type ProductStockSaleLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStockSaleLog to fetch.
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStockSaleLogs to fetch.
+     */
+    orderBy?: ProductStockSaleLogOrderByWithRelationInput | ProductStockSaleLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductStockSaleLogs.
+     */
+    cursor?: ProductStockSaleLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStockSaleLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStockSaleLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductStockSaleLogs.
+     */
+    distinct?: ProductStockSaleLogScalarFieldEnum | ProductStockSaleLogScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStockSaleLog findMany
+   */
+  export type ProductStockSaleLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductStockSaleLogs to fetch.
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductStockSaleLogs to fetch.
+     */
+    orderBy?: ProductStockSaleLogOrderByWithRelationInput | ProductStockSaleLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductStockSaleLogs.
+     */
+    cursor?: ProductStockSaleLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductStockSaleLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductStockSaleLogs.
+     */
+    skip?: number
+    distinct?: ProductStockSaleLogScalarFieldEnum | ProductStockSaleLogScalarFieldEnum[]
+  }
+
+  /**
+   * ProductStockSaleLog create
+   */
+  export type ProductStockSaleLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProductStockSaleLog.
+     */
+    data: XOR<ProductStockSaleLogCreateInput, ProductStockSaleLogUncheckedCreateInput>
+  }
+
+  /**
+   * ProductStockSaleLog createMany
+   */
+  export type ProductStockSaleLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductStockSaleLogs.
+     */
+    data: ProductStockSaleLogCreateManyInput | ProductStockSaleLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductStockSaleLog update
+   */
+  export type ProductStockSaleLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProductStockSaleLog.
+     */
+    data: XOR<ProductStockSaleLogUpdateInput, ProductStockSaleLogUncheckedUpdateInput>
+    /**
+     * Choose, which ProductStockSaleLog to update.
+     */
+    where: ProductStockSaleLogWhereUniqueInput
+  }
+
+  /**
+   * ProductStockSaleLog updateMany
+   */
+  export type ProductStockSaleLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductStockSaleLogs.
+     */
+    data: XOR<ProductStockSaleLogUpdateManyMutationInput, ProductStockSaleLogUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductStockSaleLogs to update
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * Limit how many ProductStockSaleLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductStockSaleLog upsert
+   */
+  export type ProductStockSaleLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProductStockSaleLog to update in case it exists.
+     */
+    where: ProductStockSaleLogWhereUniqueInput
+    /**
+     * In case the ProductStockSaleLog found by the `where` argument doesn't exist, create a new ProductStockSaleLog with this data.
+     */
+    create: XOR<ProductStockSaleLogCreateInput, ProductStockSaleLogUncheckedCreateInput>
+    /**
+     * In case the ProductStockSaleLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductStockSaleLogUpdateInput, ProductStockSaleLogUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductStockSaleLog delete
+   */
+  export type ProductStockSaleLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+    /**
+     * Filter which ProductStockSaleLog to delete.
+     */
+    where: ProductStockSaleLogWhereUniqueInput
+  }
+
+  /**
+   * ProductStockSaleLog deleteMany
+   */
+  export type ProductStockSaleLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductStockSaleLogs to delete
+     */
+    where?: ProductStockSaleLogWhereInput
+    /**
+     * Limit how many ProductStockSaleLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductStockSaleLog without action
+   */
+  export type ProductStockSaleLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductStockSaleLog
+     */
+    select?: ProductStockSaleLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductStockSaleLog
+     */
+    omit?: ProductStockSaleLogOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model ProcessingCostConfig
    */
 
@@ -46303,16 +47287,19 @@ export namespace Prisma {
 
   export type OpsConsoleUserAvgAggregateOutputType = {
     id: number | null
+    permission: number | null
   }
 
   export type OpsConsoleUserSumAggregateOutputType = {
     id: number | null
+    permission: number | null
   }
 
   export type OpsConsoleUserMinAggregateOutputType = {
     id: number | null
     username: string | null
     passwordHash: string | null
+    permission: number | null
     lastLoginAt: Date | null
     lastLoginIp: string | null
     createdAt: Date | null
@@ -46323,6 +47310,7 @@ export namespace Prisma {
     id: number | null
     username: string | null
     passwordHash: string | null
+    permission: number | null
     lastLoginAt: Date | null
     lastLoginIp: string | null
     createdAt: Date | null
@@ -46333,6 +47321,7 @@ export namespace Prisma {
     id: number
     username: number
     passwordHash: number
+    permission: number
     lastLoginAt: number
     lastLoginIp: number
     createdAt: number
@@ -46343,16 +47332,19 @@ export namespace Prisma {
 
   export type OpsConsoleUserAvgAggregateInputType = {
     id?: true
+    permission?: true
   }
 
   export type OpsConsoleUserSumAggregateInputType = {
     id?: true
+    permission?: true
   }
 
   export type OpsConsoleUserMinAggregateInputType = {
     id?: true
     username?: true
     passwordHash?: true
+    permission?: true
     lastLoginAt?: true
     lastLoginIp?: true
     createdAt?: true
@@ -46363,6 +47355,7 @@ export namespace Prisma {
     id?: true
     username?: true
     passwordHash?: true
+    permission?: true
     lastLoginAt?: true
     lastLoginIp?: true
     createdAt?: true
@@ -46373,6 +47366,7 @@ export namespace Prisma {
     id?: true
     username?: true
     passwordHash?: true
+    permission?: true
     lastLoginAt?: true
     lastLoginIp?: true
     createdAt?: true
@@ -46470,6 +47464,7 @@ export namespace Prisma {
     id: number
     username: string
     passwordHash: string
+    permission: number
     lastLoginAt: Date | null
     lastLoginIp: string | null
     createdAt: Date
@@ -46499,6 +47494,7 @@ export namespace Prisma {
     id?: boolean
     username?: boolean
     passwordHash?: boolean
+    permission?: boolean
     lastLoginAt?: boolean
     lastLoginIp?: boolean
     createdAt?: boolean
@@ -46511,13 +47507,14 @@ export namespace Prisma {
     id?: boolean
     username?: boolean
     passwordHash?: boolean
+    permission?: boolean
     lastLoginAt?: boolean
     lastLoginIp?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type OpsConsoleUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "lastLoginAt" | "lastLoginIp" | "createdAt" | "updatedAt", ExtArgs["result"]["opsConsoleUser"]>
+  export type OpsConsoleUserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "permission" | "lastLoginAt" | "lastLoginIp" | "createdAt" | "updatedAt", ExtArgs["result"]["opsConsoleUser"]>
 
   export type $OpsConsoleUserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OpsConsoleUser"
@@ -46526,6 +47523,10 @@ export namespace Prisma {
       id: number
       username: string
       passwordHash: string
+      /**
+       * 0=待审核，1=已开通；仅 permission=1 可登录运维控制台
+       */
+      permission: number
       lastLoginAt: Date | null
       lastLoginIp: string | null
       createdAt: Date
@@ -46902,6 +47903,7 @@ export namespace Prisma {
     readonly id: FieldRef<"OpsConsoleUser", 'Int'>
     readonly username: FieldRef<"OpsConsoleUser", 'String'>
     readonly passwordHash: FieldRef<"OpsConsoleUser", 'String'>
+    readonly permission: FieldRef<"OpsConsoleUser", 'Int'>
     readonly lastLoginAt: FieldRef<"OpsConsoleUser", 'DateTime'>
     readonly lastLoginIp: FieldRef<"OpsConsoleUser", 'String'>
     readonly createdAt: FieldRef<"OpsConsoleUser", 'DateTime'>
@@ -47866,6 +48868,16 @@ export namespace Prisma {
   export type ProductStockScalarFieldEnum = (typeof ProductStockScalarFieldEnum)[keyof typeof ProductStockScalarFieldEnum]
 
 
+  export const ProductStockSaleLogScalarFieldEnum: {
+    deliveryNumber: 'deliveryNumber',
+    productName: 'productName',
+    appliedQty: 'appliedQty',
+    createdAt: 'createdAt'
+  };
+
+  export type ProductStockSaleLogScalarFieldEnum = (typeof ProductStockSaleLogScalarFieldEnum)[keyof typeof ProductStockSaleLogScalarFieldEnum]
+
+
   export const ProcessingCostConfigScalarFieldEnum: {
     id: 'id',
     productName: 'productName',
@@ -47909,6 +48921,7 @@ export namespace Prisma {
     id: 'id',
     username: 'username',
     passwordHash: 'passwordHash',
+    permission: 'permission',
     lastLoginAt: 'lastLoginAt',
     lastLoginIp: 'lastLoginIp',
     createdAt: 'createdAt',
@@ -48371,6 +49384,7 @@ export namespace Prisma {
     category: 'category',
     subCategory: 'subCategory',
     steelMill: 'steelMill',
+    previousValue: 'previousValue',
     unit: 'unit',
     remark: 'remark'
   };
@@ -48418,6 +49432,14 @@ export namespace Prisma {
   };
 
   export type ProductStockOrderByRelevanceFieldEnum = (typeof ProductStockOrderByRelevanceFieldEnum)[keyof typeof ProductStockOrderByRelevanceFieldEnum]
+
+
+  export const ProductStockSaleLogOrderByRelevanceFieldEnum: {
+    deliveryNumber: 'deliveryNumber',
+    productName: 'productName'
+  };
+
+  export type ProductStockSaleLogOrderByRelevanceFieldEnum = (typeof ProductStockSaleLogOrderByRelevanceFieldEnum)[keyof typeof ProductStockSaleLogOrderByRelevanceFieldEnum]
 
 
   export const ProcessingCostConfigOrderByRelevanceFieldEnum: {
@@ -51074,7 +52096,7 @@ export namespace Prisma {
     steelMill?: StringNullableFilter<"ProfitParamConfig"> | string | null
     effectiveDate?: DateTimeFilter<"ProfitParamConfig"> | Date | string
     value?: DecimalFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
-    previousValue?: DecimalNullableFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    previousValue?: StringNullableFilter<"ProfitParamConfig"> | string | null
     unit?: StringNullableFilter<"ProfitParamConfig"> | string | null
     remark?: StringNullableFilter<"ProfitParamConfig"> | string | null
     createdAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
@@ -51111,7 +52133,7 @@ export namespace Prisma {
     steelMill?: StringNullableFilter<"ProfitParamConfig"> | string | null
     effectiveDate?: DateTimeFilter<"ProfitParamConfig"> | Date | string
     value?: DecimalFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
-    previousValue?: DecimalNullableFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    previousValue?: StringNullableFilter<"ProfitParamConfig"> | string | null
     unit?: StringNullableFilter<"ProfitParamConfig"> | string | null
     remark?: StringNullableFilter<"ProfitParamConfig"> | string | null
     createdAt?: DateTimeNullableFilter<"ProfitParamConfig"> | Date | string | null
@@ -51151,7 +52173,7 @@ export namespace Prisma {
     steelMill?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
     effectiveDate?: DateTimeWithAggregatesFilter<"ProfitParamConfig"> | Date | string
     value?: DecimalWithAggregatesFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string
-    previousValue?: DecimalNullableWithAggregatesFilter<"ProfitParamConfig"> | Decimal | DecimalJsLike | number | string | null
+    previousValue?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
     unit?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
     remark?: StringNullableWithAggregatesFilter<"ProfitParamConfig"> | string | null
     createdAt?: DateTimeNullableWithAggregatesFilter<"ProfitParamConfig"> | Date | string | null
@@ -51638,6 +52660,56 @@ export namespace Prisma {
     updateTime?: DateTimeNullableWithAggregatesFilter<"ProductStock"> | Date | string | null
   }
 
+  export type ProductStockSaleLogWhereInput = {
+    AND?: ProductStockSaleLogWhereInput | ProductStockSaleLogWhereInput[]
+    OR?: ProductStockSaleLogWhereInput[]
+    NOT?: ProductStockSaleLogWhereInput | ProductStockSaleLogWhereInput[]
+    deliveryNumber?: StringFilter<"ProductStockSaleLog"> | string
+    productName?: StringNullableFilter<"ProductStockSaleLog"> | string | null
+    appliedQty?: DecimalNullableFilter<"ProductStockSaleLog"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableFilter<"ProductStockSaleLog"> | Date | string | null
+  }
+
+  export type ProductStockSaleLogOrderByWithRelationInput = {
+    deliveryNumber?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    appliedQty?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    _relevance?: ProductStockSaleLogOrderByRelevanceInput
+  }
+
+  export type ProductStockSaleLogWhereUniqueInput = Prisma.AtLeast<{
+    deliveryNumber?: string
+    AND?: ProductStockSaleLogWhereInput | ProductStockSaleLogWhereInput[]
+    OR?: ProductStockSaleLogWhereInput[]
+    NOT?: ProductStockSaleLogWhereInput | ProductStockSaleLogWhereInput[]
+    productName?: StringNullableFilter<"ProductStockSaleLog"> | string | null
+    appliedQty?: DecimalNullableFilter<"ProductStockSaleLog"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableFilter<"ProductStockSaleLog"> | Date | string | null
+  }, "deliveryNumber">
+
+  export type ProductStockSaleLogOrderByWithAggregationInput = {
+    deliveryNumber?: SortOrder
+    productName?: SortOrderInput | SortOrder
+    appliedQty?: SortOrderInput | SortOrder
+    createdAt?: SortOrderInput | SortOrder
+    _count?: ProductStockSaleLogCountOrderByAggregateInput
+    _avg?: ProductStockSaleLogAvgOrderByAggregateInput
+    _max?: ProductStockSaleLogMaxOrderByAggregateInput
+    _min?: ProductStockSaleLogMinOrderByAggregateInput
+    _sum?: ProductStockSaleLogSumOrderByAggregateInput
+  }
+
+  export type ProductStockSaleLogScalarWhereWithAggregatesInput = {
+    AND?: ProductStockSaleLogScalarWhereWithAggregatesInput | ProductStockSaleLogScalarWhereWithAggregatesInput[]
+    OR?: ProductStockSaleLogScalarWhereWithAggregatesInput[]
+    NOT?: ProductStockSaleLogScalarWhereWithAggregatesInput | ProductStockSaleLogScalarWhereWithAggregatesInput[]
+    deliveryNumber?: StringWithAggregatesFilter<"ProductStockSaleLog"> | string
+    productName?: StringNullableWithAggregatesFilter<"ProductStockSaleLog"> | string | null
+    appliedQty?: DecimalNullableWithAggregatesFilter<"ProductStockSaleLog"> | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeNullableWithAggregatesFilter<"ProductStockSaleLog"> | Date | string | null
+  }
+
   export type ProcessingCostConfigWhereInput = {
     AND?: ProcessingCostConfigWhereInput | ProcessingCostConfigWhereInput[]
     OR?: ProcessingCostConfigWhereInput[]
@@ -51840,6 +52912,7 @@ export namespace Prisma {
     id?: IntFilter<"OpsConsoleUser"> | number
     username?: StringFilter<"OpsConsoleUser"> | string
     passwordHash?: StringFilter<"OpsConsoleUser"> | string
+    permission?: IntFilter<"OpsConsoleUser"> | number
     lastLoginAt?: DateTimeNullableFilter<"OpsConsoleUser"> | Date | string | null
     lastLoginIp?: StringNullableFilter<"OpsConsoleUser"> | string | null
     createdAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
@@ -51850,6 +52923,7 @@ export namespace Prisma {
     id?: SortOrder
     username?: SortOrder
     passwordHash?: SortOrder
+    permission?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     lastLoginIp?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -51864,6 +52938,7 @@ export namespace Prisma {
     OR?: OpsConsoleUserWhereInput[]
     NOT?: OpsConsoleUserWhereInput | OpsConsoleUserWhereInput[]
     passwordHash?: StringFilter<"OpsConsoleUser"> | string
+    permission?: IntFilter<"OpsConsoleUser"> | number
     lastLoginAt?: DateTimeNullableFilter<"OpsConsoleUser"> | Date | string | null
     lastLoginIp?: StringNullableFilter<"OpsConsoleUser"> | string | null
     createdAt?: DateTimeFilter<"OpsConsoleUser"> | Date | string
@@ -51874,6 +52949,7 @@ export namespace Prisma {
     id?: SortOrder
     username?: SortOrder
     passwordHash?: SortOrder
+    permission?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     lastLoginIp?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -51892,6 +52968,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"OpsConsoleUser"> | number
     username?: StringWithAggregatesFilter<"OpsConsoleUser"> | string
     passwordHash?: StringWithAggregatesFilter<"OpsConsoleUser"> | string
+    permission?: IntWithAggregatesFilter<"OpsConsoleUser"> | number
     lastLoginAt?: DateTimeNullableWithAggregatesFilter<"OpsConsoleUser"> | Date | string | null
     lastLoginIp?: StringNullableWithAggregatesFilter<"OpsConsoleUser"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"OpsConsoleUser"> | Date | string
@@ -54612,7 +55689,7 @@ export namespace Prisma {
     steelMill?: string | null
     effectiveDate: Date | string
     value: Decimal | DecimalJsLike | number | string
-    previousValue?: Decimal | DecimalJsLike | number | string | null
+    previousValue?: string | null
     unit?: string | null
     remark?: string | null
     createdAt?: Date | string | null
@@ -54628,7 +55705,7 @@ export namespace Prisma {
     steelMill?: string | null
     effectiveDate: Date | string
     value: Decimal | DecimalJsLike | number | string
-    previousValue?: Decimal | DecimalJsLike | number | string | null
+    previousValue?: string | null
     unit?: string | null
     remark?: string | null
     createdAt?: Date | string | null
@@ -54643,7 +55720,7 @@ export namespace Prisma {
     steelMill?: NullableStringFieldUpdateOperationsInput | string | null
     effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
     value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    previousValue?: NullableStringFieldUpdateOperationsInput | string | null
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     remark?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54659,7 +55736,7 @@ export namespace Prisma {
     steelMill?: NullableStringFieldUpdateOperationsInput | string | null
     effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
     value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    previousValue?: NullableStringFieldUpdateOperationsInput | string | null
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     remark?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54675,7 +55752,7 @@ export namespace Prisma {
     steelMill?: string | null
     effectiveDate: Date | string
     value: Decimal | DecimalJsLike | number | string
-    previousValue?: Decimal | DecimalJsLike | number | string | null
+    previousValue?: string | null
     unit?: string | null
     remark?: string | null
     createdAt?: Date | string | null
@@ -54690,7 +55767,7 @@ export namespace Prisma {
     steelMill?: NullableStringFieldUpdateOperationsInput | string | null
     effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
     value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    previousValue?: NullableStringFieldUpdateOperationsInput | string | null
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     remark?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54706,7 +55783,7 @@ export namespace Prisma {
     steelMill?: NullableStringFieldUpdateOperationsInput | string | null
     effectiveDate?: DateTimeFieldUpdateOperationsInput | Date | string
     value?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    previousValue?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    previousValue?: NullableStringFieldUpdateOperationsInput | string | null
     unit?: NullableStringFieldUpdateOperationsInput | string | null
     remark?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55313,6 +56390,55 @@ export namespace Prisma {
     updateTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type ProductStockSaleLogCreateInput = {
+    deliveryNumber: string
+    productName?: string | null
+    appliedQty?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+  }
+
+  export type ProductStockSaleLogUncheckedCreateInput = {
+    deliveryNumber: string
+    productName?: string | null
+    appliedQty?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+  }
+
+  export type ProductStockSaleLogUpdateInput = {
+    deliveryNumber?: StringFieldUpdateOperationsInput | string
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    appliedQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockSaleLogUncheckedUpdateInput = {
+    deliveryNumber?: StringFieldUpdateOperationsInput | string
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    appliedQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockSaleLogCreateManyInput = {
+    deliveryNumber: string
+    productName?: string | null
+    appliedQty?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string | null
+  }
+
+  export type ProductStockSaleLogUpdateManyMutationInput = {
+    deliveryNumber?: StringFieldUpdateOperationsInput | string
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    appliedQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ProductStockSaleLogUncheckedUpdateManyInput = {
+    deliveryNumber?: StringFieldUpdateOperationsInput | string
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    appliedQty?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type ProcessingCostConfigCreateInput = {
     productName?: string | null
     unitProcessingCost?: Decimal | DecimalJsLike | number | string | null
@@ -55517,6 +56643,7 @@ export namespace Prisma {
   export type OpsConsoleUserCreateInput = {
     username: string
     passwordHash: string
+    permission?: number
     lastLoginAt?: Date | string | null
     lastLoginIp?: string | null
     createdAt?: Date | string
@@ -55527,6 +56654,7 @@ export namespace Prisma {
     id?: number
     username: string
     passwordHash: string
+    permission?: number
     lastLoginAt?: Date | string | null
     lastLoginIp?: string | null
     createdAt?: Date | string
@@ -55536,6 +56664,7 @@ export namespace Prisma {
   export type OpsConsoleUserUpdateInput = {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    permission?: IntFieldUpdateOperationsInput | number
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55546,6 +56675,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    permission?: IntFieldUpdateOperationsInput | number
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55556,6 +56686,7 @@ export namespace Prisma {
     id?: number
     username: string
     passwordHash: string
+    permission?: number
     lastLoginAt?: Date | string | null
     lastLoginIp?: string | null
     createdAt?: Date | string
@@ -55565,6 +56696,7 @@ export namespace Prisma {
   export type OpsConsoleUserUpdateManyMutationInput = {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    permission?: IntFieldUpdateOperationsInput | number
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55575,6 +56707,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    permission?: IntFieldUpdateOperationsInput | number
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginIp?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -57648,7 +58781,6 @@ export namespace Prisma {
   export type ProfitParamConfigAvgOrderByAggregateInput = {
     id?: SortOrder
     value?: SortOrder
-    previousValue?: SortOrder
   }
 
   export type ProfitParamConfigMaxOrderByAggregateInput = {
@@ -57686,7 +58818,6 @@ export namespace Prisma {
   export type ProfitParamConfigSumOrderByAggregateInput = {
     id?: SortOrder
     value?: SortOrder
-    previousValue?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -58126,6 +59257,41 @@ export namespace Prisma {
     currentPrice?: SortOrder
   }
 
+  export type ProductStockSaleLogOrderByRelevanceInput = {
+    fields: ProductStockSaleLogOrderByRelevanceFieldEnum | ProductStockSaleLogOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProductStockSaleLogCountOrderByAggregateInput = {
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    appliedQty?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProductStockSaleLogAvgOrderByAggregateInput = {
+    appliedQty?: SortOrder
+  }
+
+  export type ProductStockSaleLogMaxOrderByAggregateInput = {
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    appliedQty?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProductStockSaleLogMinOrderByAggregateInput = {
+    deliveryNumber?: SortOrder
+    productName?: SortOrder
+    appliedQty?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProductStockSaleLogSumOrderByAggregateInput = {
+    appliedQty?: SortOrder
+  }
+
   export type ProcessingCostConfigOrderByRelevanceInput = {
     fields: ProcessingCostConfigOrderByRelevanceFieldEnum | ProcessingCostConfigOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -58270,6 +59436,7 @@ export namespace Prisma {
     id?: SortOrder
     username?: SortOrder
     passwordHash?: SortOrder
+    permission?: SortOrder
     lastLoginAt?: SortOrder
     lastLoginIp?: SortOrder
     createdAt?: SortOrder
@@ -58278,12 +59445,14 @@ export namespace Prisma {
 
   export type OpsConsoleUserAvgOrderByAggregateInput = {
     id?: SortOrder
+    permission?: SortOrder
   }
 
   export type OpsConsoleUserMaxOrderByAggregateInput = {
     id?: SortOrder
     username?: SortOrder
     passwordHash?: SortOrder
+    permission?: SortOrder
     lastLoginAt?: SortOrder
     lastLoginIp?: SortOrder
     createdAt?: SortOrder
@@ -58294,6 +59463,7 @@ export namespace Prisma {
     id?: SortOrder
     username?: SortOrder
     passwordHash?: SortOrder
+    permission?: SortOrder
     lastLoginAt?: SortOrder
     lastLoginIp?: SortOrder
     createdAt?: SortOrder
@@ -58302,6 +59472,7 @@ export namespace Prisma {
 
   export type OpsConsoleUserSumOrderByAggregateInput = {
     id?: SortOrder
+    permission?: SortOrder
   }
 
   export type NullableStringFieldUpdateOperationsInput = {

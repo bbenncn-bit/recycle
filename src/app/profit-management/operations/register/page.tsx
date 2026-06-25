@@ -25,7 +25,8 @@ export default function OpsRegisterPage() {
       if (!res.ok || !json.success) {
         throw new Error(json.error || `HTTP ${res.status}`);
       }
-      router.push('/profit-management/operations/login');
+      const q = new URLSearchParams({ registered: '1', user: json.data?.username ?? username.trim() });
+      router.push(`/profit-management/operations/login?${q.toString()}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : '注册失败');
     } finally {
@@ -36,9 +37,10 @@ export default function OpsRegisterPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
       <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <h1 className="text-center text-xl font-semibold text-gray-900 dark:text-white">注册运维账号</h1>
-        <p className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
-          仅在尚无账号时可用；已有账号时需设置 OPS_ALLOW_REGISTER=1 方可继续注册
+        <h1 className="text-center text-xl font-semibold text-gray-900 dark:text-white">申请运维账号</h1>
+        <p className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+          填写用户名与密码即可提交申请。密码将加密保存（bcrypt）；管理员在数据库将{' '}
+          <code className="text-xs">permission</code> 设为 <strong>1</strong> 后方可登录使用。
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={onSubmit}>
@@ -84,11 +86,12 @@ export default function OpsRegisterPage() {
             disabled={loading}
             className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
           >
-            {loading ? '提交中…' : '注册'}
+            {loading ? '提交中…' : '提交申请'}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+          已有账号？{' '}
           <Link href="/profit-management/operations/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
             返回登录
           </Link>

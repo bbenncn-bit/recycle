@@ -648,6 +648,8 @@ model OpsConsoleUser {
   id           Int       @id @default(autoincrement())
   username     String    @unique @db.VarChar(64)
   passwordHash String    @map("password_hash") @db.VarChar(255)
+  /// 0=待审核，1=已开通；仅 permission=1 可登录运维控制台
+  permission   Int       @default(0) @db.TinyInt
   lastLoginAt  DateTime? @map("last_login_at") @db.DateTime(0)
   lastLoginIp  String?   @map("last_login_ip") @db.VarChar(45)
   createdAt    DateTime  @default(now()) @map("created_at") @db.DateTime(0)

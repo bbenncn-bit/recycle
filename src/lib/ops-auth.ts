@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
+import { prisma } from '@/lib/prismadb';
 import { getOpsJwtSecretBytes } from './ops-jwt-secret';
 
 export const OPS_SESSION_COOKIE = 'ops_session';
@@ -59,5 +60,18 @@ export function getOpsSessionTokenFromRequest(request: Request): string | null {
 export async function verifyOpsSessionFromRequest(request: Request): Promise<OpsJwtPayload | null> {
   const token = getOpsSessionTokenFromRequest(request);
   if (!token) return null;
-  return verifyOpsSessionToken(token);
+  const session = await verifyOpsSessionToken(token);
+  if (!session) return null;
+
+  const userId = parseInt(session.sub, 10);
+  if (!Number.isFinite(userId) || userId <= 0) return null;
+
+  const user = await prisma.opsConsoleUser.findUnique({
+    where: { id: userId },
+    select: { permission: true, username: true },
+  });
+  if (!user || user.permission !== 1) return null;
+  if (user.username !== session.username) return null;
+
+  return session;
 }

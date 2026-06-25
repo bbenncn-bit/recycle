@@ -2,13 +2,15 @@
 -- 执行后可用该账号登录 /profit-management/operations/login
 -- 生产环境请在 .env / .env.production 配置 OPS_JWT_SECRET（与签发 Cookie 一致）
 
-INSERT INTO `OpsConsoleUser` (`username`, `password_hash`, `created_at`, `updated_at`)
+INSERT INTO `OpsConsoleUser` (`username`, `password_hash`, `permission`, `created_at`, `updated_at`)
 VALUES (
   'xiaocaiyun',
   '$2b$12$KnDyrG9bUXllALHbTjOOY.USG8JY2XHQ9vVYpgAe7vUtYfp7JiFX6',
+  1,
   NOW(),
   NOW()
 )
 ON DUPLICATE KEY UPDATE
   `password_hash` = VALUES(`password_hash`),
+  `permission` = 1,
   `updated_at` = NOW();

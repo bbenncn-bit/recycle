@@ -625,6 +625,13 @@ exports.Prisma.ProductStockScalarFieldEnum = {
   updateTime: 'updateTime'
 };
 
+exports.Prisma.ProductStockSaleLogScalarFieldEnum = {
+  deliveryNumber: 'deliveryNumber',
+  productName: 'productName',
+  appliedQty: 'appliedQty',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ProcessingCostConfigScalarFieldEnum = {
   id: 'id',
   productName: 'productName',
@@ -659,6 +666,7 @@ exports.Prisma.OpsConsoleUserScalarFieldEnum = {
   id: 'id',
   username: 'username',
   passwordHash: 'passwordHash',
+  permission: 'permission',
   lastLoginAt: 'lastLoginAt',
   lastLoginIp: 'lastLoginIp',
   createdAt: 'createdAt',
@@ -995,6 +1003,7 @@ exports.Prisma.ProfitParamConfigOrderByRelevanceFieldEnum = {
   category: 'category',
   subCategory: 'subCategory',
   steelMill: 'steelMill',
+  previousValue: 'previousValue',
   unit: 'unit',
   remark: 'remark'
 };
@@ -1030,6 +1039,11 @@ exports.Prisma.MaterialStorageOrderByRelevanceFieldEnum = {
 exports.Prisma.ProductStockOrderByRelevanceFieldEnum = {
   productName: 'productName',
   warehouseCode: 'warehouseCode'
+};
+
+exports.Prisma.ProductStockSaleLogOrderByRelevanceFieldEnum = {
+  deliveryNumber: 'deliveryNumber',
+  productName: 'productName'
 };
 
 exports.Prisma.ProcessingCostConfigOrderByRelevanceFieldEnum = {
@@ -1097,6 +1111,7 @@ exports.Prisma.ModelName = {
   ProcessingCostInput: 'ProcessingCostInput',
   MaterialStorage: 'MaterialStorage',
   ProductStock: 'ProductStock',
+  ProductStockSaleLog: 'ProductStockSaleLog',
   ProcessingCostConfig: 'ProcessingCostConfig',
   MaterialCostCache: 'MaterialCostCache',
   MaterialCostCacheErrorLog: 'MaterialCostCacheErrorLog',

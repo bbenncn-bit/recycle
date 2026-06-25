@@ -28,6 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: '用户名或密码错误' }, { status: 401 });
     }
 
+    if (user.permission !== 1) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: '账号待审核，请联系管理员在 OpsConsoleUser 表将 permission 设为 1 后再登录',
+        },
+        { status: 403 }
+      );
+    }
+
     const forwarded = request.headers.get('x-forwarded-for');
     const ip =
       forwarded?.split(',')[0]?.trim() ||

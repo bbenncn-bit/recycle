@@ -465,7 +465,7 @@ model ProfitParamConfig {
   steelMill     String?   @map("steel_mill") @db.VarChar(30) // 萍钢/吉钢/新钢，NULL=通用
   effectiveDate DateTime  @map("effective_date") @db.Date // 生效日期（精确到日）
   value         Decimal   @map("value") @db.Decimal(18, 6) // 参数值（新标准）
-  previousValue Decimal?  @map("previous_value") @db.Decimal(18, 6) // 变动前的值（可选）
+  previousValue String?   @map("previous_value") @db.Text // 变更历史 JSON：{ "修改时间ISO": 前值, ... }
   unit          String?   @map("unit") @db.VarChar(30) // 单位
   remark        String?   @map("remark") @db.VarChar(500)
   createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
@@ -587,6 +587,17 @@ model ProductStock {
   @@map("ProductStock")
 }
 
+/// 成品库销售出库台账：结算导入按发货净重幂等扣减成品库（发货单号唯一）
+model ProductStockSaleLog {
+  deliveryNumber String    @id @map("delivery_number") @db.VarChar(100)
+  productName    String?   @map("product_name") @db.VarChar(100)
+  appliedQty     Decimal?  @map("applied_qty") @db.Decimal(18, 3)
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@index([productName])
+  @@map("ProductStockSaleLog")
+}
+
 /// 加工成本配置表（上月吨加工成本）
 model ProcessingCostConfig {
   id                 Int       @id @default(autoincrement()) @map("id")
@@ -637,6 +648,8 @@ model OpsConsoleUser {
   id           Int       @id @default(autoincrement())
   username     String    @unique @db.VarChar(64)
   passwordHash String    @map("password_hash") @db.VarChar(255)
+  /// 0=待审核，1=已开通；仅 permission=1 可登录运维控制台
+  permission   Int       @default(0) @db.TinyInt
   lastLoginAt  DateTime? @map("last_login_at") @db.DateTime(0)
   lastLoginIp  String?   @map("last_login_ip") @db.VarChar(45)
   createdAt    DateTime  @default(now()) @map("created_at") @db.DateTime(0)

@@ -8,6 +8,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get('from') || '/profit-management/operations';
+  const registered = searchParams.get('registered') === '1';
+  const registeredUser = searchParams.get('user');
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +47,15 @@ function LoginForm() {
         <p className="mt-2 text-center text-sm text-gray-500 dark:text-gray-400">
           仅此入口可访问算账经营 · 运维页
         </p>
+
+        {registered && (
+          <div
+            className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-100"
+            role="status"
+          >
+            账号{registeredUser ? `「${registeredUser}」` : ''}已提交，请等待管理员审核开通（permission=1）后再登录。
+          </div>
+        )}
 
         <form className="mt-8 space-y-4" onSubmit={onSubmit}>
           <div>
@@ -92,9 +103,9 @@ function LoginForm() {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          首次部署需在库中建表后{' '}
+          没有账号？{' '}
           <Link href="/profit-management/operations/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-            注册首个账号
+            申请运维账号
           </Link>
         </p>
       </div>
