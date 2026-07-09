@@ -626,16 +626,22 @@ function buildPrismaCreateData(
     }
   }
 
-  const dailyProcessPrice =
-    productPrice != null
-      ? productPrice
-      : productTons != null && productTons > 0 && materialCostSum > 0
-        ? materialCostSum / productTons
-        : null;
+  // 成品金额：优先 ProductStock.current_price；若未维护或为 0（常见于 JG散料/JGSL），
+  // 回退为投料成本合计（Σ 毛料吨数×单价），避免 dailyProcess_amount 落成 NULL/0。
+  const useProductPrice = productPrice != null && productPrice > 0;
+  const dailyProcessPrice = useProductPrice
+    ? productPrice
+    : productTons != null && productTons > 0 && materialCostSum > 0
+      ? materialCostSum / productTons
+      : null;
 
   data.dailyProcessAmount =
-    productTons != null && productTons > 0 && productPrice != null
-      ? productTons * productPrice
+    productTons != null && productTons > 0
+      ? useProductPrice
+        ? productTons * productPrice!
+        : materialCostSum > 0
+          ? materialCostSum
+          : null
       : null;
   data.dailyProcessPrice = dailyProcessPrice;
   data.materialWarehouses = JSON.stringify(materialWarehouses);

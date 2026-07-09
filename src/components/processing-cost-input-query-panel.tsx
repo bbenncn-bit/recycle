@@ -26,6 +26,7 @@ export default function ProcessingCostInputQueryPanel() {
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const monthOptions = useMemo(() => {
@@ -67,6 +68,37 @@ export default function ProcessingCostInputQueryPanel() {
     load();
   }, [load]);
 
+  const exportExcel = useCallback(async () => {
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/profit-management/processing-cost-input/export?month=${encodeURIComponent(month)}`,
+        { credentials: 'same-origin' }
+      );
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || `导出失败 HTTP ${res.status}`);
+      }
+      const blob = await res.blob();
+      const cd = res.headers.get('Content-Disposition') || '';
+      const m = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(cd);
+      const filename = decodeURIComponent(m?.[1] || m?.[2] || `加工明细_${month}.xlsx`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '导出失败');
+    } finally {
+      setExporting(false);
+    }
+  }, [month]);
+
   return (
     <section className="rounded-lg border border-teal-200 bg-white p-4 shadow-sm dark:border-teal-900/50 dark:bg-gray-800">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -75,7 +107,7 @@ export default function ProcessingCostInputQueryPanel() {
             加工明细查询（按月）
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 max-w-3xl">
-            数据来源 ProcessingCostInput。投料组成仅展示本单有投料量的毛料（对应 XXX_qty / XXX_price 列）。
+            数据来源 ProcessingCostInput。投料组成仅展示本单有投料量的毛料（对应 XXX_qty / XXX_price 列）。导出含成品、投料明细、录入人与时间。
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -100,6 +132,15 @@ export default function ProcessingCostInputQueryPanel() {
             className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
           >
             查询
+          </button>
+          <button
+            type="button"
+            onClick={exportExcel}
+            disabled={exporting || loading}
+            className="rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-500 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+            title="导出当前所选月份的加工明细 Excel（含投料明细）"
+          >
+            {exporting ? '导出中…' : '导出 Excel'}
           </button>
         </div>
       </div>
