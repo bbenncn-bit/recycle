@@ -590,9 +590,7 @@ function ItemConfigModal({
   const transCostTotal = subitems?.transportCost ?? 0;
   const refundBase = subitems?.refundBaseTotal ?? 0;
   const inboundTaxPct = whTax * 100;
-  const inboundTaxLabel = basis?.warehouseTaxRateFromLifo
-    ? `溯源加权 ${fmt(inboundTaxPct, 4)}%`
-    : `入库单税率(inbound_tax_rate) ${fmt(inboundTaxPct, 4)}%`;
+  const inboundTaxLabel = `入库单税率(inbound_tax_rate) ${fmt(inboundTaxPct, 4)}%`;
   const matTaxAmt = matCostTotal * whTax;
   const refundBaseSteps: string[] = [
     `基数 base = 收入不含税×13% − 材料成本×入库单税率 − 加工成本×9% − 运输费×3%`,

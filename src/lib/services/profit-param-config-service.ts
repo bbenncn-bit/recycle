@@ -207,7 +207,32 @@ export function buildParamSnapshot(
 export const WAREHOUSE_TAX_PARAM_KEY = 'inbound_tax_rate';
 
 /**
- * 入库单税率（%）：LIFO 溯源失败时，从 ProfitParamConfig 读取 inbound_tax_rate。
+ * 从任意 inbound_tax_rate 行按发货日取 %（无视 steel_mill；该参数通常全厂共用）。
+ */
+function pickInboundTaxPercentFromRows(
+  rows: ParamConfigRow[],
+  deliveryDate: Date
+): number | null {
+  if (rows.length === 0) return null;
+  const normalized = new Date(deliveryDate);
+  normalized.setHours(0, 0, 0, 0);
+  const pool = [...rows].sort(
+    (a, b) => b.effectiveDate.getTime() - a.effectiveDate.getTime()
+  );
+  const row =
+    pool.find((r) => {
+      const d = new Date(r.effectiveDate);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() <= normalized.getTime();
+    }) ?? pool[pool.length - 1];
+  const hist = parseProfitParamHistory(row.previousValueRaw);
+  const pct = getParamValueAtDeliveryDate(row.value, hist, normalized);
+  return Number.isFinite(pct) && pct > 0 ? pct : null;
+}
+
+/**
+ * 入库单税率（%）：严格按 ProfitParamConfig.inbound_tax_rate 的 value / previous_value
+ * 与发货日匹配（变更日起用新值，之前用历史前值）。
  */
 export function resolveWarehouseTaxRatePercentFromConfig(
   allRows: ParamConfigRow[],
@@ -226,19 +251,15 @@ export function resolveWarehouseTaxRatePercentFromConfig(
     if (byKey != null && Number.isFinite(byKey) && byKey > 0) return byKey;
   }
 
-  const nameRows = allRows.filter(
-    (r) =>
-      (r.nameCn || '').trim() === '入库单税率' &&
-      (mill ? normSteelMill(r.steelMill) === mill || isGlobalSteelMill(r.steelMill) : isGlobalSteelMill(r.steelMill))
+  // 无钢厂精确/全局行时：回退任意 steel_mill 的 inbound_tax_rate（运维常挂在某一钢厂下）
+  const byAnyMill = pickInboundTaxPercentFromRows(
+    allRows.filter((r) => r.paramKey === WAREHOUSE_TAX_PARAM_KEY),
+    deliveryDate
   );
-  const pickRow =
-    nameRows.find((r) => r.paramKey === WAREHOUSE_TAX_PARAM_KEY) ?? nameRows[0];
-  if (pickRow) {
-    const hist = parseProfitParamHistory(pickRow.previousValueRaw);
-    const pct = getParamValueAtDeliveryDate(pickRow.value, hist, deliveryDate);
-    return Number.isFinite(pct) && pct > 0 ? pct : null;
-  }
-  return null;
+  if (byAnyMill != null) return byAnyMill;
+
+  const nameRows = allRows.filter((r) => (r.nameCn || '').trim() === '入库单税率');
+  return pickInboundTaxPercentFromRows(nameRows, deliveryDate);
 }
 
 /** 入库单税率（小数，如 0.13）；配置缺失或 ≤0 时返回 0 */
@@ -252,17 +273,15 @@ export function resolveWarehouseTaxRateDecimalFromConfig(
 }
 
 /**
- * 确定本单实际采用的入库单税率：LIFO 溯源 > 0 时优先；否则 inbound_tax_rate（%→小数）。
+ * 确定本单实际采用的入库单税率：一律取 ProfitParamConfig.inbound_tax_rate（按发货日）。
+ * @param _lifoDecimal 保留参数兼容旧调用；已不再用于优先覆盖配置值。
  */
 export function resolveFinalWarehouseTaxRate(
-  lifoDecimal: number,
+  _lifoDecimal: number,
   allRows: ParamConfigRow[],
   deliveryDate: Date,
   steelMill?: string | null
 ): { rate: number; fromLifo: boolean; percent: number } {
-  if (lifoDecimal > 0) {
-    return { rate: lifoDecimal, fromLifo: true, percent: lifoDecimal * 100 };
-  }
   const pct = resolveWarehouseTaxRatePercentFromConfig(allRows, deliveryDate, steelMill);
   const rate = pct != null && pct > 0 ? pct / 100 : 0;
   return { rate, fromLifo: false, percent: pct ?? 0 };
@@ -288,21 +307,18 @@ export interface ProfitRowBasis {
   materialCost: number;
   /** 材料单价（不含税，元/吨）= 材料成本 / 材料核算量 */
   materialUnitExclTax: number;
-  /** 入库单税率（小数，如 0.13）；LIFO 溯源或 inbound_tax_rate 配置 */
+  /** 入库单税率（小数，如 0.13）；来自 ProfitParamConfig.inbound_tax_rate（按发货日） */
   warehouseTaxRate: number;
-  /** true 表示 warehouseTaxRate 来自 PurchaseWarehouse 溯源，非配置参数 */
+  /** 兼容旧字段：入库单税率已不再走 LIFO 溯源，恒为 false */
   warehouseTaxRateFromLifo?: boolean;
 }
 
-/** 试算/展示前：将 inbound_tax_rate 写入 basis.warehouseTaxRate（与 computeProfitSubitems 一致） */
+/** 试算/展示前：将 inbound_tax_rate（按发货日）写入 basis.warehouseTaxRate */
 export function applyWarehouseTaxToBasis(
   basis: ProfitRowBasis,
   allRows: ParamConfigRow[],
   deliveryDate: Date
 ): ProfitRowBasis {
-  if (basis.warehouseTaxRateFromLifo && (basis.warehouseTaxRate ?? 0) > 0) {
-    return basis;
-  }
   const resolved = resolveFinalWarehouseTaxRate(
     0,
     allRows,
@@ -312,7 +328,7 @@ export function applyWarehouseTaxToBasis(
   return {
     ...basis,
     warehouseTaxRate: resolved.rate,
-    warehouseTaxRateFromLifo: resolved.fromLifo,
+    warehouseTaxRateFromLifo: false,
   };
 }
 
@@ -494,6 +510,25 @@ export function computeProfitSubitems(basis: ProfitRowBasis, s: ProfitParamSnaps
   };
 }
 
+/** 将 DB 读出的 previous_value（TEXT 字符串或 JSON 对象）规范为 JSON 字符串 */
+export function normalizePreviousValueRaw(raw: unknown): string | null {
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'string') {
+    const t = raw.trim();
+    if (!t) return null;
+    if (t.startsWith('{') || t.startsWith('[')) return t;
+    return null;
+  }
+  if (typeof raw === 'object' && !Array.isArray(raw)) {
+    try {
+      return JSON.stringify(raw);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
   try {
     const rows = await prisma.$queryRaw<
@@ -530,13 +565,6 @@ export async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
       .map((r) => {
         const effectiveDate = new Date(r.effectiveDate);
         if (Number.isNaN(effectiveDate.getTime())) return null;
-        let prevRaw: string | null = null;
-        if (r.previousValue != null && r.previousValue !== '') {
-          if (typeof r.previousValue === 'string') {
-            const t = r.previousValue.trim();
-            prevRaw = t.startsWith('{') ? t : null;
-          }
-        }
         return {
           id: Number(r.id),
           paramKey: r.paramKey,
@@ -546,7 +574,7 @@ export async function loadAllParamConfigRows(): Promise<ParamConfigRow[]> {
           steelMill: r.steelMill,
           effectiveDate,
           value: processDecimal(r.value),
-          previousValueRaw: prevRaw,
+          previousValueRaw: normalizePreviousValueRaw(r.previousValue),
           unit: r.unit,
           remark: r.remark,
         } as ParamConfigRow;

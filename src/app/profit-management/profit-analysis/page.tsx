@@ -1562,9 +1562,7 @@ export default function ProfitAnalysis() {
               const total = s.otherCosts ?? 0;
               const snap = s.costParamSnapshot;
               const whTax = snap?.warehouseTaxRate ?? 0;
-              const whTaxLabel = snap?.warehouseTaxRateFromLifo
-                ? '入库单加权税率'
-                : '入库单税率(inbound_tax_rate)';
+              const whTaxLabel = '入库单税率(inbound_tax_rate)';
               const revenueExcl = s.revenue / 1.13;
               const taxBase =
                 snap?.taxBaseTotal ??
@@ -1688,9 +1686,7 @@ export default function ProfitAnalysis() {
               const total = s.otherIncome ?? 0;
               const snap = s.costParamSnapshot;
               const whTax = snap?.warehouseTaxRate ?? 0;
-              const whTaxLabel = snap?.warehouseTaxRateFromLifo
-                ? '入库单加权税率'
-                : '入库单税率(inbound_tax_rate)';
+              const whTaxLabel = '入库单税率(inbound_tax_rate)';
               const revenueExcl = s.revenue / 1.13;
               const base =
                 snap?.refundBaseTotal ??

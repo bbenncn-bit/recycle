@@ -79,9 +79,7 @@ export async function POST(request: Request) {
 
     const deliveryDate = deliveryDateIso ? new Date(deliveryDateIso) : new Date();
     const effectiveBasis = applyWarehouseTaxToBasis(
-      basis.warehouseTaxRateFromLifo && (basis.warehouseTaxRate ?? 0) > 0
-        ? basis
-        : { ...basis, warehouseTaxRate: 0, warehouseTaxRateFromLifo: false },
+      { ...basis, warehouseTaxRate: 0, warehouseTaxRateFromLifo: false },
       draftRows,
       deliveryDate
     );
