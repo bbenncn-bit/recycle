@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prismadb';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
 import { parseProductionDate } from '@/lib/services/lifo-material-cost-service';
-import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+import { isCentralBaseStockReceipt } from '@/lib/cost-receipt-classification';
 import { purchaseInboundStorageArea } from '@/lib/purchase-warehouse-location';
 
 function dec(value: unknown): number {
@@ -178,7 +178,29 @@ function cloneState(rows: MaterialStorageRowSnapshot[]): MaterialStorageRowSnaps
   return rows.map((r) => ({ ...r }));
 }
 
-/** 将区间 [rangeStart, rangeEnd]（含首尾自然日）内的基地收货入库与加工耗用滚入 state */
+function ensurePurchaseRow(
+  state: MaterialStorageRowSnapshot[],
+  warehouse: string,
+  material: string
+): number {
+  const w = norm(warehouse);
+  const m = norm(material);
+  if (!w || !m) return -1;
+  const existing = matchPurchaseRowIndex(state, w, m);
+  if (existing >= 0) return existing;
+  // MaterialStorage 目录未建行时（如优质毛料库/M钢渣粒子/MP废钢库），仍按 SH 入库滚入
+  state.push({
+    id: -(state.length + 1),
+    storageArea: w,
+    materialType: m,
+    aliasName: '',
+    qty: 0,
+    price: 0,
+  });
+  return state.length - 1;
+}
+
+/** 将区间 [rangeStart, rangeEnd]（含首尾自然日）内的中心基地 SH 入库与加工耗用滚入 state */
 async function applyRollRange(
   state: MaterialStorageRowSnapshot[],
   rangeStart: Date,
@@ -210,10 +232,10 @@ async function applyRollRange(
   for (const p of purchases) {
     const st = (p.status || '').trim();
     if (st.includes('红冲') || st.includes('撤销')) continue;
-    if (!isBaseSelfReceipt(p.receiptNo, p.warehouse)) continue;
+    if (!isCentralBaseStockReceipt(p.receiptNo, p.warehouse)) continue;
     const d = parseWarehouseDate(p.warehouseDate);
     if (!d || d < rs || d > re) continue;
-    const idx = matchPurchaseRowIndex(state, purchaseInboundStorageArea(p), p.material || '');
+    const idx = ensurePurchaseRow(state, purchaseInboundStorageArea(p), p.material || '');
     if (idx < 0) continue;
     const qty = dec(p.estimatedDryBasis);
     const costYuan = dec(p.totalPriceExcludingTax);
@@ -245,7 +267,7 @@ async function applyRollRange(
   }
 }
 
-/** 指定年月初日 0 点的基地收货毛料库存（4 月=表中期初列；5、6 月=自 2026-04-01 滚存） */
+/** 指定年月初日 0 点的中心基地毛料库存（4 月=表中期初列；5、6 月=自 2026-04-01 滚存） */
 export async function getOpeningStateFirstDayOfMonth(
   year: number,
   month: number
@@ -292,7 +314,7 @@ export async function getOpeningStateFirstDayOfMonth(
   return state;
 }
 
-/** 截止日 endYmd（当天 24 点）的基地收货毛料库存 */
+/** 截止日 endYmd（当天 24 点）的中心基地毛料库存（含三库 SH，不含 TH） */
 export async function getClosingStateThroughDate(endYmd: string): Promise<MaterialStorageRowSnapshot[]> {
   const [y, m, d] = endYmd.split('-').map((x) => parseInt(x, 10));
   if (!y || m < 1 || m > 12 || d < 1 || d > 31) {
@@ -337,7 +359,7 @@ const ROLL_FORWARD_FROZEN_ALIASES = new Set([
 ]);
 
 /**
- * 按「20260331 期初 + 基地收货入库（库区优先、否则仓库）− 加工耗用」滚存结果，写回 MaterialStorage.current_qty/current_price，
+ * 按「20260331 期初 + 中心基地 SH 入库（含三库；库区优先、否则仓库）− 加工耗用」滚存结果，写回 MaterialStorage.current_qty/current_price，
  * 使小程序毛料库存与 PurchaseWarehouse 汇总及加工扣减口径一致。
  */
 export async function persistRollforwardClosingToMaterialStorage(endYmd: string): Promise<{

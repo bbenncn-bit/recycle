@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prismadb';
 import { purchaseInboundStorageArea } from '@/lib/purchase-warehouse-location';
-import { isBaseSelfReceipt } from '@/lib/cost-receipt-classification';
+import { isCentralBaseStockReceipt } from '@/lib/cost-receipt-classification';
 import { parseWarehouseDate } from '@/lib/services/profit-service';
+import { getClosingStateThroughDate } from '@/lib/services/material-storage-inventory-service';
 
 function norm(s: unknown): string {
   return (s != null ? String(s) : '').trim();
@@ -25,8 +26,12 @@ function formatYmd(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-/** 4/1 盘点滚存所在库区：平均采购单价列采用 MaterialStorage.current_price，不与入库单加权混算 */
-const AVG_FROM_CURRENT_PRICE_STORAGE = new Set(['毛料库', '毛料库区一']);
+function todayYmdLocal(): string {
+  return formatYmd(new Date());
+}
+
+/** 4/1 盘点滚存所在库区：平均采购单价列采用滚存单价，不与入库单加权混算 */
+const AVG_FROM_ROLLFORWARD_PRICE_STORAGE = new Set(['毛料库', '毛料库区一']);
 
 export interface InventoryValueAnalysisRow {
   storageArea: string;
@@ -48,29 +53,22 @@ type Agg = {
 };
 
 const CACHE_MS = 3 * 60 * 1000;
-let rowsCache: { at: number; rows: InventoryValueAnalysisRow[] } | null = null;
+let rowsCache: { at: number; rows: InventoryValueAnalysisRow[]; asOf: string } | null = null;
 
 /**
- * 毛料库存价值分析：当前库存来自 MaterialStorage；
- * 采购口径与入库同步一致（基地收货 SH、非红冲撤销），按库区+物料汇总 PurchaseWarehouse。
+ * 毛料库存价值分析（临时口径）：
+ * 数量/计价 = 2026-03-31 期初 + 中心基地 SH 入库（含优质毛料库 / M钢渣粒子 / MP废钢库）− 加工耗用滚存至今日，
+ * 仅剔除 TH 贸易直送。平均采购单价 / 最早·最近采购日按同一库存入库口径汇总。
  */
 export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAnalysisRow[]> {
-  if (rowsCache && Date.now() - rowsCache.at < CACHE_MS) {
+  const asOf = todayYmdLocal();
+  if (rowsCache && rowsCache.asOf === asOf && Date.now() - rowsCache.at < CACHE_MS) {
     return rowsCache.rows;
   }
 
-  const storages = await prisma.materialStorage.findMany({
-    where: {
-      currentQty: { gt: 0 },
-    },
-    select: {
-      storageArea: true,
-      materialType: true,
-      currentQty: true,
-      currentPrice: true,
-    },
-    orderBy: [{ storageArea: 'asc' }, { materialType: 'asc' }],
-  });
+  // 真实中心基地库存：滚存计入全部 SH（含三库），仅排除 TH
+  const closing = await getClosingStateThroughDate(asOf);
+  const storages = closing.filter((s) => (s.qty ?? 0) > 1e-9);
 
   const materialTypes = [
     ...new Set(storages.map((s) => norm(s.materialType)).filter(Boolean)),
@@ -102,7 +100,8 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     for (const r of purchases) {
       const st = norm(r.status);
       if (st.includes('红冲') || st.includes('撤销')) continue;
-      if (!isBaseSelfReceipt(r.receiptNo, r.warehouse)) continue;
+      // 中心基地库存入库（含三库）；剔除 TH 贸易直送
+      if (!isCentralBaseStockReceipt(r.receiptNo, r.warehouse)) continue;
 
       const storageArea = purchaseInboundStorageArea(r);
       const materialType = norm(r.material);
@@ -153,19 +152,21 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     const mt = norm(s.materialType);
     if (!sa || !mt) continue;
 
-    const qty = toNum(s.currentQty) ?? 0;
-    const price = toNum(s.currentPrice) ?? 0;
+    const qty = s.qty ?? 0;
+    const price = s.price ?? 0;
     if (qty <= 0) continue;
 
     const key = `${sa}\0${mt}`;
     const agg = aggByKey.get(key);
 
-    const useRollforwardPrice = AVG_FROM_CURRENT_PRICE_STORAGE.has(sa);
+    const useRollforwardPrice = AVG_FROM_ROLLFORWARD_PRICE_STORAGE.has(sa);
     const avgPurchase = useRollforwardPrice
       ? price
       : agg && Math.abs(agg.sumQty) > 1e-9
         ? agg.sumAmount / agg.sumQty
-        : null;
+        : price > 0
+          ? price
+          : null;
 
     rows.push({
       storageArea: sa,
@@ -183,6 +184,12 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     });
   }
 
-  rowsCache = { at: Date.now(), rows };
+  rows.sort((a, b) => {
+    const c = a.storageArea.localeCompare(b.storageArea, 'zh');
+    if (c !== 0) return c;
+    return a.materialType.localeCompare(b.materialType, 'zh');
+  });
+
+  rowsCache = { at: Date.now(), rows, asOf };
   return rows;
 }
