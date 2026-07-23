@@ -33,6 +33,15 @@ function todayYmdLocal(): string {
 /** 4/1 盘点滚存所在库区：平均采购单价列采用滚存单价，不与入库单加权混算 */
 const AVG_FROM_ROLLFORWARD_PRICE_STORAGE = new Set(['毛料库', '毛料库区一']);
 
+/**
+ * 库存价值分析不展示的库区（内部：中转料、不进成品加工；对外说明仅写「统计不含」）。
+ */
+const INVENTORY_VALUE_EXCLUDED_STORAGE_AREAS = new Set(['MP废钢库', 'M钢渣粒子']);
+
+function isExcludedFromInventoryValue(storageArea: string): boolean {
+  return INVENTORY_VALUE_EXCLUDED_STORAGE_AREAS.has(norm(storageArea));
+}
+
 export interface InventoryValueAnalysisRow {
   storageArea: string;
   materialType: string;
@@ -57,8 +66,8 @@ let rowsCache: { at: number; rows: InventoryValueAnalysisRow[]; asOf: string } |
 
 /**
  * 毛料库存价值分析（临时口径）：
- * 数量/计价 = 2026-03-31 期初 + 中心基地 SH 入库（含优质毛料库 / M钢渣粒子 / MP废钢库）− 加工耗用滚存至今日，
- * 仅剔除 TH 贸易直送。平均采购单价 / 最早·最近采购日按同一库存入库口径汇总。
+ * 数量/计价 = 2026-03-31 期初 + 中心基地 SH 入库（含优质毛料库等）− 加工耗用；
+ * 本模块不统计 MP废钢库、M钢渣粒子；并剔除 TH 单。
  */
 export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAnalysisRow[]> {
   const asOf = todayYmdLocal();
@@ -66,9 +75,10 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     return rowsCache.rows;
   }
 
-  // 真实中心基地库存：滚存计入全部 SH（含三库），仅排除 TH
   const closing = await getClosingStateThroughDate(asOf);
-  const storages = closing.filter((s) => (s.qty ?? 0) > 1e-9);
+  const storages = closing.filter(
+    (s) => (s.qty ?? 0) > 1e-9 && !isExcludedFromInventoryValue(s.storageArea)
+  );
 
   const materialTypes = [
     ...new Set(storages.map((s) => norm(s.materialType)).filter(Boolean)),
@@ -100,10 +110,10 @@ export async function getInventoryValueAnalysisRows(): Promise<InventoryValueAna
     for (const r of purchases) {
       const st = norm(r.status);
       if (st.includes('红冲') || st.includes('撤销')) continue;
-      // 中心基地库存入库（含三库）；剔除 TH 贸易直送
       if (!isCentralBaseStockReceipt(r.receiptNo, r.warehouse)) continue;
 
       const storageArea = purchaseInboundStorageArea(r);
+      if (isExcludedFromInventoryValue(storageArea)) continue;
       const materialType = norm(r.material);
       const qty = toNum(r.estimatedDryBasis);
       let lineAmount = toNum(r.totalPriceExcludingTax);
