@@ -317,16 +317,37 @@ async function getProductUnitProcessingCost(productName: string): Promise<number
 }
 
 /**
- * 计算单笔销售的材料成本（使用 LIFO 方法，基于 ProcessingCostInput 表的详细数据）
+ * 计算单笔销售的材料成本。
+ * 优先读 MaterialCostCache（运维预热或历史回写）；未命中再跑 LIFO，并异步回写缓存。
+ * 设 PROFIT_MATERIAL_COST_FORCE_LIVE=1 可强制每次实时 LIFO（调试用）。
  */
 async function calculateMaterialCost(
   deliveryNumber: string,
   productType: string,
   lifoQuantity: number,
   deliveryDate: string,
-  warehouse?: string | null
-): Promise<{ 
-  cost: number; 
+  warehouse?: string | null,
+  options?: {
+    prefetchedCache?: Map<
+      string,
+      {
+        materialCost: number;
+        materialComposition: Array<{ material: string; quantity: number; cost: number }>;
+        productionRecords: Array<{
+          id: number;
+          productionDate: string;
+          quantity: number;
+          unitCost: number;
+          totalCost: number;
+        }>;
+        settlementQuantity: number | null;
+      }
+    >;
+    settlementQuantity?: number;
+    writeThrough?: boolean;
+  }
+): Promise<{
+  cost: number;
   composition: Array<{ material: string; quantity: number; cost: number }>;
   productionRecords?: Array<{
     id: number;
@@ -335,36 +356,69 @@ async function calculateMaterialCost(
     unitCost: number;
     totalCost: number;
   }>;
+  fromCache?: boolean;
 }> {
   if (lifoQuantity <= 0) {
-    return { cost: 0, composition: [], productionRecords: [] };
+    return { cost: 0, composition: [], productionRecords: [], fromCache: false };
   }
 
-  // 解析销售日期
   const saleDate = parseDeliveryDate(deliveryDate);
   if (!saleDate) {
-    return { cost: 0, composition: [], productionRecords: [] };
+    return { cost: 0, composition: [], productionRecords: [], fromCache: false };
   }
 
+  const forceLive = process.env.PROFIT_MATERIAL_COST_FORCE_LIVE === '1';
+  const writeThrough = options?.writeThrough !== false;
+
   try {
-    // 从缓存读取（缓存由 MySQL 事件自动更新）
-    const { getMaterialCostFromCache } = await import('./material-cost-cache-service');
-    const cached = await getMaterialCostFromCache(deliveryNumber);
-    
-    // 缓存未命中或缓存为 0：尝试实时 LIFO（支持 alias 材料列、库别与成品名解析）
+    const {
+      getMaterialCostFromCache,
+      upsertMaterialCostCacheEntry,
+    } = await import('./material-cost-cache-service');
+
+    let cached =
+      options?.prefetchedCache?.get(deliveryNumber) ??
+      (await getMaterialCostFromCache(deliveryNumber));
+
+    // 结算量变化明显时视为缓存过期（如改磅差/扣杂后）
+    if (
+      cached &&
+      cached.settlementQuantity != null &&
+      options?.settlementQuantity != null &&
+      Math.abs(cached.settlementQuantity - options.settlementQuantity) > 0.05
+    ) {
+      cached = null;
+    }
+
+    if (!forceLive && cached && cached.materialCost > 0) {
+      if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
+        console.log(`材料成本命中缓存: ${deliveryNumber}`);
+      }
+      return {
+        cost: cached.materialCost,
+        composition: cached.materialComposition,
+        productionRecords: cached.productionRecords,
+        fromCache: true,
+      };
+    }
+
     let lifoResult: Awaited<ReturnType<typeof calculateLIFOMaterialCost>> | null = null;
+    let resolvedProductName: string | null = null;
+    let resolvedWarehouse: string | null = null;
     try {
       const { productName, productWarehouse } = await resolveSaleProductIdentity(
         productType,
-        warehouse,
+        warehouse
       );
+      resolvedProductName = productName || null;
+      resolvedWarehouse = productWarehouse;
       if (productName) {
         lifoResult = await calculateLIFOMaterialCost(
           productName,
           productWarehouse,
           lifoQuantity,
           saleDate,
-          { skipResolve: true },
+          { skipResolve: true }
         );
       }
     } catch (lifoErr) {
@@ -372,67 +426,80 @@ async function calculateMaterialCost(
     }
 
     if (lifoResult && lifoResult.cost > 0) {
-        const totalTons = lifoResult.composition.reduce((s, c) => s + (c.tons ?? 0), 0);
-        const composition: Array<{ material: string; quantity: number; cost: number }> =
-          totalTons > 0
-            ? lifoResult.composition.map((c) => ({
-                material: c.material,
-                quantity: c.tons ?? 0,
-                cost: ((c.tons ?? 0) / totalTons) * lifoResult.cost,
-              }))
-            : [];
-        if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
-          console.log(
-            `缓存未命中，实时 LIFO 计算材料成本: ${deliveryNumber}, ${lifoResult.cost.toFixed(2)} 元`,
-          );
-        }
+      const totalTons = lifoResult.composition.reduce((s, c) => s + (c.tons ?? 0), 0);
+      const composition: Array<{ material: string; quantity: number; cost: number }> =
+        totalTons > 0
+          ? lifoResult.composition.map((c) => ({
+              material: c.material,
+              quantity: c.tons ?? 0,
+              cost: ((c.tons ?? 0) / totalTons) * lifoResult.cost,
+            }))
+          : [];
+      const productionRecords = lifoResult.productionRecords ?? [];
+
+      if (writeThrough) {
+        void upsertMaterialCostCacheEntry({
+          deliveryNumber,
+          productName: resolvedProductName,
+          productWarehouse: resolvedWarehouse,
+          deliveryDate,
+          settlementQuantity: options?.settlementQuantity ?? null,
+          materialCost: lifoResult.cost,
+          materialComposition: composition,
+          productionRecords,
+        });
+      }
+
       return {
         cost: lifoResult.cost,
         composition,
-        productionRecords: lifoResult.productionRecords ?? [],
+        productionRecords,
+        fromCache: false,
       };
     }
 
-    if (cached && cached.materialCost > 0) {
-      if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
-        console.log(`从缓存读取材料成本: ${deliveryNumber}`);
-      }
+    // 实时 LIFO 无结果时，仍可回退旧缓存（即便结算量略有差异）
+    const fallbackCache =
+      options?.prefetchedCache?.get(deliveryNumber) ??
+      (await getMaterialCostFromCache(deliveryNumber));
+    if (fallbackCache && fallbackCache.materialCost > 0) {
       return {
-        cost: cached.materialCost,
-        composition: cached.materialComposition,
-        productionRecords: cached.productionRecords,
+        cost: fallbackCache.materialCost,
+        composition: fallbackCache.materialComposition,
+        productionRecords: fallbackCache.productionRecords,
+        fromCache: true,
       };
     }
 
-    // 仍无结果则返回 0（建议执行材料成本缓存刷新；旧版 SP 可能未统计 alias 材料列）
-    if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
-      console.warn(`缓存未命中: ${deliveryNumber}，无 LIFO 结果，材料成本显示为 0`);
-    }
     return {
       cost: 0,
       composition: [],
       productionRecords: [],
+      fromCache: false,
     };
   } catch (error) {
     console.error(`LIFO 材料成本计算失败 (${productType}):`, error);
-    
+
     // 如果 LIFO 计算失败，回退到原来的方法
     const saleMonth = formatDate(saleDate).substring(0, 7); // YYYY-MM
     const composition = await getProductMaterialComposition(productType, saleMonth);
 
     if (composition.length === 0) {
-      // 如果没有生产记录，尝试使用上个月的数据
       const lastMonth = new Date(saleDate);
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       const lastMonthStr = formatDate(lastMonth).substring(0, 7);
-      const lastMonthComposition = await getProductMaterialComposition(productType, lastMonthStr);
+      const lastMonthComposition = await getProductMaterialComposition(
+        productType,
+        lastMonthStr
+      );
       if (lastMonthComposition.length > 0) {
         composition.push(...lastMonthComposition);
       }
     }
 
     let totalCost = 0;
-    const materialDetails: Array<{ material: string; quantity: number; cost: number }> = [];
+    const materialDetails: Array<{ material: string; quantity: number; cost: number }> =
+      [];
 
     for (const item of composition) {
       const qty = lifoQuantity * item.ratio;
@@ -442,7 +509,12 @@ async function calculateMaterialCost(
       materialDetails.push({ material: item.material, quantity: qty, cost });
     }
 
-    return { cost: totalCost, composition: materialDetails, productionRecords: [] };
+    return {
+      cost: totalCost,
+      composition: materialDetails,
+      productionRecords: [],
+      fromCache: false,
+    };
   }
 }
 
@@ -921,6 +993,30 @@ export async function getProfitAnalysisData(
     console.warn('获取加工成本配置失败（表可能不存在）:', error);
   }
 
+  // 批量预取材料成本缓存（命中则跳过 LIFO，显著缩短二次打开耗时）
+  // 先清理不受信任的旧 SP 脏缓存，避免再次污染利润
+  const {
+    getMaterialCostsFromCacheBatch,
+    purgeUntrustedMaterialCostCache,
+  } = await import('./material-cost-cache-service');
+  try {
+    const purged = await purgeUntrustedMaterialCostCache();
+    if (purged > 0) {
+      console.log(`已清理不受信任的旧材料成本缓存 ${purged} 条`);
+    }
+  } catch (e) {
+    console.warn('清理旧材料成本缓存失败:', e);
+  }
+  const deliveryNumbersForCache = validSalesForDetails
+    .map((s) => (s.deliveryNumber || '').trim())
+    .filter(Boolean);
+  const materialCostCacheMap = await getMaterialCostsFromCacheBatch(deliveryNumbersForCache);
+  if (process.env.PROFIT_ANALYSIS_VERBOSE === '1') {
+    console.log(
+      `材料成本缓存预取: ${materialCostCacheMap.size}/${deliveryNumbersForCache.length} 命中`
+    );
+  }
+
   // 批量处理销售数据（适当提高并发，减轻总耗时）
   const BATCH_SIZE = 36;
   for (let i = 0; i < validSalesForDetails.length; i += BATCH_SIZE) {
@@ -968,7 +1064,12 @@ export async function getProfitAnalysisData(
               productType,
               lifoQuantity,
               sale.deliveryDate || '',
-              sale.warehouse || null
+              sale.warehouse || null,
+              {
+                prefetchedCache: materialCostCacheMap,
+                settlementQuantity: quantity,
+                writeThrough: true,
+              }
             );
             materialCost = result.cost;
             composition = result.composition;

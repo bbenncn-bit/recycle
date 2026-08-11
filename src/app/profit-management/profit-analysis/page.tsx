@@ -896,8 +896,8 @@ export default function ProfitAnalysis() {
 
         {data.provisional && (
           <div className="mb-4 rounded-md border border-sky-200/90 bg-sky-50/90 px-3 py-2 text-sm text-sky-950 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-100">
-            <strong>粗算首屏</strong>：已展示今日收入与趋势粗算；销售明细需先<strong>全量</strong>完成材料 LIFO 核算后，再按月份切片展示
-            {focusMonthLabel ? `（默认 ${focusMonthLabel}）` : '（默认最近月份）'}
+            <strong>粗算首屏</strong>：已展示今日收入与趋势粗算；销售明细正在核算材料成本（优先读取 MaterialCostCache，未命中才跑 LIFO）
+            {focusMonthLabel ? `，完成后默认 ${focusMonthLabel}` : '，完成后默认最近月份'}
             ，请稍候
             <AnimatedEllipsis />
           </div>

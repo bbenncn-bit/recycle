@@ -765,6 +765,21 @@ export async function insertProcessingCost(
     };
   }
 
+  // 加工变更会使后续结算单的 LIFO 结果变化：作废该成品自生产日起的材料成本缓存
+  try {
+    const { invalidateMaterialCostCacheForProduct } = await import(
+      './material-cost-cache-service'
+    );
+    const fromYmd = productionDate.match(/^\d{4}-\d{2}-\d{2}/)?.[0] ?? null;
+    await invalidateMaterialCostCacheForProduct({
+      productName,
+      productWarehouse: productWarehouse || null,
+      fromDeliveryDateYmd: fromYmd,
+    });
+  } catch (e) {
+    console.warn('加工录入后作废材料成本缓存失败（不影响本单保存）:', e);
+  }
+
   return { success: true, id: insertedId, productStockUpdate };
 }
 

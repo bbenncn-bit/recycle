@@ -26,7 +26,7 @@ function resolveMessage(
   const monthHint = focusMonthLabel ? `，完成后默认展示${focusMonthLabel}` : '，完成后默认展示最近月份';
   if (stage === 'idle') return '正在连接并准备利润数据';
   if (provisional || stage === 'shell') {
-    return `正在全量核算材料成本（LIFO）${monthHint}`;
+    return `正在核算材料成本（优先读缓存，未命中再 LIFO）${monthHint}`;
   }
   if (stage === 'core') return '精确数据已就绪，正在加载成品对比分析';
   return '正在加载';
@@ -97,7 +97,7 @@ export function ProfitAnalysisLoadingHint({
           </div>
           {loadStartedAt != null && elapsedSec >= 3 && (
             <span className="pl-5 text-[10px] text-gray-400 dark:text-gray-500">
-              {formatElapsed(elapsedSec)}（全量 LIFO 核算约需 20～40 秒，请稍候）
+              {formatElapsed(elapsedSec)}（有缓存时通常数秒内完成；首次或缓存失效时需全量 LIFO，请稍候）
             </span>
           )}
         </div>
@@ -131,8 +131,8 @@ export function ProfitTableComputingHint({
   return (
     <span className="inline-flex items-center justify-center gap-0.5 text-sm text-gray-500 dark:text-gray-400">
       {monthLabel
-        ? `正在全量核算销售明细（LIFO），${monthLabel}将优先展示`
-        : '正在全量核算销售明细（LIFO），最近月份将优先展示'}
+        ? `正在核算销售明细（优先材料成本缓存），${monthLabel}将优先展示`
+        : '正在核算销售明细（优先材料成本缓存），最近月份将优先展示'}
       <AnimatedEllipsis />
     </span>
   );

@@ -44,7 +44,55 @@ function processDecimal(value: unknown): number {
 }
 
 /**
- * 从 MaterialCostCache 读取材料成本（由运维「刷新材料成本缓存」或利润页实时 LIFO 写入）
+ * 仅信任此时间之后写入的材料成本缓存。
+ * 此前 MaterialCostCache 多为旧版 MySQL SP / 错误刷新结果（成本虚高），
+ * 2026-08 起改为「优先读缓存」后曾直接污染利润分析；必须丢弃旧缓存。
+ * 环境变量 MATERIAL_COST_CACHE_TRUST_AFTER（ISO 时间）可覆盖。
+ */
+export function getMaterialCostCacheTrustAfter(): Date {
+  const fromEnv = (process.env.MATERIAL_COST_CACHE_TRUST_AFTER || '').trim();
+  if (fromEnv) {
+    const d = new Date(fromEnv);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  // 北京时间 2026-08-11 17:00 — 修复「缓存优先读到旧 SP 脏数据」之后
+  return new Date('2026-08-11T09:00:00.000Z');
+}
+
+function isTrustedCacheCalculatedAt(calculatedAt: Date | null | undefined): boolean {
+  if (!calculatedAt) return false;
+  return calculatedAt.getTime() >= getMaterialCostCacheTrustAfter().getTime();
+}
+
+function parseCacheComposition(raw: unknown): MaterialCompositionItem[] {
+  const rawComp = raw as Array<{ material?: string; quantity?: number; cost?: number }> | null;
+  if (!Array.isArray(rawComp)) return [];
+  return rawComp
+    .filter(
+      (m): m is { material: string; quantity: number; cost: number } =>
+        !!m && typeof m.material === 'string'
+    )
+    .map((m) => ({
+      material: String(m.material),
+      quantity: Number(m.quantity ?? 0),
+      cost: Number(m.cost ?? 0),
+    }));
+}
+
+function parseCacheProductionRecords(raw: unknown): ProductionRecordItem[] {
+  const rawRec = raw as ProductionRecordItem[] | null;
+  if (!Array.isArray(rawRec)) return [];
+  return rawRec.map((r) => ({
+    id: Number(r.id),
+    productionDate: String(r.productionDate ?? ''),
+    quantity: Number(r.quantity ?? 0),
+    unitCost: Number(r.unitCost ?? 0),
+    totalCost: Number(r.totalCost ?? 0),
+  }));
+}
+
+/**
+ * 从 MaterialCostCache 读取材料成本（仅信任近期 TypeScript LIFO 写入的结果）
  */
 export async function getMaterialCostFromCache(
   deliveryNumber: string
@@ -52,51 +100,180 @@ export async function getMaterialCostFromCache(
   materialCost: number;
   materialComposition: MaterialCompositionItem[];
   productionRecords: ProductionRecordItem[];
+  settlementQuantity: number | null;
 } | null> {
   try {
     const cache = await prisma.materialCostCache.findUnique({
       where: { deliveryNumber },
     });
 
-  // material_cost = 0 多为旧版 SP 未统计 MSLKM*/MGJKM* 列或库别不匹配；允许走实时 LIFO 重算
     if (
       !cache ||
       cache.materialCost == null ||
-      Number(cache.materialCost) === 0
+      Number(cache.materialCost) === 0 ||
+      !isTrustedCacheCalculatedAt(cache.calculatedAt)
     ) {
       return null;
     }
 
-    const rawComp = (cache.materialComposition as unknown) as Array<{ material?: string; quantity?: number; cost?: number }> | null;
-    const materialComposition: MaterialCompositionItem[] = Array.isArray(rawComp)
-      ? rawComp
-          .filter((m): m is { material: string; quantity: number; cost: number } => !!m && typeof m.material === 'string')
-          .map((m) => ({
-            material: String(m.material),
-            quantity: Number(m.quantity ?? 0),
-            cost: Number(m.cost ?? 0),
-          }))
-      : [];
-
-    const rawRec = (cache.productionRecords as unknown) as ProductionRecordItem[] | null;
-    const productionRecords: ProductionRecordItem[] = Array.isArray(rawRec)
-      ? rawRec.map((r) => ({
-          id: Number(r.id),
-          productionDate: String(r.productionDate ?? ''),
-          quantity: Number(r.quantity ?? 0),
-          unitCost: Number(r.unitCost ?? 0),
-          totalCost: Number(r.totalCost ?? 0),
-        }))
-      : [];
-
     return {
       materialCost: Number(cache.materialCost),
-      materialComposition,
-      productionRecords,
+      materialComposition: parseCacheComposition(cache.materialComposition),
+      productionRecords: parseCacheProductionRecords(cache.productionRecords),
+      settlementQuantity:
+        cache.settlementQuantity != null ? Number(cache.settlementQuantity) : null,
     };
   } catch (error) {
     console.error('从缓存获取材料成本失败:', error);
     return null;
+  }
+}
+
+export type MaterialCostCacheEntry = {
+  materialCost: number;
+  materialComposition: MaterialCompositionItem[];
+  productionRecords: ProductionRecordItem[];
+  settlementQuantity: number | null;
+};
+
+/** 批量预取材料成本缓存（利润分析页一次加载，避免逐单 findUnique） */
+export async function getMaterialCostsFromCacheBatch(
+  deliveryNumbers: string[]
+): Promise<Map<string, MaterialCostCacheEntry>> {
+  const out = new Map<string, MaterialCostCacheEntry>();
+  const keys = [
+    ...new Set(
+      deliveryNumbers.map((d) => (d || '').trim()).filter((d) => d.length > 0)
+    ),
+  ];
+  if (keys.length === 0) return out;
+
+  const trustAfter = getMaterialCostCacheTrustAfter();
+
+  try {
+    const rows = await prisma.materialCostCache.findMany({
+      where: {
+        deliveryNumber: { in: keys },
+        calculatedAt: { gte: trustAfter },
+        materialCost: { gt: 0 },
+      },
+      select: {
+        deliveryNumber: true,
+        materialCost: true,
+        materialComposition: true,
+        productionRecords: true,
+        settlementQuantity: true,
+        calculatedAt: true,
+      },
+    });
+
+    for (const cache of rows) {
+      const dn = (cache.deliveryNumber || '').trim();
+      if (!dn) continue;
+      if (!isTrustedCacheCalculatedAt(cache.calculatedAt)) continue;
+      if (cache.materialCost == null || Number(cache.materialCost) === 0) continue;
+
+      out.set(dn, {
+        materialCost: Number(cache.materialCost),
+        materialComposition: parseCacheComposition(cache.materialComposition),
+        productionRecords: parseCacheProductionRecords(cache.productionRecords),
+        settlementQuantity:
+          cache.settlementQuantity != null ? Number(cache.settlementQuantity) : null,
+      });
+    }
+  } catch (error) {
+    console.error('批量读取 MaterialCostCache 失败:', error);
+  }
+
+  return out;
+}
+
+/** 将单笔 LIFO 结果回写缓存（利润页未命中时边算边写，供后续秒开） */
+export async function upsertMaterialCostCacheEntry(params: {
+  deliveryNumber: string;
+  productName?: string | null;
+  productWarehouse?: string | null;
+  deliveryDate?: string | null;
+  settlementQuantity?: number | null;
+  materialCost: number;
+  materialComposition: MaterialCompositionItem[];
+  productionRecords: ProductionRecordItem[];
+}): Promise<void> {
+  const deliveryNumber = (params.deliveryNumber || '').trim();
+  if (!deliveryNumber || !(params.materialCost > 0)) return;
+
+  try {
+    await prisma.materialCostCache.upsert({
+      where: { deliveryNumber },
+      create: {
+        deliveryNumber,
+        productName: params.productName ?? null,
+        productWarehouse: params.productWarehouse ?? null,
+        deliveryDate: params.deliveryDate ?? null,
+        settlementQuantity: params.settlementQuantity ?? null,
+        materialCost: params.materialCost,
+        materialComposition: params.materialComposition,
+        productionRecords: params.productionRecords,
+        calculatedAt: new Date(),
+      },
+      update: {
+        productName: params.productName ?? null,
+        productWarehouse: params.productWarehouse ?? null,
+        deliveryDate: params.deliveryDate ?? null,
+        settlementQuantity: params.settlementQuantity ?? null,
+        materialCost: params.materialCost,
+        materialComposition: params.materialComposition,
+        productionRecords: params.productionRecords,
+        calculatedAt: new Date(),
+      },
+    });
+  } catch (err) {
+    console.warn(`MaterialCostCache 回写失败 ${deliveryNumber}:`, err);
+  }
+}
+
+/**
+ * 加工数据变更后：删除该成品自指定日期起的材料成本缓存，促使利润页重算。
+ * productionDateYmd 为空则删除该成品全部缓存。
+ */
+export async function invalidateMaterialCostCacheForProduct(params: {
+  productName: string;
+  productWarehouse?: string | null;
+  fromDeliveryDateYmd?: string | null;
+}): Promise<number> {
+  const productName = (params.productName || '').trim();
+  if (!productName) return 0;
+  const wh = (params.productWarehouse || '').trim();
+  const from = (params.fromDeliveryDateYmd || '').trim();
+
+  try {
+    const where: {
+      productName: string;
+      productWarehouse?: string;
+      deliveryDate?: { gte: string };
+    } = { productName };
+    if (wh) where.productWarehouse = wh;
+    if (/^\d{4}-\d{2}-\d{2}/.test(from)) {
+      where.deliveryDate = { gte: from.slice(0, 10) };
+    }
+    const res = await prisma.materialCostCache.deleteMany({ where });
+    return res.count;
+  } catch (e) {
+    console.warn('invalidateMaterialCostCacheForProduct failed:', e);
+    return 0;
+  }
+}
+
+/** 删除不受信任的旧缓存（旧 SP / 2026-05 脏数据），避免再次被读入 */
+export async function purgeUntrustedMaterialCostCache(): Promise<number> {
+  try {
+    const res = await prisma.materialCostCache.deleteMany({
+      where: { calculatedAt: { lt: getMaterialCostCacheTrustAfter() } },
+    });
+    return res.count;
+  } catch (e) {
+    console.warn('purgeUntrustedMaterialCostCache failed:', e);
+    return 0;
   }
 }
 
