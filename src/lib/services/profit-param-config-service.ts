@@ -37,7 +37,9 @@ export interface ProfitParamSnapshot {
   /** 城建及教育税附加扶持是否结给 is_give_tax_extra：0 不结给 / 1 结给 */
   isGiveTaxExtra: number;
   discountRatePinggang: number;
-  /** 萍钢贴现天数（collection_days_pinggang，与回款周期共用参数键） */
+  /** 萍钢贴现天数（discount_days_pinggang，仅贴现费用段1） */
+  discountDaysPinggang: number;
+  /** 萍钢回款周期天数（collection_days_pinggang，仅回款利息） */
   collectionDaysPinggang: number;
   collectionDaysJigang: number;
   collectionDaysXingang: number;
@@ -194,6 +196,9 @@ export function buildParamSnapshot(
     isGiveCes: v('is_give_ces') ?? 0,
     isGiveTaxExtra: v('is_give_tax_extra') ?? 0,
     discountRatePinggang: vMill('discount_rate_pinggang') ?? 1.2,
+    // 贴现天数与回款周期拆分；未配置 discount_days 时回退旧共用键，避免空库突变
+    discountDaysPinggang:
+      vMill('discount_days_pinggang') ?? vMill('collection_days_pinggang') ?? 120,
     collectionDaysPinggang: vMill('collection_days_pinggang') ?? 120,
     collectionDaysJigang: vMill('collection_days_jigang') ?? 12,
     collectionDaysXingang: vMill('collection_days_xingang') ?? 37,
@@ -375,7 +380,7 @@ function computeDiscountCost(revenueInclTax: number, customer: string, s: Profit
 } {
   if ((customer || '').trim() !== '萍钢') return { discountCost: 0, tranche1: 0, tranche2: 0 };
   const tranche1 =
-    revenueInclTax * (s.discountRatePinggang / 100) * (s.collectionDaysPinggang / 360);
+    revenueInclTax * (s.discountRatePinggang / 100) * (s.discountDaysPinggang / 360);
   const tranche2 =
     revenueInclTax *
     (s.reverseDiscountAnnualRate / 100) *

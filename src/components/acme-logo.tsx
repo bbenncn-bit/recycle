@@ -11,7 +11,7 @@ export default function AcmeLogo() {
         style={{ width: '6rem', height: '6rem' }}
         aria-hidden
       />
-      <p className="text-[25px]">萍乡再生资源交易中心</p>
+      <p className="text-[25px]">萍乡智慧业财系统</p>
     </div>
   );
 }

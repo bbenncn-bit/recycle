@@ -174,7 +174,32 @@ export async function deleteProcessingOrderWithRollback(opts: {
         productWarehouse,
         productTons,
         materialLines: composition.length,
+        productionDate: productionDate || null,
       };
+    }).then(async (result) => {
+      // 事务外作废材料成本缓存：该成品自生产日起的结算单需按新加工明细重算 LIFO
+      if (result.success && result.productName) {
+        try {
+          const { invalidateMaterialCostCacheForProduct } = await import(
+            './material-cost-cache-service'
+          );
+          const fromYmd =
+            (result as { productionDate?: string | null }).productionDate?.match(
+              /^\d{4}-\d{2}-\d{2}/
+            )?.[0] ?? null;
+          await invalidateMaterialCostCacheForProduct({
+            productName: result.productName,
+            productWarehouse: result.productWarehouse || null,
+            fromDeliveryDateYmd: fromYmd,
+          });
+        } catch (e) {
+          console.warn('删除加工单后作废材料成本缓存失败（不影响删单本身）:', e);
+        }
+      }
+      const { productionDate: _pd, ...rest } = result as typeof result & {
+        productionDate?: string | null;
+      };
+      return rest;
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

@@ -1160,7 +1160,7 @@ export async function getProfitAnalysisData(
               taxBaseTotal: sub.taxBaseTotal,
               taxPerTon: sub.taxPerTon,
               discountRatePinggang: paramSnapshot.discountRatePinggang / 100,
-              discountDaysPinggang: paramSnapshot.collectionDaysPinggang,
+              discountDaysPinggang: paramSnapshot.discountDaysPinggang,
               reverseDiscountAnnualRate: paramSnapshot.reverseDiscountAnnualRate / 100,
               reverseDiscountOccupancyDays: paramSnapshot.reverseDiscountOccupancyDays,
               discountTranche1: sub.discountTranche1,

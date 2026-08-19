@@ -112,6 +112,7 @@ const ITEM_PARAM_KEYS: Record<ItemKey, string[]> = {
     'tax_rate_main',
     'tax_rate_extra',
     'discount_rate_pinggang',
+    'discount_days_pinggang',
     'collection_days_pinggang',
     'reverse_discount_annual_rate',
     'reverse_discount_occupancy_days',
@@ -558,7 +559,10 @@ function ItemConfigModal({
           ? resolveParam('transport_fee_xingang')
           : 0;
   const pDiscountRate = resolveParam('discount_rate_pinggang');
-  const pDiscountDays = customer === '萍钢' ? resolveParam('collection_days_pinggang') : 0;
+  const pDiscountDays =
+    customer === '萍钢'
+      ? resolveParam('discount_days_pinggang') || resolveParam('collection_days_pinggang')
+      : 0;
   const pReverseRate = resolveParam('reverse_discount_annual_rate');
   const pReverseDays = resolveParam('reverse_discount_occupancy_days');
   const pCollectionDays =
@@ -652,7 +656,7 @@ function ItemConfigModal({
           steps:
             customer === '萍钢'
               ? [
-                  `段1 = 销售收入含税 ${fmt(revenueInclTotal)} × 贴现年利率(discount_rate_pinggang) ${fmt(pDiscountRate)}% × 贴现天数(collection_days_pinggang) ${fmt(pDiscountDays, 0)} ÷ 360 = ${fmt(subitems.discountTranche1)} 元`,
+                  `段1 = 销售收入含税 ${fmt(revenueInclTotal)} × 贴现年利率(discount_rate_pinggang) ${fmt(pDiscountRate)}% × 贴现天数-萍钢(discount_days_pinggang) ${fmt(pDiscountDays, 0)} ÷ 360 = ${fmt(subitems.discountTranche1)} 元`,
                   `段2 = 销售收入含税 ${fmt(revenueInclTotal)} × 反贴现息年利率(reverse_discount_annual_rate) ${fmt(pReverseRate)}% × 占用天数(reverse_discount_occupancy_days) ${fmt(pReverseDays, 0)} ÷ 360 = ${fmt(subitems.discountTranche2)} 元`,
                   `贴现费用 = 段1 + 段2 = ${fmt(subitems.discountCost)} 元`,
                 ]

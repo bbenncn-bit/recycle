@@ -336,7 +336,7 @@ export default function ProfitOperationsPage() {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">材料成本缓存</h3>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               使用 TypeScript LIFO 写入 MaterialCostCache。利润分析页<strong>优先读缓存</strong>，但<strong>自动忽略</strong>
-              2026-08-11 之前的旧缓存（多为旧 SP 虚高成本，曾导致 4/5 月吨钢毛利异常）。未命中会实时 LIFO 并回写。加工录入会作废相关成品缓存。大批量导入后请对本区间执行刷新预热。请勿执行旧版{' '}
+              2026-08-11 之前的旧缓存（多为旧 SP 虚高成本，曾导致 4/5 月吨钢毛利异常）。未命中会实时 LIFO 并回写。加工录入与运维删单回滚都会作废相关成品缓存；若刚批量删/改加工单后材料成本未变，对本区间点下方「刷新材料成本缓存」即可立即生效，无需等明天。请勿执行旧版{' '}
               <code className="rounded bg-black/5 px-1 dark:bg-white/10">CALL sp_update_material_cost_cache</code>
               。
             </p>

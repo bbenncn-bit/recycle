@@ -6,8 +6,8 @@ import Footer from 'src/components/footer';
 import { ThemeProvider } from 'src/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: '萍乡再生资源交易中心',
-  description: '变废为宝 - 萍乡再生资源交易中心',
+  title: '萍乡智慧业财系统',
+  description: '变废为宝 - 萍乡智慧业财系统',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },

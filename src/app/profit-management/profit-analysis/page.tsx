@@ -1633,7 +1633,7 @@ export default function ProfitAnalysis() {
                         {s.customer === '萍钢' ? (
                           <>
                             <div>
-                              段1 = 收入含税×{pctBracket('萍钢贴现率', snap?.discountRatePinggang ?? 0)}×{paramBracket('萍钢贴现天数', `${snap?.discountDaysPinggang ?? 0}天`)}÷360
+                              段1 = 收入含税×{pctBracket('萍钢贴现率', snap?.discountRatePinggang ?? 0)}×{paramBracket('贴现天数-萍钢', `${snap?.discountDaysPinggang ?? 0}天`)}÷360
                             </div>
                             <div>
                               段2 = 收入含税×{pctBracket('反向贴现年利率', snap?.reverseDiscountAnnualRate ?? 0)}×{paramBracket('反向贴现占用天数', `${snap?.reverseDiscountOccupancyDays ?? 0}天`)}÷360
