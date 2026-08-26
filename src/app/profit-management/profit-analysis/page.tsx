@@ -185,6 +185,7 @@ interface ProfitAnalysisData {
       quantity: number;
       unitCost: number;
       totalCost: number;
+      materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
     }>;
   }>;
   productComparison: {
@@ -1048,6 +1049,50 @@ export default function ProfitAnalysis() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">销售明细利润分析</h2>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={async () => {
+              if (!data?.salesDetails?.length || currentMonthDetails.length === 0) {
+                window.alert('暂无数据可导出');
+                return;
+              }
+              if (data.provisional) {
+                window.alert('精确数据计算中，请稍后再导出');
+                return;
+              }
+              try {
+                const { downloadProfitMaterialCostTraceExcel } = await import(
+                  '@/lib/profit-analysis-material-cost-trace-excel'
+                );
+                const includeMonthColumn = salesDetailMonth === '';
+                const filenameBase = includeMonthColumn
+                  ? '利润分析-材料成本跟踪-全部'
+                  : `利润分析-材料成本跟踪-${salesDetailMonth}`;
+                const reportTitle = salesDetailMonth
+                  ? (() => {
+                      const [y, m] = salesDetailMonth.split('-');
+                      return `${y}年${parseInt(m, 10)}月材料成本 LIFO 跟踪表`;
+                    })()
+                  : '材料成本 LIFO 跟踪表（全部月份）';
+                await downloadProfitMaterialCostTraceExcel(currentMonthDetails, {
+                  filenameBase,
+                  includeMonthColumn,
+                  reportTitle,
+                });
+              } catch (e) {
+                console.error(e);
+                window.alert(
+                  e instanceof Error ? e.message : '材料成本跟踪表导出失败，请稍后再试'
+                );
+              }
+            }}
+            disabled={!data?.salesDetails?.length || currentMonthDetails.length === 0 || !!data?.provisional}
+            className="inline-flex items-center justify-center rounded-md border border-teal-600 bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-teal-500 dark:bg-teal-600 dark:hover:bg-teal-500"
+            title="按当前月份导出每张结算单的材料成本 LIFO 构成：加工单 → 毛料吨数/单价/成本；毛料合计应等于页面材料成本。"
+          >
+            导出材料成本跟踪表
+          </button>
           <button
             type="button"
             onClick={async () => {
@@ -1082,11 +1127,12 @@ export default function ProfitAnalysis() {
               }
             }}
             disabled={!data?.salesDetails?.length || currentMonthDetails.length === 0 || !!data?.provisional}
-            className="shrink-0 inline-flex items-center justify-center rounded-md border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-green-500 dark:bg-green-600 dark:hover:bg-green-500"
+            className="inline-flex items-center justify-center rounded-md border border-green-600 bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-green-500 dark:bg-green-600 dark:hover:bg-green-500"
             title="按当前月份筛选导出该月全部明细；选「全部」时导出所有月份并增加「月份」列。表格下方附公式说明。"
           >
             导出 Excel
           </button>
+          </div>
         </div>
 
           {/* 月份导航（根据 delivery_date 自动累加） */}

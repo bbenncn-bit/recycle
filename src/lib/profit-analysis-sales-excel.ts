@@ -18,7 +18,15 @@ export type ProfitSalesDetailExcelRow = {
   materialCost: number;
   processingCost: number;
   otherCosts: number;
+  /** 其它成本分解 */
+  transportCost: number;
+  taxCost: number;
+  discountCost: number;
+  interestCost: number;
   otherIncome: number;
+  /** 其它收入分解 */
+  immediateRefund: number;
+  governmentSupport: number;
   profit: number;
   profitPerNetTon: number;
 };
@@ -29,8 +37,10 @@ const FORMULA_NOTES: string[] = [
   '· 净重(吨)：DeliverySettlement.net_weight。',
   '· 磅差(吨)：DeliverySettlement.transitloss 参与后台材料核算量；当前导出表不单独列出该列。',
   '· 材料成本(元)：按材料核算量做 LIFO，匹配投产记录与材料单价后汇总。',
-  '· 其它成本项(元)：运输费(运价÷路损×净重)+税费+贴现(萍钢两段)+回款利息；口径见 ProfitParamConfig。',
-  '· 其它收入项(元)：即征即退 + 政府扶持（详见页面 ℹ️）。',
+  '· 其它成本项(元) = 运输费 + 税费 + 贴现费用 + 回款周期资金利息；口径见 ProfitParamConfig。',
+  '· 运输费 / 税费 / 贴现费用 / 回款周期资金利息：为其它成本项的分解细项（贴现费用仅萍钢）。',
+  '· 其它收入项(元) = 即征即退 + 政府扶持资金。',
+  '· 即征即退 / 政府扶持资金：为其它收入项的分解细项。',
   '· 利润(元)：销售收入÷1.13（不含税）− 材料成本 − 加工成本 − 其它成本项 + 其它收入项。',
   '· 吨钢毛利(元/吨)：利润(元) ÷ 净重(吨)；净重为 0 时导出为「—」。',
 ];
@@ -73,6 +83,18 @@ function fmtProfitPerTon(v: number, netWeight: number): string {
   return v.toFixed(2);
 }
 
+/** 1-based 列号 → Excel 列字母（支持 >26） */
+function colLetter(col: number): string {
+  let n = col;
+  let s = '';
+  while (n > 0) {
+    const r = (n - 1) % 26;
+    s = String.fromCharCode(65 + r) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+
 function applyTableBorderAndHeader(
   sheet: ExcelJS.Worksheet,
   fromRow: number,
@@ -104,6 +126,10 @@ function applyTableBorderAndHeader(
   }
 }
 
+function money(n: number | undefined | null): number {
+  return Number((n ?? 0).toFixed(2));
+}
+
 /**
  * 生成工作簿并触发浏览器下载
  */
@@ -133,8 +159,14 @@ export async function downloadProfitSalesDetailsExcel(
         '销售收入-含税(元)',
         '材料成本(元)',
         '加工成本(元)',
-        '其它成本项:运输费+税费+贴现+回款利息(元)',
-        '其它收入项:即征即退+政府扶持(元)',
+        '其它成本项(元)',
+        '运输费(元)',
+        '税费(元)',
+        '贴现费用(元)',
+        '回款周期资金利息(元)',
+        '其它收入项(元)',
+        '即征即退(元)',
+        '政府扶持资金(元)',
         '利润(元)',
         '吨钢毛利(元/吨)',
       ]
@@ -148,14 +180,20 @@ export async function downloadProfitSalesDetailsExcel(
         '销售收入-含税(元)',
         '材料成本(元)',
         '加工成本(元)',
-        '其它成本项:运输费+税费+贴现+回款利息(元)',
-        '其它收入项:即征即退+政府扶持(元)',
+        '其它成本项(元)',
+        '运输费(元)',
+        '税费(元)',
+        '贴现费用(元)',
+        '回款周期资金利息(元)',
+        '其它收入项(元)',
+        '即征即退(元)',
+        '政府扶持资金(元)',
         '利润(元)',
         '吨钢毛利(元/吨)',
       ];
 
   const colCount = headers.length;
-  const lastColLetter = String.fromCharCode(64 + colCount); // A=1 .. M=13, N=14
+  const lastColLetter = colLetter(colCount);
 
   ws.mergeCells(`A1:${lastColLetter}1`);
   ws.getCell('A1').value = options.reportTitle;
@@ -188,12 +226,18 @@ export async function downloadProfitSalesDetailsExcel(
       sale.customer,
       Number((sale.netWeight ?? 0).toFixed(2)),
       Number(sale.settlementQuantity.toFixed(2)),
-      Number(sale.revenue.toFixed(2)),
-      Number((sale.materialCost ?? 0).toFixed(2)),
-      Number(sale.processingCost.toFixed(2)),
-      Number((sale.otherCosts ?? 0).toFixed(2)),
-      Number((sale.otherIncome ?? 0).toFixed(2)),
-      Number(sale.profit.toFixed(2)),
+      money(sale.revenue),
+      money(sale.materialCost),
+      money(sale.processingCost),
+      money(sale.otherCosts),
+      money(sale.transportCost),
+      money(sale.taxCost),
+      money(sale.discountCost),
+      money(sale.interestCost),
+      money(sale.otherIncome),
+      money(sale.immediateRefund),
+      money(sale.governmentSupport),
+      money(sale.profit),
       ppn,
     ];
 
@@ -213,8 +257,8 @@ export async function downloadProfitSalesDetailsExcel(
   ws.views = [{ state: 'frozen', ySplit: headerRowIdx }];
 
   const colWidths = options.includeMonthColumn
-    ? [10, 14, 10, 18, 10, 10, 10, 14, 12, 12, 28, 26, 12, 14]
-    : [14, 10, 18, 10, 10, 10, 14, 12, 12, 28, 26, 12, 14];
+    ? [10, 14, 10, 18, 10, 10, 10, 14, 12, 12, 12, 12, 12, 12, 16, 12, 12, 14, 12, 14]
+    : [14, 10, 18, 10, 10, 10, 14, 12, 12, 12, 12, 12, 12, 16, 12, 12, 14, 12, 14];
   colWidths.forEach((w, i) => {
     ws.getColumn(i + 1).width = w;
   });

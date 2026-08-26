@@ -9,6 +9,7 @@ type Row = {
   materialFeed: string;
   dailyProcessQty: number;
   dailyProcessAmount: number;
+  materialCostTotal?: number;
 };
 
 function defaultMonth(): string {
@@ -107,7 +108,8 @@ export default function ProcessingCostInputQueryPanel() {
             加工明细查询（按月）
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 max-w-3xl">
-            数据来源 ProcessingCostInput。投料组成仅展示本单有投料量的毛料（对应 XXX_qty / XXX_price 列）。导出含成品、投料明细、录入人与时间。
+            数据来源 ProcessingCostInput。投料组成仅展示本单有投料量的毛料（对应 XXX_qty / XXX_price
+            列）。「投料总成本」= Σ(投料吨×单价)，与利润分析材料成本（LIFO）同一口径；列表不再展示成品库估价。导出含成品、投料明细与口径说明。
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -170,7 +172,7 @@ export default function ProcessingCostInputQueryPanel() {
                 成品吨数
               </th>
               <th className="px-2 py-2 text-right font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                成品金额
+                投料总成本
               </th>
             </tr>
           </thead>
@@ -197,7 +199,10 @@ export default function ProcessingCostInputQueryPanel() {
                     {r.dailyProcessQty.toFixed(3)}
                   </td>
                   <td className="px-2 py-2 text-right tabular-nums">
-                    {r.dailyProcessAmount.toFixed(2)}
+                    {((r.materialCostTotal ?? 0) > 0
+                      ? r.materialCostTotal!
+                      : r.dailyProcessAmount
+                    ).toFixed(2)}
                   </td>
                 </tr>
               ))

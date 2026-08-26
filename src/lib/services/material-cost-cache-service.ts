@@ -25,6 +25,13 @@ export type ProductionRecordItem = {
   quantity: number;
   unitCost: number;
   totalCost: number;
+  /** 本结算单分摊到的投料明细（旧缓存可能缺失） */
+  materials?: Array<{
+    material: string;
+    qty: number;
+    price: number;
+    cost: number;
+  }>;
 };
 
 /** 磅差：transitloss 列为吨数；列为空时材料核算回退扣杂率（率） */
@@ -88,6 +95,14 @@ function parseCacheProductionRecords(raw: unknown): ProductionRecordItem[] {
     quantity: Number(r.quantity ?? 0),
     unitCost: Number(r.unitCost ?? 0),
     totalCost: Number(r.totalCost ?? 0),
+    materials: Array.isArray(r.materials)
+      ? r.materials.map((m) => ({
+          material: String(m.material ?? ''),
+          qty: Number(m.qty ?? 0),
+          price: Number(m.price ?? 0),
+          cost: Number(m.cost ?? 0),
+        }))
+      : undefined,
   }));
 }
 

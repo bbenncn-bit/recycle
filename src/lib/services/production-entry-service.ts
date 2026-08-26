@@ -482,20 +482,6 @@ export async function getMaterialStorageForEntry(): Promise<
   return grouped;
 }
 
-async function getProductStockPrice(
-  productName: string,
-  warehouseCode: string | null
-): Promise<number | null> {
-  const pn = norm(productName);
-  if (!pn) return null;
-  const wh = norm(warehouseCode);
-  const row = await prisma.productStock.findFirst({
-    where: wh ? { productName: pn, warehouseCode: wh } : { productName: pn },
-    select: { currentPrice: true },
-  });
-  return row ? toNum(row.currentPrice) : null;
-}
-
 async function buildMaterialStoragePriceMap(): Promise<Record<string, number>> {
   const map: Record<string, number> = {};
   const rows = await prisma.materialStorage.findMany({
@@ -550,7 +536,6 @@ type ProcessingCostCreateData = Parameters<
 
 function buildPrismaCreateData(
   payload: InsertProcessingCostPayload,
-  productPrice: number | null,
   storagePriceMap: Record<string, number>,
   lifoPriceMap: Record<string, number>
 ): ProcessingCostCreateData {
@@ -626,23 +611,15 @@ function buildPrismaCreateData(
     }
   }
 
-  // 成品金额：优先 ProductStock.current_price；若未维护或为 0（常见于 JG散料/JGSL），
-  // 回退为投料成本合计（Σ 毛料吨数×单价），避免 dailyProcess_amount 落成 NULL/0。
-  const useProductPrice = productPrice != null && productPrice > 0;
-  const dailyProcessPrice = useProductPrice
-    ? productPrice
-    : productTons != null && productTons > 0 && materialCostSum > 0
+  // 成品金额/单价一律按投料成本（Σ 毛料吨数×单价）写入，与 LIFO 材料成本口径一致。
+  // 不再使用 ProductStock.current_price（那是成品库估价，会导致「成品金额≠投料总成本」）。
+  const dailyProcessPrice =
+    productTons != null && productTons > 0 && materialCostSum > 0
       ? materialCostSum / productTons
       : null;
 
   data.dailyProcessAmount =
-    productTons != null && productTons > 0
-      ? useProductPrice
-        ? productTons * productPrice!
-        : materialCostSum > 0
-          ? materialCostSum
-          : null
-      : null;
+    productTons != null && productTons > 0 && materialCostSum > 0 ? materialCostSum : null;
   data.dailyProcessPrice = dailyProcessPrice;
   data.materialWarehouses = JSON.stringify(materialWarehouses);
   data.materialComposition = payload.materialComposition;
@@ -677,15 +654,9 @@ export async function insertProcessingCost(
     return { success: false, error: '请至少选择一种毛料并填写用量' };
   }
 
-  const productPrice = await getProductStockPrice(productName, productWarehouse);
   const storagePriceMap = await buildMaterialStoragePriceMap();
   const lifoPriceMap = await buildLatestPurchasePriceMap(productionDate);
-  const createData = buildPrismaCreateData(
-    payload,
-    productPrice,
-    storagePriceMap,
-    lifoPriceMap
-  );
+  const createData = buildPrismaCreateData(payload, storagePriceMap, lifoPriceMap);
 
   const inserted = await prisma.processingCostInput.create({ data: createData });
   const insertedId = inserted.id;

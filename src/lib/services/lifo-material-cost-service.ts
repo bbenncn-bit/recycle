@@ -6,6 +6,37 @@ import {
 } from './lifo-match-resolve';
 import { parseWarehouseDate } from './profit-service';
 
+/** 单张加工单在本结算单上分摊到的毛料明细（吨/单价/成本按消耗比例） */
+export type LifoProductionMaterialLine = {
+  material: string;
+  qty: number;
+  price: number;
+  cost: number;
+};
+
+/** LIFO 消耗的加工单行（含投料明细，供材料成本跟踪导出） */
+export type LifoProductionRecord = {
+  id: number;
+  productionDate: string;
+  quantity: number;
+  unitCost: number;
+  totalCost: number;
+  materials: LifoProductionMaterialLine[];
+};
+
+function scaleMaterialsByRatio(
+  materials: Array<{ material: string; qty: number; price: number; cost: number }>,
+  ratio: number
+): LifoProductionMaterialLine[] {
+  if (!(ratio > 0) || materials.length === 0) return [];
+  return materials.map((m) => ({
+    material: m.material,
+    qty: m.qty * ratio,
+    price: m.price,
+    cost: m.cost * ratio,
+  }));
+}
+
 function getRecordField(record: Record<string, unknown>, canonical: string): unknown {
   if (canonical in record) return (record as any)[canonical];
   const lower = canonical.toLowerCase();
@@ -427,13 +458,7 @@ export async function calculateLIFOMaterialCost(
 ): Promise<{
   cost: number;
   composition: Array<{ material: string; tons: number }>;
-  productionRecords: Array<{
-    id: number;
-    productionDate: string;
-    quantity: number;
-    unitCost: number;
-    totalCost: number;
-  }>;
+  productionRecords: LifoProductionRecord[];
 }> {
   if (saleQuantity <= 0) {
     return { cost: 0, composition: [], productionRecords: [] };
@@ -611,16 +636,20 @@ export async function calculateLIFOMaterialCost(
         return {
           cost: totalCost,
           composition,
-          productionRecords: [
-            {
-              id: sameMonthRecords[0].id || 0,
-              productionDate:
-                sameMonthRecords[0].production_date || sameMonthRecords[0].productionDate || '',
-              quantity: saleQuantity,
+          productionRecords: sameMonthRecords.map((rec) => {
+            const p = calculateProductionMaterialCost(rec);
+            const share =
+              monthOutputQty > 0 ? (p.totalQty / monthOutputQty) * saleQuantity : 0;
+            const ratio = p.totalQty > 0 ? share / p.totalQty : 0;
+            return {
+              id: rec.id || 0,
+              productionDate: rec.production_date || rec.productionDate || '',
+              quantity: share,
               unitCost: avgUnitCost,
-              totalCost,
-            },
-          ],
+              totalCost: avgUnitCost * share,
+              materials: scaleMaterialsByRatio(p.materials, ratio),
+            };
+          }),
         };
       }
     }
@@ -633,13 +662,7 @@ export async function calculateLIFOMaterialCost(
 
     // LIFO 分配：从最新的生产记录开始消耗
     let remainingQuantity = saleQuantity;
-    const usedRecords: Array<{
-      id: number;
-      productionDate: string;
-      quantity: number;
-      unitCost: number;
-      totalCost: number;
-    }> = [];
+    const usedRecords: LifoProductionRecord[] = [];
     const materialComposition = new Map<string, number>(); // material -> total tons
 
     for (const record of validRecords) {
@@ -655,6 +678,7 @@ export async function calculateLIFOMaterialCost(
 
       const usedQty = Math.min(remainingQuantity, availableQty);
       const usedCost = prodCost.unitCost * usedQty;
+      const ratio = availableQty > 0 ? usedQty / availableQty : 0;
 
       if (lifoDebug) {
         console.log(
@@ -668,11 +692,11 @@ export async function calculateLIFOMaterialCost(
         quantity: usedQty,
         unitCost: prodCost.unitCost,
         totalCost: usedCost,
+        materials: scaleMaterialsByRatio(prodCost.materials, ratio),
       });
 
       // 按比例分配原材料用量
       if (availableQty > 0) {
-        const ratio = usedQty / availableQty;
         for (const mat of prodCost.materials) {
           const materialTons = mat.qty * ratio;
           materialComposition.set(
@@ -690,6 +714,7 @@ export async function calculateLIFOMaterialCost(
       const lastRecord = validRecords[validRecords.length - 1];
       const lastCost = calculateProductionMaterialCost(lastRecord);
       const estimatedCost = lastCost.unitCost * remainingQuantity;
+      const ratio = lastCost.totalQty > 0 ? remainingQuantity / lastCost.totalQty : 0;
       
       usedRecords.push({
         id: lastRecord.id || 0,
@@ -697,11 +722,11 @@ export async function calculateLIFOMaterialCost(
         quantity: remainingQuantity,
         unitCost: lastCost.unitCost,
         totalCost: estimatedCost,
+        materials: scaleMaterialsByRatio(lastCost.materials, ratio),
       });
 
       // 按比例分配原材料用量
       if (lastCost.totalQty > 0) {
-        const ratio = remainingQuantity / lastCost.totalQty;
         for (const mat of lastCost.materials) {
           const materialTons = mat.qty * ratio;
           materialComposition.set(
@@ -745,16 +770,23 @@ export async function calculateLIFOMaterialCost(
           return {
             cost: totalCost,
             composition,
-            productionRecords: [
-              {
-                id: sameMonthRecords[0].id || 0,
-                productionDate:
-                  sameMonthRecords[0].production_date || sameMonthRecords[0].productionDate || '',
-                quantity: saleQuantity,
-                unitCost: avgUnitCost,
-                totalCost,
-              },
-            ],
+            productionRecords: sameMonthRecords
+              .map((rec) => {
+                const p = calculateProductionMaterialCost(rec);
+                if (p.unitCost <= 0) return null;
+                const share =
+                  monthOutputQty > 0 ? (p.totalQty / monthOutputQty) * saleQuantity : 0;
+                const ratio = p.totalQty > 0 ? share / p.totalQty : 0;
+                return {
+                  id: rec.id || 0,
+                  productionDate: rec.production_date || rec.productionDate || '',
+                  quantity: share,
+                  unitCost: avgUnitCost,
+                  totalCost: avgUnitCost * share,
+                  materials: scaleMaterialsByRatio(p.materials, ratio),
+                } satisfies LifoProductionRecord;
+              })
+              .filter((r): r is LifoProductionRecord => r != null),
           };
         }
       }
@@ -781,4 +813,65 @@ export async function calculateLIFOMaterialCost(
     console.error('LIFO 材料成本计算失败:', error);
     return { cost: 0, composition: [], productionRecords: [] };
   }
+}
+
+/**
+ * 按加工单 id 批量读取投料成本快照（用于旧缓存缺少 materials 时补全跟踪表）。
+ */
+export async function loadProcessingOrderCostSnapshots(
+  ids: number[]
+): Promise<
+  Map<
+    number,
+    {
+      totalQty: number;
+      unitCost: number;
+      totalCost: number;
+      productionDate: string;
+      materials: LifoProductionMaterialLine[];
+    }
+  >
+> {
+  const unique = [...new Set(ids.map((n) => Math.floor(Number(n))).filter((n) => n > 0))];
+  const out = new Map<
+    number,
+    {
+      totalQty: number;
+      unitCost: number;
+      totalCost: number;
+      productionDate: string;
+      materials: LifoProductionMaterialLine[];
+    }
+  >();
+  if (unique.length === 0) return out;
+
+  try {
+    const placeholders = unique.map(() => '?').join(',');
+    const rows = await prisma.$queryRawUnsafe<Record<string, unknown>[]>(
+      `SELECT * FROM ProcessingCostInput WHERE id IN (${placeholders})`,
+      ...unique
+    );
+    for (const row of rows) {
+      const id = Number(row.id);
+      if (!id) continue;
+      const prod = calculateProductionMaterialCost(row);
+      out.set(id, {
+        totalQty: prod.totalQty,
+        unitCost: prod.unitCost,
+        totalCost: prod.totalCost,
+        productionDate: String(
+          getRecordField(row, 'production_date') ?? getRecordField(row, 'productionDate') ?? ''
+        ),
+        materials: prod.materials.map((m) => ({
+          material: m.material,
+          qty: m.qty,
+          price: m.price,
+          cost: m.cost,
+        })),
+      });
+    }
+  } catch (e) {
+    console.warn('loadProcessingOrderCostSnapshots failed:', e);
+  }
+  return out;
 }

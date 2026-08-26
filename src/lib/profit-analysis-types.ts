@@ -56,6 +56,7 @@ export interface ProfitSalesDetailRow {
     quantity: number;
     unitCost: number;
     totalCost: number;
+    materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
   }>;
 }
 

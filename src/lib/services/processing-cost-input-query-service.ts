@@ -191,9 +191,15 @@ export type ProcessingCostInputListItem = {
   productionDate: string;
   materialFeed: string;
   materialLines: MaterialFeedLine[];
+  /** 投料总成本 Σ(吨×单价)，利润分析 LIFO 材料成本依据 */
+  materialCostTotal: number;
   dailyProcessQty: number;
+  /** 材料单价：投料总成本/成品吨数（有投料时）；否则回退库内 dailyProcess_price */
   dailyProcessPrice: number | null;
+  /** 材料成本金额：优先投料总成本；无投料明细时回退库内 dailyProcess_amount */
   dailyProcessAmount: number;
+  /** 库内原始成品库估价金额（历史可能按 ProductStock 单价写入，仅对照用） */
+  stockValuationAmount: number;
   operator: string;
   createBy: string;
   openid: string;
@@ -222,9 +228,18 @@ function mapRowToListItem(row: Record<string, unknown>): ProcessingCostInputList
   const qty =
     toNum(getRowField(row, 'dailyProcess_qty', 'dailyProcessQty', 'product_tons', 'productTons')) ??
     0;
-  const amount = toNum(getRowField(row, 'dailyProcess_amount', 'dailyProcessAmount')) ?? 0;
-  const price = toNum(getRowField(row, 'dailyProcess_price', 'dailyProcessPrice'));
+  const stockValuationAmount =
+    toNum(getRowField(row, 'dailyProcess_amount', 'dailyProcessAmount')) ?? 0;
+  const stockPrice = toNum(getRowField(row, 'dailyProcess_price', 'dailyProcessPrice'));
   const materialLines = extractMaterialFeedLines(row);
+  const materialCostTotal = materialLines.reduce((s, l) => s + (l.amount ?? 0), 0);
+  const useFeed = materialCostTotal > 0;
+  const dailyProcessAmount = useFeed ? materialCostTotal : stockValuationAmount;
+  const dailyProcessPrice = useFeed
+    ? qty > 0
+      ? materialCostTotal / qty
+      : null
+    : stockPrice;
 
   return {
     id: Number(row.id),
@@ -234,9 +249,11 @@ function mapRowToListItem(row: Record<string, unknown>): ProcessingCostInputList
     productionDate: prodDate,
     materialFeed: formatMaterialFeedComposition(row),
     materialLines,
+    materialCostTotal,
     dailyProcessQty: qty,
-    dailyProcessPrice: price,
-    dailyProcessAmount: amount,
+    dailyProcessPrice,
+    dailyProcessAmount,
+    stockValuationAmount,
     operator: pickOperator(row),
     createBy: String(getRowField(row, 'createBy', 'create_by') ?? '').trim(),
     openid: String(getRowField(row, 'openid', 'cloudOpenid', '_openid') ?? '').trim(),
@@ -275,8 +292,8 @@ export async function exportProcessingCostInputByMonth(
     { header: '成品库区', key: 'productWarehouse', width: 12 },
     { header: '加工日期', key: 'productionDate', width: 18 },
     { header: '成品吨数', key: 'qty', width: 12 },
-    { header: '成品单价(元/吨)', key: 'price', width: 14 },
-    { header: '成品金额(元)', key: 'amount', width: 14 },
+    { header: '材料单价(元/吨)', key: 'price', width: 14 },
+    { header: '成品金额=投料总成本(元)', key: 'amount', width: 22 },
     { header: '投料组成', key: 'feed', width: 48 },
     { header: '投料总成本(元)', key: 'materialCost', width: 14 },
     { header: '录入人', key: 'operator', width: 14 },
@@ -293,7 +310,7 @@ export async function exportProcessingCostInputByMonth(
   };
 
   for (const r of rows) {
-    const materialCost = r.materialLines.reduce((s, l) => s + (l.amount ?? 0), 0);
+    const materialCost = r.materialCostTotal;
     sheetOrders.addRow({
       id: r.id,
       productName: r.productName,
@@ -371,6 +388,21 @@ export async function exportProcessingCostInputByMonth(
       });
     }
   }
+
+  const sheetNote = wb.addWorksheet('口径说明');
+  sheetNote.getColumn(1).width = 100;
+  const notes = [
+    '【加工明细口径】',
+    '· 投料总成本(元) = Σ(各毛料投料吨数 × 采购/库存单价)，来自 ProcessingCostInput 投料列或 material_composition。',
+    '· 成品金额 = 投料总成本；材料单价 = 投料总成本 ÷ 成品吨数。二者应相等（同一投料成本）。',
+    '· 历史库内 dailyProcess_amount 曾按 ProductStock.current_price×产量写入（成品库估价），与投料成本不同；导出/列表已改按投料成本展示。',
+    '· 利润分析「销售明细 → 材料成本」按 LIFO 消耗加工批次：批次单位材料成本 = 该单投料总成本 ÷ 成品吨数，再 × 销售匹配吨数。不使用成品库估价。',
+  ];
+  notes.forEach((line, i) => {
+    const cell = sheetNote.getCell(i + 1, 1);
+    cell.value = line;
+    cell.font = { name: 'Microsoft YaHei', size: 10 };
+  });
 
   const buffer = Buffer.from(await wb.xlsx.writeBuffer());
   const filename = `加工明细_${monthCn}.xlsx`;

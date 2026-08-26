@@ -109,12 +109,13 @@ export interface ProfitAnalysisData {
       quantity: number;
       cost: number;
     }>;
-    productionRecords?: Array<{    // LIFO 使用的生产记录（用于 tooltip 显示）
+    productionRecords?: Array<{    // LIFO 使用的生产记录（用于 tooltip / 材料成本跟踪导出）
       id: number;
       productionDate: string;
       quantity: number;
       unitCost: number;
       totalCost: number;
+      materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
     }>;
   }>;
   productComparison: {              // 当月与上月对比（按客户-成品）
@@ -339,6 +340,7 @@ async function calculateMaterialCost(
           quantity: number;
           unitCost: number;
           totalCost: number;
+          materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
         }>;
         settlementQuantity: number | null;
       }
@@ -355,6 +357,7 @@ async function calculateMaterialCost(
     quantity: number;
     unitCost: number;
     totalCost: number;
+    materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
   }>;
   fromCache?: boolean;
 }> {
@@ -1056,6 +1059,7 @@ export async function getProfitAnalysisData(
             quantity: number;
             unitCost: number;
             totalCost: number;
+            materials?: Array<{ material: string; qty: number; price: number; cost: number }>;
           }> = [];
 
           try {
