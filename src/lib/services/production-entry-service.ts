@@ -706,10 +706,8 @@ export async function insertProcessingCost(
     | undefined;
 
   if (productTons != null && productTons > 0) {
-    const unitPrice =
-      toNum(inserted.dailyProcessPrice) != null
-        ? toNum(inserted.dailyProcessPrice)
-        : productPrice;
+    // 成品入库默认单价取本单材料单价（投料总成本/产量）；已写入 dailyProcess_price
+    const unitPrice = toNum(inserted.dailyProcessPrice);
     const incRes = await incrementProductStockForProcessingInsert(
       productName,
       productWarehouse,
