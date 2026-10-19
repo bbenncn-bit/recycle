@@ -9,11 +9,12 @@
   },
   "scripts": {
     "dev": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack -H 0.0.0.0",
+    "postinstall": "prisma generate",
     "dev:turbopack": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev --turbopack -H 0.0.0.0",
     "dev:webpack": "node -r ./scripts/patch-localstorage.js ./node_modules/next/dist/bin/next dev -H 0.0.0.0",
     "dev:clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\" && npm run dev",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "postbuild": "node scripts/copy-standalone-static.js",
     "build:clean": "npm run clean && npm run build",
     "build:production": "cross-env NODE_ENV=production next build",
